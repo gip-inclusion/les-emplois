@@ -57,6 +57,11 @@ urlpatterns = [
         name="pro_support_report",
     ),
     path(
+        "pro-support-report/<uuid:public_id>/introduction",
+        views.send_pro_support_report_introduction,
+        name="send_pro_support_report_introduction",
+    ),
+    path(
         "<uuid:public_id>/assignments/<int:assignment_pk>/edit",
         views.create_or_edit_assignment,
         name="edit_assignment",

@@ -15,6 +15,7 @@ from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Cast, Coalesce, Greatest
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from itou.common_apps.address.models import AddressMixin, AddressQuerySet
 from itou.common_apps.organizations.models import (
@@ -1382,6 +1383,16 @@ class ProSupportReport(models.Model):
         blank=True,
         default="",
     )
+    introduction_email_sent_at = models.DateTimeField(
+        verbose_name="date de l’e-mail de mise en relation", null=True, blank=True
+    )
+    introduction_email_recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="destinataire de l’e-mail de mise en relation",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     objects = ProSupportReportQuerySet.as_manager()
 
@@ -1410,6 +1421,10 @@ class ProSupportReport(models.Model):
     def __str__(self):
         return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
 
+    @cached_property
+    def author_has_left(self):
+        return self.company_id is not None and not self.company.has_member(self.author)
+
     def get_job_seeker_prescriber_assignment_to_notify(self):
         """The assignment of the authorized prescriber suggested to the employer to receive the report, if any."""
         from itou.users.models import JobSeekerAssignment
@@ -1428,6 +1443,38 @@ class ProSupportReport(models.Model):
             update_fields=["notified_prescriber", "notified_prescriber_organization", "notified_prescriber_source"]
         )
         ProSupportReportCreatedNotification(prescriber, organization, report=self).send()
+
+    def get_company_contact(self):
+        if self.company_id is None:
+            return None
+        if self.author_has_left:
+            # The admin most likely to read the e-mail takes the place of the author who left.
+            return self.company.active_admin_members.order_by(F("last_login").desc(nulls_last=True)).first()
+        return self.author
+
+    def get_introduction_contact(self):
+        if self.introduction_email_sent_at:
+            # The person who received the email, even if someone else would be chosen today.
+            return self.introduction_email_recipient
+        return self.get_company_contact()
+
+    def introduction_email(self, contact, prescriber, prescriber_organization):
+        to = [contact.email]
+        cc = [prescriber.email]
+        context = {
+            "report": self,
+            "contact": contact,
+            "prescriber": prescriber,
+            "prescriber_organization": prescriber_organization,
+            "report_url": get_absolute_url(
+                reverse("job_seekers_views:pro_support_report", kwargs={"public_id": self.public_id})
+            ),
+        }
+        subject = "companies/email/pro_support_report_introduction_subject.txt"
+        body = "companies/email/pro_support_report_introduction_body.md"
+        # The contact replies to the prescriber, not to the sender address of the platform.
+        # A single address: Mailjet and Brevo do not support several.
+        return get_email_message(to, context, subject, body, cc=cc, reply_to=cc)
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]

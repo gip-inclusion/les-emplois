@@ -1,0 +1,17 @@
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="message-modal-{{ forloop.counter }}-label">
+                <i class="ri-checkbox-circle-fill text-success me-1" aria-hidden="true"></i>{{ message }}
+            </h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+            <p>Si vous le souhaitez, vous pouvez contacter {{ introduction_contact.get_full_name }}{% if introduction_contact != report.author %}, qui administre le compte de la structure,{% endif %} dès maintenant :</p>
+            {% include "job_seekers_views/includes/pro_support_report_introduction_contact.html" with contact=introduction_contact company=report.company in_modal=True only %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+    </div>
+</div>
