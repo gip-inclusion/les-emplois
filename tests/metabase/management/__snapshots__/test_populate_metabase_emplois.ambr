@@ -10283,7 +10283,7 @@
 # ---
 # name: test_populate_pro_support_reports
   dict({
-    'num_queries': 32,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -10327,7 +10327,9 @@
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_bilans_accompagnement_v0" ("id" integer,"uid" UUID,
                                                                                           "date_de_création" timestamp WITH TIME ZONE,
-                                                                                                                                 "id_candidat" integer,"id_structure" integer,"id_auteur" integer,"id_prescripteur_prévenu" integer,"id_organisation_prévenue" integer,"origine_destinataire" varchar,"id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
+                                                                                                                                 "id_candidat" integer,"id_structure" integer,"id_auteur" integer,"id_prescripteur_prévenu" integer,"id_organisation_prévenue" integer,"origine_destinataire" varchar,"date_première_lecture" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                                                                  "date_mise_en_relation" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                                                                                                              "id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -10437,6 +10439,30 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."origine_destinataire" IS \'Origine du prescripteur prévenu, vide si aucun prescripteur n’a été prévenu ou si le bilan est antérieur à l’ajout de cette colonne\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_pro_support_reports[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."date_première_lecture" IS \'Date à laquelle le prescripteur prévenu a ouvert le bilan pour la première fois, vide sinon\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_pro_support_reports[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."date_mise_en_relation" IS \'Date à laquelle un prescripteur a envoyé l’e-mail de mise en relation avec la structure, vide si aucun e-mail n’a été envoyé\'',
       }),
       dict({
         'origin': list([
@@ -10661,6 +10687,8 @@
                                                  "id_prescripteur_prévenu",
                                                  "id_organisation_prévenue",
                                                  "origine_destinataire",
+                                                 "date_première_lecture",
+                                                 "date_mise_en_relation",
                                                  "id_contrat_asp",
                                                  "date_fin_contrat",
                                                  "frein_santé",
