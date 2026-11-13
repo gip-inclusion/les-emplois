@@ -452,19 +452,6 @@ class JobApplicationQuerySet(models.QuerySet):
             appointment__start_at__gt=timezone.now(),
         )
 
-    def with_next_appointment_start_at(self):
-        """
-        Gives the next pending RDVI appointment datetime for this job seeker and this SIAE
-        """
-        return self.annotate(
-            next_appointment_start_at=Subquery(
-                self._get_participations_subquery()
-                .order_by("appointment__start_at")
-                .values("appointment__start_at")[:1],
-                output_field=models.DateTimeField(),
-            )
-        )
-
     def with_upcoming_participations_count(self):
         """
         Gives the total count of pending RDVI appointments for this job seeker and this SIAE
