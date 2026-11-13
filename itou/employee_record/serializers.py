@@ -14,7 +14,7 @@ from itou.asp.models import (
 from itou.asp.typing import CodeComInsee
 from itou.asp.utils import asp_birth_place
 from itou.employee_record.enums import MovementType
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
@@ -347,90 +347,6 @@ class EmployeeRecordSerializer(serializers.Serializer):
         return serializer_class(obj).data
 
 
-class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
-    numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
-    typeMouvement = serializers.ReadOnlyField(default=MovementType.MODIFICATION)  # Required
-    mesure = serializers.CharField(source="employee_record.asp_measure")  # Required
-    siret = serializers.SerializerMethodField()  # Required
-
-    personnePhysique = serializers.SerializerMethodField()  # Required
-    adresse = serializers.SerializerMethodField()  # Required
-    situationSalarie = serializers.SerializerMethodField()  # Required
-
-    # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
-    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
-
-    def get_siret(self, obj: EmployeeRecordUpdateNotification):
-        """We don't trust the SIRET we have in the ER:
-
-        - siret_from_asp_source and obj.siret can be equal, so this
-          does not change anything.
-        - siret_from_asp_source and obj.siret can differ in which case:
-            The ER have an old SIRET, the ASP have a new SIRET: using
-            siret_from_asp_source fix the situation as we're giving the
-            SIRET expected by the ASP.
-
-        Giving the old SIRET leads the ASP to refuse the update (Error
-        3435).
-
-        This probably just bypasses a filter ASP side: the goal of a
-        Notification is just to update the end date of a pass linked
-        to an existing ER.
-
-        """
-        return obj.employee_record.job_application.to_company.siret_from_asp_source()
-
-    def get_personnePhysique(self, obj: EmployeeRecordUpdateNotification):
-        is_missing_required_fields = not all(
-            [
-                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
-                for field in {"birth_country"}
-            ]
-        )
-        # Also check if a NIR/NTT is missing
-        if is_missing_required_fields or (
-            is_ntt_required(obj.employee_record.job_application.job_seeker.jobseeker_profile.nir)
-            and not obj.employee_record.ntt
-        ):
-            return _StaticPersonSerializer(obj.employee_record).data
-        return _PersonSerializer(obj.employee_record).data
-
-    def get_adresse(self, obj: EmployeeRecordUpdateNotification):
-        is_missing_required_fields = not all(
-            [
-                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
-                for field in {"hexa_lane_type", "hexa_lane_name", "hexa_post_code", "hexa_commune"}
-            ]
-        )
-        if is_missing_required_fields:
-            return _StaticAddressSerializer(obj.employee_record.job_application.job_seeker).data
-        return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
-
-    def get_situationSalarie(self, obj: EmployeeRecordUpdateNotification):
-        is_eiti = obj.employee_record.asp_measure == SiaeMeasure.EITI
-
-        required_fields = {"education_level"}
-        if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_id:
-            required_fields.add("pole_emploi_since")
-        if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_since:
-            required_fields.add("pole_emploi_id")
-        if is_eiti:
-            required_fields.update({"mean_monthly_income_before_process", "actor_met_for_business_creation"})
-        is_missing_required_fields = not all(
-            [
-                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
-                for field in required_fields
-            ]
-        )
-
-        if is_missing_required_fields:
-            serializer_class = _StaticSituationForEITISerializer if is_eiti else _StaticSituationSerializer
-        else:
-            serializer_class = _SituationForEITISerializer if is_eiti else _SituationSerializer
-        return serializer_class(obj.employee_record).data
-
-
 class EmployeeRecordForUpdateSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
     typeMouvement = serializers.CharField(default=MovementType.MODIFICATION)  # Required
@@ -512,10 +428,6 @@ class EmployeeRecordBatchSerializer(serializers.Serializer):
     msgInformatif = serializers.CharField(source="message", allow_blank=True, allow_null=True)  # Optional
     telId = serializers.CharField(source="id", allow_blank=True, allow_null=True)  # Optional
     lignesTelechargement = EmployeeRecordSerializer(many=True, source="elements")  # Required
-
-
-class EmployeeRecordUpdateNotificationBatchSerializer(EmployeeRecordBatchSerializer):
-    lignesTelechargement = EmployeeRecordUpdateNotificationSerializer(many=True, source="elements")  # Required
 
 
 class EmployeeRecordForUpdateBatchSerializer(EmployeeRecordBatchSerializer):
