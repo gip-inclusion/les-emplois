@@ -4,6 +4,7 @@ from django.db import migrations
 
 from itou.asp.constants import IGNORED_COMMUNES_TARGET_CODES
 from itou.asp.utils import migrate_commune
+from itou.utils.triggers.migration import TriggerContextMigration
 
 
 def forward(apps, editor):
@@ -16,7 +17,7 @@ def forward(apps, editor):
             )
 
 
-class Migration(migrations.Migration):
+class Migration(TriggerContextMigration):
     dependencies = [
         ("asp", "0002_update_pierrefite-sur-seine"),
     ]
