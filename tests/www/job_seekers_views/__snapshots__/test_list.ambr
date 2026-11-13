@@ -4857,8 +4857,22 @@
                    44,
                    45,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
-                   "users_user"."id" DESC
+          ORDER BY
+            (SELECT V0."public_id" AS "public_id"
+             FROM "companies_prosupportreport" V0
+             INNER JOIN "companies_contract" V1 ON (V0."contract_id" = V1."id")
+             WHERE (V0."contract_id" =
+                      (SELECT U0."id" AS "pk"
+                       FROM "companies_contract" U0
+                       WHERE (U0."job_seeker_id" = ("users_user"."id")
+                              AND U0."company_id" = %s)
+                       ORDER BY U0."start_date" DESC,
+                                1 DESC
+                       LIMIT 1)
+                    AND V0."contract_end_date" >= (V1."end_date"))
+             ORDER BY V0."contract_end_date" DESC
+             LIMIT 1) IS NULL DESC, 43 DESC,
+                                    "users_user"."id" DESC
           LIMIT 1
         ''',
       }),
