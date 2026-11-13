@@ -22,6 +22,7 @@
                         {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.FULL_NAME_ASC name="Nom Prénom" only %}
                         {% if request.from_iae_actor %}<th scope="col">Situation IAE</th>{% endif %}
                         {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.LAST_ACTION_AT_ASC name="Dernière action" only %}
+                        {% if show_pro_support_report_status %}<th scope="col">Bilan d’accompagnement</th>{% endif %}
                         {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nbr de candidatures" only %}
                         {% include "common/tables/th_with_sort.html" with order=order ascending_value=order.ADVISORS_NB_ASC name="Nbr d’accompagnateurs" only %}
                         <th scope="col">Dernier accompagnateur connu</th>
@@ -66,6 +67,15 @@
                                 </td>
                             {% endif %}
                             <td>{{ job_seeker.last_action_at|date:"d/m/Y" }}</td>
+                            {% if show_pro_support_report_status %}
+                                <td>
+                                    {% if job_seeker.show_pro_support_report %}
+                                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success">Bilan rempli</span>
+                                    {% else %}
+                                        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">Bilan à remplir</span>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.active_advisors_nb }}</td>
                             <td>{{ job_seeker.last_assignment.advisor.get_inverted_full_name|default:"Non précisé" }} ({{ job_seeker.last_assignment.organization.display_name|default:"Non précisé" }})</td>
@@ -103,6 +113,10 @@
                                                 <a href="{% url 'job_seekers_views:create_pro_support_report' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                                    class="dropdown-item"
                                                    {% matomo_event "employeurs" "clic" "remplir-bilan-liste" %}>Remplir le bilan</a>
+                                            {% elif job_seeker.show_pro_support_report %}
+                                                <a href="{% url 'job_seekers_views:pro_support_report' public_id=job_seeker.last_contract_pro_support_report_public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="dropdown-item"
+                                                   {% matomo_event "employeurs" "clic" "voir-bilan-liste" %}>Voir le bilan</a>
                                             {% endif %}
                                             {% if request.current_organization.is_authorized %}
                                                 {% if not job_seeker.has_valid_approval %}
