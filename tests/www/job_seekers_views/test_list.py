@@ -1270,7 +1270,7 @@ def test_end_of_iae_journey_filter_for_siae(client):
 
 
 @freeze_time("2026-01-15")
-def test_filtered_by_end_of_journey_for_siae(client):
+def test_filtered_by_end_of_journey_for_siae(client, snapshot):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     company = membership.company
     employer = membership.user
@@ -1297,7 +1297,8 @@ def test_filtered_by_end_of_journey_for_siae(client):
     ).user
     JobSeekerAssignmentFactory(job_seeker=job_seeker_with_contract_elsewhere, professional=employer, company=company)
 
-    response = client.get(url, {"end_of_journey": "on"})
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(url, {"end_of_journey": "on"})
     assert response.context["page_obj"].object_list == [job_seeker_with_ended_contract]
 
 
