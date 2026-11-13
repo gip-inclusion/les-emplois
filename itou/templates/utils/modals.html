@@ -13,6 +13,8 @@
                 {% include "utils/modal_includes/registration_failure.html" %}
             {% elif "login_failure" in message.extra_tags %}
                 {% include "utils/modal_includes/login_failure.html" %}
+            {% elif "pro_support_report_introduction" in message.extra_tags %}
+                {% include "utils/modal_includes/pro_support_report_introduction_sent.html" %}
             {% endif %}
         </div>
 

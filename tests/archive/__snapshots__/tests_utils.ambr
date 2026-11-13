@@ -92,6 +92,11 @@
       'model': 'companies.ProSupportReport',
     }),
     dict({
+      'field': 'introduction_email_recipient',
+      'hidden': True,
+      'model': 'companies.ProSupportReport',
+    }),
+    dict({
       'field': 'notified_prescriber',
       'hidden': True,
       'model': 'companies.ProSupportReport',
