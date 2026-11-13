@@ -1,4 +1,5 @@
 import datetime
+from functools import partial
 
 from django.core import management
 from django.utils import timezone
@@ -8,10 +9,12 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, JobSource
 from itou.companies.models import Company, JobDescription
+from tests.approvals.factories import ApprovalFactory
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 from tests.utils.testing import remove_greetings
 
 
@@ -230,3 +233,71 @@ def test_deactivate_spontaneous_jobapps_batch_size(mocker, caplog, settings):
     management.call_command("deactivate_spontaneous_jobapps")
     assert Company.objects.filter(spontaneous_applications_open_since__isnull=False).count() == 1
     assert [record.message for record in caplog.records if record.levelname == "ERROR"] == []
+
+
+@freeze_time("2026-11-10")
+def test_send_end_of_contract_monthly_recaps(
+    snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog, settings
+):
+    settings.TALLY_URL = "https://tally.so"
+    company = companies_factories.CompanyFactory(for_snapshot=True)
+    admin = companies_factories.CompanyMembershipFactory(
+        company=company, is_admin=True, user__first_name="camille"
+    ).user
+    advisor = companies_factories.CompanyMembershipFactory(company=company, is_admin=False).user
+    make_contract = partial(companies_factories.ContractFactory, company=company)
+
+    make_contract(
+        job_seeker=ApprovalFactory(
+            user__first_name="Jeanne", user__last_name="Martin", user__public_id="1b4e28ba-2fa1-41d2-883f-0016d3cca427"
+        ).user,
+        end_date=datetime.date(2026, 10, 20),
+    )
+    # Ended before the recap is sent.
+    make_contract(
+        job_seeker=ApprovalFactory(
+            user__first_name="Lina", user__last_name="Morel", user__public_id="4f0d6c2a-8e3b-4b7a-9d15-2c6e8a1f3b07"
+        ).user,
+        end_date=datetime.date(2026, 11, 5),
+    )
+    make_contract(
+        job_seeker=JobSeekerFactory(
+            first_name="Paul", last_name="Durand", public_id="9c7f2a3e-5b1d-4e8f-a2c6-7d4b3e1f0a9c"
+        ),
+        end_date=datetime.date(2026, 11, 25),
+    )
+    contract_followed_by_advisor = make_contract(end_date=datetime.date(2026, 11, 15))
+    JobSeekerAssignmentFactory(
+        job_seeker=contract_followed_by_advisor.job_seeker, company=company, professional=advisor
+    )
+    company_in_grace_period_contract = companies_factories.ContractFactory(
+        company__convention__pending_grace_period=True, end_date=datetime.date(2026, 11, 30)
+    )
+    company_in_grace_period_admin = companies_factories.CompanyMembershipFactory(
+        company=company_in_grace_period_contract.company, is_admin=True
+    ).user
+    # Not in the recaps.
+    companies_factories.ContractFactory(end_date=datetime.date(2026, 11, 30))  # Nobody to write to in the company.
+    companies_factories.ProSupportReportFactory(contract=make_contract(end_date=datetime.date(2026, 11, 20)))
+    make_contract(end_date=datetime.date(2026, 12, 1))
+    inactive_company_contract = companies_factories.ContractFactory(
+        company__convention__after_grace_period=True, end_date=datetime.date(2026, 11, 30)
+    )
+    companies_factories.CompanyMembershipFactory(company=inactive_company_contract.company, is_admin=True)
+
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        with django_capture_on_commit_callbacks(execute=True):
+            management.call_command("send_end_of_contract_monthly_recaps", wet_run=True)
+
+    assert caplog.messages[:-1] == [
+        "Contracts without anyone to write to: 1",
+        "Sending 3 end of contract monthly recaps",
+    ]
+    assert sorted(mail.to[0] for mail in mailoutbox) == sorted(
+        [admin.email, advisor.email, company_in_grace_period_admin.email]
+    )
+    mail = next(mail for mail in mailoutbox if mail.to == [admin.email])
+    assert mail.subject == snapshot(name="email subject")
+    assert mail.body.startswith("Bonjour Camille,\n")
+    assert remove_greetings(mail.body) == snapshot(name="email body")
+    assert '<a href="https://tally.so/r/kdDjod?mail=1&amp;role=siae">' in mail.alternatives[0][0]
