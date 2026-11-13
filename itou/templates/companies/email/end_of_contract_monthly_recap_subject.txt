@@ -1,0 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load str_filters %}
+{% block subject %}
+Vous avez {{ contracts|length }} salarié{{ contracts|length|pluralizefr }} en fin de contrat au sein de {{ structure.display_name }}
+{% endblock %}
