@@ -67,10 +67,18 @@ def organizations_list(request):
     raise PermissionDenied
 
 
-class AuthorizationListView(prescribers_views.AuthorizationListView):
+class BaseAuthorizationMixin(prescribers_views.BaseAuthorizationMixin):
     def get_filters(self):
         if self.request.from_institution and self.request.current_organization.kind == InstitutionKind.DDETS_IAE:
             return Q(
                 department=self.request.current_organization.department,
                 kind=PrescriberOrganizationKind.OHPD,
             )
+
+
+class AuthorizationListView(BaseAuthorizationMixin, prescribers_views.AuthorizationListView):
+    pass
+
+
+class AuthorizationDetailsView(BaseAuthorizationMixin, prescribers_views.AuthorizationDetailsView):
+    pass

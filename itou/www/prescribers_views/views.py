@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -113,13 +113,7 @@ def update_admin_role(request, action, public_id, template_name="prescribers/upd
     )
 
 
-class AuthorizationListView(UserPassesTestMixin, ListView):
-    template_name = "prescribers/authorizations_list.html"
-    paginate_by = settings.PAGE_SIZE_DEFAULT
-    paginator_class = ItouPaginator
-    model = PrescriberOrganization
-    ordering = ("authorization_status", "name")
-
+class BaseAuthorizationMixin(UserPassesTestMixin):
     def get_filters(self):
         if (
             self.request.from_prescriber
@@ -134,7 +128,30 @@ class AuthorizationListView(UserPassesTestMixin, ListView):
     def test_func(self):
         return self.get_filters() is not None
 
+
+class AuthorizationListView(BaseAuthorizationMixin, ListView):
+    template_name = "prescribers/authorizations_list.html"
+    paginate_by = settings.PAGE_SIZE_DEFAULT
+    paginator_class = ItouPaginator
+    model = PrescriberOrganization
+    ordering = ("authorization_status", "name")
+
     def get_queryset(self):
         queryset = super().get_queryset()
         # XXX Add filtering
         return queryset.filter(self.get_filters()).select_related("created_by")
+
+
+class AuthorizationDetailsView(BaseAuthorizationMixin, DetailView):
+    template_name = "prescribers/authorizations_details.html"
+    model = PrescriberOrganization
+    slug_field = "uid"
+    slug_url_kwarg = "uid"
+    queryset = PrescriberOrganization.objects
+    context_object_name = "organization"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
+        context["members"] = self.object.memberships.all()
+        return context

@@ -14,10 +14,10 @@
     </thead>
     <tbody>
         {% for organization in object_list %}
+            {% url request.from_prescriber|yesno:'prescribers_views:authorizations_details,institutions_views:authorizations_details' organization.uid as details_url %}
             <tr>
                 <td>
-                    {# FIXME: Add link #}
-                    <a href="?back_url={{ request.get_full_path|urlencode }}"
+                    <a href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                        class="btn-link"
                        {% matomo_event "habilitations" "clic" "détail-organisation" %}>{{ organization.name }}</a>
                 </td>
@@ -29,8 +29,7 @@
                 <td>{% if organization.authorization_updated_at %}{{ organization.authorization_updated_at|date:"d/m/Y" }} {% else %}-{% endif %}</td>
                 <td class="text-end w-50px align-middle">
                     <a class="btn btn-sm btn-link btn-ico-only"
-                       {# FIXME: Add link #}
-                       href="?back_url={{ request.get_full_path|urlencode }}"
+                       href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
                        {% matomo_event "habilitations" "clic" "détail-organisation" %}
                        data-bs-toggle="tooltip"
                        data-bs-title="Voir la structure {{ organization.name }}">
