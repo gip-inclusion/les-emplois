@@ -52,10 +52,6 @@ class CompanySource(models.TextChoices):
     STAFF_CREATED = "STAFF_CREATED", "Staff Itou"
 
 
-class ContractNature(models.TextChoices):
-    PEC_OFFER = "PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
-
-
 class JobSourceTag(models.TextChoices):
     FT_EA_OFFER = "FT_EA_OFFER", "Priorité aux bénéficiaires de la RQTH"
     FT_EHE_OFFER = "FT_EHE_OFFER", "Employeur handi-engagé"
