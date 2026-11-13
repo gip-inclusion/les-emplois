@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       - name: 🤹 Django tests
-        run: make test TARGET="--shard=${{ matrix.shard }}/${{ strategy.job-total }}"
+        run: make test TARGET="--shard=${{ matrix.shard }}/${{ strategy.job-total }} --allow-hosts=127.0.0.1,::1,${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}"
 
   tests: # Single, stable entry point for the required status checks, whatever the number of shards
     needs: tests-shard

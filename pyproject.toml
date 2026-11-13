@@ -55,6 +55,7 @@ filterwarnings = [
 addopts = [
     "--reuse-db",
     "--strict-markers",
+    "--allow-hosts=127.0.0.1,::1,172.16.0.0/12",  # Allow local calls (redis, rustfs)
 ]
 markers = [
     "no_django_db: mark tests that should not be marked with django_db.",
