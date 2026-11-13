@@ -1,6 +1,5 @@
 import random
 
-from itou.asp.models import Commune
 from itou.utils.apis.exceptions import AddressLookupError
 
 
@@ -335,11 +334,3 @@ def mock_get_geocoding_data_by_ban_api_resolved(address, **_):
 
 def get_random_geocoding_api_result():
     return random.choice(BAN_GEOCODING_API_RESULTS_MOCK)
-
-
-def get_random_insee_code():
-    return get_random_geocoding_api_result()["insee_code"]
-
-
-def get_random_asp_commune():
-    return Commune.objects.by_insee_code(get_random_insee_code())
