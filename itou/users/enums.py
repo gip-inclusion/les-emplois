@@ -75,6 +75,7 @@ class ActionKind(models.TextChoices):
     GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
     SELF_ASSIGN = "SELF_ASSIGN", "se positionner comme accompagnateur"
     ORIENT = "ORIENT", "orientation vers un service"
+    FILL_REPORT = "FILL_REPORT", "saisie d'un bilan d'accompagnement"
 
 
 class AssignmentEndReason(models.TextChoices):

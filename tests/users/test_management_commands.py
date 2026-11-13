@@ -20,14 +20,14 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
-from itou.users.models import NirModificationRequest, User
+from itou.users.enums import ActionKind, AssignmentEndReason, IdentityCertificationAuthorities, IdentityProvider
+from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils import triggers
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1608,3 +1608,47 @@ def test_archive_old_assignments_command():
     ended_assignment.refresh_from_db()
     assert ended_assignment.ended_at == old_ended_at
     assert ended_assignment.end_reason == AssignmentEndReason.MANUAL
+
+
+def test_update_assignments_with_reports():
+    now = timezone.now()
+    thirty_days_ago = now - datetime.timedelta(days=30)
+    yesterday = now - datetime.timedelta(days=1)
+    report_1 = ProSupportReportFactory(created_at=yesterday)
+    report_2 = ProSupportReportFactory(created_at=yesterday)
+    report_3 = ProSupportReportFactory(created_at=yesterday)  # no job seeker assignment
+
+    assignment_1 = JobSeekerAssignmentFactory(
+        job_seeker=report_1.job_seeker,
+        professional=report_1.author,
+        company=report_1.company,
+        last_action_at=thirty_days_ago,
+        last_action_kind=ActionKind.ORIENT,
+    )  # Most recent action is the pro support report completion
+
+    assignment_2 = JobSeekerAssignmentFactory(
+        job_seeker=report_2.job_seeker,
+        professional=report_2.author,
+        company=report_2.company,
+        last_action_at=now,
+        last_action_kind=ActionKind.HIRE,
+    )  # Most recent action is NOT the pro support report completion
+
+    call_command("update_assignments_with_reports", wet_run=True)
+
+    # Assignment was updated
+    assignment_1.refresh_from_db()
+    assert assignment_1.last_action_at == report_1.created_at
+    assert assignment_1.last_action_kind == ActionKind.FILL_REPORT
+
+    # Assignment stayed the same
+    assignment_2.refresh_from_db()
+    assert assignment_2.last_action_at == now
+    assert assignment_2.last_action_kind == ActionKind.HIRE
+
+    # Assignment created
+    assignment_3 = JobSeekerAssignment.objects.get(
+        job_seeker=report_3.job_seeker, professional=report_3.author, company=report_3.company
+    )
+    assert assignment_3.last_action_at == report_3.created_at
+    assert assignment_3.last_action_kind == ActionKind.FILL_REPORT
