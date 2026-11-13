@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
-from itou.companies.models import Company, Contract, JobDescription, SiaeACIConvergencePHC
+from itou.companies.models import Company, Contract, JobDescription, ProSupportReport, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
@@ -29,7 +29,7 @@ from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory, ProfessionalFactory
 from tests.utils.testing import normalize_fields_history
 
 
@@ -821,3 +821,73 @@ class TestProSupportReport:
         report = ProSupportReportFactory()
         with pytest.raises(IntegrityError, match="companies_prosupportreport_contract_id_key"):
             ProSupportReportFactory(contract=report.contract)
+
+    def test_get_introduction_contact(self):
+        report = ProSupportReportFactory()
+        author_membership = CompanyMembershipFactory(company=report.company, user=report.author, is_admin=False)
+        assert report.get_introduction_contact() == report.author
+
+        author_membership.is_active = False
+        author_membership.save(update_fields=["is_active", "updated_at"])
+        now = timezone.now()
+        CompanyMembershipFactory(company=report.company, is_admin=False, user__last_login=now)
+        CompanyMembershipFactory(company=report.company, user__last_login=None)
+        CompanyMembershipFactory(company=report.company, user__last_login=now - timedelta(days=2))
+        admin = CompanyMembershipFactory(company=report.company, user__last_login=now - timedelta(days=1)).user
+        report = ProSupportReport.objects.get(pk=report.pk)  # author_has_left is cached
+        assert report.get_introduction_contact() == admin
+
+    def test_get_introduction_contact_without_admin(self):
+        report = ProSupportReportFactory()
+        CompanyMembershipFactory(company=report.company, is_admin=False)
+        assert report.get_introduction_contact() is None
+
+    def test_get_introduction_contact_without_company(self):
+        assert ProSupportReportFactory(company=None).get_introduction_contact() is None
+
+    @freeze_time("2026-01-15 10:00")
+    def test_introduction_email(self, snapshot):
+        report = ProSupportReportFactory(
+            for_snapshot=True, contract__job_seeker__first_name="Salomé", contract__job_seeker__last_name="Salarié"
+        )
+        prescriber = PrescriberFactory(for_snapshot=True, membership=False)
+        email = report.introduction_email(report.author, prescriber, PrescriberOrganizationFactory(for_snapshot=True))
+
+        assert email.to == [report.author.email]
+        assert email.cc == [prescriber.email]
+        assert email.reply_to == [report.author.email, prescriber.email]
+        assert email.subject == snapshot(name="subject")
+        assert email.body == snapshot(name="body")
+        # The job seeker's name is only visible once logged in.
+        assert "Salomé" not in email.subject + email.body
+        assert "Salarié" not in email.subject + email.body
+
+    @pytest.mark.parametrize(
+        "author_phone,company_phone,expected_phone_line",
+        [
+            ("06 12 34 56 78", "04 94 98 76 54", "Téléphone\xa0: 06 12 34 56 78\n"),
+            ("", "04 94 98 76 54", "Téléphone de la structure\xa0: 04 94 98 76 54\n"),
+            ("", "", ""),
+        ],
+        ids=["author_phone", "company_phone", "no_phone"],
+    )
+    def test_introduction_email_contact_phone(self, author_phone, company_phone, expected_phone_line):
+        report = ProSupportReportFactory(author__phone=author_phone, contract__company__phone=company_phone)
+        email = report.introduction_email(report.author, PrescriberFactory(), PrescriberOrganizationFactory())
+        assert (
+            f"**{report.author.get_full_name()}**, {report.company.display_name}\n"
+            f"{expected_phone_line}Adresse e-mail\xa0: {report.author.email}"
+        ) in email.body
+
+    def test_introduction_email_when_the_author_left(self):
+        report = ProSupportReportFactory()
+        admin = CompanyMembershipFactory(company=report.company).user
+        prescriber = PrescriberFactory()
+        email = report.introduction_email(admin, prescriber, PrescriberOrganizationFactory())
+
+        assert email.to == [admin.email]
+        assert email.reply_to == [admin.email, prescriber.email]
+        assert email.subject.endswith("souhaite échanger avec vous sur un bilan de votre structure")
+        assert f"par {report.author.get_full_name()}, qui a quitté votre structure" in email.body
+        assert f"**{admin.get_full_name()}**, {report.company.display_name}" in email.body
+        assert "vous pouvez lui transférer ce message" in email.body
