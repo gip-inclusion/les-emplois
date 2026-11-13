@@ -159,9 +159,6 @@ class TestProcessViews:
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         self.cities = create_test_cities(["54", "57"], num_per_department=2)
 
-    def get_random_city(self):
-        return random.choice(self.cities)
-
     def _get_transition_logs_content(self, response, job_application):
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
