@@ -6,11 +6,6 @@ on:
     types: [ unlabeled, closed ]
 
 env:
-  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
-  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
-  CLEVER_CLI: clever-tools-latest_linux/clever
-  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
-  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   CLEVER_ORG_ID: orga_647d7c8e-c014-4346-b1cb-b97dc8fc6d25
   BRANCH: ${{ github.head_ref }}
 
@@ -26,6 +21,8 @@ jobs:
     steps:
     - name: 📥 Checkout to the PR branch
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: 🏷 Set review app name
       run:
@@ -35,15 +32,17 @@ jobs:
       run:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
+    - name: ⏬ Install Clever Tools
+      uses: ./.github/actions/clever-cli
+      with:
+        token: ${{ secrets.CLEVER_TOKEN }}
+        secret: ${{ secrets.CLEVER_SECRET }}
+
     - name: 🤝 Find the application on Clever Cloud
       run: |
-        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
-        tar -xvf $CLEVER_TAR_FILE
-        echo "Clever CLI version: $($CLEVER_CLI version)"
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
-    - name: 💂 Install Python
+    - name: ⏬ Install uv
       uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       with:
         enable-cache: true

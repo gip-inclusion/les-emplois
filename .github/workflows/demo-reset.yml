@@ -7,39 +7,43 @@ on:
 
 permissions: {}
 
-env:
-  ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
-  BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
-  CLEVER_CLI: clever-tools-latest_linux/clever
-  CLEVER_CLI_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
-  CLEVER_CLI_TAR_FILE: clever-tools-latest_linux.tar.gz
-  CLEVER_SECRET: ${{ secrets.DEMO_CLEVER_SECRET }}
-  CLEVER_TOKEN: ${{ secrets.DEMO_CLEVER_TOKEN }}
-  DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
-  BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
-
 jobs:
   reset:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: 🤝 Set the private key for Clever SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}
         run: |
           mkdir ~/.ssh
           echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIEG+zB8Lo9ByLS5JSC8zIGQhVOAyWMHbmppafWEz8LSsz7a+IdvpBriDMamtn4OmchdQm+Y1GlTgsKB7rIM4HYtBNe0FPeMsveL6GQ/y9ztOLBKES05XOLbyZhCA2ZfXlx5SJT/5n+2SsArrcPlNkA/HWO+RyugZhApkrxmfvzLBosbE0hgts0ZJ/JbpQElYou49kDN3WwlrgYDfv6cn2r1K9No+CIvhu7ESOEG/NV+z42Fu9ZtANJiGKEBotXGwKU64cQdGvCA2CP87Yg1DSRQIpTs6OVRfEABXJ/SExtbGEuesdx/xEYIgiFdc1+7jYEtqEB+WpenWIZp8r9Cq3" >> ~/.ssh/known_hosts
           echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsvDx3AczrEJoF7WdyL8JaOTywQs3vR1AOEKW/i/Jlh" >>~/.ssh/known_hosts
           touch ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}" >~/.ssh/id_ed25519
+          echo "$SSH_PRIVATE_KEY" >~/.ssh/id_ed25519
+
+      - name: ⏬ Install Clever Tools
+        uses: ./.github/actions/clever-cli
+        with:
+          token: ${{ secrets.DEMO_CLEVER_TOKEN }}
+          secret: ${{ secrets.DEMO_CLEVER_SECRET }}
 
       - name: 🧫 Reset the demo environment on CleverCloud
+        env:
+          ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
+          BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
+          DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
+          BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
         run: |
-          curl $CLEVER_CLI_DOWNLOAD_URL > $CLEVER_CLI_TAR_FILE
-          tar -xvf $CLEVER_CLI_TAR_FILE
-          echo "Clever CLI version: $($CLEVER_CLI version)"
-          $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
           $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
           OUTPUT_FILE=$(mktemp)
           # Always returns error code 0, as the SSH command succeeds.
-          echo "source .bashrc && cd app_* && scripts/reset --bucket-name $BUCKET_NAME --admin-password $ADMIN_PASSWORD --dora-token $DORA_TOKEN --brevo-token $BREVO_TOKEN" | \
+          # %q quotes the values for the remote shell, whatever characters they contain.
+          printf 'source .bashrc && cd app_* && scripts/reset --bucket-name %q --admin-password %q --dora-token %q --brevo-token %q\n' \
+              "$BUCKET_NAME" "$ADMIN_PASSWORD" "$DORA_TOKEN" "$BREVO_TOKEN" | \
               $CLEVER_CLI ssh --alias demo-app | tee $OUTPUT_FILE
           grep --quiet "Reset of DEMO environment completed successfully." $OUTPUT_FILE

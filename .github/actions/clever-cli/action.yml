@@ -1,0 +1,37 @@
+name: 'Setup Clever Tools'
+description: 'Install a pinned and verified Clever Cloud CLI, log in, and expose its path in $CLEVER_CLI'
+inputs:
+  token:
+    description: 'Clever Cloud API token'
+    required: true
+  secret:
+    description: 'Clever Cloud API secret'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: ⏬ Install Clever Tools
+      env:
+        # Not covered by Dependabot: update both values from https://github.com/CleverCloud/clever-tools/releases
+        # (the SHA-256 is the `digest` of the `_linux.tar.gz` asset, also served next to it as `.sha256`)
+        CLEVER_TOOLS_VERSION: "5.3.0"
+        CLEVER_TOOLS_SHA256: "f2d2b1b7f97b2123a23cdc37e15126368af93ea1f1382070b9fbca3743cdf6e8"
+      # The CLI receives the Clever credentials: the checksum guards against a tampered download.
+      run: |
+        archive="$RUNNER_TEMP/clever-tools-${CLEVER_TOOLS_VERSION}_linux.tar.gz"
+        curl --fail --silent --show-error --location --output "$archive" \
+          "https://github.com/CleverCloud/clever-tools/releases/download/${CLEVER_TOOLS_VERSION}/clever-tools-${CLEVER_TOOLS_VERSION}_linux.tar.gz"
+        echo "$CLEVER_TOOLS_SHA256  $archive" | sha256sum --check --strict
+        mkdir "$RUNNER_TEMP/clever-tools"
+        tar --extract --gzip --file "$archive" --directory "$RUNNER_TEMP/clever-tools" --strip-components=1
+        echo "CLEVER_CLI=$RUNNER_TEMP/clever-tools/clever" >> "$GITHUB_ENV"
+      shell: bash
+    - name: 🔑 Log in to Clever Cloud
+      # The credentials are saved in the runner's home: later steps don't need them in their environment
+      env:
+        CLEVER_TOKEN: ${{ inputs.token }}
+        CLEVER_SECRET: ${{ inputs.secret }}
+      run: |
+        echo "Clever CLI version: $("$CLEVER_CLI" version)"
+        "$CLEVER_CLI" login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+      shell: bash
