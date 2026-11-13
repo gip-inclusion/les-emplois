@@ -186,7 +186,7 @@ class Command(EmployeeRecordTransferCommand):
     ):
         if preflight:
             self.logger.info("Preflight activated, checking for possible serialization errors...")
-            self.preflight(EmployeeRecord)
+            self.preflight()
         elif parse_file_name:
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
             # so use an atomic block to avoid creating more incoherence when something breaks.
