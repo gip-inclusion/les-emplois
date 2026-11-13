@@ -42,10 +42,8 @@ jobs:
           BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
         run: |
           $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
-          OUTPUT_FILE=$(mktemp)
-          # Always returns error code 0, as the SSH command succeeds.
-          # %q quotes the values for the remote shell, whatever characters they contain.
-          printf 'source .bashrc && cd app_* && scripts/reset --bucket-name %q --admin-password %q --dora-token %q --brevo-token %q\n' \
-              "$BUCKET_NAME" "$ADMIN_PASSWORD" "$DORA_TOKEN" "$BREVO_TOKEN" | \
-              $CLEVER_CLI ssh --alias demo-app | tee $OUTPUT_FILE
-          grep --quiet "Reset of DEMO environment completed successfully." $OUTPUT_FILE
+          # %q quotes the values for the remote shell, whatever characters they contain
+          command=$(printf 'source ~/.bashrc && scripts/reset --bucket-name %q --admin-password %q --dora-token %q --brevo-token %q' \
+              "$BUCKET_NAME" "$ADMIN_PASSWORD" "$DORA_TOKEN" "$BREVO_TOKEN")
+          # --app-home runs the command from the application folder, and --command returns its exit code
+          $CLEVER_CLI ssh --alias demo-app --app-home --command "$command"

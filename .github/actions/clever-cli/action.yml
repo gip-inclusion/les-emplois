@@ -14,8 +14,8 @@ runs:
       env:
         # Not covered by Dependabot: update both values from https://github.com/CleverCloud/clever-tools/releases
         # (the SHA-256 is the `digest` of the `_linux.tar.gz` asset, also served next to it as `.sha256`)
-        CLEVER_TOOLS_VERSION: "5.3.0"
-        CLEVER_TOOLS_SHA256: "f2d2b1b7f97b2123a23cdc37e15126368af93ea1f1382070b9fbca3743cdf6e8"
+        CLEVER_TOOLS_VERSION: "5.4.0"
+        CLEVER_TOOLS_SHA256: "017edd8aed89360c84f2ea383df0db62439a66261b248053a15b9966c7fb8ea3"
       # The CLI receives the Clever credentials: the checksum guards against a tampered download.
       run: |
         archive="$RUNNER_TEMP/clever-tools-${CLEVER_TOOLS_VERSION}_linux.tar.gz"
