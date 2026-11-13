@@ -34,9 +34,6 @@ class CommonEligibilityDiagnosisQuerySet(models.QuerySet):
             return self.filter(created_at__date__lt=before)
         return self.filter(created_at__lt=before)
 
-    def by_author_kind_prescriber(self):
-        return self.filter(author_kind=AuthorKind.PRESCRIBER)
-
 
 class AbstractEligibilityDiagnosisModel(models.Model):
     """

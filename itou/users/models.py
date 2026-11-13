@@ -718,10 +718,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     def has_valid_diagnosis(self, for_siae=None):
         return self.eligibility_diagnoses.has_considered_valid(job_seeker=self, for_siae=for_siae)
 
-    def joined_recently(self):
-        time_since_date_joined = timezone.now() - self.date_joined
-        return time_since_date_joined.days < 7
-
     def active_or_in_grace_period_company_memberships(self):
         """
         Return the company memberships accessible to the employer, which means either active
