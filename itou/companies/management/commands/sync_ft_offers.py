@@ -29,19 +29,6 @@ PE_TYPE_TO_CONTRACT_TYPE = {
 }
 
 
-class NoAppellationFoundException(Exception):
-    def __init__(self, rome_code, label):
-        self.rome_code = rome_code
-        self.label = label
-
-    def __str__(self):
-        return f"NoAppellationFound(rome={self.rome_code},label='{self.label}')"
-
-
-class NoZipCodeException(Exception):
-    pass
-
-
 def pe_offer_to_job_description(data, logger):
     source_id = data["id"]
     rome_code = data["romeCode"]
