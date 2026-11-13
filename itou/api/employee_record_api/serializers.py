@@ -241,18 +241,3 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
 
     numeroAnnexe = serializers.CharField(source="financial_annex.number", allow_null=True)
-
-
-class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
-    numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(default=MovementType.MODIFICATION, read_only=True)  # Required
-    siret = serializers.CharField(source="employee_record.siret")
-    mesure = serializers.CharField(source="employee_record.asp_measure")
-
-    personnePhysique = _API_PersonSerializer(source="employee_record")
-    adresse = _API_AddressSerializer(source="employee_record.job_application.job_seeker")
-    situationSalarie = _API_SituationSerializer(source="employee_record")
-
-    # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
-    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)

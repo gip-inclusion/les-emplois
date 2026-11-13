@@ -9,9 +9,8 @@ from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
 from itou.api.employee_record_api.serializers import (
     EmployeeRecordAPISerializer,
-    EmployeeRecordUpdateNotificationAPISerializer,
 )
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
+from itou.employee_record.models import EmployeeRecord, Status
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.readonly import ReadonlyViewMixin
 
@@ -188,17 +187,4 @@ le 15/01/2027. Les clients doivent donc être **modifiés avant le
 nouveau comportement. À partir du 15/01/2027, l'en-tête pourra être
 supprimée des requêtes, puisque l'API n'aura plus qu'un seul
 comportement possible.
-"""
-
-
-class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
-    queryset = EmployeeRecordUpdateNotification.objects.full_fetch()
-    serializer_class = EmployeeRecordUpdateNotificationAPISerializer
-    company_lookup = "employee_record__job_application__to_company__id"
-
-
-EmployeeRecordUpdateNotificationViewSet.__doc__ = f"""\
-L'utilisation externe de cette API nécessite un token d'autorisation :
-
-{AUTH_TOKEN_EXPLANATION_TEXT}
 """
