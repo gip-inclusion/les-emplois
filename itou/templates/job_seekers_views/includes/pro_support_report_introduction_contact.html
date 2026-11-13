@@ -1,0 +1,30 @@
+<ul class="list-data mb-0">
+    <li>
+        <small>Structure</small>
+        <strong>{{ company.display_name }}</strong>
+    </li>
+    {% if company.address_on_one_line %}
+        <li>
+            <small>Adresse</small>
+            <strong>{{ company.address_on_one_line }}</strong>
+        </li>
+    {% endif %}
+    {% if contact.phone %}
+        <li>
+            <small>Téléphone</small>
+            <strong>{{ contact.phone }}</strong>
+            {% include "includes/copy_to_clipboard.html" with content=contact.phone css_classes="btn-link" only_icon=True in_modal=in_modal only %}
+        </li>
+    {% elif company.phone %}
+        <li>
+            <small>Téléphone de la structure</small>
+            <strong>{{ company.phone }}</strong>
+            {% include "includes/copy_to_clipboard.html" with content=company.phone css_classes="btn-link" only_icon=True in_modal=in_modal only %}
+        </li>
+    {% endif %}
+    <li>
+        <small>Adresse e-mail</small>
+        <strong class="text-break">{{ contact.email }}</strong>
+        {% include "includes/copy_to_clipboard.html" with content=contact.email css_classes="btn-link" only_icon=True in_modal=in_modal only %}
+    </li>
+</ul>

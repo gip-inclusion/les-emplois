@@ -736,3 +736,18 @@ class ProSupportReportForm(forms.ModelForm):
             self.cleaned_data["orientation"] = ""
         else:
             self.cleaned_data["solution"] = ""
+
+
+class ProSupportReportIntroductionForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["phone"]
+        labels = {"phone": "Votre téléphone professionnel"}
+        help_texts = {"phone": "Ce numéro sera enregistré dans votre profil, modifiable à tout moment."}
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
+        error_messages = {"phone": {"required": "Renseignez votre téléphone professionnel."}}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Both phone numbers are given in the introduction email.
+        self.fields["phone"].required = True

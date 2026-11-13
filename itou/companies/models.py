@@ -1363,6 +1363,16 @@ class ProSupportReport(models.Model):
         blank=True,
         default="",
     )
+    introduction_email_sent_at = models.DateTimeField(
+        verbose_name="date de l’e-mail de mise en relation", null=True, blank=True
+    )
+    introduction_email_recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="destinataire de l’e-mail de mise en relation",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     class Meta:
         verbose_name = "bilan d’accompagnement"
@@ -1409,6 +1419,9 @@ class ProSupportReport(models.Model):
             ).send()
 
     def get_introduction_contact(self):
+        if self.introduction_email_sent_at:
+            # The person who received the email, even if someone else would be chosen today.
+            return self.introduction_email_recipient
         if self.company_id is None:
             return None
         if self.author_has_left:

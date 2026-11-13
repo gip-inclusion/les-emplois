@@ -10634,7 +10634,9 @@
                  "companies_prosupportreport"."other_barrier",
                  "companies_prosupportreport"."autonomy",
                  "companies_prosupportreport"."solution",
-                 "companies_prosupportreport"."orientation"
+                 "companies_prosupportreport"."orientation",
+                 "companies_prosupportreport"."introduction_email_sent_at",
+                 "companies_prosupportreport"."introduction_email_recipient_id"
           FROM "companies_prosupportreport"
           ORDER BY RANDOM() ASC
         ''',

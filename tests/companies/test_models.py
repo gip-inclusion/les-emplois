@@ -837,6 +837,13 @@ class TestProSupportReport:
         report = ProSupportReport.objects.get(pk=report.pk)  # author_has_left is cached
         assert report.get_introduction_contact() == admin
 
+    def test_get_introduction_contact_once_the_email_is_sent(self):
+        report = ProSupportReportFactory(introduction_email_sent_at=timezone.now())
+        report.introduction_email_recipient = report.author
+        # The author left after receiving the email, an admin would be chosen today.
+        CompanyMembershipFactory(company=report.company)
+        assert report.get_introduction_contact() == report.author
+
     def test_get_introduction_contact_without_admin(self):
         report = ProSupportReportFactory()
         CompanyMembershipFactory(company=report.company, is_admin=False)
