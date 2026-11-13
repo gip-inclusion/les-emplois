@@ -6,12 +6,10 @@ from django.db import transaction
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
-from itou.employee_record.enums import NotificationStatus
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, Status
 from itou.employee_record.serializers import (
     EmployeeRecordForUpdateSerializer,
     EmployeeRecordSerializer,
-    EmployeeRecordUpdateNotificationSerializer,
 )
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import triggers
@@ -145,7 +143,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
         self.logger.info("Successfully parsed %d/%d files", successfully_parsed_files, len(result_files))
 
-    def preflight(self, object_class, for_update=False):
+    def preflight(self, for_update=False):
         """Parse new notifications or employee records and attempt to tackle serialization errors.
         Serialization of EmployeeRecordBatch objects does not allow detailed information
         on what specific employee record is faulty.
@@ -155,12 +153,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         causing address lookup errors (city, birth city ...) with None values.
         As a reminder, it's a NON-FIX (from both itou and ASP sides), we'll have to deal with it,
         and border it as well as possible."""
-        assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
-
-        if object_class == EmployeeRecordUpdateNotification:
-            objects_to_serialize = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
-            object_serializer = EmployeeRecordUpdateNotificationSerializer
-        elif for_update:
+        if for_update:
             objects_to_serialize = EmployeeRecord.objects.filter(
                 status=Status.MODIFICATION_PENDING, job_application__state=JobApplicationState.ACCEPTED
             )
