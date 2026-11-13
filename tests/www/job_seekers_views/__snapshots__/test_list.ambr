@@ -4859,8 +4859,25 @@
                    44,
                    45,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
-                   "users_user"."id" DESC
+          ORDER BY
+            (SELECT
+               (SELECT U0."public_id" AS "public_id"
+                FROM "companies_prosupportreport" U0
+                WHERE (U0."contract_id" = (V0."id")
+                       AND U0."contract_end_date" >= (V0."end_date"))
+                ORDER BY U0."contract_end_date" DESC
+                LIMIT 1) AS "covering_pro_support_report_public_id"
+             FROM "companies_contract" V0
+             WHERE V0."id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE (U0."job_seeker_id" = ("users_user"."id")
+                         AND U0."company_id" = %s)
+                  ORDER BY U0."start_date" DESC,
+                           1 DESC
+                  LIMIT 1)
+             ORDER BY RANDOM() ASC) IS NULL DESC, 43 DESC,
+                                                  "users_user"."id" DESC
           LIMIT 1
         ''',
       }),
