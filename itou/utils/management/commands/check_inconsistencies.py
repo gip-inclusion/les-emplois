@@ -49,7 +49,7 @@ class Command(BaseCommand):
         inconsistencies = {}
         for app in apps.get_app_configs():
             for model in app.get_models():
-                # Check limit_choices_to (at least in dict fornat) for all models
+                # Check limit_choices_to (at least in dict format) for all models
                 if get_fields_with_dict_limit_choices(model):
                     limit_choices_inconsistencies = check_limit_choices_to_inconsistencies(model.objects.all())
                     self.logger.info(
