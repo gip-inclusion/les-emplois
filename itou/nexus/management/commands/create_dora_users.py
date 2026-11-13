@@ -72,12 +72,6 @@ class Command(BaseCommand):
     def display_structure(self, structure, old_siret=None):
         return f"{old_siret or structure.siret} | {structure.kind or 'N/A':<8} | {structure.name}"
 
-    def find_structure_smart_match(self, nexus_siret):
-        if not nexus_siret:
-            return
-
-        return self.emplois_full_structure_list.get((nexus_siret, PrescriberOrganizationKind.OTHER))
-
     def build_user(self, nexus_user):
         return User(
             kind=UserKind.PROFESSIONAL,
