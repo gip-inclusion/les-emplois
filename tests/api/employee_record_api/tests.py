@@ -9,8 +9,7 @@ from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.mocks.address_format import mock_get_geocoding_data
-from tests.companies.factories import CompanyMembershipFactory
-from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import HASHED_DEFAULT_PASSWORD, ProfessionalFactory
 
@@ -437,48 +436,3 @@ class TestEmployeeRecordAPIParameters:
 
         results = response.json().get("results")
         assert len(results) == 0
-
-
-class TestEmployeeRecordUpdateNotificationViewSet:
-    endpoint_url = reverse("v1:employee-record-notifications-list")
-
-    def test_companies_isolation(self, api_client):
-        """
-        An employer admin of a company must not see notifications from a company he does not belongs to
-        """
-        notification = EmployeeRecordUpdateNotificationFactory()
-        company = notification.employee_record.job_application.to_company
-        employer = company.members.first()
-
-        # Employer must only see the notification from its own company
-        EmployeeRecordUpdateNotificationFactory()
-        api_client.force_login(employer)
-        response = api_client.get(self.endpoint_url, format="json")
-        assert response.status_code == 200
-        assert response.data["count"] == 1
-
-    def test_non_admin_member_is_forbidden(self, api_client):
-        """
-        A regular member of a company must not access notifications
-        """
-        notification = EmployeeRecordUpdateNotificationFactory()
-        company = notification.employee_record.job_application.to_company
-        membership = CompanyMembershipFactory(company=company, is_admin=False)
-
-        # force_authenticate to avoid SessionMiddleware middleware
-        # that doesn't play nicely with a PermissionDenied causing
-        # the tests connection to be marked as needs_rollback
-        # preventing SessionMiddleware to update the session and
-        # ending with a 400 status code
-        api_client.force_authenticate(user=membership.user)
-        response = api_client.get(self.endpoint_url, format="json")
-        assert response.status_code == 403
-
-    def test_query_count(self, api_client, snapshot):
-        notification = EmployeeRecordUpdateNotificationFactory()
-        company = notification.employee_record.job_application.to_company
-        employer = company.members.first()
-
-        api_client.force_login(employer)
-        with assertSnapshotQueries(snapshot):
-            api_client.get(self.endpoint_url, format="json")

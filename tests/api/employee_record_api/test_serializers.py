@@ -6,14 +6,12 @@ from django.utils import timezone
 
 from itou.api.employee_record_api.serializers import (
     EmployeeRecordAPISerializer,
-    EmployeeRecordUpdateNotificationAPISerializer,
     _API_AddressSerializer,
     _API_PersonSerializer,
 )
 from itou.asp.models import Commune, Country, SiaeMeasure
 from itou.companies.models import Company
 from itou.employee_record.enums import MovementType, Status
-from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -189,7 +187,6 @@ def test_oeth_employee(kind):
     ["serializer", "expected_movement_type"],
     [
         (EmployeeRecordAPISerializer, MovementType.CREATION),
-        (EmployeeRecordUpdateNotificationAPISerializer, MovementType.MODIFICATION),
     ],
 )
 def test_serializer(serializer, expected_movement_type):
@@ -202,12 +199,7 @@ def test_serializer(serializer, expected_movement_type):
     approval.end_at = end_at
     employee_record.save()
 
-    if serializer == EmployeeRecordUpdateNotificationAPISerializer:
-        instance = EmployeeRecordUpdateNotification(employee_record=employee_record)
-    else:
-        instance = employee_record
-
-    data = serializer(instance, context={"request": make_dummy_request()}).data
+    data = serializer(employee_record, context={"request": make_dummy_request()}).data
     assert data is not None
     assert data.get("siret") == employee_record.siret
     assert data.get("mesure") == employee_record.asp_measure

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
@@ -6,7 +5,7 @@ from rest_framework import routers
 
 from itou.api.applicants_api.views import ApplicantsView
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
-from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificationViewSet, EmployeeRecordViewSet
+from itou.api.employee_record_api.viewsets import EmployeeRecordViewSet
 from itou.api.geiq.views import GeiqJobApplicationListView
 from itou.api.inbound_parsing.views import BrevoInboundParsingView
 from itou.api.insertion.views import OrientationsCountView, OrientationsView
@@ -31,12 +30,6 @@ app_name = "itou.api"
 # Using DRF router with viewsets means automatic definition of URL patterns
 router = routers.DefaultRouter()
 router.register(r"employee-records", EmployeeRecordViewSet, basename="employee-records")
-if not settings.API_HIDE_EMPLOYEE_RECORD_NOTIFICATIONS_ENDPOINT:
-    router.register(
-        r"employee-record-notifications",
-        EmployeeRecordUpdateNotificationViewSet,
-        basename="employee-record-notifications",
-    )
 router.register(r"siaes", SiaeViewSet, basename="siaes")
 
 urlpatterns = [
