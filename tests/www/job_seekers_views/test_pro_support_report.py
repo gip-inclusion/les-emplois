@@ -132,6 +132,7 @@ def test_create_pro_support_report_for_employer(
     # The authorized prescriber is notified.
     assert [email.to for email in mailoutbox] == [[advisor_membership.user.email]]
     assert report.notified_prescriber == advisor_membership.user
+    assert report.notified_prescriber_organization == advisor_membership.organization
 
     # The employer is the last advisor
     last_assignment = report.job_seeker.last_assignment
@@ -257,6 +258,7 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     )
     report = ProSupportReport.objects.get()
     assert report.notified_prescriber is None
+    assert report.notified_prescriber_organization is None
     assert mailoutbox == []
 
 

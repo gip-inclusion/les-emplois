@@ -62,6 +62,14 @@ TABLE.add_columns(
             ),
         ),
         get_column_from_field(
+            get_model_field(ProSupportReport, "notified_prescriber_organization"),
+            name="id_organisation_prévenue",
+            comment=(
+                "ID C1 de l’organisation du prescripteur prévenu (organisations_v0.id), "
+                "vide si aucun prescripteur n’a été prévenu ou si le bilan est antérieur à l’ajout de cette colonne"
+            ),
+        ),
+        get_column_from_field(
             get_model_field(ProSupportReport, "contract"),
             name="id_contrat_asp",
             comment=(

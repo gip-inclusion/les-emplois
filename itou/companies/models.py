@@ -1336,6 +1336,13 @@ class ProSupportReport(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    notified_prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="organisation prévenue",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
     contract = models.ForeignKey(
         Contract,
@@ -1408,7 +1415,8 @@ class ProSupportReport(models.Model):
         from itou.users.notifications import ProSupportReportCreatedNotification
 
         self.notified_prescriber = prescriber
-        self.save(update_fields=["notified_prescriber"])
+        self.notified_prescriber_organization = organization
+        self.save(update_fields=["notified_prescriber", "notified_prescriber_organization"])
         ProSupportReportCreatedNotification(prescriber, organization, report=self).send()
 
     def get_barriers_display(self):
