@@ -1175,8 +1175,9 @@ class TestServices:
                 organization__authorized=False,
             ),
             partial(CompanyMembershipFactory, user__for_snapshot=True, company__for_snapshot=True),
+            partial(CompanyMembershipFactory, user__for_snapshot=True, company__for_snapshot=True, user__phone=""),
         ],
-        ids=["authorized_prescriber", "prescriber", "employer"],
+        ids=["authorized_prescriber", "prescriber", "employer", "employer_no_phone"],
     )
     @pytest.mark.parametrize(
         "job_seeker_factory",
