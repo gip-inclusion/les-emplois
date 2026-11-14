@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-[Contrôle a posteriori] La structure {{ siae.kind }} {{ siae.name }} a transmis ses pièces justificatives.
-{% endblock %}
+{% block subject %}[Contrôle a posteriori] La structure {{ siae.kind }} {{ siae.name }} a transmis ses pièces justificatives.{% endblock %}

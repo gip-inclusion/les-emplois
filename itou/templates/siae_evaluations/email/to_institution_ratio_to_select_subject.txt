@@ -1,6 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-
-Lancement du contrôle a posteriori : Vous disposez de 4 semaines pour sélectionner votre échantillon.
-
-{% endblock %}
+{% block subject %}Lancement du contrôle a posteriori : Vous disposez de 4 semaines pour sélectionner votre échantillon.{% endblock %}

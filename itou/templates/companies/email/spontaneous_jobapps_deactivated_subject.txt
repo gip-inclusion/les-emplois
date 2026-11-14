@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-La réception des candidatures spontanées pour votre structure a été suspendue
-{% endblock %}
+{% block subject %}La réception des candidatures spontanées pour votre structure a été suspendue{% endblock %}

@@ -158,21 +158,17 @@ def manually_refuse_approval(
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     # Display a preview of the email that will be send.
-    email_subject_template = get_email_text_template(
-        "approvals/email/refuse_manually_subject.txt", {"job_application": job_application}
-    )
-    email_body_template = get_email_text_template(
-        "approvals/email/refuse_manually_body.md",
-        {
-            "job_application": job_application,
-            "job_application_url": get_absolute_url(
-                reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-            ),
-            "search_url": get_absolute_url(reverse("search:prescribers_home")),
-            "base_url": get_absolute_url(),
-            "itou_environment": settings.ITOU_ENVIRONMENT,
-        },
-    )
+    email_context = {
+        "job_application": job_application,
+        "job_application_url": get_absolute_url(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        ),
+        "search_url": get_absolute_url(reverse("search:prescribers_home")),
+        "base_url": get_absolute_url(),
+        "itou_environment": settings.ITOU_ENVIRONMENT,
+    }
+    email_subject_template = get_email_text_template("approvals/email/refuse_manually_subject.txt", email_context)
+    email_body_template = get_email_text_template("approvals/email/refuse_manually_body.md", email_context)
 
     context = _admin_context(
         request,

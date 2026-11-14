@@ -1,13 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-
-{% if job_application.is_sent_by_proxy %}
-
-    {{ job_application.sender.get_inverted_full_name }} a envoyé votre candidature chez {{ job_application.to_company.display_name }}
-
-{% else %}
-
-    Candidature chez {{ job_application.to_company.display_name }} envoyée
-
-{% endif %}
-{% endblock %}
+{% block subject %}{% if job_application.is_sent_by_proxy %}{{ job_application.sender.get_inverted_full_name }} a envoyé votre candidature chez {{ job_application.to_company.display_name }}{% else %}Candidature chez {{ job_application.to_company.display_name }} envoyée{% endif %}{% endblock %}

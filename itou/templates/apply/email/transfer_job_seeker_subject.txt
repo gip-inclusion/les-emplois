@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-Votre candidature a été transférée à une autre structure
-{% endblock %}
+{% block subject %}Votre candidature a été transférée à une autre structure{% endblock %}

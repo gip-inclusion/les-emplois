@@ -1,3 +1,2 @@
-{% autoescape off %}
-{% if itou_environment != "PROD" %}[{{ itou_environment }}] {% endif %}Confirmez votre adresse e-mail
-{% endautoescape %}
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}Confirmez votre adresse e-mail{% endblock %}

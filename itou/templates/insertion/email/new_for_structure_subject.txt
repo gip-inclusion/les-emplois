@@ -1,6 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-
-    Nouvelle demande d’orientation reçue
-
-{% endblock %}
+{% block subject %}Nouvelle demande d’orientation reçue{% endblock %}

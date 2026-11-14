@@ -1,3 +1,2 @@
-{% autoescape off %}
-{% if itou_environment != "PROD" %}[{{ itou_environment }}] {% endif %}E-mail de réinitialisation du mot de passe
-{% endautoescape %}
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}E-mail de réinitialisation du mot de passe{% endblock %}
