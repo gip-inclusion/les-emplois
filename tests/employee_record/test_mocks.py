@@ -3,7 +3,7 @@ from textwrap import dedent
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.mocks import asp_test_siaes, fake_serializers
-from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecordBatch
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 
 
@@ -48,9 +48,6 @@ def get_staging_siret_from_kind(mocker):
 
 def test_fake_serializers():
     employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-    notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
     assert fake_serializers.TestEmployeeRecordBatchSerializer(EmployeeRecordBatch([employee_record])).data
-    assert fake_serializers.TestEmployeeRecordUpdateNotificationBatchSerializer(
-        EmployeeRecordBatch([notification])
-    ).data
+    assert fake_serializers.TestEmployeeRecordForUpdateBatchSerializer(EmployeeRecordBatch([employee_record])).data
