@@ -29,3 +29,21 @@
 # name: TestProSupportReport.test_introduction_email[subject]
   '[TEST] Pierre DUPONT souhaite échanger avec vous sur le bilan que vous avez rempli'
 # ---
+# name: TestProSupportReport.test_notify_read[body]
+  '''
+  Bonjour Jean,
+  
+  Pierre DUPONT (Pres. Org.) a consulté le bilan d’accompagnement que vous avez rempli le 15/01/2026.
+  
+  Si vous souhaitez en parler avec Pierre DUPONT, vous trouverez ses coordonnées dans l’onglet « Accompagnateurs » de la fiche du salarié :
+  http://localhost:8000/job-seekers/advisors/7614fc4b-aef9-4694-ab17-12324300180a
+  
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProSupportReport.test_notify_read[subject]
+  '[TEST] Pierre DUPONT a consulté votre bilan d’accompagnement'
+# ---

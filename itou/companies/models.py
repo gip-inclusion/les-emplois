@@ -1451,6 +1451,19 @@ class ProSupportReport(models.Model):
             return self.introduction_email_recipient
         return self.get_company_contact()
 
+    def notify_read(self, contact):
+        from itou.companies.notifications import ProSupportReportReadNotification
+
+        # Without an organization: it may have lost its authorization since the report was sent.
+        assignment = self.get_last_authorized_prescriber_assignment(professional_id=self.notified_prescriber_id)
+        ProSupportReportReadNotification(
+            contact,
+            self.company,
+            report=self,
+            prescriber=self.notified_prescriber,
+            prescriber_organization=assignment and assignment.prescriber_organization,
+        ).send()
+
     def introduction_email(self, contact, prescriber, prescriber_organization):
         to = [contact.email]
         cc = [prescriber.email]
