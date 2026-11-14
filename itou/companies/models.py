@@ -1230,6 +1230,15 @@ class ContractQuerySet(models.QuerySet):
             Exists(Company.objects.active().filter(pk=OuterRef("company_id"))),
         )
 
+    def with_has_covering_pro_support_report(self):
+        # A renewal postpones the end date of the contract and calls for a new report.
+        # An end date brought forward does not: the existing report still covers the contract.
+        return self.annotate(
+            has_covering_pro_support_report=Exists(
+                ProSupportReport.objects.filter(contract=OuterRef("pk"), contract_end_date__gte=OuterRef("end_date"))
+            )
+        )
+
 
 class Contract(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)
@@ -1331,12 +1340,12 @@ class ProSupportReport(models.Model):
         related_name="+",
     )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
-    contract = models.OneToOneField(
+    contract = models.ForeignKey(
         Contract,
         verbose_name="contrat",
         null=True,
         on_delete=models.SET_NULL,
-        related_name="pro_support_report",
+        related_name="pro_support_reports",
     )
     contract_end_date = models.DateField(verbose_name="date de fin du contrat")
 
@@ -1376,6 +1385,12 @@ class ProSupportReport(models.Model):
                 name="%(class)s_solution_or_orientation",
                 condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
                 violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
+            ),
+            # The ASP renewals are merged into the same contract: each new end date calls for its own report.
+            models.UniqueConstraint(
+                fields=["contract", "contract_end_date"],
+                name="%(class)s_contract_end_date_unique",
+                violation_error_message="Un bilan existe déjà pour ce contrat et cette date de fin.",
             ),
         ]
 

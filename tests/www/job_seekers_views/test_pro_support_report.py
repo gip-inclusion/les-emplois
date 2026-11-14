@@ -121,6 +121,70 @@ def test_create_pro_support_report_for_employer(
 
 
 @freeze_time("2026-01-15")
+def test_create_pro_support_report_after_renewal_for_employer(client, membership):
+    contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
+    previous_report = ProSupportReportFactory(
+        contract=contract,
+        contract_end_date=datetime.date(2026, 1, 25),
+        created_at=timezone.now() - datetime.timedelta(days=30),
+    )
+    client.force_login(membership.user)
+    assert client.get(create_url(contract.job_seeker)).status_code == 404
+
+    contract.end_date = datetime.date(2026, 2, 10)
+    contract.save(update_fields=["end_date", "updated_at"])
+    response = client.post(
+        create_url(contract.job_seeker),
+        data={
+            "barriers": [ProSupportReportBarrier.MOBILITY],
+            "autonomy": "3",
+            "has_solution": "True",
+            "solution": ProSupportReportSolution.TRAINING,
+        },
+    )
+    assertRedirects(
+        response,
+        reverse("job_seekers_views:details", kwargs={"public_id": contract.job_seeker.public_id}),
+        fetch_redirect_response=False,
+    )
+    report = ProSupportReport.objects.exclude(pk=previous_report.pk).get()
+    assert report.contract == contract
+    assert report.contract_end_date == datetime.date(2026, 2, 10)
+    assert client.get(create_url(contract.job_seeker)).status_code == 404
+
+    # The card shows the new report.
+    details_url = reverse("job_seekers_views:details", kwargs={"public_id": contract.job_seeker.public_id})
+    response = client.get(details_url)
+    assertContains(response, f'href="{report_url(report)}?back_url={details_url}"')
+    assertNotContains(response, f'href="{report_url(previous_report)}?back_url={details_url}"')
+
+    # The previous report can still be read, with its own end date.
+    response = client.get(report_url(previous_report))
+    assertContains(response, "En cours, fin le 25/01/2026")
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_when_contract_end_date_moves_for_employer(client, membership):
+    report_end_date = datetime.date(2026, 2, 10)
+    contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
+    ProSupportReportFactory(contract=contract, contract_end_date=report_end_date)
+    client.force_login(membership.user)
+
+    # The contract end date was brought forward since the report.
+    assert client.get(create_url(contract.job_seeker)).status_code == 404
+
+    # Then it is extended, without going past the end date of the report.
+    contract.end_date = report_end_date
+    contract.save(update_fields=["end_date", "updated_at"])
+    assert client.get(create_url(contract.job_seeker)).status_code == 404
+
+    # Then it is extended past the end date of the report.
+    contract.end_date = report_end_date + datetime.timedelta(days=2)
+    contract.save(update_fields=["end_date", "updated_at"])
+    assert client.get(create_url(contract.job_seeker)).status_code == 200
+
+
+@freeze_time("2026-01-15")
 def test_create_pro_support_report_shows_the_question_matching_the_answer_for_employer(client, membership):
     contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
     client.force_login(membership.user)
@@ -342,3 +406,66 @@ def test_pro_support_report_banner_on_job_seeker_card_for_employer(client):
     client.force_login(CompanyMembershipFactory().user)
     response = client.get(details_url)
     assertNotContains(response, "Bilan d’accompagnement disponible")
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize(
+    "contract_end_date,report_banner_count",
+    [
+        (datetime.date(2026, 2, 10), 0),
+        (datetime.date(2026, 6, 1), 1),
+        (datetime.date(2026, 1, 20), 1),
+    ],
+    ids=["contract_renewed_ending_soon", "contract_renewed_not_ending_soon", "contract_end_date_brought_forward"],
+)
+@pytest.mark.parametrize(
+    "user_factory",
+    [
+        lambda report: advisor_organization(report).members.get(),
+        lambda report: CompanyMembershipFactory(company=report.company).user,
+    ],
+    ids=["advisor", "employer"],
+)
+def test_pro_support_report_banner_when_contract_end_date_moves(
+    client, contract_end_date, report_banner_count, user_factory
+):
+    report = ProSupportReportFactory(
+        contract__end_date=datetime.date(2026, 1, 25), contract_end_date=datetime.date(2026, 1, 25)
+    )
+    ApprovalFactory(user=report.job_seeker, start_at=report.contract.start_date, end_at=datetime.date(2026, 6, 1))
+    report.contract.end_date = contract_end_date
+    report.contract.save(update_fields=["end_date", "updated_at"])
+
+    client.force_login(user_factory(report))
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": report.job_seeker.public_id}))
+    assertContains(response, "Bilan d’accompagnement disponible", count=report_banner_count)
+
+
+@freeze_time("2026-01-15")
+def test_pro_support_report_banner_shows_the_report_on_the_last_contract_for_advisor(client):
+    report_on_last_contract = ProSupportReportFactory(contract__end_date=datetime.date(2026, 2, 10))
+    job_seeker = report_on_last_contract.job_seeker
+    ApprovalFactory(user=job_seeker, start_at=datetime.date(2025, 6, 1), end_at=datetime.date(2026, 6, 1))
+    # A more recent report, on a contract with another company ending earlier.
+    report_on_previous_contract = ProSupportReportFactory(
+        contract__job_seeker=job_seeker,
+        contract__end_date=datetime.date(2026, 2, 1),
+        created_at=report_on_last_contract.created_at + datetime.timedelta(days=1),
+    )
+    details_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    client.force_login(advisor_organization(report_on_last_contract).members.get())
+    response = client.get(details_url)
+    assertContains(response, f'href="{report_url(report_on_last_contract)}?back_url={details_url}"')
+    assertNotContains(response, f'href="{report_url(report_on_previous_contract)}?back_url={details_url}"')
+
+
+@freeze_time("2026-01-15")
+def test_pro_support_report_banner_with_a_newer_contract_without_end_date_for_advisor(client):
+    report = ProSupportReportFactory(contract__end_date=datetime.date(2026, 1, 25))
+    ApprovalFactory(user=report.job_seeker, start_at=report.contract.start_date, end_at=datetime.date(2026, 6, 1))
+    ContractFactory(job_seeker=report.job_seeker, start_date=datetime.date(2026, 1, 10), end_date=None)
+
+    client.force_login(advisor_organization(report).members.get())
+    response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": report.job_seeker.public_id}))
+    assertContains(response, f'href="{report_url(report)}?back_url=')

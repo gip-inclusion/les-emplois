@@ -285,6 +285,16 @@ class TestQuerySet:
         assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_has_pro_support_report is False
         assert job_seekers_qs.get(pk=report.job_seeker_id).last_contract_end_date == newer_contract.end_date
 
+    def test_with_last_contract_has_pro_support_report_after_renewal(self):
+        report = ProSupportReportFactory()
+        report.contract.end_date = report.contract_end_date + relativedelta(months=6)
+        report.contract.save(update_fields=["end_date", "updated_at"])
+
+        job_seeker = User.objects.with_last_contract_has_pro_support_report(siae=report.company).get(
+            pk=report.job_seeker_id
+        )
+        assert job_seeker.last_contract_has_pro_support_report is False
+
 
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):

@@ -38,7 +38,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.constants import IAE_CONTRACT_ENDING_SOON_DAYS
-from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
+from itou.companies.models import Company, CompanyMembership, Contract
 from itou.emails.utils import get_email_message
 from itou.otp.models import ItouTOTPDevice
 from itou.prescribers.enums import PrescriberAuthorizationStatus
@@ -175,7 +175,9 @@ class UserQuerySet(models.QuerySet):
     def with_last_contract_has_pro_support_report(self, siae):
         return self.annotate(
             last_contract_has_pro_support_report=Exists(
-                ProSupportReport.objects.filter(contract=self.last_contract_pk_lookup(siae=siae))
+                Contract.objects.with_has_covering_pro_support_report().filter(
+                    pk=self.last_contract_pk_lookup(siae=siae), has_covering_pro_support_report=True
+                )
             )
         )
 

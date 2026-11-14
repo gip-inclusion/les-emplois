@@ -229,7 +229,9 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                     "job_seekers_views:create_pro_support_report", kwargs={"public_id": self.object.public_id}
                 )
         elif self.request.from_authorized_prescriber and at_end_of_journey:
-            if last_contract := self.object.contracts.order_by("-end_date").first():
+            if last_contract := (
+                self.object.contracts.with_has_covering_pro_support_report().order_by("-end_date").first()
+            ):
                 contract_end_date = last_contract.end_date
                 company_email = last_contract.company.email if last_contract.company else None
                 # The job seeker's name is in the mail body: no action when it must stay masked.
@@ -247,12 +249,16 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             pro_support_reports = self.object.pro_support_reports.select_related("company").order_by("-created_at")
             if self.request.from_employer:
                 pro_support_reports = pro_support_reports.filter(company=self.request.current_organization)
-            pro_support_report = pro_support_reports.first()
-            if pro_support_report and (
-                not can_view_pro_support_report(self.request, pro_support_report)
+            elif contract_end_date:
                 # A report on a previous contract does not cover the contract ending soon.
-                or (contract_end_date and pro_support_report.contract_end_date != contract_end_date)
-            ):
+                # Nor does a report on a previous end date of this contract.
+                pro_support_reports = (
+                    pro_support_reports.filter(contract=last_contract)
+                    if last_contract.has_covering_pro_support_report
+                    else pro_support_reports.none()
+                )
+            pro_support_report = pro_support_reports.first()
+            if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
                 pro_support_report = None
 
         return context | {
@@ -585,9 +591,12 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         kind=UserKind.JOB_SEEKER,
     )
     last_contract = (
-        job_seeker.contracts.filter(company=request.current_organization).order_by("-start_date", "-pk").first()
+        job_seeker.contracts.filter(company=request.current_organization)
+        .with_has_covering_pro_support_report()
+        .order_by("-start_date", "-pk")
+        .first()
     )
-    if ProSupportReport.objects.filter(contract=last_contract).exists():
+    if last_contract.has_covering_pro_support_report:
         raise Http404
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 

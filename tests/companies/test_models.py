@@ -741,6 +741,31 @@ class TestContractQuerySet:
             ordered=False,
         )
 
+    @pytest.mark.parametrize(
+        "days_after_contract_end_date,expected",
+        [(0, True), (10, True), (-10, False)],
+        ids=["same_end_date", "contract_end_date_brought_forward", "contract_renewed"],
+    )
+    def test_with_has_covering_pro_support_report(self, days_after_contract_end_date, expected):
+        contract = ContractFactory(end_date=timezone.localdate())
+        ProSupportReportFactory(
+            contract=contract, contract_end_date=contract.end_date + timedelta(days=days_after_contract_end_date)
+        )
+        assert (
+            Contract.objects.with_has_covering_pro_support_report().get(pk=contract.pk).has_covering_pro_support_report
+            is expected
+        )
+
+    def test_with_has_covering_pro_support_report_ignores_other_contracts(self):
+        report = ProSupportReportFactory()
+        contract = ContractFactory(
+            job_seeker=report.job_seeker, company=report.company, end_date=report.contract_end_date
+        )
+        assert (
+            Contract.objects.with_has_covering_pro_support_report().get(pk=contract.pk).has_covering_pro_support_report
+            is False
+        )
+
 
 class TestContractModel:
     def test_has_ended(self):
@@ -817,7 +842,10 @@ class TestProSupportReport:
         report.refresh_from_db()
         assert report.notified_prescriber is None
 
-    def test_unique_per_contract(self):
+    def test_unique_per_contract_end_date(self):
         report = ProSupportReportFactory()
-        with pytest.raises(IntegrityError, match="companies_prosupportreport_contract_id_key"):
-            ProSupportReportFactory(contract=report.contract)
+        ProSupportReportFactory(
+            contract=report.contract, contract_end_date=report.contract_end_date + timedelta(days=1)
+        )
+        with pytest.raises(IntegrityError, match="prosupportreport_contract_end_date_unique"):
+            ProSupportReportFactory(contract=report.contract, contract_end_date=report.contract_end_date)
