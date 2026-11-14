@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from unittest import mock
 
 import pytest
@@ -765,6 +765,37 @@ class TestContractModel:
         assert contract_no_enddate_inactive_siae.has_ended
         assert contract_no_enddate_deleted_siae.has_ended
         assert contract_enddate_in_past.has_ended
+
+    @pytest.mark.parametrize(
+        "details,expected",
+        [
+            (
+                [
+                    {"Contrat Date Sortie Definitive": None, "Motif Sortie": None},
+                    {"Contrat Date Sortie Definitive": "2026-03-31", "Motif Sortie": "Inactif"},
+                ],
+                "Inactif",
+            ),
+            (
+                [{"Contrat Date Sortie Definitive": None, "Motif Sortie": None}],
+                None,
+            ),
+            (
+                [
+                    {"Contrat Date Sortie Definitive": "2026-01-15", "Motif Sortie": "Inactif"},
+                    {"Contrat Date Sortie Definitive": None, "Motif Sortie": None},
+                ],
+                None,
+            ),
+        ],
+        ids=["exit", "planned_end", "exit_then_renewal"],
+    )
+    def test_exit_reason(self, details, expected):
+        contract = ContractFactory(end_date=date(2026, 3, 31), details=details)
+        assert contract.exit_reason == expected
+
+    def test_exit_reason_without_end_date(self):
+        assert ContractFactory(end_date=None).exit_reason is None
 
 
 class TestProSupportReport:

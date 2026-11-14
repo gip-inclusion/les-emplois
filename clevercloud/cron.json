@@ -40,6 +40,7 @@
   "45 4 * * * $ROOT/clevercloud/run_management_command.sh deactivate_spontaneous_jobapps",
   "0 5 * * * $ROOT/clevercloud/run_management_command.sh deactivate_old_job_descriptions",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
+  "45 5 * * * $ROOT/clevercloud/run_management_command.sh detect_contract_exits --wet-run",
   "30 6 * * * $ROOT/clevercloud/run_management_command.sh check_inconsistencies",
   "0 7 * * * $ROOT/clevercloud/run_management_command.sh archive_accepted_evaluated_siae --wet-run",
   "30 7 * * * $ROOT/clevercloud/run_management_command.sh archive_old_assignments",
