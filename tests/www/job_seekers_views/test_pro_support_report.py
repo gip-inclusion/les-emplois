@@ -130,6 +130,7 @@ def test_create_pro_support_report_for_employer(
     # The authorized prescriber is notified.
     assert [email.to for email in mailoutbox] == [[advisor.email]]
     assert report.notified_prescriber == advisor
+    assert report.notified_prescriber_organization == advisor_membership.organization
 
     # Sent reports cannot be modified.
     response = client.get(create_url(contract.job_seeker))
@@ -197,6 +198,7 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     )
     report = ProSupportReport.objects.get()
     assert report.notified_prescriber is None
+    assert report.notified_prescriber_organization is None
     assert mailoutbox == []
 
 

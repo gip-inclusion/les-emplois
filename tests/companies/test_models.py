@@ -806,6 +806,7 @@ class TestProSupportReport:
         assert [email.to for email in mailoutbox] == [[membership.user.email]]
         report.refresh_from_db()
         assert report.notified_prescriber == membership.user
+        assert report.notified_prescriber_organization == membership.organization
 
     def test_unique_per_contract(self):
         report = ProSupportReportFactory()
