@@ -605,7 +605,8 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     )
     if request.method == "POST" and form.is_valid():
         report = form.save()
-        report.notify_authorized_prescriber()
+        if recipient := report.get_suggested_recipient():
+            report.notify_prescriber(recipient.professional, recipient.prescriber_organization)
         messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
