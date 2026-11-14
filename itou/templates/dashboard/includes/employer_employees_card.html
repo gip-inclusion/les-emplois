@@ -34,7 +34,7 @@
                     <span>Usagers accompagnés</span>
                 </a>
             </li>
-            {% if end_of_journey_count is not None %}
+            {% if pro_support_report_to_fill_count is not None %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'job_seekers_views:list_organization' %}?end_of_journey=on"
                        class="btn-link btn-ico"
@@ -42,8 +42,8 @@
                         <i class="ri-history-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Fins de contrats</span>
                     </a>
-                    {% if end_of_journey_count %}
-                        <span class="badge rounded-pill badge-xs bg-warning">{{ end_of_journey_count }}</span>
+                    {% if pro_support_report_to_fill_count %}
+                        <span class="badge rounded-pill badge-xs bg-warning">{{ pro_support_report_to_fill_count }}</span>
                     {% endif %}
                 </li>
             {% endif %}
