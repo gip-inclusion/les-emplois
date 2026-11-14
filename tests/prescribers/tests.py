@@ -39,7 +39,24 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, ProfessionalFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, ProfessionalFactory
+
+
+class TestPrescriberOrganizationQuerySet:
+    def test_authorized_for_member_email(self):
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        authorized_organization = prescriber.prescriberorganization_set.get()
+        # The prescriber left this organization, where a coworker remains an active member.
+        left_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
+        PrescriberMembershipFactory(user=prescriber, organization=left_organization, is_active=False)
+        PrescriberMembershipFactory(user=prescriber, organization__authorized=False)
+        inactive_prescriber = PrescriberFactory(membership__organization__authorized=True, is_active=False)
+
+        assertQuerySetEqual(
+            PrescriberOrganization.objects.authorized_for_member_email(prescriber.email.upper()),
+            [authorized_organization],
+        )
+        assertQuerySetEqual(PrescriberOrganization.objects.authorized_for_member_email(inactive_prescriber.email), [])
 
 
 class TestPrescriberOrganizationManager:
