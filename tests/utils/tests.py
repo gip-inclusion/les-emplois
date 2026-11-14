@@ -21,6 +21,7 @@ from django.db import models
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
+from django.templatetags.static import static
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -1545,6 +1546,36 @@ def test_matomo_context_processor(client, settings, snapshot):
     script_content = parse_response_to_soup(response, selector=f"#{matomo_script_id}")
     assert pretty_indented(script_content) == snapshot(name="matomo custom init siae card")
     assertContains(response, matomo_tarteaucitron_integration)
+
+
+class TestWebauthnSurvey:
+    @pytest.fixture(autouse=True)
+    def setup(self, settings):
+        settings.MATOMO_BASE_URL = "https://fake.matomo.url"
+
+    def get_survey_scripts(self, response):
+        # static() gives the hashed name when ManifestStaticFilesStorage is used (on the CI).
+        return parse_response_to_soup(response).select(f'script[src="{static("js/webauthn_survey.js")}"]')
+
+    def test_anonymous(self, client):
+        response = client.get(reverse("search:employers_home"))
+        assertContains(response, "matomo-custom-init")
+        assert self.get_survey_scripts(response) == []
+
+    def test_authenticated(self, client):
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"), follow=True)
+        [script] = self.get_survey_scripts(response)
+        assert script["data-emplois-user-id"] == str(user.pk)
+
+    def test_hijacked(self, client):
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+        client.post(reverse("hijack:acquire"), {"user_pk": JobSeekerFactory().pk, "next": "/"})
+        response = client.get(reverse("dashboard:index"), follow=True)
+        assertContains(response, "matomo-custom-init")
+        assert self.get_survey_scripts(response) == []
 
 
 @pytest.mark.parametrize("state", JobApplicationState.values)
