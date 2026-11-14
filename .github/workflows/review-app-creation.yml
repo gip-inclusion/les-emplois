@@ -56,12 +56,22 @@ jobs:
         echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME}.cleverapps.io\"`" >> $GITHUB_ENV
     # End of environment variables
 
-    - name: 🧫 Create a review app on Clever Cloud
+    - name: 🌐 Download Clever Cloud CLI
       run: |
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
+
+    - name: 🤝 Login to Clever Cloud
+      run:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+
+    - name: ✅ Ensure the app does not already exists
+      run: |
+        ! $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME "
+
+    - name: 🧫 Create a review app on Clever Cloud
+      run: |
         $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $CLEVER_ORG_ID --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
 
