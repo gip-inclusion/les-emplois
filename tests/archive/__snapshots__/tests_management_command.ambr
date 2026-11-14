@@ -1903,6 +1903,7 @@
                  "companies_prosupportreport"."author_id",
                  "companies_prosupportreport"."notified_prescriber_id",
                  "companies_prosupportreport"."notified_prescriber_organization_id",
+                 "companies_prosupportreport"."notified_prescriber_source",
                  "companies_prosupportreport"."contract_id",
                  "companies_prosupportreport"."contract_end_date",
                  "companies_prosupportreport"."barriers",
