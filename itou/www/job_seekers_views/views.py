@@ -695,9 +695,11 @@ def send_pro_support_report_introduction(
 @http_methods(db_write=["POST"])
 @check_request(lambda request: request.from_authorized_prescriber)
 def record_pro_support_report_first_read(request, public_id):
-    ProSupportReport.objects.filter(public_id=public_id, notified_prescriber=request.user, first_read_at=None).update(
-        first_read_at=timezone.now()
-    )
+    # The support team impersonating the prescriber is not a read: the author would be told so.
+    if not request.user.is_hijacked:
+        ProSupportReport.objects.filter(
+            public_id=public_id, notified_prescriber=request.user, first_read_at=None
+        ).update(first_read_at=timezone.now())
     return HttpResponse()
 
 

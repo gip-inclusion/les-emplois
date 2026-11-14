@@ -898,3 +898,60 @@ class TestProSupportReport:
         assert f"par {report.author.get_full_name()}, qui a quitté votre structure" in email.body
         assert f"**{admin.get_full_name()}**, {report.company.display_name}" in email.body
         assert "vous pouvez lui transférer ce message" in email.body
+
+    @freeze_time("2026-01-15 10:00")
+    def test_notify_read(self, django_capture_on_commit_callbacks, mailoutbox, snapshot):
+        report = ProSupportReportFactory(
+            for_snapshot=True,
+            contract__job_seeker__for_snapshot=True,
+            contract__job_seeker__first_name="Salomé",
+            contract__job_seeker__last_name="Salarié",
+        )
+        CompanyMembershipFactory(company=report.company, user=report.author)
+        organization = PrescriberOrganizationFactory(for_snapshot=True, authorized=True)
+        report.notified_prescriber = PrescriberFactory(for_snapshot=True, membership__organization=organization)
+        JobSeekerAssignmentFactory(
+            job_seeker=report.job_seeker, professional=report.notified_prescriber, prescriber_organization=organization
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_read(report.author)
+        [email] = mailoutbox
+        assert email.to == [report.author.email]
+        assert email.subject == snapshot(name="subject")
+        assert email.body == snapshot(name="body")
+        # The job seeker's name is only visible once logged in.
+        assert "Salomé" not in email.subject + email.body
+        assert "Salarié" not in email.subject + email.body
+
+    def test_notify_read_when_the_author_left(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory(notified_prescriber=PrescriberFactory())
+        JobSeekerAssignmentFactory(
+            job_seeker=report.job_seeker,
+            professional=report.notified_prescriber,
+            prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+        )
+        admin = CompanyMembershipFactory(company=report.company).user
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_read(admin)
+        [email] = mailoutbox
+        assert email.to == [admin.email]
+        assert email.subject.endswith("a consulté un bilan d’accompagnement de votre structure")
+        assert f"par {report.author.get_full_name()}.\n" in email.body
+        assert "vous pouvez lui transférer ce message" in email.body
+
+    def test_notify_read_once_the_organization_lost_its_authorization(
+        self, django_capture_on_commit_callbacks, mailoutbox
+    ):
+        report = ProSupportReportFactory(notified_prescriber=PrescriberFactory())
+        organization = PrescriberOrganizationFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=report.job_seeker, professional=report.notified_prescriber, prescriber_organization=organization
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            report.notify_read(report.author)
+        [email] = mailoutbox
+        assert f"{report.notified_prescriber.get_full_name()} a consulté le bilan" in email.body
+        assert organization.display_name not in email.body

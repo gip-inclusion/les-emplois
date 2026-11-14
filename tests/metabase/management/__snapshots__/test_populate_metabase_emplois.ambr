@@ -10311,7 +10311,7 @@
 # ---
 # name: test_populate_pro_support_reports
   dict({
-    'num_queries': 32,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -10357,7 +10357,8 @@
                                                                                           "date_de_création" timestamp WITH TIME ZONE,
                                                                                                                                  "id_candidat" integer,"id_structure" integer,"id_auteur" integer,"id_prescripteur_prévenu" integer,"date_première_lecture" timestamp WITH TIME ZONE,
                                                                                                                                                                                                                                                                                 "date_mise_en_relation" timestamp WITH TIME ZONE,
-                                                                                                                                                                                                                                                                                                                            "id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
+                                                                                                                                                                                                                                                                                                                            "date_mail_bilan_consulté" timestamp WITH TIME ZONE,
+                                                                                                                                                                                                                                                                                                                                                                           "id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -10467,6 +10468,18 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."date_mise_en_relation" IS \'Date à laquelle un prescripteur a envoyé l’e-mail de mise en relation avec la structure, vide si aucun e-mail n’a été envoyé\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_pro_support_reports[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."date_mail_bilan_consulté" IS \'Date à laquelle la structure a été prévenue par e-mail de la première lecture du bilan, y compris si le destinataire a désactivé cette notification, vide sinon\'',
       }),
       dict({
         'origin': list([
@@ -10663,7 +10676,8 @@
                  "companies_prosupportreport"."orientation",
                  "companies_prosupportreport"."introduction_email_sent_at",
                  "companies_prosupportreport"."introduction_email_recipient_id",
-                 "companies_prosupportreport"."first_read_at"
+                 "companies_prosupportreport"."first_read_at",
+                 "companies_prosupportreport"."read_email_sent_at"
           FROM "companies_prosupportreport"
           ORDER BY RANDOM() ASC
         ''',
@@ -10689,6 +10703,7 @@
                                                  "id_prescripteur_prévenu",
                                                  "date_première_lecture",
                                                  "date_mise_en_relation",
+                                                 "date_mail_bilan_consulté",
                                                  "id_contrat_asp",
                                                  "date_fin_contrat",
                                                  "frein_santé",
