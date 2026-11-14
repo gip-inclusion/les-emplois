@@ -49,6 +49,13 @@ class PrescriberOrganizationQuerySet(OrganizationQuerySet):
             has_active_members=Exists(PrescriberMembership.objects.filter(organization=OuterRef("pk")))
         )
 
+    def authorized_for_member_email(self, email):
+        # The default manager only keeps active members, whose user is active too.
+        return self.filter(
+            Exists(PrescriberMembership.objects.filter(user__email=email, organization=OuterRef("pk"))),
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+
 
 class PrescriberOrganizationManager(models.Manager):
     def get_accredited_orgs_for(self, org):
