@@ -347,6 +347,12 @@ def advisor_who_created_the_job_seeker(report):
     return prescriber
 
 
+def member_of_the_notified_organization(report, authorized=True):
+    organization = PrescriberOrganizationFactory(with_membership=True, authorized=authorized)
+    ProSupportReport.objects.filter(pk=report.pk).update(notified_prescriber_organization=organization)
+    return organization.members.get()
+
+
 @pytest.mark.parametrize(
     "user_factory,status_code",
     [
@@ -356,6 +362,8 @@ def advisor_who_created_the_job_seeker(report):
         (lambda report: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(), 404),
         (lambda report: advisor_organization(report, authorized=False).members.get(), 404),
         (advisor_who_created_the_job_seeker, 404),
+        (member_of_the_notified_organization, 200),
+        (lambda report: member_of_the_notified_organization(report, authorized=False), 404),
         (lambda report: CompanyMembershipFactory().user, 404),
         (lambda report: report.job_seeker, 403),
     ],
@@ -366,6 +374,8 @@ def advisor_who_created_the_job_seeker(report):
         "authorized_prescriber_not_advisor",
         "prescriber_advisor_who_cannot_view_personal_information",
         "prescriber_advisor_who_can_view_personal_information",
+        "member_of_the_notified_organization",
+        "member_of_the_notified_organization_no_longer_authorized",
         "employer_of_another_company",
         "job_seeker",
     ],

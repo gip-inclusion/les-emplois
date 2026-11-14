@@ -28,7 +28,8 @@ def can_view_pro_support_report(request, report):
         return report.company_id == request.current_organization.pk
     if request.from_authorized_prescriber:
         return (
-            JobSeekerAssignment.objects.assigned_to(
+            report.notified_prescriber_organization_id == request.current_organization.pk
+            or JobSeekerAssignment.objects.assigned_to(
                 request.user, request.current_organization, from_all_coworkers=True
             )
             .filter(job_seeker_id=report.job_seeker_id)
