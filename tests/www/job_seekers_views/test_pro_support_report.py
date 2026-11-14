@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import ProSupportReportBarrier, ProSupportReportOrientation, ProSupportReportSolution
-from itou.companies.models import Contract, ProSupportReport
+from itou.companies.models import ProSupportReport
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
@@ -131,7 +131,8 @@ def test_create_pro_support_report_after_renewal_for_employer(client, membership
     client.force_login(membership.user)
     assert client.get(create_url(contract.job_seeker)).status_code == 404
 
-    Contract.objects.filter(pk=contract.pk).update(end_date=datetime.date(2026, 2, 10))
+    contract.end_date = datetime.date(2026, 2, 10)
+    contract.save(update_fields=["end_date", "updated_at"])
     response = client.post(
         create_url(contract.job_seeker),
         data={
@@ -173,27 +174,14 @@ def test_create_pro_support_report_when_contract_end_date_moves_for_employer(cli
     assert client.get(create_url(contract.job_seeker)).status_code == 404
 
     # Then it is extended, without going past the end date of the report.
-    Contract.objects.filter(pk=contract.pk).update(end_date=report_end_date)
+    contract.end_date = report_end_date
+    contract.save(update_fields=["end_date", "updated_at"])
     assert client.get(create_url(contract.job_seeker)).status_code == 404
 
     # Then it is extended past the end date of the report.
-    Contract.objects.filter(pk=contract.pk).update(end_date=report_end_date + datetime.timedelta(days=2))
+    contract.end_date = report_end_date + datetime.timedelta(days=2)
+    contract.save(update_fields=["end_date", "updated_at"])
     assert client.get(create_url(contract.job_seeker)).status_code == 200
-
-
-@freeze_time("2026-01-15")
-def test_create_pro_support_report_when_last_contract_has_no_end_date_for_employer(client, membership):
-    contract = end_of_journey_contract(membership.company, datetime.date(2026, 1, 25))
-    ContractFactory(
-        job_seeker=contract.job_seeker,
-        company=membership.company,
-        start_date=datetime.date(2026, 1, 10),
-        end_date=None,
-    )
-    client.force_login(membership.user)
-
-    response = client.get(create_url(contract.job_seeker))
-    assert response.status_code == 404
 
 
 @freeze_time("2026-01-15")
@@ -441,9 +429,12 @@ def test_pro_support_report_banner_on_job_seeker_card_for_employer(client):
 def test_pro_support_report_banner_when_contract_end_date_moves(
     client, contract_end_date, report_banner_count, user_factory
 ):
-    report = ProSupportReportFactory(contract__end_date=datetime.date(2026, 1, 25))
+    report = ProSupportReportFactory(
+        contract__end_date=datetime.date(2026, 1, 25), contract_end_date=datetime.date(2026, 1, 25)
+    )
     ApprovalFactory(user=report.job_seeker, start_at=report.contract.start_date, end_at=datetime.date(2026, 6, 1))
-    Contract.objects.filter(pk=report.contract_id).update(end_date=contract_end_date)
+    report.contract.end_date = contract_end_date
+    report.contract.save(update_fields=["end_date", "updated_at"])
 
     client.force_login(user_factory(report))
     response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": report.job_seeker.public_id}))

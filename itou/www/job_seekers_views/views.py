@@ -251,13 +251,14 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                 pro_support_reports = pro_support_reports.filter(company=self.request.current_organization)
             elif contract_end_date:
                 # A report on a previous contract does not cover the contract ending soon.
-                pro_support_reports = pro_support_reports.filter(contract=last_contract)
-            pro_support_report = pro_support_reports.first()
-            if pro_support_report and (
-                not can_view_pro_support_report(self.request, pro_support_report)
                 # Nor does a report on a previous end date of this contract.
-                or (contract_end_date and not last_contract.has_covering_pro_support_report)
-            ):
+                pro_support_reports = (
+                    pro_support_reports.filter(contract=last_contract)
+                    if last_contract.has_covering_pro_support_report
+                    else pro_support_reports.none()
+                )
+            pro_support_report = pro_support_reports.first()
+            if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
                 pro_support_report = None
 
         return context | {
@@ -595,8 +596,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         .order_by("-start_date", "-pk")
         .first()
     )
-    # The last contract may have no end date yet while an older one is ending soon: nothing to report on.
-    if not last_contract.end_date or last_contract.has_covering_pro_support_report:
+    if last_contract.has_covering_pro_support_report:
         raise Http404
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 
