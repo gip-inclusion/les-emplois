@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 
@@ -21,37 +22,64 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form mb-3 mb-md-4">
-                        <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
+                        <h2 class="h3 mb-1">Bilan d’accompagnement</h2>
+                        <p class="mb-4">
+                            {% if last_contract.has_ended %}
+                                Le contrat de travail a pris fin le {{ last_contract.end_date|date:"d/m/Y" }}.
+                            {% else %}
+                                Le contrat arrive à échéance le {{ last_contract.end_date|date:"d/m/Y" }}.
+                            {% endif %}
+                        </p>
+                        {% if other_company %}
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0" %}
+                                {% fragment as c_info__summary %}
+                                    Connectez-vous à la structure {{ other_company.display_name }} pour remplir le bilan d’accompagnement de ce salarié.
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    <form action="{% url 'dashboard:switch_organization' %}?next_url={{ request.get_full_path|urlencode }}"
+                                          method="post">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-sm btn-link ps-0"
+                                                name="organization_key"
+                                                value="{{ other_company.organization_switch_key }}">Me connecter à cette structure</button>
+                                    </form>
+                                {% endfragment %}
+                            {% endcomponent_info %}
+                        {% elif pro_support_report %}
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-0" %}
+                                {% fragment as c_info__summary %}
+                                    Le bilan d’accompagnement de ce contrat a déjà été rempli le {{ pro_support_report.created_at|date:"d/m/Y" }} par {{ pro_support_report.author.get_full_name }}.
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    <a href="{% url 'job_seekers_views:pro_support_report' public_id=pro_support_report.public_id %}?back_url={{ back_url|urlencode }}"
+                                       class="btn btn-sm btn-link ps-0">Consulter le bilan</a>
+                                {% endfragment %}
+                            {% endcomponent_info %}
+                        {% else %}
+                            <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
 
-                            <h2 class="h3 mb-1">Bilan d’accompagnement</h2>
-                            <p class="mb-4">
-                                {% if last_contract.has_ended %}
-                                    Le contrat de travail a pris fin le {{ last_contract.end_date|date:"d/m/Y" }}.
-                                {% else %}
-                                    Le contrat arrive à échéance le {{ last_contract.end_date|date:"d/m/Y" }}.
-                                {% endif %}
-                            </p>
+                                {% bootstrap_form_errors form type="non_fields" %}
 
-                            {% bootstrap_form_errors form type="non_fields" %}
+                                {% bootstrap_field form.barriers %}
+                                {% bootstrap_field form.other_barrier %}
 
-                            {% bootstrap_field form.barriers %}
-                            {% bootstrap_field form.other_barrier %}
+                                {% bootstrap_field form.autonomy %}
 
-                            {% bootstrap_field form.autonomy %}
+                                {% bootstrap_field form.has_solution %}
+                                <div id="pro-support-report-next-step">
+                                    {% if form.has_solution.value == "True" %}
+                                        {% bootstrap_field form.solution %}
+                                    {% elif form.has_solution.value == "False" %}
+                                        {% bootstrap_field form.orientation %}
+                                    {% endif %}
+                                </div>
 
-                            {% bootstrap_field form.has_solution %}
-                            <div id="pro-support-report-next-step">
-                                {% if form.has_solution.value == "True" %}
-                                    {% bootstrap_field form.solution %}
-                                {% elif form.has_solution.value == "False" %}
-                                    {% bootstrap_field form.orientation %}
-                                {% endif %}
-                            </div>
-
-                            <p>Une fois envoyé, le bilan ne pourra plus être modifié.</p>
-                            {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
-                        </form>
+                                <p>Une fois envoyé, le bilan ne pourra plus être modifié.</p>
+                                {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
