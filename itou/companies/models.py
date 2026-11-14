@@ -1398,21 +1398,25 @@ class ProSupportReport(models.Model):
     def author_has_left(self):
         return self.company_id is not None and not self.company.has_member(self.author)
 
-    def notify_authorized_prescriber(self):
+    def get_last_authorized_prescriber_assignment(self, **filters):
         from itou.users.models import JobSeekerAssignment
-        from itou.users.notifications import ProSupportReportCreatedNotification
 
         # Ended assignments included: the last authorized prescriber may have closed the follow-up.
-        assignment = (
+        return (
             JobSeekerAssignment.objects.filter(
                 job_seeker_id=self.job_seeker_id,
                 prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+                **filters,
             )
             .select_related("professional", "prescriber_organization")
             .order_by("-last_action_at")
             .first()
         )
-        if assignment:
+
+    def notify_authorized_prescriber(self):
+        from itou.users.notifications import ProSupportReportCreatedNotification
+
+        if assignment := self.get_last_authorized_prescriber_assignment():
             self.notified_prescriber = assignment.professional
             self.save(update_fields=["notified_prescriber"])
             ProSupportReportCreatedNotification(
@@ -1429,6 +1433,19 @@ class ProSupportReport(models.Model):
             # The admin most likely to read the e-mail takes the place of the author who left.
             return self.company.active_admin_members.order_by(F("last_login").desc(nulls_last=True)).first()
         return self.author
+
+    def notify_read(self, contact):
+        from itou.companies.notifications import ProSupportReportReadNotification
+
+        # Without an organization: it may have lost its authorization since the report was sent.
+        assignment = self.get_last_authorized_prescriber_assignment(professional_id=self.notified_prescriber_id)
+        ProSupportReportReadNotification(
+            contact,
+            self.company,
+            report=self,
+            prescriber=self.notified_prescriber,
+            prescriber_organization=assignment and assignment.prescriber_organization,
+        ).send()
 
     def introduction_email(self, contact, prescriber, prescriber_organization):
         to = [contact.email]
