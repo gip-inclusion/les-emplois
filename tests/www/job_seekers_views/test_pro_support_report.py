@@ -239,6 +239,53 @@ def test_pro_support_report_for_employer(client, answer, expected, not_expected)
         assertNotContains(response, text)
 
 
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize(
+    "report_contract_end_date,contract_end_date,contract_deleted,expected",
+    [
+        (datetime.date(2026, 2, 15), datetime.date(2026, 2, 15), False, "En cours, fin le 15/02/2026"),
+        (
+            datetime.date(2026, 1, 5),
+            datetime.date(2026, 6, 30),
+            False,
+            "Initialement terminé le 05/01/2026, renouvelé jusqu’au 30/06/2026",
+        ),
+        # The report keeps the end date it was written for until that date.
+        (datetime.date(2026, 2, 15), datetime.date(2026, 6, 30), False, "En cours, fin le 15/02/2026"),
+        (
+            datetime.date(2025, 12, 5),
+            datetime.date(2026, 1, 5),
+            False,
+            "Initialement terminé le 05/12/2025, renouvelé jusqu’au 05/01/2026",
+        ),
+        (datetime.date(2026, 1, 5), datetime.date(2026, 1, 5), False, "Terminé le 05/01/2026"),
+        (datetime.date(2026, 1, 5), datetime.date(2025, 12, 5), False, "Terminé le 05/01/2026"),
+        (datetime.date(2026, 1, 5), None, False, "Terminé le 05/01/2026"),
+        (datetime.date(2026, 1, 5), datetime.date(2026, 1, 5), True, "Terminé le 05/01/2026"),
+    ],
+    ids=[
+        "ongoing",
+        "renewed",
+        "renewed_before_its_initial_end",
+        "renewal_ended",
+        "ended",
+        "end_date_moved_back",
+        "contract_without_end_date",
+        "contract_deleted",
+    ],
+)
+def test_pro_support_report_contract_situation(
+    client, report_contract_end_date, contract_end_date, contract_deleted, expected
+):
+    report = ProSupportReportFactory(contract_end_date=report_contract_end_date, contract__end_date=contract_end_date)
+    if contract_deleted:
+        report.contract.delete()
+    client.force_login(CompanyMembershipFactory(company=report.company).user)
+
+    response = client.get(report_url(report))
+    assertContains(response, f"<strong>{expected}</strong>", html=True, count=1)
+
+
 def advisor_organization(report, authorized=True, ended=False):
     organization = PrescriberOrganizationFactory(with_membership=True, authorized=authorized)
     JobSeekerAssignmentFactory(

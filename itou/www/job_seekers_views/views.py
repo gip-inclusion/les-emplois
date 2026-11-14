@@ -625,7 +625,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report.html"):
     report = get_object_or_404(
-        ProSupportReport.objects.select_related("job_seeker", "company", "author"), public_id=public_id
+        ProSupportReport.objects.select_related("job_seeker", "company", "author", "contract"), public_id=public_id
     )
     if not can_view_pro_support_report(request, report):
         raise Http404
