@@ -603,17 +603,30 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
             contract_end_date=last_contract.end_date,
         ),
     )
+    recipient = form.instance.get_suggested_recipient()
     if request.method == "POST" and form.is_valid():
         report = form.save()
-        if recipient := report.get_suggested_recipient():
+        if recipient:
             report.notify_prescriber(recipient.professional, recipient.prescriber_organization)
-        messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
+            messages.success(
+                request,
+                f"Bilan envoyé à {recipient.professional.get_full_name()}, "
+                f"de {recipient.prescriber_organization.display_name}",
+                extra_tags="toast",
+            )
+        else:
+            messages.success(
+                request,
+                "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne.",
+                extra_tags="toast",
+            )
         return HttpResponseRedirect(back_url)
 
     context = {
         "form": form,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
+        "recipient": recipient,
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),
