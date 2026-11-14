@@ -19,10 +19,11 @@ from tests.companies.factories import (
     ProSupportReportFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
 
 
 NO_RECIPIENT = "Aucun prescripteur habilité n’est rattaché à"
+SWITCH_ORGANIZATION = "Me connecter à cette structure"
 
 
 @pytest.fixture
@@ -424,3 +425,73 @@ def test_pro_support_report_banner_on_job_seeker_card_for_employer(client):
     client.force_login(CompanyMembershipFactory().user)
     response = client.get(details_url)
     assertNotContains(response, "Bilan d’accompagnement disponible")
+
+
+def test_pro_support_report_offers_the_notified_prescriber_to_switch_organization(client):
+    report = ProSupportReportFactory()
+    notified_organization = advisor_organization(report)
+    prescriber = notified_organization.members.get()
+    ProSupportReport.objects.filter(pk=report.pk).update(
+        notified_prescriber=prescriber, notified_prescriber_organization=notified_organization
+    )
+    other_organization = PrescriberMembershipFactory(user=prescriber, organization__authorized=True).organization
+    client.force_login(prescriber)
+    client.post(
+        reverse("dashboard:switch_organization"), {"organization_key": other_organization.organization_switch_key}
+    )
+
+    response = client.get(report_url(report))
+    assertContains(
+        response,
+        f"Ce bilan a été envoyé à la structure {notified_organization.display_name}. "
+        "Connectez-vous à cette structure pour le consulter.",
+    )
+    assertContains(response, SWITCH_ORGANIZATION)
+    assertNotContains(response, report.job_seeker.get_full_name())
+
+    response = client.post(
+        reverse("dashboard:switch_organization", query={"next_url": report_url(report)}),
+        {"organization_key": notified_organization.organization_switch_key},
+    )
+    assertRedirects(response, report_url(report), fetch_redirect_response=False)
+    response = client.get(report_url(report))
+    assertContains(
+        response, f"<h1>Bilan d’accompagnement de {report.job_seeker.get_inverted_full_name()}</h1>", html=True
+    )
+    assertNotContains(response, SWITCH_ORGANIZATION)
+
+
+def report_notified_before_organizations(prescriber, organization):
+    return ProSupportReportFactory(notified_prescriber=prescriber)
+
+
+def report_notified_to_an_organization(prescriber, organization):
+    return ProSupportReportFactory(notified_prescriber=prescriber, notified_prescriber_organization=organization)
+
+
+@pytest.mark.parametrize(
+    "report_factory,user_factory,switch_to_another_organization",
+    [
+        (report_notified_before_organizations, lambda prescriber: prescriber, True),
+        (report_notified_to_an_organization, lambda prescriber: PrescriberFactory(), True),
+        # No endless offer to switch to the current organization.
+        (report_notified_to_an_organization, lambda prescriber: prescriber, False),
+    ],
+    ids=["report_before_organizations", "not_a_member", "current_organization_no_longer_authorized"],
+)
+def test_pro_support_report_not_found_for_a_prescriber_of_another_organization(
+    client, report_factory, user_factory, switch_to_another_organization
+):
+    # Not authorized (anymore): the notified organization cannot view the report.
+    membership = PrescriberMembershipFactory()
+    report = report_factory(membership.user, membership.organization)
+    user = user_factory(membership.user)
+    client.force_login(user)
+    if switch_to_another_organization:
+        other_organization = PrescriberMembershipFactory(user=user, organization__authorized=True).organization
+        client.post(
+            reverse("dashboard:switch_organization"), {"organization_key": other_organization.organization_switch_key}
+        )
+
+    response = client.get(report_url(report))
+    assert response.status_code == 404
