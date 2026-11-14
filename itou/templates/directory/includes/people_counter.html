@@ -1,0 +1,6 @@
+{% load humanize %}
+{% load str_filters %}
+
+<p class="mb-0" id="people-search-count">
+    {{ results.paginator.count|intcomma }} résultat{{ results.paginator.count|pluralizefr }}
+</p>
