@@ -1,0 +1,31 @@
+# serializer version: 1
+# name: TestProSupportReport.test_introduction_email[body]
+  '''
+  Bonjour Jean, bonjour Pierre,
+  
+  Jean, Pierre DUPONT (Pres. Org.), en copie de ce message, a consulté le bilan d’accompagnement que vous avez rempli le 15/01/2026, et souhaite en parler de vive voix avec vous, pour évoquer le bilan et travailler la suite du parcours.
+  
+  Voici vos coordonnées respectives :
+  
+  **Jean MICHEL**, ACME Inc.
+  Téléphone : 0701020304
+  Adresse e-mail : jean.michel@test.local
+  
+  **Pierre DUPONT**, Pres. Org.
+  Téléphone : 0612345678
+  Adresse e-mail : pierre.dupont@test.local
+  
+  N’hésitez pas à vous appeler ou à vous écrire : utilisez « Répondre à tous ».
+  
+  Consulter le bilan :
+  http://localhost:8000/job-seekers/pro-support-report/6a2d3b1e-5f0c-4d8e-9b7a-1c2e3f4a5b6c
+  
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProSupportReport.test_introduction_email[subject]
+  '[TEST] Pierre DUPONT souhaite échanger avec vous sur le bilan que vous avez rempli'
+# ---

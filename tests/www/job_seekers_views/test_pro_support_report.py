@@ -342,3 +342,203 @@ def test_pro_support_report_banner_on_job_seeker_card_for_employer(client):
     client.force_login(CompanyMembershipFactory().user)
     response = client.get(details_url)
     assertNotContains(response, "Bilan d’accompagnement disponible")
+
+
+def introduction_url(report):
+    return reverse("job_seekers_views:send_pro_support_report_introduction", kwargs={"public_id": report.public_id})
+
+
+class TestSendProSupportReportIntroduction:
+    @freeze_time("2026-01-15 10:00")
+    def test_send(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        CompanyMembershipFactory(company=report.company, user=report.author)
+        organization = advisor_organization(report)
+        prescriber = PrescriberMembershipFactory(organization=organization, user__phone="").user
+        client.force_login(prescriber)
+
+        response = client.get(report_url(report))
+        assertNotContains(response, "a quitté la structure")
+        assertContains(response, f"Échanger avec {report.author.get_full_name()}")
+        assertContains(response, f"Mise en relation avec {report.author.get_full_name()}")
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        assert response.headers["HX-Refresh"] == "true"
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "06 12 34 56 78"
+        report.refresh_from_db()
+        assert report.introduction_email_sent_at == timezone.now()
+        assert report.introduction_email_recipient == report.author
+        [email] = mailoutbox
+        assert email.to == [report.author.email]
+        assert email.cc == [prescriber.email]
+
+        response = client.get(report_url(report))
+        assertContains(response, "E-mail de mise en relation envoyé")
+        assertContains(response, f"vous pouvez contacter {report.author.get_full_name()} dès maintenant")
+        assertContains(response, f"Échanger de vive voix avec {report.author.get_full_name()}")
+        assertNotContains(response, f"Échanger avec {report.author.get_full_name()}")
+
+        # Any authorized prescriber who reads the report sees the contact details.
+        client.force_login(PrescriberMembershipFactory(organization=organization).user)
+        response = client.get(report_url(report))
+        assertContains(response, f"Échanger de vive voix avec {report.author.get_full_name()}")
+        assertNotContains(response, f"Échanger avec {report.author.get_full_name()}")
+
+        # The SIAE does not see the contact details given to the prescriber.
+        client.force_login(CompanyMembershipFactory(company=report.company, is_admin=False).user)
+        response = client.get(report_url(report))
+        assertNotContains(response, "Échanger de vive voix")
+        assertNotContains(response, "Échanger avec")
+
+    def test_missing_phone(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        CompanyMembershipFactory(company=report.company, user=report.author)
+        client.force_login(PrescriberMembershipFactory(organization=advisor_organization(report), user__phone="").user)
+
+        response = client.post(introduction_url(report), {"phone": ""}, headers={"HX-Request": "true"})
+        assertContains(response, "Renseignez votre téléphone professionnel.")
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.introduction_email_sent_at is None
+
+    def test_already_sent(self, client, mailoutbox):
+        report = ProSupportReportFactory(introduction_email_sent_at=timezone.now())
+        CompanyMembershipFactory(company=report.company, user=report.author)
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == 404
+        assert mailoutbox == []
+
+    def test_author_left(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        admin = CompanyMembershipFactory(company=report.company).user
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.get(report_url(report))
+        # The admin is unknown to the prescriber: the author's departure explains why they get the email.
+        assertContains(response, f"par {report.author.get_full_name()} (a quitté la structure)")
+        assertContains(response, "<span>Échanger avec l’employeur</span>", html=True)
+        assertNotContains(response, f"Échanger avec {admin.get_full_name()}")
+        assertContains(response, f"Mise en relation avec {report.company.display_name}")
+        assertContains(
+            response, f"L’e-mail de mise en relation sera envoyé à {admin.get_full_name()}, qui administre le compte"
+        )
+
+        client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        [email] = mailoutbox
+        assert email.to == [admin.email]
+        report.refresh_from_db()
+        assert report.introduction_email_recipient == admin
+
+        response = client.get(report_url(report))
+        assertContains(
+            response, f"contacter {admin.get_full_name()}, qui administre le compte de la structure, dès maintenant"
+        )
+        assertContains(response, f"Échanger de vive voix avec {admin.get_full_name()}")
+
+        # The contact details stay those of the admin who received the email.
+        other_admin = CompanyMembershipFactory(company=report.company, user__last_login=timezone.now()).user
+        response = client.get(report_url(report))
+        assertContains(response, f"Échanger de vive voix avec {admin.get_full_name()}")
+        assertNotContains(response, other_admin.get_full_name())
+
+    @pytest.mark.parametrize(
+        "report_factory",
+        [
+            lambda: ProSupportReportFactory(company=None),
+            # The author is not a member of the company, which has no admin left.
+            ProSupportReportFactory,
+        ],
+        ids=["company_deleted", "author_left_without_admin"],
+    )
+    def test_without_contact(self, client, mailoutbox, report_factory):
+        report = report_factory()
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.get(report_url(report))
+        assertContains(response, '<h2 class="h3 mb-0">Contenu du bilan</h2>', html=True)
+        assertNotContains(response, "Échanger avec")
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == 404
+        assert mailoutbox == []
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (lambda report: CompanyMembershipFactory(company=report.company, is_admin=False).user, 403),
+            (lambda report: advisor_organization(report, authorized=False).members.get(), 403),
+            (lambda report: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(), 404),
+        ],
+        ids=["employer_of_the_report", "prescriber_advisor_not_authorized", "authorized_prescriber_not_advisor"],
+    )
+    def test_access(self, client, mailoutbox, user_factory, status_code):
+        report = ProSupportReportFactory()
+        CompanyMembershipFactory(company=report.company, user=report.author)
+        client.force_login(user_factory(report))
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == status_code
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.introduction_email_sent_at is None
+
+
+def first_read_url(report):
+    return reverse("job_seekers_views:record_pro_support_report_first_read", kwargs={"public_id": report.public_id})
+
+
+class TestRecordProSupportReportFirstRead:
+    @freeze_time("2026-01-15 10:00")
+    def test_record(self, client):
+        report = ProSupportReportFactory()
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.get(report_url(report))
+        assertContains(response, f'hx-post="{first_read_url(report)}"')
+        report.refresh_from_db()
+        assert report.first_read_at is None
+
+        client.post(first_read_url(report))
+        report.refresh_from_db()
+        assert report.first_read_at == timezone.now()
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+    def test_already_read(self, client):
+        report = ProSupportReportFactory(first_read_at=timezone.now() - datetime.timedelta(days=1))
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == 200
+        assert ProSupportReport.objects.get().first_read_at == report.first_read_at
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (lambda report, organization: PrescriberMembershipFactory(organization=organization).user, 200),
+            (lambda report, organization: CompanyMembershipFactory(company=report.company).user, 403),
+        ],
+        ids=["coworker_of_the_recipient", "employer_of_the_report"],
+    )
+    def test_read_by_someone_else(self, client, user_factory, status_code):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        report.notified_prescriber = organization.members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(user_factory(report, organization))
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == status_code
+        report.refresh_from_db()
+        assert report.first_read_at is None

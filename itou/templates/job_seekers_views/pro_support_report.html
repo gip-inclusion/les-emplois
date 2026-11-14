@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load matomo %}
 
 {% block title %}
     Bilan d’accompagnement de {{ report.job_seeker.get_inverted_full_name }} {{ block.super }}
@@ -14,7 +15,7 @@
         {% fragment as c_title__main %}
             <h1>Bilan d’accompagnement de {{ report.job_seeker.get_inverted_full_name }}</h1>
             <p>
-                Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.company %}, {{ report.company.display_name }}{% endif %}
+                Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.author_has_left %} (a quitté la structure){% endif %}{% if report.company %}, {{ report.company.display_name }}{% endif %}
             </p>
         {% endfragment %}
     {% endcomponent_title %}
@@ -26,6 +27,23 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-box mb-3 mb-md-4">
+                        <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="h3 mb-0">Contenu du bilan</h2>
+                            {% if introduction_form %}
+                                <button type="button"
+                                        class="btn btn-outline-primary btn-ico"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#pro-support-report-introduction-modal"
+                                        {% matomo_event "candidat" "clic" "ouvrir-mise-en-relation-bilan" %}>
+                                    <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
+                                    {% if report.author_has_left %}
+                                        <span>Échanger avec l’employeur</span>
+                                    {% else %}
+                                        <span>Échanger avec {{ introduction_contact.get_full_name }}</span>
+                                    {% endif %}
+                                </button>
+                            {% endif %}
+                        </div>
                         <ul class="list-data mb-0">
                             <li>
                                 <small>Situation du contrat</small>
@@ -73,10 +91,30 @@
                             {% endif %}
                         </ul>
                     </div>
+                    {% if introduction_contact and report.introduction_email_sent_at %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <h2 class="h3">Échanger de vive voix avec {{ introduction_contact.get_full_name }}</h2>
+                            {% include "job_seekers_views/includes/pro_support_report_introduction_contact.html" with contact=introduction_contact company=report.company in_modal=False only %}
+                        </div>
+                    {% endif %}
                     <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"
                        class="btn btn-outline-primary">Voir la fiche du salarié</a>
+                    {% if record_first_read %}
+                        <form hx-post="{% url "job_seekers_views:record_pro_support_report_first_read" public_id=report.public_id %}"
+                              hx-trigger="load"
+                              hx-swap="none">
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% if introduction_form %}
+        {% include "job_seekers_views/includes/pro_support_report_introduction_modal.html" with form=introduction_form report=report contact=introduction_contact csrf_token=csrf_token only %}
+    {% endif %}
 {% endblock %}
