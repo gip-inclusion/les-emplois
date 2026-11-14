@@ -12,11 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
 
 env:
-  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
-  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
-  CLEVER_CLI: clever-tools-latest_linux/clever
-  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
-  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   CLEVER_ORG_ID: orga_647d7c8e-c014-4346-b1cb-b97dc8fc6d25
   BRANCH: ${{ github.head_ref }}
 
@@ -32,6 +27,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ github.head_ref }}
+        persist-credentials: false
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
@@ -56,12 +52,14 @@ jobs:
         echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME}.cleverapps.io\"`" >> $GITHUB_ENV
     # End of environment variables
 
+    - name: ⏬ Install Clever Tools
+      uses: ./.github/actions/clever-cli
+      with:
+        token: ${{ secrets.CLEVER_TOKEN }}
+        secret: ${{ secrets.CLEVER_SECRET }}
+
     - name: 🧫 Create a review app on Clever Cloud
       run: |
-        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
-        tar -xvf $CLEVER_TAR_FILE
-        echo "Clever CLI version: $($CLEVER_CLI version)"
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $CLEVER_ORG_ID --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
 
@@ -98,9 +96,10 @@ jobs:
         $CLEVER_CLI deploy --branch "$BRANCH" --alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
-      run: gh pr comment ${{ github.event.pull_request.number }} --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
+      run: gh pr comment "$PR_NUMBER" --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://$DEPLOY_URL)"
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
 
   redeploy:
     runs-on: ubuntu-latest
@@ -113,6 +112,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ github.head_ref }}
+        persist-credentials: false
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
@@ -121,12 +121,14 @@ jobs:
       run:
         echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63 | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
 
+    - name: ⏬ Install Clever Tools
+      uses: ./.github/actions/clever-cli
+      with:
+        token: ${{ secrets.CLEVER_TOKEN }}
+        secret: ${{ secrets.CLEVER_SECRET }}
+
     - name: 🤝 Find the application on Clever Cloud
       run: |
-        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
-        tar -xvf $CLEVER_TAR_FILE
-        echo "Clever CLI version: $($CLEVER_CLI version)"
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: ⏭ Skip fixtures

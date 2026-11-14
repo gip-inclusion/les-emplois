@@ -51,8 +51,8 @@ cat << EOF
 Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
     clever ssh --alias "$APP_NAME"
- - 🔨 Jouer les scripts d’import, par exemple:
-    cd ~/app_* && scripts/import-iae.sh
+ - 🔨 Jouer les scripts d’import, par exemple (clever-tools 5.4.0 ou plus):
+    clever ssh --alias "$APP_NAME" --app-home --command scripts/import-iae.sh
  - 🍺 Supprimer la machine:
     clever delete --alias $APP_NAME --yes
 EOF

@@ -37,7 +37,7 @@ jobs:
       cancel-in-progress: true
     services:
       redis:
-        image: redis
+        image: redis:8
         ports:
           - 6379:6379
       postgres:
@@ -55,9 +55,14 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
       - name: 🤹 Django tests
-        run: make test TARGET="--shard=${{ matrix.shard }}/${{ strategy.job-total }} --allow-hosts=127.0.0.1,::1,${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}"
+        env:
+          SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
+          CELLAR_HOST: ${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}
+        run: make test TARGET="--shard=$SHARD --allow-hosts=127.0.0.1,::1,$CELLAR_HOST"
 
   tests: # Single, stable entry point for the required status checks, whatever the number of shards
     needs: tests-shard
@@ -96,6 +101,8 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
       - name: ✨ Verify quality
         run: make quality
