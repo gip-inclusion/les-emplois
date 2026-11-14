@@ -172,14 +172,20 @@ class UserQuerySet(models.QuerySet):
             )
         )
 
+    def last_contract_has_pro_support_report_lookup(self, siae):
+        return Exists(
+            ProSupportReport.objects.filter(
+                contract=self.last_contract_pk_lookup(siae=siae)
+            ).covering_contract_end_date()
+        )
+
     def with_last_contract_has_pro_support_report(self, siae):
         return self.annotate(
-            last_contract_has_pro_support_report=Exists(
-                ProSupportReport.objects.filter(
-                    contract=self.last_contract_pk_lookup(siae=siae)
-                ).covering_contract_end_date()
-            )
+            last_contract_has_pro_support_report=self.last_contract_has_pro_support_report_lookup(siae)
         )
+
+    def pro_support_report_to_fill(self, siae):
+        return self.at_end_of_journey(siae).exclude(self.last_contract_has_pro_support_report_lookup(siae))
 
     def with_last_contract_pro_support_report_public_id(self, siae):
         return self.annotate(
