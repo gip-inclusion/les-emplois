@@ -1,0 +1,16 @@
+{% load enums %}
+{% enums "users" "ActionKind" as ActionKind %}
+{% if recipient.last_action_kind == ActionKind.APPLY %}
+    qui a envoyé une candidature pour {{ job_seeker_name }} {{ last_action_date }}.
+{% elif recipient.last_action_kind == ActionKind.IAE_ELIGIBILITY %}
+    qui a validé l’éligibilité IAE de {{ job_seeker_name }} {{ last_action_date }}.
+{% elif recipient.last_action_kind == ActionKind.GEIQ_ELIGIBILITY %}
+    qui a validé l’éligibilité GEIQ de {{ job_seeker_name }} {{ last_action_date }}.
+{% elif recipient.last_action_kind == ActionKind.CREATE %}
+    qui a créé le compte de {{ job_seeker_name }} {{ last_action_date }}.
+{% elif recipient.last_action_kind == ActionKind.SELF_ASSIGN %}
+    qui s’est déclaré accompagnateur de {{ job_seeker_name }} {{ last_action_date }}.
+{% else %}
+    {# ActionKind.ORIENT: the employer actions (HIRE, ACCEPT) are not recorded for a prescriber organization. #}
+    qui a orienté {{ job_seeker_name }} vers un service {{ last_action_date }}.
+{% endif %}

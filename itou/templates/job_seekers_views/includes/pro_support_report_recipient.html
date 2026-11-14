@@ -1,0 +1,76 @@
+{% load components %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% load str_filters %}
+
+<div id="pro-support-report-recipient">
+    {% with job_seeker_name=job_seeker.get_full_name|mask_unless:can_view_personal_information suggested_recipient=form.suggested_recipient %}
+        {% fragment as authorized_prescribers %}
+            <p class="mb-0">
+                Seul un prescripteur habilité peut recevoir le bilan : France Travail, Mission locale, CCAS, Département…
+                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733442624657--Liste-des-prescripteurs-habilités-au-national/"
+                   target="_blank"
+                   rel="noopener"
+                   class="has-external-link"
+                   aria-label="Voir la liste complète des prescripteurs habilités (ouverture dans un nouvel onglet)">Voir la liste complète</a>
+            </p>
+        {% endfragment %}
+        {% if suggested_recipient %}
+            <div class="collapse pro-support-report-recipient-collapse{% if not form.prescriber_email.value %} show{% endif %}"
+                 id="pro-support-report-suggested-recipient">
+                {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+                    {% fragment as content %}
+                        {% fragment as last_action_date %}en {{ suggested_recipient.last_action_at|date:"F Y" }}{% endfragment %}
+                        <p class="mb-0">
+                            Ce bilan sera envoyé à <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }},
+                            {% include "job_seekers_views/includes/pro_support_report_recipient_reason.html" with recipient=suggested_recipient job_seeker_name=job_seeker_name last_action_date=last_action_date only %}
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+                <p>
+                    Ce n’est pas la bonne personne ?
+                    <button type="button"
+                            class="btn btn-link p-0 align-baseline"
+                            data-bs-toggle="collapse"
+                            data-bs-target=".pro-support-report-recipient-collapse"
+                            aria-expanded="false"
+                            aria-controls="pro-support-report-other-recipient"
+                            {% matomo_event "employeurs" "clic" "choisir-autre-prescripteur-bilan" %}>
+                        Choisir un autre prescripteur habilité
+                    </button>
+                </p>
+            </div>
+        {% endif %}
+        <div {% if suggested_recipient %}class="collapse pro-support-report-recipient-collapse{% if form.prescriber_email.value %} show{% endif %}"{% endif %} id="pro-support-report-other-recipient">
+            {% if suggested_recipient %}
+                {% component_alert content=authorized_prescribers variant="info" %}
+                {% endcomponent_alert %}
+            {% else %}
+                {% component_alert title=title content=authorized_prescribers variant="warning" %}
+                    {% fragment as title %}
+                        Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
+            {% bootstrap_field form.prescriber_email wrapper_class="form-group form-group-input-w-lg-66" %}
+            {% if form.prescriber_organization %}
+                {% bootstrap_field form.prescriber_organization wrapper_class="form-group form-group-input-w-lg-66" %}
+            {% endif %}
+            {% if suggested_recipient %}
+                <p class="mb-4">
+                    <button type="button"
+                            class="btn btn-link p-0"
+                            data-bs-toggle="collapse"
+                            data-bs-target=".pro-support-report-recipient-collapse"
+                            aria-expanded="false"
+                            aria-controls="pro-support-report-suggested-recipient"
+                            data-emplois-setter-target="#{{ form.prescriber_email.id_for_label }}"
+                            data-emplois-setter-value=""
+                            {% matomo_event "employeurs" "clic" "garder-prescripteur-propose-bilan" %}>
+                        Annuler et garder {{ suggested_recipient.professional.get_full_name }}
+                    </button>
+                </p>
+            {% endif %}
+        </div>
+    {% endwith %}
+</div>

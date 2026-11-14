@@ -28,7 +28,6 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.enums import ProSupportReportRecipientSource
 from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -604,17 +603,14 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
             contract_end_date=last_contract.end_date,
         ),
     )
-    recipient = form.instance.get_suggested_recipient()
     if request.method == "POST" and form.is_valid():
         report = form.save()
-        if recipient:
-            report.notify_prescriber(
-                recipient.professional, recipient.prescriber_organization, ProSupportReportRecipientSource.SUGGESTED
-            )
+        if prescriber := form.cleaned_data["prescriber"]:
+            organization = form.cleaned_data["organization"]
+            report.notify_prescriber(prescriber, organization, form.cleaned_data["source"])
             messages.success(
                 request,
-                f"Bilan envoyé à {recipient.professional.get_full_name()}, "
-                f"de {recipient.prescriber_organization.display_name}",
+                f"Bilan envoyé à {prescriber.get_full_name()}, de {organization.display_name}",
                 extra_tags="toast",
             )
         else:
@@ -629,7 +625,6 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         "form": form,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
-        "recipient": recipient,
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),

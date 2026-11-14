@@ -1,0 +1,108 @@
+# serializer version: 1
+# name: test_create_pro_support_report_recipient_block[with_suggestion]
+  '''
+  <div id="pro-support-report-recipient">
+      <div class="collapse pro-support-report-recipient-collapse show" id="pro-support-report-suggested-recipient">
+          <div class="alert alert-info" role="status">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-mail-send-line ri-xl text-info">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          Ce bilan sera envoyé à
+                          <strong>
+                              Pierre DUPONT
+                          </strong>
+                          , de Pres. Org.,
+                              
+  
+  
+      qui a envoyé une candidature pour Jane DOE en mars 2025.
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <p>
+              Ce n’est pas la bonne personne ?
+              <button aria-controls="pro-support-report-other-recipient" aria-expanded="false" class="btn btn-link p-0 align-baseline" data-bs-target=".pro-support-report-recipient-collapse" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="choisir-autre-prescripteur-bilan" type="button">
+                  Choisir un autre prescripteur habilité
+              </button>
+          </p>
+      </div>
+      <div class="collapse pro-support-report-recipient-collapse" id="pro-support-report-other-recipient">
+          <div class="alert alert-info" role="status">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          Seul un prescripteur habilité peut recevoir le bilan : France Travail, Mission locale, CCAS, Département…
+                          <a aria-label="Voir la liste complète des prescripteurs habilités (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733442624657--Liste-des-prescripteurs-habilités-au-national/" rel="noopener" target="_blank">
+                              Voir la liste complète
+                          </a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group form-group-input-w-lg-66">
+              <label class="form-label" for="id_prescriber_email">
+                  Adresse e-mail du prescripteur habilité
+              </label>
+              <input aria-describedby="id_prescriber_email_helptext" class="form-control" id="id_prescriber_email" maxlength="320" name="prescriber_email" type="email"/>
+              <div class="form-text" id="id_prescriber_email_helptext">
+                  Celle du prescripteur qui accompagne Jane DOE. Pierre DUPONT ne recevra pas le bilan.
+              </div>
+          </div>
+          <p class="mb-4">
+              <button aria-controls="pro-support-report-suggested-recipient" aria-expanded="false" class="btn btn-link p-0" data-bs-target=".pro-support-report-recipient-collapse" data-bs-toggle="collapse" data-emplois-setter-target="#id_prescriber_email" data-emplois-setter-value="" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="garder-prescripteur-propose-bilan" type="button">
+                  Annuler et garder Pierre DUPONT
+              </button>
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_create_pro_support_report_recipient_block[without_suggestion]
+  '''
+  <div id="pro-support-report-recipient">
+      <div id="pro-support-report-other-recipient">
+          <div class="alert alert-warning" role="status">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                      </i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-2">
+                          <strong>
+                              Aucun prescripteur habilité n’est rattaché à Jane DOE.
+                          </strong>
+                      </p>
+                      <p class="mb-0">
+                          Seul un prescripteur habilité peut recevoir le bilan : France Travail, Mission locale, CCAS, Département…
+                          <a aria-label="Voir la liste complète des prescripteurs habilités (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733442624657--Liste-des-prescripteurs-habilités-au-national/" rel="noopener" target="_blank">
+                              Voir la liste complète
+                          </a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group form-group-input-w-lg-66">
+              <label class="form-label" for="id_prescriber_email">
+                  Adresse e-mail du prescripteur habilité
+              </label>
+              <input aria-describedby="id_prescriber_email_helptext" class="form-control" id="id_prescriber_email" maxlength="320" name="prescriber_email" type="email"/>
+              <div class="form-text" id="id_prescriber_email_helptext">
+                  Celle du prescripteur qui accompagne Jane DOE.
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---

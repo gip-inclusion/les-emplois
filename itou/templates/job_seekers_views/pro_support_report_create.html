@@ -1,8 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
-{% load components %}
 {% load django_bootstrap5 %}
-{% load enums %}
 {% load str_filters %}
 
 {% block title %}
@@ -52,43 +50,7 @@
                         </div>
                         <div class="c-form mb-3 mb-md-4">
                             <h2 class="h3">Destinataire du bilan</h2>
-                            {% with job_seeker_name=job_seeker.get_full_name|mask_unless:can_view_personal_information %}
-                                {% if recipient %}
-                                    {% enums "users" "ActionKind" as ActionKind %}
-                                    {% with last_action_month=recipient.last_action_at|date:"F Y" %}
-                                        {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
-                                            {% fragment as content %}
-                                                <p class="mb-0">
-                                                    Ce bilan sera envoyé à <strong>{{ recipient.professional.get_full_name }}</strong>, de {{ recipient.prescriber_organization.display_name }},
-                                                    {% if recipient.last_action_kind == ActionKind.APPLY %}
-                                                        qui a envoyé une candidature pour {{ job_seeker_name }} en {{ last_action_month }}.
-                                                    {% elif recipient.last_action_kind == ActionKind.IAE_ELIGIBILITY %}
-                                                        qui a validé l’éligibilité IAE de {{ job_seeker_name }} en {{ last_action_month }}.
-                                                    {% elif recipient.last_action_kind == ActionKind.GEIQ_ELIGIBILITY %}
-                                                        qui a validé l’éligibilité GEIQ de {{ job_seeker_name }} en {{ last_action_month }}.
-                                                    {% elif recipient.last_action_kind == ActionKind.CREATE %}
-                                                        qui a créé le compte de {{ job_seeker_name }} en {{ last_action_month }}.
-                                                    {% elif recipient.last_action_kind == ActionKind.SELF_ASSIGN %}
-                                                        qui s’est déclaré accompagnateur de {{ job_seeker_name }} en {{ last_action_month }}.
-                                                    {% else %}
-                                                        {# ActionKind.ORIENT: the employer actions (HIRE, ACCEPT) are not recorded for a prescriber organization. #}
-                                                        qui a orienté {{ job_seeker_name }} vers un service en {{ last_action_month }}.
-                                                    {% endif %}
-                                                </p>
-                                            {% endfragment %}
-                                        {% endcomponent_alert %}
-                                    {% endwith %}
-                                {% else %}
-                                    {% component_alert title=title content=content variant="warning" %}
-                                        {% fragment as title %}
-                                            Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
-                                        {% endfragment %}
-                                        {% fragment as content %}
-                                            <p class="mb-0">Le bilan sera enregistré dans le dossier du salarié sans être envoyé.</p>
-                                        {% endfragment %}
-                                    {% endcomponent_alert %}
-                                {% endif %}
-                            {% endwith %}
+                            {% include "job_seekers_views/includes/pro_support_report_recipient.html" with form=form job_seeker=job_seeker can_view_personal_information=can_view_personal_information ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                             {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
                         </div>
                     </form>
