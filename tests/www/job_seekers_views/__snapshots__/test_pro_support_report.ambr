@@ -2,6 +2,7 @@
 # name: test_create_pro_support_report_recipient_block[with_suggestion]
   '''
   <div id="pro-support-report-recipient">
+      <input name="displayed_recipient" type="hidden" value="[PK of JobSeekerAssignment]"/>
       <div class="collapse pro-support-report-recipient-collapse show" id="pro-support-report-suggested-recipient">
           <div class="alert alert-info" role="status">
               <div class="row">
@@ -16,7 +17,7 @@
                               Pierre DUPONT
                           </strong>
                           , de Pres. Org..
-                              Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour Jane DOE (en mars 2025).
+                                  Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour Jane DOE (en mars 2025).
                       </p>
                   </div>
               </div>
@@ -62,6 +63,7 @@
 # name: test_create_pro_support_report_recipient_block[without_suggestion]
   '''
   <div id="pro-support-report-recipient">
+      <input name="displayed_recipient" type="hidden"/>
       <div id="pro-support-report-other-recipient">
           <div class="alert alert-warning" role="status">
               <div class="row">
