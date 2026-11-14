@@ -50,7 +50,7 @@
                             </div>
                             <hr class="my-4">
                             <h3 class="h4">Destinataire du bilan</h3>
-                            {% include "job_seekers_views/includes/pro_support_report_recipient.html" with recipient=recipient job_seeker=job_seeker can_view_personal_information=can_view_personal_information only %}
+                            {% include "job_seekers_views/includes/pro_support_report_recipient.html" with form=form job_seeker=job_seeker can_view_personal_information=can_view_personal_information ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                             {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
                         </form>
                     </div>
