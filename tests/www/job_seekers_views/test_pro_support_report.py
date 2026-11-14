@@ -18,7 +18,7 @@ from tests.companies.factories import (
     ProSupportReportFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerAssignmentFactory, JobSeekerFactory
 
 
 @pytest.fixture
@@ -519,6 +519,18 @@ class TestRecordProSupportReportFirstRead:
         response = client.post(first_read_url(report))
         assert response.status_code == 200
         assert ProSupportReport.objects.get().first_read_at == report.first_read_at
+
+    def test_read_by_the_support_team(self, client):
+        report = ProSupportReportFactory()
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        client.post(reverse("hijack:acquire"), {"user_pk": report.notified_prescriber.pk})
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == 200
+        report.refresh_from_db()
+        assert report.first_read_at is None
 
     @pytest.mark.parametrize(
         "user_factory,status_code",
