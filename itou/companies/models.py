@@ -1302,6 +1302,9 @@ class ProSupportReport(models.Model):
     The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
     """
 
+    # Leaves the prescriber time to get in touch first: no read email then.
+    READ_EMAIL_DELAY = timedelta(hours=1)
+
     public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     job_seeker = models.ForeignKey(
@@ -1374,6 +1377,9 @@ class ProSupportReport(models.Model):
         related_name="+",
     )
     first_read_at = models.DateTimeField(verbose_name="date de première lecture", null=True, blank=True)
+    read_email_sent_at = models.DateTimeField(
+        verbose_name="date de l’e-mail signalant la lecture du bilan", null=True, blank=True
+    )
 
     class Meta:
         verbose_name = "bilan d’accompagnement"
@@ -1423,16 +1429,19 @@ class ProSupportReport(models.Model):
                 assignment.professional, assignment.prescriber_organization, report=self
             ).send()
 
-    def get_introduction_contact(self):
-        if self.introduction_email_sent_at:
-            # The person who received the email, even if someone else would be chosen today.
-            return self.introduction_email_recipient
+    def get_company_contact(self):
         if self.company_id is None:
             return None
         if self.author_has_left:
             # The admin most likely to read the e-mail takes the place of the author who left.
             return self.company.active_admin_members.order_by(F("last_login").desc(nulls_last=True)).first()
         return self.author
+
+    def get_introduction_contact(self):
+        if self.introduction_email_sent_at:
+            # The person who received the email, even if someone else would be chosen today.
+            return self.introduction_email_recipient
+        return self.get_company_contact()
 
     def notify_read(self, contact):
         from itou.companies.notifications import ProSupportReportReadNotification
