@@ -105,6 +105,16 @@
                                                         <span>{{ otp_secret }}</span>
                                                         {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
                                                     </p>
+                                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail %}
+                                                        {% fragment as c_info__summary %}
+                                                            Vous n’avez pas encore de gestionnaire mot de passe ?
+                                                        {% endfragment %}
+                                                        {% fragment as c_info__detail %}
+                                                            <p>
+                                                                Nous vous conseillons d’installer <a href="https://proton.me/fr/authenticator">Proton Authenticator</a>
+                                                            </p>
+                                                        {% endfragment %}
+                                                    {% endcomponent_info %}
                                                 </div>
                                             </li>
                                         {% endif %}
