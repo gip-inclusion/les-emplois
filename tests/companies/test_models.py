@@ -11,7 +11,13 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
+from itou.companies.enums import (
+    CompanyKind,
+    CompanySource,
+    ContractType,
+    ProSupportReportRecipientSource,
+    ProSupportReportSolution,
+)
 from itou.companies.models import Company, Contract, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
@@ -802,11 +808,12 @@ class TestProSupportReport:
         membership = PrescriberMembershipFactory(organization__authorized=True)
 
         with django_capture_on_commit_callbacks(execute=True):
-            report.notify_prescriber(membership.user, membership.organization)
+            report.notify_prescriber(membership.user, membership.organization, ProSupportReportRecipientSource.CHOSEN)
         assert [email.to for email in mailoutbox] == [[membership.user.email]]
         report.refresh_from_db()
         assert report.notified_prescriber == membership.user
         assert report.notified_prescriber_organization == membership.organization
+        assert report.notified_prescriber_source == ProSupportReportRecipientSource.CHOSEN
 
     def test_unique_per_contract(self):
         report = ProSupportReportFactory()

@@ -36,6 +36,7 @@ from itou.companies.enums import (
     ProSupportReportAutonomy,
     ProSupportReportBarrier,
     ProSupportReportOrientation,
+    ProSupportReportRecipientSource,
     ProSupportReportSolution,
 )
 from itou.emails.utils import get_email_message
@@ -1336,6 +1337,13 @@ class ProSupportReport(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    notified_prescriber_source = models.CharField(
+        verbose_name="origine du prescripteur prévenu",
+        choices=ProSupportReportRecipientSource.choices,
+        blank=True,
+        default="",
+        db_default="",
+    )
     # Contracts missing from the ASP data are deleted: the end date is kept on the report.
     contract = models.OneToOneField(
         Contract,
@@ -1396,12 +1404,15 @@ class ProSupportReport(models.Model):
             self.job_seeker_id
         )
 
-    def notify_prescriber(self, prescriber, organization):
+    def notify_prescriber(self, prescriber, organization, source):
         from itou.users.notifications import ProSupportReportCreatedNotification
 
         self.notified_prescriber = prescriber
         self.notified_prescriber_organization = organization
-        self.save(update_fields=["notified_prescriber", "notified_prescriber_organization"])
+        self.notified_prescriber_source = source
+        self.save(
+            update_fields=["notified_prescriber", "notified_prescriber_organization", "notified_prescriber_source"]
+        )
         ProSupportReportCreatedNotification(prescriber, organization, report=self).send()
 
     def get_barriers_display(self):

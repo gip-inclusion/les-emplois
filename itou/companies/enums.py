@@ -204,3 +204,9 @@ class ProSupportReportOrientation(models.TextChoices):
     SOCIO_PROFESSIONAL = "SOCIO_PROFESSIONAL", "Socio-professionnelle"
     PROFESSIONAL = "PROFESSIONAL", "Professionnelle"
     TO_BE_DEFINED = "TO_BE_DEFINED", "À définir avec le prescripteur"
+
+
+class ProSupportReportRecipientSource(models.TextChoices):
+    SUGGESTED = "SUGGESTED", "Proposé par la plateforme"
+    CHOSEN = "CHOSEN", "Choisi par la structure à la place de la proposition"
+    ADDED = "ADDED", "Indiqué par la structure faute de proposition"

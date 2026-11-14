@@ -7,7 +7,12 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.companies.enums import ProSupportReportBarrier, ProSupportReportOrientation, ProSupportReportSolution
+from itou.companies.enums import (
+    ProSupportReportBarrier,
+    ProSupportReportOrientation,
+    ProSupportReportRecipientSource,
+    ProSupportReportSolution,
+)
 from itou.companies.models import ProSupportReport
 from itou.users.enums import ActionKind
 from itou.users.models import User
@@ -133,6 +138,7 @@ def test_create_pro_support_report_for_employer(
     assert [email.to for email in mailoutbox] == [[advisor_membership.user.email]]
     assert report.notified_prescriber == advisor_membership.user
     assert report.notified_prescriber_organization == advisor_membership.organization
+    assert report.notified_prescriber_source == ProSupportReportRecipientSource.SUGGESTED
 
     # Sent reports cannot be modified.
     response = client.get(create_url(contract.job_seeker))
@@ -201,6 +207,7 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     report = ProSupportReport.objects.get()
     assert report.notified_prescriber is None
     assert report.notified_prescriber_organization is None
+    assert report.notified_prescriber_source == ""
     assert mailoutbox == []
 
 

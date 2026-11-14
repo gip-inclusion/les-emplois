@@ -2,6 +2,7 @@ from itou.companies.enums import (
     ProSupportReportAutonomy,
     ProSupportReportBarrier,
     ProSupportReportOrientation,
+    ProSupportReportRecipientSource,
     ProSupportReportSolution,
 )
 from itou.companies.models import ProSupportReport
@@ -69,6 +70,17 @@ TABLE.add_columns(
                 "vide si aucun prescripteur n’a été prévenu ou si le bilan est antérieur à l’ajout de cette colonne"
             ),
         ),
+        {
+            "name": "origine_destinataire",
+            "type": "varchar",
+            "comment": (
+                "Origine du prescripteur prévenu, vide si aucun prescripteur n’a été prévenu "
+                "ou si le bilan est antérieur à l’ajout de cette colonne"
+            ),
+            "fn": lambda o: get_choice(
+                choices=ProSupportReportRecipientSource.choices, key=o.notified_prescriber_source or None
+            ),
+        },
         get_column_from_field(
             get_model_field(ProSupportReport, "contract"),
             name="id_contrat_asp",

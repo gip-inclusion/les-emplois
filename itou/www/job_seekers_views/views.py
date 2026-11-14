@@ -28,6 +28,7 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
+from itou.companies.enums import ProSupportReportRecipientSource
 from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -607,7 +608,9 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     if request.method == "POST" and form.is_valid():
         report = form.save()
         if recipient:
-            report.notify_prescriber(recipient.professional, recipient.prescriber_organization)
+            report.notify_prescriber(
+                recipient.professional, recipient.prescriber_organization, ProSupportReportRecipientSource.SUGGESTED
+            )
             messages.success(
                 request,
                 f"Bilan envoyé à {recipient.professional.get_full_name()}, "
