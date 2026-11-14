@@ -67,6 +67,8 @@ class ResetRequestAdmin(ItouModelAdmin):
     fields = ("user", "structure", "state", "created_at", "updated_at")
     readonly_fields = fields
     inlines = (PkSupportRemarkInline, ResetRequestTransitionsInline)
+    list_filter = ["state", "created_at"]
+    search_fields = ["user__email", "user__full_name_search_vector"]
 
     def structure(self, obj):
         links = []
