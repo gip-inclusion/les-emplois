@@ -576,9 +576,7 @@ def create_or_edit_assignment(
     return render(request, template_name, context)
 
 
-@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_request(can_fill_pro_support_report)
-def create_pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report_create.html"):
+def _get_pro_support_report_to_fill(request, public_id):
     job_seeker = get_object_or_404(
         User.objects.at_end_of_journey(siae=request.current_organization),
         public_id=public_id,
@@ -589,19 +587,26 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     )
     if ProSupportReport.objects.filter(contract=last_contract).exists():
         raise Http404
+    return ProSupportReport(
+        job_seeker=job_seeker,
+        company=request.current_organization,
+        author=request.user,
+        contract=last_contract,
+        contract_end_date=last_contract.end_date,
+    )
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@check_request(can_fill_pro_support_report)
+def create_pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report_create.html"):
+    report = _get_pro_support_report_to_fill(request, public_id)
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 
     form = ProSupportReportForm(
         request.path,
         data=request.POST or None,
         initial={"has_solution": request.GET.get("has_solution")},
-        instance=ProSupportReport(
-            job_seeker=job_seeker,
-            company=request.current_organization,
-            author=request.user,
-            contract=last_contract,
-            contract_end_date=last_contract.end_date,
-        ),
+        instance=report,
     )
     if request.method == "POST" and form.is_valid():
         report = form.save()
@@ -623,12 +628,33 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
 
     context = {
         "form": form,
-        "job_seeker": job_seeker,
-        "last_contract": last_contract,
+        "job_seeker": report.job_seeker,
+        "last_contract": report.contract,
         "back_url": back_url,
-        "can_view_personal_information": can_view_personal_information(request, job_seeker),
-        "services_search_url": build_services_search_url(request, job_seeker),
+        "can_view_personal_information": can_view_personal_information(request, report.job_seeker),
+        "services_search_url": build_services_search_url(request, report.job_seeker),
         "matomo_custom_title": "Bilan d’accompagnement",
+    }
+    return render(request, template_name, context)
+
+
+@http_methods(db_readonly=["POST"])
+@check_request(can_fill_pro_support_report)
+def reload_pro_support_report_recipient(
+    request, public_id, template_name="job_seekers_views/includes/pro_support_report_recipient.html"
+):
+    report = _get_pro_support_report_to_fill(request, public_id)
+    form = ProSupportReportForm(
+        reverse("job_seekers_views:create_pro_support_report", args=(public_id,)), data=request.POST, instance=report
+    )
+    form.is_valid()
+    # Only the checked email is reported, the employer has not sent the report yet.
+    for field_name in ["prescriber_organization", "no_known_prescriber", "displayed_recipient"]:
+        form.errors.pop(field_name, None)
+    context = {
+        "form": form,
+        "job_seeker": report.job_seeker,
+        "can_view_personal_information": can_view_personal_information(request, report.job_seeker),
     }
     return render(request, template_name, context)
 

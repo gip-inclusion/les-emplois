@@ -461,6 +461,123 @@ def test_create_pro_support_report_when_the_suggested_recipient_changed(
     assert report.notified_prescriber == (new_membership.user if with_new_suggestion else None)
 
 
+def reload_recipient_url(job_seeker):
+    return reverse("job_seekers_views:reload_pro_support_report_recipient", kwargs={"public_id": job_seeker.public_id})
+
+
+@freeze_time("2026-01-15")
+class TestReloadProSupportReportRecipient:
+    CHECKED = "recevra le bilan."
+
+    def test_check_email(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": prescriber.email})
+        assertContains(
+            response,
+            f"{prescriber.get_full_name()}, de {prescriber.prescriberorganization_set.get().display_name}, "
+            f"{self.CHECKED}",
+        )
+        assert not ProSupportReport.objects.exists()
+
+    def test_check_unknown_email(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        client.force_login(membership.user)
+
+        response = client.post(
+            reload_recipient_url(contract.job_seeker), data={"prescriber_email": "inconnu@example.com"}
+        )
+        assertContains(response, UNKNOWN_AUTHORIZED_PRESCRIBER)
+        assertNotContains(response, self.CHECKED)
+
+    def test_check_email_of_a_prescriber_of_several_organizations(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        PrescriberMembershipFactory(user=prescriber, organization__authorized=True)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": prescriber.email})
+        assertContains(response, f"{prescriber.get_full_name()} {self.CHECKED}")
+        assertContains(response, f"Organisation de {prescriber.get_full_name()} qui recevra le bilan")
+        # The organization is not chosen yet.
+        assertNotContains(response, "Ce champ est obligatoire.")
+
+    @pytest.mark.parametrize(
+        "with_suggestion,error",
+        [
+            (False, "Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."),
+            (True, "Le bilan n’a pas été envoyé"),
+        ],
+        ids=["no_known_prescriber", "displayed_recipient"],
+    )
+    def test_report_errors_are_not_displayed(self, client, membership, with_suggestion, error):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        if with_suggestion:
+            advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
+            JobSeekerAssignmentFactory(
+                job_seeker=contract.job_seeker,
+                professional=advisor_membership.user,
+                prescriber_organization=advisor_membership.organization,
+            )
+        client.force_login(membership.user)
+
+        # The report has not been sent yet: no suggestion displayed beforehand, and no box checked.
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": ""})
+        assertNotContains(response, error)
+
+    def test_keep_the_suggested_recipient(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            professional=advisor_membership.user,
+            prescriber_organization=advisor_membership.organization,
+        )
+        client.force_login(membership.user)
+
+        # "Annuler et garder" displays the block again without the email that was checked.
+        response = client.post(
+            reload_recipient_url(contract.job_seeker),
+            data={"prescriber_email": "", "displayed_recipient": assignment.pk},
+        )
+        suggested_recipient = parse_response_to_soup(response, selector="#pro-support-report-suggested-recipient")
+        assert "show" in suggested_recipient["class"]
+        assertNotContains(response, self.CHECKED)
+
+    @pytest.mark.parametrize(
+        "end_date,with_report",
+        [(datetime.date(2026, 1, 25), True), (datetime.date(2026, 3, 15), False)],
+        ids=["report_already_sent", "not_at_the_end_of_journey"],
+    )
+    def test_not_found(self, client, membership, end_date, with_report):
+        contract = end_of_journey_contract(membership.company, end_date)
+        if with_report:
+            ProSupportReportFactory(contract=contract)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker))
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            lambda: CompanyMembershipFactory(company__not_subject_to_iae_rules=True).user,
+            lambda: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(),
+        ],
+        ids=["non_iae_employer", "authorized_prescriber"],
+    )
+    def test_not_for_other_roles(self, client, user_factory):
+        contract = end_of_journey_contract(
+            CompanyFactory(subject_to_iae_rules=True), timezone.localdate() + datetime.timedelta(days=10)
+        )
+        client.force_login(user_factory())
+
+        response = client.post(reload_recipient_url(contract.job_seeker))
+        assert response.status_code == 403
+
+
 @freeze_time("2026-01-15")
 def test_create_pro_support_report_shows_the_question_matching_the_answer_for_employer(client, membership):
     contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))

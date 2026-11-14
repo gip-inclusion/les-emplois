@@ -58,8 +58,11 @@
                   Celle du prescripteur qui accompagne Jane DOE. Pierre DUPONT ne recevra pas le bilan.
               </div>
           </div>
+          <button class="btn btn-secondary mb-3" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="verifier-email-prescripteur-bilan" hx-indicator="#pro-support-report-recipient" hx-post="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/pro-support-report/reload-recipient" hx-swap="outerHTML" hx-target="#pro-support-report-recipient" type="button">
+              Vérifier l’e-mail
+          </button>
           <p class="mb-4">
-              <button aria-controls="pro-support-report-suggested-recipient" aria-expanded="false" class="btn btn-link p-0" data-bs-target=".pro-support-report-recipient-collapse" data-bs-toggle="collapse" data-emplois-setter-target="#id_prescriber_email" data-emplois-setter-value="" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="garder-prescripteur-propose-bilan" type="button">
+              <button class="btn btn-link p-0" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="garder-prescripteur-propose-bilan" hx-indicator="#pro-support-report-recipient" hx-post="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/pro-support-report/reload-recipient" hx-swap="outerHTML" hx-target="#pro-support-report-recipient" hx-vals='{"prescriber_email": ""}' type="button">
                   Annuler et garder Pierre DUPONT
               </button>
           </p>
@@ -103,6 +106,9 @@
                   Celle du prescripteur qui accompagne Jane DOE.
               </div>
           </div>
+          <button class="btn btn-secondary mb-3" data-emplois-elements-visibility-on-selection="disabled" data-matomo-action="clic" data-matomo-category="employeurs" data-matomo-event="true" data-matomo-option="verifier-email-prescripteur-bilan" hx-indicator="#pro-support-report-recipient" hx-post="/job-seekers/7614fc4b-aef9-4694-ab17-12324300180a/pro-support-report/reload-recipient" hx-swap="outerHTML" hx-target="#pro-support-report-recipient" type="button">
+              Vérifier l’e-mail
+          </button>
           <div class="form-group mb-5">
               <div class="form-check">
                   <input aria-describedby="id_no_known_prescriber_helptext" class="form-check-input" id="id_no_known_prescriber" name="no_known_prescriber" type="checkbox"/>
