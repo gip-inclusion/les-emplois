@@ -16,7 +16,24 @@ from itou.utils.apis import geocoding as api_geocoding
 logger = logging.getLogger(__name__)
 
 
-class ItouUserCreationForm(forms.ModelForm):
+class EnforceStaffEmailDomainMixin(forms.ModelForm):
+    DOMAIN = "inclusion.gouv.fr"
+
+    def ensure_admin_emails_are_ours(self):
+        if "email" not in self.cleaned_data:
+            # EmailField may have already dropped the email with a ValidationError.
+            return
+
+        kind = self.cleaned_data.get("kind") or self.instance.kind
+        if kind == UserKind.ITOU_STAFF and not self.cleaned_data["email"].endswith(f"@{self.DOMAIN}"):
+            raise ValidationError("Cet adresse email n’est pas autorisée pour les administrateurs.")
+
+    def clean(self):
+        self.ensure_admin_emails_are_ours()
+        return super().clean()
+
+
+class ItouUserCreationForm(EnforceStaffEmailDomainMixin, forms.ModelForm):
     def save(self, commit=True):
         if not self.instance.username:  # This field is not in ItouUserAdmin.add_fieldsets
             self.instance.username = str(uuid.uuid4())
@@ -33,7 +50,7 @@ class ItouUserCreationForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class UserAdminForm(UserChangeForm):
+class UserAdminForm(EnforceStaffEmailDomainMixin, UserChangeForm):
     class Meta:
         model = User
         fields = "__all__"
