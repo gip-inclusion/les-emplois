@@ -15,18 +15,61 @@
                    aria-label="Voir la liste complète des prescripteurs habilités (ouverture dans un nouvel onglet)">Voir la liste complète</a>
             </p>
         {% endfragment %}
-        {% if suggested_recipient %}
-            <div class="collapse pro-support-report-recipient-collapse{% if not form.prescriber_email.value %} show{% endif %}"
-                 id="pro-support-report-suggested-recipient">
-                {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+        {% fragment as changed_recipient %}
+            {% if form.displayed_recipient.errors %}
+                {% component_alert title=title content=content variant="danger" form_error=True %}
+                    {% fragment as title %}
+                        Le bilan n’a pas été envoyé
+                    {% endfragment %}
                     {% fragment as content %}
-                        {% fragment as last_action_date %}en {{ suggested_recipient.last_action_at|date:"F Y" }}{% endfragment %}
+                        {% with previous_recipient=form.previous_recipient %}
+                            <p>
+                                Le prescripteur à prévenir a changé entre-temps.
+                                {% if suggested_recipient %}
+                                    {% fragment as last_action_date %}le {{ suggested_recipient.last_action_at|date:"j F Y" }}{% endfragment %}
+                                    Depuis l’ouverture de ce formulaire,
+                                    {% if previous_recipient %}
+                                        {{ previous_recipient.professional.get_full_name }} n’est plus le prescripteur à prévenir :
+                                    {% else %}
+                                        un prescripteur habilité a été rattaché à {{ job_seeker_name }} :
+                                    {% endif %}
+                                    ce sera <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }},
+                                    {% include "job_seekers_views/includes/pro_support_report_recipient_reason.html" with recipient=suggested_recipient job_seeker_name=job_seeker_name last_action_date=last_action_date only %}
+                                {% else %}
+                                    Depuis l’ouverture de ce formulaire, {{ previous_recipient.professional.get_full_name }} n’est plus le prescripteur à prévenir, et aucun autre prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                                {% endif %}
+                            </p>
+                        {% endwith %}
                         <p class="mb-0">
-                            Ce bilan sera envoyé à <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }},
-                            {% include "job_seekers_views/includes/pro_support_report_recipient_reason.html" with recipient=suggested_recipient job_seeker_name=job_seeker_name last_action_date=last_action_date only %}
+                            {% if suggested_recipient %}
+                                Si c’est bon pour vous, cliquez à nouveau sur « Envoyer le bilan ». Sinon, choisissez un autre prescripteur habilité.
+                            {% else %}
+                                Indiquez l’adresse e-mail d’un prescripteur habilité, ou cochez « Je ne connais pas le prescripteur… ».
+                            {% endif %}
                         </p>
                     {% endfragment %}
                 {% endcomponent_alert %}
+            {% endif %}
+        {% endfragment %}
+        {# Not the posted value of form.displayed_recipient: nothing is sent if the suggestion displayed changes. #}
+        <input type="hidden"
+               name="{{ form.displayed_recipient.html_name }}"{% if suggested_recipient %} value="{{ suggested_recipient.pk }}"{% endif %}>
+        {% if suggested_recipient %}
+            <div class="collapse pro-support-report-recipient-collapse{% if not form.prescriber_email.value %} show{% endif %}"
+                 id="pro-support-report-suggested-recipient">
+                {% if form.displayed_recipient.errors %}
+                    {{ changed_recipient }}
+                {% else %}
+                    {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+                        {% fragment as content %}
+                            {% fragment as last_action_date %}en {{ suggested_recipient.last_action_at|date:"F Y" }}{% endfragment %}
+                            <p class="mb-0">
+                                Ce bilan sera envoyé à <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }},
+                                {% include "job_seekers_views/includes/pro_support_report_recipient_reason.html" with recipient=suggested_recipient job_seeker_name=job_seeker_name last_action_date=last_action_date only %}
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% endif %}
                 <p>
                     Ce n’est pas la bonne personne ?
                     <button type="button"
@@ -46,6 +89,7 @@
                 {% component_alert content=authorized_prescribers variant="info" %}
                 {% endcomponent_alert %}
             {% else %}
+                {{ changed_recipient }}
                 {% component_alert title=title content=authorized_prescribers variant="warning" %}
                     {% fragment as title %}
                         Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.

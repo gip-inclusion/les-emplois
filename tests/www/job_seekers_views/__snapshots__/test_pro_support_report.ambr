@@ -2,6 +2,7 @@
 # name: test_create_pro_support_report_recipient_block[with_suggestion]
   '''
   <div id="pro-support-report-recipient">
+      <input name="displayed_recipient" type="hidden" value="[PK of JobSeekerAssignment]"/>
       <div class="collapse pro-support-report-recipient-collapse show" id="pro-support-report-suggested-recipient">
           <div class="alert alert-info" role="status">
               <div class="row">
@@ -16,7 +17,7 @@
                               Pierre DUPONT
                           </strong>
                           , de Pres. Org.,
-                              
+                                  
   
   
       qui a envoyé une candidature pour Jane DOE en mars 2025.
@@ -70,6 +71,7 @@
 # name: test_create_pro_support_report_recipient_block[without_suggestion]
   '''
   <div id="pro-support-report-recipient">
+      <input name="displayed_recipient" type="hidden"/>
       <div id="pro-support-report-other-recipient">
           <div class="alert alert-warning" role="status">
               <div class="row">

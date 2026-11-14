@@ -711,6 +711,8 @@ class ProSupportReportForm(forms.ModelForm):
     prescriber_organization = None
     # Only when no authorized prescriber is suggested.
     no_known_prescriber = None
+    # The suggested recipient the employer saw, nothing is sent if it changed since.
+    displayed_recipient = forms.ModelChoiceField(queryset=JobSeekerAssignment.objects.none(), required=False)
 
     class Meta:
         model = ProSupportReport
@@ -745,6 +747,11 @@ class ProSupportReportForm(forms.ModelForm):
         )
 
         self.suggested_recipient = self.instance.get_suggested_recipient()
+        # Its prescriber is named to the employer if it changed: only one of the job seeker can be posted.
+        self.fields["displayed_recipient"].queryset = JobSeekerAssignment.objects.filter(
+            job_seeker_id=self.instance.job_seeker_id
+        )
+        self.previous_recipient = None
         job_seeker_name = self.instance.job_seeker.get_full_name()
         email_help_text = f"Celle du prescripteur qui accompagne {job_seeker_name}."
         if self.suggested_recipient:
@@ -804,6 +811,10 @@ class ProSupportReportForm(forms.ModelForm):
                     [organization] = self.organizations_from_email
                 else:
                     organization = self.cleaned_data.get("prescriber_organization")
+        elif (displayed_recipient := self.cleaned_data.get("displayed_recipient")) != self.suggested_recipient:
+            # Named to the employer: the error removes it from cleaned_data.
+            self.previous_recipient = displayed_recipient
+            self.add_error("displayed_recipient", "Le prescripteur à prévenir a changé entre-temps.")
         elif self.suggested_recipient:
             prescriber = self.suggested_recipient.professional
             organization = self.suggested_recipient.prescriber_organization
