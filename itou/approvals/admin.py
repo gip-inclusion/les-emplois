@@ -521,6 +521,20 @@ class SuspensionAdmin(
     def is_in_progress(self, obj):
         return obj.is_in_progress
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Suspension.clean() already refuses a new suspension starting before the minimum date
+        if not change or not {"start_at", "approval"}.intersection(form.changed_data):
+            return
+        min_start_at = models.Suspension.next_min_start_at(obj.approval, obj.pk, obj.created_at.date())
+        if obj.start_at < min_start_at:
+            messages.warning(
+                request,
+                f"La date de début ({obj.start_at:%d/%m/%Y}) précède la date minimum autorisée pour les employeurs "
+                f"({min_start_at:%d/%m/%Y}) : vérifiez la cohérence avec les embauches "
+                "et les suspensions précédentes.",
+            )
+
 
 class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display_links = ("pk", "approval")

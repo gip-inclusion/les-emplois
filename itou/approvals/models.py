@@ -1259,7 +1259,7 @@ class Suspension(models.Model):
                 }
             )
 
-        # Don't compate to approval if not present : it crashes.
+        # Don't compare to approval if not present : it crashes.
         if self.approval_id:
             # The start of a suspension must be contained in its approval boundaries.
             if not self.start_in_approval_boundaries:
@@ -1272,10 +1272,11 @@ class Suspension(models.Model):
                     }
                 )
 
-            referent_date = self.created_at.date() if self.pk else None
-            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date)
-            if next_min_start_at and self.start_at < next_min_start_at:
-                raise ValidationError({"start_at": (f"La date de début minimum est : {next_min_start_at:%d/%m/%Y}.")})
+            # An existing suspension may legitimately precede this date: see next_min_start_at()
+            if not self.pk:
+                min_start_at = self.next_min_start_at(self.approval)
+                if self.start_at < min_start_at:
+                    raise ValidationError({"start_at": f"La date de début minimum est : {min_start_at:%d/%m/%Y}."})
 
     @property
     def duration(self):
@@ -1315,7 +1316,11 @@ class Suspension(models.Model):
         referent_date=None,
     ):
         """
-        Returns the minimum date on which a suspension can begin.
+        Returns the minimum start date of a new suspension, or of an existing one edited by an employer.
+
+        It derives from the last hiring and the last finished suspension of the approval, so an existing suspension
+        may legitimately precede it (see Approval.unsuspend()). That is why Suspension.clean() only enforces it on
+        creation: the support team can edit existing suspensions in the admin.
         """
         if referent_date is None:
             referent_date = timezone.localdate()
