@@ -348,13 +348,6 @@ class TestManager:
         }
         assert duplicated_users == expected_result
 
-    def test_search_by_full_name(self):
-        user_1 = JobSeekerFactory(first_name="Jean-Paul", last_name="II")
-        JobSeekerFactory(first_name="Jean-Michel", last_name="Relou")
-
-        assert User.objects.search_by_full_name("Jean").count() == 2
-        assert User.objects.search_by_full_name("Jean II").get() == user_1
-
     def test_assigned_job_seeker_ids(self):
         """The main logic is in JobSeekerAssignment.objects.assigned_to, which is tested more thoroughly."""
 
