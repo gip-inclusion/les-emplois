@@ -1,6 +1,7 @@
 import collections
 import datetime
 import shutil
+import types
 import uuid
 from pathlib import Path
 
@@ -15,7 +16,11 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource
-from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
+from itou.companies.management.commands._import_siae import convention as convention_module
+from itou.companies.management.commands._import_siae.convention import (
+    get_creatable_conventions,
+    update_existing_conventions,
+)
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
     build_siae,
@@ -388,3 +393,114 @@ def test_cleanup_siaes_after_grace_period(capsys):
         "1 siaes past their grace period have been deleted",
         "1 siaes past their grace period cannot be deleted but have been removed from the search results",
     ]
+
+
+class TestUpdateExistingConventionsReactivation:
+    @staticmethod
+    def run_update(*companies):
+        """Run `update_existing_conventions()` with ASP data saying the given companies have an active convention."""
+        update_existing_conventions(
+            {
+                company.siret: types.SimpleNamespace(
+                    asp_id=company.convention.asp_id, siret_signature=company.convention.siret_signature
+                )
+                for company in companies
+            },
+            {
+                (company.convention.asp_id, company.kind): Convention(
+                    has_active_state=True, end_at=timezone.localdate() + datetime.timedelta(days=30)
+                )
+                for company in companies
+            },
+        )
+
+    @staticmethod
+    def hidden_company(**kwargs):
+        kwargs.setdefault("convention__after_grace_period", True)
+        return CompanyFactory(
+            source=CompanySource.ASP,
+            kind=CompanyKind.ACI,
+            convention__kind=CompanyKind.ACI,
+            siret="12345678900001",
+            convention__siret_signature="12345678900001",
+            is_searchable=False,
+            **kwargs,
+        )
+
+    def test_hidden_after_grace_period(self, capsys):
+        company = self.hidden_company()
+        antenna = CompanyFactory(
+            source=CompanySource.USER_CREATED,
+            kind=company.kind,
+            siret="12345678900002",
+            convention=company.convention,
+            is_searchable=False,
+        )
+        before = company.updated_at
+
+        self.run_update(company)
+
+        company.convention.refresh_from_db()
+        assert company.convention.is_active is True
+        for hidden in [company, antenna]:
+            hidden.refresh_from_db()
+            assert hidden.is_searchable is True
+        assert company.updated_at > before
+        assert capsys.readouterr().out.splitlines() == [
+            "1 conventions have been reactivated",
+            "2 siaes have been made searchable again",
+            "0 conventions have been deactivated",
+        ]
+
+    def test_company_source_of_data_transfer_stays_hidden(self, capsys):
+        company = self.hidden_company(block_job_applications=True)
+
+        self.run_update(company)
+
+        company.convention.refresh_from_db()
+        assert company.convention.is_active is True
+        company.refresh_from_db()
+        assert company.is_searchable is False
+        assert "0 siaes have been made searchable again" in capsys.readouterr().out.splitlines()
+
+    def test_reactivated_during_grace_period_stays_hidden(self):
+        company = self.hidden_company(convention__after_grace_period=False, convention__pending_grace_period=True)
+
+        self.run_update(company)
+
+        company.convention.refresh_from_db()
+        assert company.convention.is_active is True
+        company.refresh_from_db()
+        assert company.is_searchable is False
+
+    def test_convention_already_active_keeps_company_hidden(self):
+        company = self.hidden_company(convention__after_grace_period=False)
+
+        self.run_update(company)
+
+        company.refresh_from_db()
+        assert company.is_searchable is False
+
+    @freeze_time("2026-02-01")
+    def test_deactivation_threshold_reached(self, capsys, monkeypatch):
+        monkeypatch.setattr(convention_module, "CONVENTION_DEACTIVATION_THRESHOLD", 1)
+        company = self.hidden_company()
+        other_company = CompanyFactory(
+            source=CompanySource.ASP,
+            kind=CompanyKind.ACI,
+            convention__kind=CompanyKind.ACI,
+            siret="98765432100002",
+            convention__siret_signature="98765432100002",
+        )
+
+        self.run_update(company)
+
+        company.refresh_from_db()
+        assert company.is_searchable is True
+        other_company.convention.refresh_from_db()
+        assert other_company.convention.is_active is True
+        assert capsys.readouterr().out.splitlines() == [
+            "1 conventions have been reactivated",
+            "1 siaes have been made searchable again",
+            "ERROR: too many conventions would be deactivated (1 is above threshold 1) thus none will actually be!",
+        ]
