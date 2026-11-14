@@ -898,15 +898,20 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <button aria-controls="collapse-nav-mon-territoire" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-mon-territoire" data-bs-toggle="collapse" type="button">
-                          <i aria-hidden="true" class="ri-road-map-line fw-medium">
+                      <button aria-controls="collapse-nav-territoire" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-territoire" data-bs-toggle="collapse" type="button">
+                          <i aria-hidden="true" class="ri-global-line fw-medium">
                           </i>
                           <span>
-                              Mon territoire
+                              Territoire
                           </span>
                       </button>
-                      <div class="collapse" id="collapse-nav-mon-territoire">
+                      <div class="collapse" id="collapse-nav-territoire">
                           <ul>
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="institution-liste-habilitations" href="/institutions/authorizations-list">
+                                      Gestion des habilitations
+                                  </a>
+                              </li>
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="liste-organisations" href="/institutions/organizations-list">
                                       Liste des organisations

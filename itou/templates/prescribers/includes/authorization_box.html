@@ -1,0 +1,37 @@
+{% load format_filters %}
+
+
+<div class="c-box c-box--pass {% if organization.is_authorized %}bg-success-lightest border-success{% else %}bg-warning-lightest border-warning{% endif %}">
+    <div class="mb-3 mb-md-4">
+        {% if organization.is_authorized %}
+            <span class="badge rounded-pill bg-success"><i class="ri-checkbox-circle-line 1"></i>Habilitation validée</span>
+        {% else %}
+            <span class="badge rounded-pill bg-accent-03 text-primary"><i class="ri-pause-circle-line"></i>Habilitation en attente</span>
+        {% endif %}
+    </div>
+
+    <ul class="list-data">
+        <li>
+            <small>Date d’inscription</small>
+            <strong>{{ organization.created_at|date:"d/m/Y" }}</strong>
+        </li>
+        {% if organization.is_authorized %}
+            <li>
+                <small>Validée le</small>
+                <strong>{{ organization.authorization_updated_at|date:"d/m/Y" }}</strong>
+            </li>
+            <li>
+                <small>Validée par</small>
+                {% if organization.authorization_updated_by.is_staff %}
+                    <strong>La plateforme de l’inclusion</strong>
+                {% else %}
+                    {# FIXME Add authorization_updated_by_organization and authorization_updated_by_institution #}
+                    <strong>{{ organization.authorization_updated_by.get_full_name }}</strong>
+                {% endif %}
+            </li>
+        {% endif %}
+    </ul>
+    {% if not organization.is_authorized %}
+        <p class="mt-3 mb-0"><i>En attente d'habilitation, la structure peut orienter des bénéficiaires mais n'a pas encore le statut de prescripteur habilité.</i></p>
+    {% endif %}
+</div>
