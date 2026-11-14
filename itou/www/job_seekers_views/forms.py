@@ -709,6 +709,8 @@ class ProSupportReportForm(forms.ModelForm):
     )
     # Only when the authorized prescriber is a member of several authorized organizations.
     prescriber_organization = None
+    # Only when no authorized prescriber is suggested.
+    no_known_prescriber = None
 
     class Meta:
         model = ProSupportReport
@@ -748,6 +750,16 @@ class ProSupportReportForm(forms.ModelForm):
         if self.suggested_recipient:
             email_help_text += f" {self.suggested_recipient.professional.get_full_name()} ne recevra pas le bilan."
         self.fields["prescriber_email"].help_text = email_help_text
+        if self.suggested_recipient is None:
+            self.fields["no_known_prescriber"] = forms.BooleanField(
+                label=f"Je ne connais pas le prescripteur qui accompagne {job_seeker_name}",
+                help_text="Le bilan sera enregistré sans être envoyé.",
+                required=False,
+            )
+            # The email is put aside, not cleared: unchecking the box by mistake gives it back.
+            self.fields["prescriber_email"].widget.attrs["data-emplois-elements-visibility-on-selection"] = "disabled"
+            if self["no_known_prescriber"].value():
+                self.fields["prescriber_email"].widget.attrs["disabled"] = True
 
         # The organizations are looked up again on each POST: an employer cannot open the report to another one.
         self.prescriber_from_email = None
@@ -769,6 +781,9 @@ class ProSupportReportForm(forms.ModelForm):
         else:
             self.cleaned_data["solution"] = ""
 
+        if self.cleaned_data.get("no_known_prescriber"):
+            # The box prevails: without JavaScript, the email field is not disabled when it is checked.
+            self.cleaned_data["prescriber_email"] = ""
         prescriber = organization = None
         if self.cleaned_data.get("prescriber_email"):
             if self.prescriber_from_email is None:
@@ -792,6 +807,10 @@ class ProSupportReportForm(forms.ModelForm):
         elif self.suggested_recipient:
             prescriber = self.suggested_recipient.professional
             organization = self.suggested_recipient.prescriber_organization
+        elif not self.cleaned_data.get("no_known_prescriber"):
+            self.add_error(
+                "no_known_prescriber", "Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."
+            )
 
         if prescriber is None:
             source = ""

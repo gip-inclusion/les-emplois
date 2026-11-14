@@ -20,7 +20,10 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
+                    <form method="post"
+                          id="pro-support-report-form"
+                          class="js-prevent-multiple-submit"
+                          data-emplois-elements-visibility-on-selection-controller="no_known_prescriber">
                         {% csrf_token %}
                         <div class="c-form mb-3 mb-md-4">
                             <h2 class="h3 mb-1">Bilan d’accompagnement</h2>
@@ -51,7 +54,17 @@
                         <div class="c-form mb-3 mb-md-4">
                             <h2 class="h3">Destinataire du bilan</h2>
                             {% include "job_seekers_views/includes/pro_support_report_recipient.html" with form=form job_seeker=job_seeker can_view_personal_information=can_view_personal_information ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
-                            {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
+                            {% if form.no_known_prescriber %}
+                                {# Nobody receives the report when the box is checked: it is only saved. #}
+                                <div data-emplois-elements-visibility-on-selection="hidden"{% if form.no_known_prescriber.value %} class="d-none"{% endif %}>
+                                    {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
+                                </div>
+                                <div data-emplois-elements-visibility-on-selection="shown"{% if not form.no_known_prescriber.value %} class="d-none"{% endif %}>
+                                    {% itou_buttons_form primary_label="Enregistrer le bilan" primary_aria_label="Enregistrer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="enregistrer-bilan" %}
+                                </div>
+                            {% else %}
+                                {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
+                            {% endif %}
                         </div>
                     </form>
                 </div>

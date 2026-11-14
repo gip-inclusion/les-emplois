@@ -56,6 +56,9 @@
             {% if form.prescriber_organization %}
                 {% bootstrap_field form.prescriber_organization wrapper_class="form-group form-group-input-w-lg-66" %}
             {% endif %}
+            {% if form.no_known_prescriber %}
+                {% bootstrap_field form.no_known_prescriber wrapper_class="form-group mb-5" %}
+            {% endif %}
             {% if suggested_recipient %}
                 <p class="mb-4">
                     <button type="button"

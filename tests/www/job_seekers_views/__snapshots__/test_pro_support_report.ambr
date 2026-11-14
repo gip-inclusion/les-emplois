@@ -96,9 +96,20 @@
               <label class="form-label" for="id_prescriber_email">
                   Adresse e-mail du prescripteur habilité
               </label>
-              <input aria-describedby="id_prescriber_email_helptext" class="form-control" id="id_prescriber_email" maxlength="320" name="prescriber_email" type="email"/>
+              <input aria-describedby="id_prescriber_email_helptext" class="form-control" data-emplois-elements-visibility-on-selection="disabled" id="id_prescriber_email" maxlength="320" name="prescriber_email" type="email"/>
               <div class="form-text" id="id_prescriber_email_helptext">
                   Celle du prescripteur qui accompagne Jane DOE.
+              </div>
+          </div>
+          <div class="form-group mb-5">
+              <div class="form-check">
+                  <input aria-describedby="id_no_known_prescriber_helptext" class="form-check-input" id="id_no_known_prescriber" name="no_known_prescriber" type="checkbox"/>
+                  <label class="form-check-label" for="id_no_known_prescriber">
+                      Je ne connais pas le prescripteur qui accompagne Jane DOE
+                  </label>
+                  <div class="form-text" id="id_no_known_prescriber_helptext">
+                      Le bilan sera enregistré sans être envoyé.
+                  </div>
               </div>
           </div>
       </div>

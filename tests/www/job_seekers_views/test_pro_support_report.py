@@ -110,6 +110,8 @@ def test_create_pro_support_report_for_employer(
             "has_solution": has_solution,
             "solution": ProSupportReportSolution.RENEWAL,
             "orientation": ProSupportReportOrientation.PROFESSIONAL,
+            # Only offered when no authorized prescriber is suggested.
+            "no_known_prescriber": "on",
         }
         | answer,
     )
@@ -198,9 +200,24 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     response = client.get(create_url(contract.job_seeker))
     assertContains(response, f"{NO_RECIPIENT} {contract.job_seeker.get_full_name()}.")
 
+    # Notifying nobody is an explicit choice.
+    response = client.post(create_url(contract.job_seeker), data=REPORT_DATA)
+    assert response.context["form"].errors == {
+        "no_known_prescriber": ["Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."]
+    }
+    assert not ProSupportReport.objects.exists()
+
+    # Displayed again with the box checked, the email stays aside and the report is only saved.
+    response = client.post(create_url(contract.job_seeker), data={"no_known_prescriber": "on"})
+    assert parse_response_to_soup(response, selector="#id_prescriber_email").has_attr("disabled")
+    save_buttons = parse_response_to_soup(response, selector='[data-emplois-elements-visibility-on-selection="shown"]')
+    assert "d-none" not in save_buttons.get("class", [])
+
+    # The box prevails over an email left in the field.
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
     response = client.post(
         create_url(contract.job_seeker),
-        data={"autonomy": "3", "has_solution": "True", "solution": ProSupportReportSolution.TRAINING},
+        data=REPORT_DATA | {"no_known_prescriber": "on", "prescriber_email": prescriber.email},
     )
     assertMessages(
         response,
