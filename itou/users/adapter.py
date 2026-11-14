@@ -1,12 +1,15 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.ft_connect.constants import FRANCETRAVAIL_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
+from itou.utils.auth import get_client_ip
 from itou.utils.urls import get_absolute_url, get_safe_url
 
 
@@ -106,3 +109,14 @@ class UserAdapter(DefaultAccountAdapter):
         context["base_url"] = get_absolute_url()
         context["signup_url"] = get_absolute_url(reverse("signup:choose_user_kind"))
         super().send_mail(template_prefix, email, context)
+
+    def get_client_ip(self, request: HttpRequest) -> str:
+        """Returns the IP address of the client.
+
+        This is identical to `DefaultAccountAdapter.get_client_ip`,
+        but we use our implementation of the get_client_ip function.
+        """
+        ip = get_client_ip(request)
+        if not ip:
+            raise PermissionDenied("Unable to determine client IP address")
+        return ip
