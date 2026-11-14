@@ -295,6 +295,40 @@ class TestQuerySet:
         )
         assert job_seeker.last_contract_has_pro_support_report is False
 
+    @freezegun.freeze_time("2026-09-22")
+    def test_pro_support_report_to_fill(self):
+        company = CompanyFactory()
+        today = timezone.localdate()
+        a_year_ago = today - relativedelta(years=1)
+        ten_days_ago = today - datetime.timedelta(days=10)
+        five_days_ago = today - datetime.timedelta(days=5)
+        in_ten_days = today + datetime.timedelta(days=10)
+        in_three_months = today + relativedelta(months=3)
+
+        job_seeker_without_report = ContractFactory(company=company, end_date=in_ten_days).job_seeker
+        ProSupportReportFactory(contract__company=company, contract__end_date=in_ten_days)
+        # A report on a former contract does not cover the new one.
+        job_seeker_with_report_on_former_contract = ProSupportReportFactory(
+            contract__company=company, contract__start_date=a_year_ago, contract__end_date=ten_days_ago
+        ).job_seeker
+        ContractFactory(
+            job_seeker=job_seeker_with_report_on_former_contract,
+            company=company,
+            start_date=five_days_ago,
+            end_date=in_ten_days,
+        )
+        # A report filled by another SIAE does not count.
+        job_seeker_with_report_elsewhere = ProSupportReportFactory(contract__end_date=in_ten_days).job_seeker
+        ContractFactory(job_seeker=job_seeker_with_report_elsewhere, company=company, end_date=in_ten_days)
+        # Not at the end of their journey.
+        ContractFactory(company=company, end_date=in_three_months)
+
+        assertQuerySetEqual(
+            User.objects.pro_support_report_to_fill(siae=company),
+            [job_seeker_without_report, job_seeker_with_report_on_former_contract, job_seeker_with_report_elsewhere],
+            ordered=False,
+        )
+
     def test_with_last_contract_pro_support_report_public_id(self):
         report = ProSupportReportFactory()
         job_seeker_without_report = ContractFactory(company=report.company).job_seeker
