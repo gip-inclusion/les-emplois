@@ -1,6 +1,6 @@
 import logging
 import os
-import urllib.parse
+import traceback
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -9,44 +9,167 @@ from sentry_sdk.integrations.huey import HueyIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.redis import RedisIntegration
 
+from itou.utils.redaction import (
+    REDACTED,
+    redact_personal_data,
+    redact_query_values,
+    redact_query_values_by_default,
+)
 
-# Keep in sync with the query parameters sent by itou.utils.apis.api_particulier
-HTTP_QUERY_SENSITIVE_KEYS = [
+
+# A key holding one of these is sensitive whatever is spelled around it: `birth_place`,
+# `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `date_naissance`…
+# `nom` and `name` are deliberately absent: they sit inside `denomination`, `nombre`,
+# `template_name` or `model_name`, and those are the variables that make a traceback readable.
+SENSITIVE_KEY_FRAGMENTS = {
+    "address",
+    "adresse",
+    "birth",
+    "email",
+    "france_travail_id",
+    "naissance",
+    "nir",
+    "phone",
+    "pole_emploi_id",
+    "prenom",
+    "telephone",
+}
+
+# Whole names, for what no fragment above can catch without redacting far more than intended
+SENSITIVE_VARIABLE_NAMES = {
+    "first_name",
+    "ft_id",
+    "last_name",
+}
+
+# An inventory of the personal data the partner APIs send and return. The fragments
+# above already catch most of them and are what covers the next spelling: these lists
+# document the APIs, and give the tests the parameter names to look for in an event.
+SENSITIVE_API_RESPONSE_FIELDS = {
+    # France Travail, see itou.utils.apis.france_travail_agent.fetch_and_parse_user_data
+    "adresseEmail",
+    "codeInseeCommune",
+    "codePostal",
+    "complementAdresse",
+    "complementDestinataire",
+    "complementDistribution",
+    "indicateurResidentQPV",
+    "libelleCommune",
+    "nom",
+    "nomCorrespondance",
+    "numeroTelephone",
+    "numeroTypeLibelleVoie",
+    "prenomCorrespondance",
+    # ProConnect, see itou.openid_connect.pro_connect
+    "family_name",
+    "given_name",
+    "usual_name",
+}
+
+SENSITIVE_API_PARAMETERS = {
+    # API Particulier, see itou.utils.apis.api_particulier
     "anneeDateNaissance",
     "codeCogInseeCommuneNaissance",
     "codeCogInseePaysNaissance",
     "jourDateNaissance",
     "moisDateNaissance",
-    "nomNaissance",
-    "prenoms[]",
+    "nomNaissance",  # also sent to France Travail by recherche_individu_certifie
+    "prenoms[]",  # prenoms%5B%5D in the URL
     "sexeEtatCivil",
+    # France Travail, see itou.utils.apis.pole_emploi
+    "dateNaissance",
+    "nirCertifie",
+    "numeroFranceTravail",
+    "prenom",
+    # Employee records sent to the ASP, see itou.employee_record.serializers
+    "nomUsage",
+}
+
+NON_SENSITIVE_KEYS = {
+    "email_id",  # the primary key of an itou.emails.models.Email row, logged when sending fails
+    "had_nir",  # a boolean kept on anonymized job seekers
+    "had_pole_emploi_id",  # a boolean kept on anonymized job seekers
+    "lack_of_nir_reason",  # why a job seeker has no NIR, not a NIR
+    "lack_of_pole_emploi_id_reason",  # why a job seeker has no France Travail ID, not an ID
+    "pe_obfuscated_nir",  # the France Travail "id national", obfuscated by design
+    "pole_emploi_id_forgotten",  # a boolean of the job seeker forms
+    "require_phone_interview",  # a boolean of the PASS IAE forms
+}
+
+_SENSITIVE_NAMES = SENSITIVE_API_PARAMETERS | SENSITIVE_API_RESPONSE_FIELDS | SENSITIVE_VARIABLE_NAMES
+_SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
+
+PII_SCRUBBING_FAILED = "PII scrubbing failed"
+# Where the scrubbing code lives, and so the frame that says why it failed
+_SCRUBBING_FILES = ("config/sentry.py", "itou/utils/redaction.py")
+
+# Event fields that never carry personal data: the only ones kept when scrubbing fails
+EVENT_PII_FREE_KEYS = [
+    "dist",
+    "environment",
+    "event_id",
+    "level",
+    "logger",
+    "platform",
+    "release",
+    "sdk",
+    "server_name",
+    "timestamp",
+    "transaction",
+    "type",
 ]
 
 
-def strip_sensitive_data_from_breadcrumb(breadcrumb, _hint):
-    if (
-        breadcrumb.get("type") == "http"
-        and breadcrumb.get("category") == "httplib"
-        and (query := breadcrumb.get("data", {}).get("http.query"))
-    ):
-        if any(sensitive_key in query for sensitive_key in HTTP_QUERY_SENSITIVE_KEYS):
-            parsed_query = urllib.parse.parse_qsl(query, keep_blank_values=True)
-            redacted_query = [
-                (key, "_REDACTED_" if key in HTTP_QUERY_SENSITIVE_KEYS and value else value)
-                for key, value in parsed_query
-            ]
-            breadcrumb["data"]["http.query"] = urllib.parse.urlencode(redacted_query)
-    return breadcrumb
+def _is_sensitive_key(key):
+    """Whether a mapping key, a variable name or a query parameter names something private.
+
+    The single predicate behind every layer below, so that the mappings of an event, its frame
+    variables and the query strings found in its free text cannot end up protecting three
+    different sets of keys.
+    """
+    if not isinstance(key, str):
+        return False
+    key = key.lower()
+    if key in NON_SENSITIVE_KEYS:
+        return False
+    return key in _SENSITIVE_NAMES_LOWER or any(fragment in key for fragment in SENSITIVE_KEY_FRAGMENTS)
 
 
-def strip_sentry_sensitive_data(event, _hint):
+def _scrub_dict_value(key, value):
+    if _is_sensitive_key(key):
+        return REDACTED
+    if key == "http.query" and isinstance(value, str):
+        # `http.query` holds a query string without a host, so we can't tell whether it comes from
+        # an outgoing API call or from a request to our own site. We therefore redact every
+        # value, except `NON_PERSONAL_QUERY_KEYS`
+        return redact_query_values_by_default(value)
+    return scrub_sensitive_data(value)
+
+
+def scrub_sensitive_data(value):
+    """Redact personal data anywhere in a Sentry event.
+
+    This includes: the message of an exception, the log entry, breadcrumbs, and
+    the local variables of the stack frames.
     """
-    Be very cautious about not raising any exception in this method,
-    because when this happens, the initial 500 error
-    never reaches the sentry servers... and it could take
-    months before we realize a real error was silenced.
-    Also, you cannot use the debugger here.
-    """
+    match value:
+        case str():
+            value = redact_personal_data(value)
+            # Catches the query strings that `redact_personal_data` misses because no `https://host`
+            # precedes them, such as our own request's `query_string` or a relative
+            # `next=/path?nir=...`.
+            return redact_query_values(value, _is_sensitive_key)
+        case dict():
+            return {key: _scrub_dict_value(key, item) for key, item in value.items()}
+        case list():
+            return [scrub_sensitive_data(item) for item in value]
+        case tuple():
+            return tuple(scrub_sensitive_data(item) for item in value)
+    return value
+
+
+def anonymize_user(event):
+    """Keep the user ID, drop everything else identifying them."""
     if "user" in event:
         # Unfortunately this does not work for the IP address
         # which keeps appearing. ¯\_(ツ)_/¯
@@ -57,7 +180,68 @@ def strip_sentry_sensitive_data(event, _hint):
         # Identify clearly users who have not logged in.
         if "id" not in event["user"]:
             event["user"]["id"] = "anonymous"
-    return event
+
+
+def _failed_scrubbing_event():
+    """The part of the event sent when scrubbing failed that does not depend on the event."""
+    return {"message": PII_SCRUBBING_FAILED, "tags": {"pii_scrubbing": "failed"}}
+
+
+def _scrubbing_failure(exc):
+    """Describe why scrubbing failed by the type of the exception and the line raising it.
+
+    That is what fixing the scrubber takes, whereas the message of the exception can quote the
+    very value being scrubbed, so it is never reported.
+    """
+    frames = [frame for frame in traceback.extract_tb(exc.__traceback__) if frame.filename.endswith(_SCRUBBING_FILES)]
+    location = f"{os.path.basename(frames[-1].filename)}:{frames[-1].lineno}" if frames else "unknown"
+    return {"pii_scrubbing_error": type(exc).__qualname__, "pii_scrubbing_location": location}
+
+
+def degraded_event(event, exc):
+    """Reduce an event to the fields that cannot carry personal data, once scrubbing failed.
+
+    Rather than silencing the error or letting personal data through, keep the alert firing.
+    The message is hardcoded to give the issue a stable, greppable title instead of
+    “<unlabeled event>”. The exception types are the one detail of the event known to be safe,
+    and they also group the degraded events, so that muting one of their issues does not hide
+    every later failure. Everything else goes, `contexts` included, and with it the trace that
+    would link this event to its transaction.
+    """
+    degraded = _failed_scrubbing_event()
+    degraded.update({key: event[key] for key in EVENT_PII_FREE_KEYS if key in event})
+    exception_types = [
+        value["type"]
+        for value in event.get("exception", {}).get("values", [])
+        if isinstance(value, dict) and "type" in value
+    ]
+    if exception_types:
+        degraded["tags"]["exception_type"] = ",".join(exception_types)
+    degraded["tags"].update(_scrubbing_failure(exc))
+    degraded["fingerprint"] = ["pii-scrubbing-failed", *exception_types]
+    return degraded
+
+
+def strip_sentry_sensitive_data(event, _hint):
+    """`before_send` hook to remove personal data from Sentry events.
+
+    Breadcrumbs only leave the process inside an error event, so this is also what scrubs them:
+    no `before_breadcrumb` hook is needed.
+
+    When scrubbing raises, the event is not sent as it is but reduced by `degraded_event`: a bug
+    in the scrubber costs the details of the event, not the alert. Also, you cannot use the
+    debugger here.
+    """
+    try:
+        anonymize_user(event)
+        return scrub_sensitive_data(event)
+    except Exception as exc:
+        try:
+            return degraded_event(event, exc)
+        except Exception:
+            # The fallback itself must not raise: the SDK would drop the event, leaving nothing
+            # but a `callback_error` in the client reports of the project.
+            return {"event_id": event["event_id"], "level": "error", **_failed_scrubbing_event()}
 
 
 def sentry_init():
@@ -91,11 +275,8 @@ def sentry_init():
         # Associate users (ID+email+username+IP) to errors.
         # https://docs.sentry.io/platforms/python/django/
         send_default_pii=True,
-        # Filter out sensitive data from http breadcrumbs.
-        before_breadcrumb=strip_sensitive_data_from_breadcrumb,
-        # Filter out sensitive email and username.
-        # Unfortunately ip_address cannot be filtered out.
-        # https://docs.sentry.io/error-reporting/configuration/filtering/?platform=python
+        # https://docs.sentry.io/platforms/python/data-management/sensitive-data/#before-send-before-send-transaction--before-send-span
+        # https://docs.sentry.io/platforms/python/configuration/filtering/
         before_send=strip_sentry_sensitive_data,
         # The alternative solution
         # https://docs.sentry.io/enriching-error-data/additional-data/?platform=python#capturing-the-user

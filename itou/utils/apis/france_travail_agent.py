@@ -21,11 +21,11 @@ def get_user_data(ft_id):
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class Address:
-    address_line_1: str
-    address_line_2: str
-    post_code: str
-    city: str
-    insee_code: str
+    address_line_1: str = dataclasses.field(repr=False)
+    address_line_2: str = dataclasses.field(repr=False)
+    post_code: str = dataclasses.field(repr=False)
+    city: str = dataclasses.field(repr=False)
+    insee_code: str = dataclasses.field(repr=False)
 
     @property
     def on_one_line(self):
@@ -42,13 +42,13 @@ class Address:
 @dataclasses.dataclass(frozen=True, slots=True)
 class AdministrativeData:
     title: str
-    first_name: str
-    last_name: str
-    birthdate: datetime.date
-    phone: str = ""
-    email: str = ""
-    address: Address | None = None
-    is_in_qpv: bool = False
+    first_name: str = dataclasses.field(repr=False)
+    last_name: str = dataclasses.field(repr=False)
+    birthdate: datetime.date = dataclasses.field(repr=False)
+    phone: str = dataclasses.field(default="", repr=False)
+    email: str = dataclasses.field(default="", repr=False)
+    address: Address | None = dataclasses.field(default=None, repr=False)
+    is_in_qpv: bool = dataclasses.field(default=False, repr=False)
     # TODO: Add in_zrr / partially_in_zrr
 
 
@@ -87,8 +87,8 @@ class Criterion:
 class Author:
     """Data structure for diagnosis authors with timestamp"""
 
-    first_name: str
-    last_name: str
+    first_name: str = dataclasses.field(repr=False)
+    last_name: str = dataclasses.field(repr=False)
     organization: str
     timestamp: datetime.datetime | None
 
