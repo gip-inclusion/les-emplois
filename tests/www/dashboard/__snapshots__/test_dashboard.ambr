@@ -384,7 +384,20 @@
                              FROM "approvals_approval" U0
                              WHERE (U0."user_id" = ("users_user"."id")
                                     AND U0."end_at" >= %s)
-                             LIMIT 1))))
+                             LIMIT 1)))
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "companies_prosupportreport" V0
+                             INNER JOIN "companies_contract" V1 ON (V0."contract_id" = V1."id")
+                             WHERE (V0."contract_id" =
+                                      (SELECT U0."id" AS "pk"
+                                       FROM "companies_contract" U0
+                                       WHERE (U0."job_seeker_id" = ("users_user"."id")
+                                              AND U0."company_id" = %s)
+                                       ORDER BY U0."start_date" DESC, 1 DESC
+                                       LIMIT 1)
+                                    AND V0."contract_end_date" >= (V1."end_date"))
+                             LIMIT 1)))
         ''',
       }),
       dict({
