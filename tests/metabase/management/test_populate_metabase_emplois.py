@@ -1178,6 +1178,7 @@ def test_populate_pro_support_reports(snapshot):
     report_with_solution = ProSupportReportFactory(
         contract__pk=2**31,  # ASP contract IDs are big integers
         notified_prescriber=PrescriberFactory(),
+        notified_prescriber_organization=PrescriberOrganizationFactory(),
         barriers=[ProSupportReportBarrier.HEALTH, ProSupportReportBarrier.LEGAL],
         other_barrier=other_barrier,
         autonomy=ProSupportReportAutonomy.AUTONOMOUS,
@@ -1206,6 +1207,7 @@ def test_populate_pro_support_reports(snapshot):
             "id_structure": report_with_solution.company_id,
             "id_auteur": report_with_solution.author_id,
             "id_prescripteur_prévenu": report_with_solution.notified_prescriber_id,
+            "id_organisation_prévenue": report_with_solution.notified_prescriber_organization_id,
             "id_contrat_asp": report_with_solution.contract_id,
             "date_fin_contrat": report_with_solution.contract_end_date,
             "frein_santé": True,
@@ -1229,6 +1231,7 @@ def test_populate_pro_support_reports(snapshot):
             "id_structure": report_with_orientation.company_id,
             "id_auteur": report_with_orientation.author_id,
             "id_prescripteur_prévenu": None,
+            "id_organisation_prévenue": None,
             "id_contrat_asp": report_with_orientation.contract_id,
             "date_fin_contrat": report_with_orientation.contract_end_date,
             "frein_santé": False,

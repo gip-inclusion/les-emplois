@@ -603,16 +603,30 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
             contract_end_date=last_contract.end_date,
         ),
     )
+    recipient = form.instance.get_suggested_recipient()
     if request.method == "POST" and form.is_valid():
         report = form.save()
-        report.notify_authorized_prescriber()
-        messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
+        if recipient:
+            report.notify_prescriber(recipient.professional, recipient.prescriber_organization)
+            messages.success(
+                request,
+                f"Bilan envoyé à {recipient.professional.get_full_name()}, "
+                f"de {recipient.prescriber_organization.display_name}",
+                extra_tags="toast",
+            )
+        else:
+            messages.success(
+                request,
+                "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne.",
+                extra_tags="toast",
+            )
         return HttpResponseRedirect(back_url)
 
     context = {
         "form": form,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
+        "recipient": recipient,
         "back_url": back_url,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "services_search_url": build_services_search_url(request, job_seeker),
@@ -625,9 +639,24 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report.html"):
     report = get_object_or_404(
-        ProSupportReport.objects.select_related("job_seeker", "company", "author"), public_id=public_id
+        ProSupportReport.objects.select_related("job_seeker", "company", "author", "notified_prescriber_organization"),
+        public_id=public_id,
     )
     if not can_view_pro_support_report(request, report):
+        # The notified prescriber may be logged in with another of their organizations.
+        if (
+            report.notified_prescriber_organization in request.organizations
+            and report.notified_prescriber_organization != request.current_organization
+        ):
+            return render(
+                request,
+                "job_seekers_views/pro_support_report_switch_organization.html",
+                {
+                    "organization": report.notified_prescriber_organization,
+                    "back_url": get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index")),
+                    "matomo_custom_title": "Bilan d’accompagnement",
+                },
+            )
         raise Http404
     context = {
         "report": report,

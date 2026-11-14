@@ -1,6 +1,8 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load str_filters %}
 
 {% block title %}
@@ -20,10 +22,9 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="c-form mb-3 mb-md-4">
-                        <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-
+                    <form method="post" id="pro-support-report-form" class="js-prevent-multiple-submit">
+                        {% csrf_token %}
+                        <div class="c-form mb-3 mb-md-4">
                             <h2 class="h3 mb-1">Bilan d’accompagnement</h2>
                             <p class="mb-4">
                                 {% if last_contract.has_ended %}
@@ -48,11 +49,49 @@
                                     {% bootstrap_field form.orientation %}
                                 {% endif %}
                             </div>
-
-                            <p>Une fois envoyé, le bilan ne pourra plus être modifié.</p>
+                        </div>
+                        <div class="c-form mb-3 mb-md-4">
+                            <h2 class="h3">Destinataire du bilan</h2>
+                            {% with job_seeker_name=job_seeker.get_full_name|mask_unless:can_view_personal_information %}
+                                {% if recipient %}
+                                    {% enums "users" "ActionKind" as ActionKind %}
+                                    {% with last_action_month=recipient.last_action_at|date:"F Y" %}
+                                        {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+                                            {% fragment as content %}
+                                                <p class="mb-0">
+                                                    Ce bilan sera envoyé à <strong>{{ recipient.professional.get_full_name }}</strong>, de {{ recipient.prescriber_organization.display_name }},
+                                                    {% if recipient.last_action_kind == ActionKind.APPLY %}
+                                                        qui a envoyé une candidature pour {{ job_seeker_name }} en {{ last_action_month }}.
+                                                    {% elif recipient.last_action_kind == ActionKind.IAE_ELIGIBILITY %}
+                                                        qui a validé l’éligibilité IAE de {{ job_seeker_name }} en {{ last_action_month }}.
+                                                    {% elif recipient.last_action_kind == ActionKind.GEIQ_ELIGIBILITY %}
+                                                        qui a validé l’éligibilité GEIQ de {{ job_seeker_name }} en {{ last_action_month }}.
+                                                    {% elif recipient.last_action_kind == ActionKind.CREATE %}
+                                                        qui a créé le compte de {{ job_seeker_name }} en {{ last_action_month }}.
+                                                    {% elif recipient.last_action_kind == ActionKind.SELF_ASSIGN %}
+                                                        qui s’est déclaré accompagnateur de {{ job_seeker_name }} en {{ last_action_month }}.
+                                                    {% else %}
+                                                        {# ActionKind.ORIENT: the employer actions (HIRE, ACCEPT) are not recorded for a prescriber organization. #}
+                                                        qui a orienté {{ job_seeker_name }} vers un service en {{ last_action_month }}.
+                                                    {% endif %}
+                                                </p>
+                                            {% endfragment %}
+                                        {% endcomponent_alert %}
+                                    {% endwith %}
+                                {% else %}
+                                    {% component_alert title=title content=content variant="warning" %}
+                                        {% fragment as title %}
+                                            Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p class="mb-0">Le bilan sera enregistré dans le dossier du salarié sans être envoyé.</p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                            {% endwith %}
                             {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -10311,7 +10311,7 @@
 # ---
 # name: test_populate_pro_support_reports
   dict({
-    'num_queries': 30,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -10355,7 +10355,7 @@
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_bilans_accompagnement_v0" ("id" integer,"uid" UUID,
                                                                                           "date_de_création" timestamp WITH TIME ZONE,
-                                                                                                                                 "id_candidat" integer,"id_structure" integer,"id_auteur" integer,"id_prescripteur_prévenu" integer,"id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
+                                                                                                                                 "id_candidat" integer,"id_structure" integer,"id_auteur" integer,"id_prescripteur_prévenu" integer,"id_organisation_prévenue" integer,"id_contrat_asp" bigint,"date_fin_contrat" date,"frein_santé" integer,"frein_mobilité" integer,"frein_situation_familiale" integer,"frein_situation_financière" integer,"frein_numérique" integer,"frein_administratif_ou_juridique" integer,"frein_français_ou_calcul" integer,"autre_frein_renseigné" integer,"autonomie" integer,"solution_envisagée" varchar,"orientation_recommandée" varchar,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -10441,6 +10441,18 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."id_prescripteur_prévenu" IS \'ID C1 du prescripteur habilité qui a reçu le bilan par mail (utilisateurs_v0.id), vide si aucun prescripteur n’a été prévenu\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_pro_support_reports[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_bilans_accompagnement_v0"."id_organisation_prévenue" IS \'ID C1 de l’organisation du prescripteur prévenu (organisations_v0.id), vide si aucun prescripteur n’a été prévenu ou si le bilan est antérieur à l’ajout de cette colonne\'',
       }),
       dict({
         'origin': list([
@@ -10628,6 +10640,7 @@
                  "companies_prosupportreport"."company_id",
                  "companies_prosupportreport"."author_id",
                  "companies_prosupportreport"."notified_prescriber_id",
+                 "companies_prosupportreport"."notified_prescriber_organization_id",
                  "companies_prosupportreport"."contract_id",
                  "companies_prosupportreport"."contract_end_date",
                  "companies_prosupportreport"."barriers",
@@ -10658,6 +10671,7 @@
                                                  "id_structure",
                                                  "id_auteur",
                                                  "id_prescripteur_prévenu",
+                                                 "id_organisation_prévenue",
                                                  "id_contrat_asp",
                                                  "date_fin_contrat",
                                                  "frein_santé",

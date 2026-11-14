@@ -37,6 +37,7 @@ class TransferField(TextChoices):
     ORIENTATIONS = "orientations", "Demandes d’orientation"
     PROLONGATIONS = "prolongations", "Prolongations déclarées"
     PROLONGATION_REQUESTS = "demandes de prolongation", "Demandes de prolongation"
+    PRO_SUPPORT_REPORTS = "pro_support_reports", "Bilans d’accompagnement reçus"
     SUSPENSIONS = "suspensions", "Suspensions déclarées"
     BRAND = "brand", "Enseigne"
     EMAIL = "email", "E-mail"
@@ -81,6 +82,7 @@ PRESCRIBERORG_TRANSFER_FIELDS = {
     TransferField.ORIENTATIONS,
     TransferField.PROLONGATION_REQUESTS,
     TransferField.PROLONGATIONS,
+    TransferField.PRO_SUPPORT_REPORTS,
     TransferField.DESCRIPTION,
     TransferField.EMAIL,
     TransferField.IS_SEARCHABLE,
@@ -271,6 +273,10 @@ PRESCRIBERORG_TRANSFER_SPECS = {
     TransferField.PROLONGATIONS: {
         "related_model": approvals_models.Prolongation,
         "related_model_field": "prescriber_organization",
+    },
+    TransferField.PRO_SUPPORT_REPORTS: {
+        "related_model": companies_models.ProSupportReport,
+        "related_model_field": "notified_prescriber_organization",
     },
     TransferField.DESCRIPTION: {
         "model_field": prescribers_models.PrescriberOrganization._meta.get_field("description"),
