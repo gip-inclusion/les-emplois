@@ -1,0 +1,46 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}
+    Bilan d’accompagnement {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Bilan d’accompagnement</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail %}
+                        {% fragment as c_info__summary %}
+                            Ce bilan a été envoyé à la structure {{ organization.display_name }}. Connectez-vous à cette structure pour le consulter.
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
+                            <form action="{% url 'dashboard:switch_organization' %}?next_url={{ request.get_full_path|urlencode }}"
+                                  method="post">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-sm btn-link ps-0"
+                                        name="organization_key"
+                                        value="{{ organization.organization_switch_key }}">
+                                    Me connecter à cette structure
+                                </button>
+                            </form>
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
