@@ -800,26 +800,26 @@ class TestProSupportReport:
         with pytest.raises(IntegrityError, match=constraint):
             ProSupportReportFactory(**kwargs)
 
-    def test_notify_authorized_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_get_job_seeker_prescriber_assignment_to_notify(self):
         report = ProSupportReportFactory()
         membership = PrescriberMembershipFactory(organization__authorized=True)
-        JobSeekerAssignmentFactory(
+        assignment = JobSeekerAssignmentFactory(
             job_seeker=report.job_seeker, professional=membership.user, prescriber_organization=membership.organization
         )
+        assert report.get_job_seeker_prescriber_assignment_to_notify() == assignment
+
+    def test_get_job_seeker_prescriber_assignment_to_notify_without_one(self):
+        assert ProSupportReportFactory().get_job_seeker_prescriber_assignment_to_notify() is None
+
+    def test_notify_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
+        report = ProSupportReportFactory()
+        membership = PrescriberMembershipFactory(organization__authorized=True)
 
         with django_capture_on_commit_callbacks(execute=True):
-            report.notify_authorized_prescriber()
+            report.notify_prescriber(membership.user, membership.organization)
         assert [email.to for email in mailoutbox] == [[membership.user.email]]
         report.refresh_from_db()
         assert report.notified_prescriber == membership.user
-
-    def test_notify_authorized_prescriber_without_one(self, django_capture_on_commit_callbacks, mailoutbox):
-        report = ProSupportReportFactory()
-        with django_capture_on_commit_callbacks(execute=True):
-            report.notify_authorized_prescriber()
-        assert mailoutbox == []
-        report.refresh_from_db()
-        assert report.notified_prescriber is None
 
     def test_unique_per_contract_end_date(self):
         report = ProSupportReportFactory()
