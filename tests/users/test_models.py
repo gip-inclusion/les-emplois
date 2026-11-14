@@ -1759,14 +1759,19 @@ class TestJobSeekerAssignment:
             last_action_at=last_month,
         )
         # More recent, but not an authorized prescriber.
-        membership = PrescriberMembershipFactory()
+        membership = PrescriberMembershipFactory(
+            organization__authorization_status=PrescriberAuthorizationStatus.NOT_REQUIRED
+        )
         JobSeekerAssignmentFactory(
             job_seeker=job_seeker,
             professional=membership.user,
             prescriber_organization=membership.organization,
             last_action_at=now,
         )
-        JobSeekerAssignmentFactory(job_seeker=job_seeker, company=CompanyFactory(), last_action_at=now)
+        membership = CompanyMembershipFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=membership.user, company=membership.company, last_action_at=now
+        )
         job_seeker_without_assignment = JobSeekerFactory()
 
         with assertNumQueries(1):
@@ -1787,6 +1792,7 @@ class TestJobSeekerAssignment:
             PrescriberAuthorizationStatus.NOT_SET,
             PrescriberAuthorizationStatus.REFUSED,
         ],
+        ids=str,
     )
     def test_get_authorized_prescriber_assignments_unauthorized_organization(self, authorization_status):
         membership = PrescriberMembershipFactory(organization__authorized=True)
@@ -1829,7 +1835,6 @@ class TestJobSeekerAssignment:
             job_seeker.pk: previous
         }
 
-        # Reactivated.
         inactive.is_active = True
         inactive.save()
         assert JobSeekerAssignment.objects.get_authorized_prescriber_assignments([job_seeker.pk]) == {

@@ -80,11 +80,11 @@ def test_create_pro_support_report_for_employer(
     if hired_elsewhere:
         ContractFactory(job_seeker=contract.job_seeker, start_date=timezone.localdate())
     advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
-    advisor = JobSeekerAssignmentFactory(
+    JobSeekerAssignmentFactory(
         job_seeker=contract.job_seeker,
         professional=advisor_membership.user,
         prescriber_organization=advisor_membership.organization,
-    ).professional
+    )
     client.force_login(membership.user)
 
     response = client.get(create_url(contract.job_seeker))
@@ -112,7 +112,8 @@ def test_create_pro_support_report_for_employer(
         [
             messages.Message(
                 messages.SUCCESS,
-                f"Bilan envoyé à {advisor.get_full_name()}, de {advisor_membership.organization.display_name}",
+                f"Bilan envoyé à {advisor_membership.user.get_full_name()}, "
+                f"de {advisor_membership.organization.display_name}",
             )
         ],
     )
@@ -129,8 +130,8 @@ def test_create_pro_support_report_for_employer(
     assert report.solution == answer.get("solution", "")
     assert report.orientation == answer.get("orientation", "")
     # The authorized prescriber is notified.
-    assert [email.to for email in mailoutbox] == [[advisor.email]]
-    assert report.notified_prescriber == advisor
+    assert [email.to for email in mailoutbox] == [[advisor_membership.user.email]]
+    assert report.notified_prescriber == advisor_membership.user
     assert report.notified_prescriber_organization == advisor_membership.organization
 
     # Sent reports cannot be modified.
