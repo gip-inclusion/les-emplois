@@ -24,7 +24,6 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.files.forms import ItouFileField
-from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -341,12 +340,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
 
         if kwargs.get("data"):
             if email := kwargs["data"].get("email"):
-                orgs = PrescriberOrganization.objects.filter(
-                    members__email=email,
-                    members__is_active=True,
-                    memberships__is_active=True,
-                    authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-                )
+                orgs = PrescriberOrganization.objects.authorized_for_member_email(email)
                 self.fields["prescriber_organization"].queryset = orgs
                 self.fields["prescriber_organization"].disabled = False
                 self.fields["prescriber_organization"].required = True
