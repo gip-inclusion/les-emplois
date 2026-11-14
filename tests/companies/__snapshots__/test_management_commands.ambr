@@ -1145,3 +1145,880 @@
 # name: test_deactivate_spontaneous_jobapps[email subject]
   '[TEST] La réception des candidatures spontanées pour votre structure a été suspendue'
 # ---
+# name: test_send_end_of_contract_monthly_recaps[SQL queries]
+  dict({
+    'num_queries': 29,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_contract"."id",
+                 "companies_contract"."job_seeker_id",
+                 "companies_contract"."company_id",
+                 "companies_contract"."start_date",
+                 "companies_contract"."end_date",
+                 "companies_contract"."details",
+                 "companies_contract"."updated_at",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_prosupportreport" U0
+             WHERE (U0."contract_id" = ("companies_contract"."id")
+                    AND U0."contract_end_date" >= ("companies_contract"."end_date"))
+             LIMIT 1) AS "has_covering_pro_support_report",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "companies_company"."id",
+                 "companies_company"."fields_history",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "companies_contract"
+          LEFT OUTER JOIN "companies_company" ON ("companies_contract"."company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "users_user" ON ("companies_contract"."job_seeker_id" = "users_user"."id")
+          WHERE ((("companies_contract"."id" =
+                     (SELECT U0."id" AS "pk"
+                      FROM "companies_contract" U0
+                      WHERE (U0."company_id" = ("companies_contract"."company_id")
+                             AND U0."job_seeker_id" = ("companies_contract"."job_seeker_id"))
+                      ORDER BY U0."start_date" DESC,
+                               1 DESC
+                      LIMIT 1)
+                   AND "companies_contract"."end_date" BETWEEN %s AND %s
+                   AND "companies_contract"."job_seeker_id" IS NOT NULL)
+                  OR (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "users_user" W0
+                         WHERE (EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_contract" V0
+                                   WHERE (V0."end_date" < %s
+                                          AND V0."id" =
+                                            (SELECT U0."id" AS "pk"
+                                             FROM "companies_contract" U0
+                                             WHERE U0."job_seeker_id" = (W0."id")
+                                             ORDER BY U0."start_date" DESC, 1 DESC
+                                             LIMIT 1))
+                                   LIMIT 1)
+                                AND EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "approvals_approval" U0
+                                   WHERE (U0."user_id" = (W0."id")
+                                          AND U0."end_at" >= %s)
+                                   LIMIT 1)
+                                AND W0."id" = ("companies_contract"."job_seeker_id")
+                                AND
+                                  (SELECT V0."id" AS "pk"
+                                   FROM "companies_contract" V0
+                                   WHERE V0."id" =
+                                       (SELECT U0."id" AS "pk"
+                                        FROM "companies_contract" U0
+                                        WHERE U0."job_seeker_id" = (W0."id")
+                                        ORDER BY U0."start_date" DESC, 1 DESC
+                                        LIMIT 1)
+                                   ORDER BY RANDOM() ASC) = ("companies_contract"."id"))
+                         LIMIT 1)
+                      AND "companies_contract"."end_date" >= %s))
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND NOT (V0."kind" IN (%s, %s))
+                           AND (V0."kind" IN (%s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."deactivated_at" >= %s
+                                          AND U0."id" = (V0."convention_id"))
+                                   LIMIT 1))
+                           AND V0."id" = ("companies_contract"."company_id"))
+                    LIMIT 1)
+                 AND NOT EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_prosupportreport" U0
+                    WHERE (U0."contract_id" = ("companies_contract"."id")
+                           AND U0."contract_end_date" >= ("companies_contract"."end_date"))
+                    LIMIT 1))
+          ORDER BY "companies_contract"."end_date" ASC,
+                   "companies_contract"."id" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ContractQuerySet.get_company_contacts[companies/models.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_contract"."id" AS "pk",
+                 "companies_contract"."job_seeker_id" AS "job_seeker_id",
+                 "companies_contract"."company_id" AS "company_id"
+          FROM "companies_contract"
+          WHERE "companies_contract"."id" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ContractQuerySet.get_company_contacts[companies/models.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" IN (%s,
+                                                                    %s,
+                                                                    %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ContractQuerySet.get_company_contacts[companies/models.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."job_seeker_id" AS "job_seeker_id",
+                 "users_jobseekerassignment"."company_id" AS "company_id",
+                 "users_jobseekerassignment"."professional_id" AS "professional_id"
+          FROM "users_jobseekerassignment"
+          WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
+                 AND "users_jobseekerassignment"."company_id" IN (%s,
+                                                                  %s,
+                                                                  %s)
+                 AND "users_jobseekerassignment"."ended_at" IS NULL
+                 AND "users_jobseekerassignment"."job_seeker_id" IN (%s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s))
+          ORDER BY "users_jobseekerassignment"."last_action_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ContractQuerySet.get_company_contacts[companies/models.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."job_seeker_id" AS "job_application__job_seeker_id",
+                 "job_applications_jobapplication"."to_company_id" AS "job_application__to_company_id",
+                 "job_applications_jobapplicationtransitionlog"."user_id" AS "user_id"
+          FROM "job_applications_jobapplicationtransitionlog"
+          INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplicationtransitionlog"."job_application_id" = "job_applications_jobapplication"."id")
+          WHERE ("job_applications_jobapplicationtransitionlog"."job_application_id" IN
+                   (SELECT U0."id"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."state" = %s
+                           AND U0."job_seeker_id" IN (%s,
+                                                      %s,
+                                                      %s,
+                                                      %s,
+                                                      %s,
+                                                      %s)
+                           AND U0."to_company_id" IN (%s,
+                                                      %s,
+                                                      %s)))
+                 AND "job_applications_jobapplicationtransitionlog"."transition" = %s)
+          ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.should_send[communications/dispatch/base.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "body_html",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.should_send[communications/dispatch/base.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "body_html",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."function",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."fields_history",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."terms_accepted_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EndOfContractMonthlyRecapForEmployerNotification.should_send[communications/dispatch/base.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'EndOfContractMonthlyRecapForEmployerNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/send_end_of_contract_monthly_recaps.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "body_html",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id",
+                                                                                                            "emails_email"."body_html"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."body_html",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."body_html",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."body_html",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_send_end_of_contract_monthly_recaps[email body]
+  '''
+  
+  Voici les salariés que vous accompagnez chez ACME Inc. dont le contrat se termine ce mois-ci ou s’est terminé le mois dernier sans suite connue.
+  
+  Remplir leur bilan d’accompagnement permet à leur prescripteur de préparer la suite avec eux.
+  
+  Pensez aussi à déclarer à l’ASP les sorties et les renouvellements de contrat dès que possible. Si vous avez prévu de renouveler un salarié, vous pouvez l’ignorer dans cette liste.
+  
+  **Contrat terminé le mois dernier (1)**
+  
+  - [Jeanne MARTIN](http://localhost:8000/job-seekers/details/1b4e28ba-2fa1-41d2-883f-0016d3cca427) – fin le 20/10/2026 – Remplir le bilan : http://localhost:8000/job-seekers/1b4e28ba-2fa1-41d2-883f-0016d3cca427/pro-support-report/create
+  
+  **Contrats qui se terminent ce mois-ci (2)**
+  
+  - [Lina MOREL](http://localhost:8000/job-seekers/details/4f0d6c2a-8e3b-4b7a-9d15-2c6e8a1f3b07) – fin le 05/11/2026 – Remplir le bilan : http://localhost:8000/job-seekers/4f0d6c2a-8e3b-4b7a-9d15-2c6e8a1f3b07/pro-support-report/create
+  - [Paul DURAND](http://localhost:8000/job-seekers/details/9c7f2a3e-5b1d-4e8f-a2c6-7d4b3e1f0a9c) – fin prévue le 25/11/2026 – Remplir le bilan : http://localhost:8000/job-seekers/9c7f2a3e-5b1d-4e8f-a2c6-7d4b3e1f0a9c/pro-support-report/create
+  
+  Voir toute la liste : http://localhost:8000/job-seekers/list-organization?end_of_journey=on
+  
+  ---
+  
+  Ce mail récapitulatif vous est envoyé une fois par mois en tant que membre de ACME Inc..
+  Gérer vos notifications : http://localhost:8000/dashboard/edit_user_notifications
+  Ce mail récapitulatif vous est-il utile ? Donnez-nous votre avis : https://tally.so/r/kdDjod?mail=1&role=siae
+  
+  -- 
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  La plateforme de l’inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_send_end_of_contract_monthly_recaps[email subject]
+  '[TEST] Vous avez 3 salariés en fin de contrat au sein de ACME Inc.'
+# ---

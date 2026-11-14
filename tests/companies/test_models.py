@@ -1,21 +1,25 @@
 import random
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from functools import partial
 from unittest import mock
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
 from itou.companies.models import Company, Contract, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.utils import triggers
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -742,6 +746,78 @@ class TestContractQuerySet:
         )
 
     @pytest.mark.parametrize(
+        "today",
+        [date(2026, 11, 10), date(2027, 1, 12)],
+        ids=["same_year", "new_year"],
+    )
+    def test_in_monthly_recap(self, today):
+        first_day_of_month = today.replace(day=1)
+        last_day_of_month = first_day_of_month + relativedelta(months=1, days=-1)
+        first_day_of_last_month = first_day_of_month - relativedelta(months=1)
+        last_day_of_last_month = first_day_of_month - timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+        two_years_ago = today - relativedelta(years=2)
+        three_years_ago = today - relativedelta(years=3)
+        expired_approval = {"start_at": two_years_ago, "end_at": yesterday}
+
+        def make_contract(end_date, **approval_kwargs):
+            return ContractFactory(
+                job_seeker=ApprovalFactory(**approval_kwargs).user, start_date=two_years_ago, end_date=end_date
+            )
+
+        with freeze_time(today):
+            contract_ending_this_month = make_contract(last_day_of_month)
+            # Unlike an ended contract, it needs no valid approval.
+            contract_ending_today_with_expired_approval = make_contract(today, **expired_approval)
+            contract_ending_this_month_before_hiring_elsewhere = make_contract(last_day_of_month)
+            ContractFactory(
+                job_seeker=contract_ending_this_month_before_hiring_elsewhere.job_seeker,
+                start_date=yesterday,
+                end_date=None,
+            )
+            # Or a renewal not declared to the ASP yet.
+            contract_ended_last_month = make_contract(first_day_of_last_month)
+            # Ended before the recap is sent: it needs a valid approval as well.
+            contract_ended_this_month = make_contract(first_day_of_month)
+            last_contract_ended_last_month = make_contract(last_day_of_last_month)
+            ContractFactory(
+                job_seeker=last_contract_ended_last_month.job_seeker,
+                start_date=three_years_ago,
+                end_date=last_day_of_last_month,
+            )
+            # Not in the recap.
+            make_contract(last_day_of_month + timedelta(days=1))  # Or a renewal declared to the ASP.
+            make_contract(first_day_of_last_month - timedelta(days=1))
+            make_contract(None)
+            make_contract(last_day_of_last_month, **expired_approval)
+            make_contract(first_day_of_month, **expired_approval)
+            contract_ended_before_hiring_elsewhere = make_contract(last_day_of_last_month)
+            ContractFactory(
+                job_seeker=contract_ended_before_hiring_elsewhere.job_seeker, start_date=yesterday, end_date=None
+            )
+            contract_ending_this_month_before_new_contract = make_contract(last_day_of_month)
+            ContractFactory(
+                job_seeker=contract_ending_this_month_before_new_contract.job_seeker,
+                company=contract_ending_this_month_before_new_contract.company,
+                start_date=yesterday,
+                end_date=None,
+            )
+            ContractFactory(job_seeker=None, end_date=last_day_of_month)
+
+            assertQuerySetEqual(
+                Contract.objects.in_monthly_recap(),
+                [
+                    contract_ending_this_month,
+                    contract_ending_today_with_expired_approval,
+                    contract_ending_this_month_before_hiring_elsewhere,
+                    contract_ended_last_month,
+                    contract_ended_this_month,
+                    last_contract_ended_last_month,
+                ],
+                ordered=False,
+            )
+
+    @pytest.mark.parametrize(
         "days_after_contract_end_date,expected",
         [(0, True), (10, True), (-10, False)],
         ids=["same_end_date", "contract_end_date_brought_forward", "contract_renewed"],
@@ -849,3 +925,189 @@ class TestProSupportReport:
         )
         with pytest.raises(IntegrityError, match="prosupportreport_contract_end_date_unique"):
             ProSupportReportFactory(contract=report.contract, contract_end_date=report.contract_end_date)
+
+
+class TestContractGetCompanyContacts:
+    @staticmethod
+    def make_job_application(contract, *acceptances, state=JobApplicationState.ACCEPTED):
+        job_application = JobApplicationFactory(
+            job_seeker=contract.job_seeker,
+            to_company=contract.company,
+            state=state,
+            sent_by_job_seeker=True,
+        )
+        for accepted_by, accepted_at in acceptances:
+            JobApplicationTransitionLog.objects.create(
+                job_application=job_application,
+                transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+                to_state=JobApplicationState.ACCEPTED,
+                user=accepted_by,
+                timestamp=accepted_at,
+            )
+
+    def test_most_recent_advisor_still_member(self):
+        contract = ContractFactory()
+        now = timezone.now()
+        yesterday = now - timedelta(days=1)
+        five_days_ago = now - timedelta(days=5)
+        ten_days_ago = now - timedelta(days=10)
+        twenty_days_ago = now - timedelta(days=20)
+        make_member = partial(CompanyMembershipFactory, company=contract.company, is_admin=False)
+        make_assignment = partial(JobSeekerAssignmentFactory, job_seeker=contract.job_seeker, company=contract.company)
+        CompanyMembershipFactory(company=contract.company, is_admin=True)
+        self.make_job_application(contract, (make_member().user, now))
+
+        # Created in the middle so that the order comes neither from the primary key nor from updated_at.
+        make_assignment(professional=make_member().user, last_action_at=ten_days_ago)
+        most_recent_advisor = make_member().user
+        make_assignment(professional=most_recent_advisor, last_action_at=five_days_ago)
+        make_assignment(professional=make_member().user, last_action_at=twenty_days_ago)
+        make_assignment(professional=make_member(is_active=False).user, last_action_at=yesterday)
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {most_recent_advisor}}
+
+    @pytest.mark.parametrize(
+        "membership_kwargs, assignment_kwargs",
+        [
+            pytest.param({}, {"ended": True}, id="ended_assignment"),
+            pytest.param({}, {"assigned_to_unknown_advisor": True}, id="unknown_advisor"),
+            pytest.param({"is_active": False}, {}, id="former_member"),
+            pytest.param({"user__is_active": False}, {}, id="deactivated_user"),
+        ],
+    )
+    def test_unusable_advisor(self, membership_kwargs, assignment_kwargs):
+        contract = ContractFactory()
+        admin = CompanyMembershipFactory(company=contract.company, is_admin=True).user
+        JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            company=contract.company,
+            professional=CompanyMembershipFactory(company=contract.company, is_admin=False, **membership_kwargs).user,
+            **assignment_kwargs,
+        )
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {admin}}
+
+    @pytest.mark.parametrize(
+        "organization_field, organization_factory",
+        [
+            pytest.param("company", CompanyFactory, id="other_company"),
+            pytest.param(
+                "prescriber_organization",
+                partial(PrescriberOrganizationFactory, authorized=True),
+                id="authorized_prescriber",
+            ),
+        ],
+    )
+    def test_advisor_from_another_organization(self, organization_field, organization_factory):
+        contract = ContractFactory()
+        admin = CompanyMembershipFactory(company=contract.company, is_admin=True).user
+        JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            professional=CompanyMembershipFactory(company=contract.company, is_admin=False).user,
+            **{organization_field: organization_factory()},
+        )
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {admin}}
+
+    def test_employee_of_several_companies(self):
+        now = timezone.now()
+        contract_with_advisor = ContractFactory()
+        other_contract_with_advisor = ContractFactory(job_seeker=contract_with_advisor.job_seeker)
+        contract_with_accepted_application = ContractFactory()
+        other_contract_with_accepted_application = ContractFactory(
+            job_seeker=contract_with_accepted_application.job_seeker
+        )
+        expected_contacts = {}
+        for contract in [contract_with_advisor, other_contract_with_advisor]:
+            advisor = CompanyMembershipFactory(company=contract.company, is_admin=False).user
+            JobSeekerAssignmentFactory(job_seeker=contract.job_seeker, company=contract.company, professional=advisor)
+            expected_contacts[contract.pk] = {advisor}
+        for contract in [contract_with_accepted_application, other_contract_with_accepted_application]:
+            accepted_by = CompanyMembershipFactory(company=contract.company, is_admin=False).user
+            self.make_job_application(contract, (accepted_by, now))
+            expected_contacts[contract.pk] = {accepted_by}
+
+        with assertNumQueries(4):  # contracts, memberships, assignments, acceptances
+            assert Contract.objects.get_company_contacts() == expected_contacts
+
+    def test_several_employees_of_a_company(self):
+        company = CompanyFactory()
+        admin = CompanyMembershipFactory(company=company, is_admin=True).user
+        advisor = CompanyMembershipFactory(company=company, is_admin=False).user
+        accepted_by = CompanyMembershipFactory(company=company, is_admin=False).user
+        contract_with_advisor, contract_with_accepted_application, contract_without_contact = (
+            ContractFactory.create_batch(3, company=company)
+        )
+        JobSeekerAssignmentFactory(job_seeker=contract_with_advisor.job_seeker, company=company, professional=advisor)
+        self.make_job_application(contract_with_accepted_application, (accepted_by, timezone.now()))
+
+        assert Contract.objects.get_company_contacts() == {
+            contract_with_advisor.pk: {advisor},
+            contract_with_accepted_application.pk: {accepted_by},
+            contract_without_contact.pk: {admin},
+        }
+
+    def test_last_job_application_accepted_by(self):
+        contract = ContractFactory()
+        now = timezone.now()
+        five_days_ago = now - timedelta(days=5)
+        ten_days_ago = now - timedelta(days=10)
+        make_member = partial(CompanyMembershipFactory, company=contract.company, is_admin=False)
+        CompanyMembershipFactory(company=contract.company, is_admin=True)
+        last_accepted_by = make_member().user
+
+        # Accepted twice: created first so that the order cannot come from the primary key.
+        self.make_job_application(contract, (last_accepted_by, five_days_ago), (make_member().user, ten_days_ago))
+        self.make_job_application(contract, (make_member().user, ten_days_ago))
+        # More recent, but no longer accepted.
+        self.make_job_application(contract, (make_member().user, now), state=JobApplicationState.CANCELLED)
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {last_accepted_by}}
+
+    def test_last_job_application_accepted_by_former_member(self):
+        contract = ContractFactory()
+        now = timezone.now()
+        five_days_ago = now - timedelta(days=5)
+        ten_days_ago = now - timedelta(days=10)
+        admin = CompanyMembershipFactory(company=contract.company, is_admin=True).user
+        former_member = CompanyMembershipFactory(company=contract.company, is_admin=False, is_active=False).user
+
+        self.make_job_application(contract, (former_member, five_days_ago))
+        # Still a member, but this is not the last job application.
+        still_member = CompanyMembershipFactory(company=contract.company, is_admin=False).user
+        self.make_job_application(contract, (still_member, ten_days_ago))
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {admin}}
+
+    @pytest.mark.parametrize(
+        "assignment_kwargs",
+        [
+            pytest.param({"ended": True}, id="ended_assignment"),
+            pytest.param({"assigned_to_unknown_advisor": True}, id="unknown_advisor"),
+        ],
+    )
+    def test_last_job_application_accepted_by_unusable_advisor(self, assignment_kwargs):
+        contract = ContractFactory()
+        CompanyMembershipFactory(company=contract.company, is_admin=True)
+        accepted_by = CompanyMembershipFactory(company=contract.company, is_admin=False).user
+        self.make_job_application(contract, (accepted_by, timezone.now()))
+        # Accepting a job application also assigns the job seeker to the professional who accepted it.
+        JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker, company=contract.company, professional=accepted_by, **assignment_kwargs
+        )
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: {accepted_by}}
+
+    def test_administrators(self):
+        contract = ContractFactory()
+        admins = {CompanyMembershipFactory(company=contract.company, is_admin=True).user for _ in range(2)}
+        CompanyMembershipFactory(company=contract.company, is_admin=False)
+        CompanyMembershipFactory(company=contract.company, is_admin=True, is_active=False)
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: admins}
+
+    def test_no_contact(self):
+        contract = ContractFactory()
+        CompanyMembershipFactory(company=contract.company, is_admin=False)
+
+        assert Contract.objects.get_company_contacts() == {contract.pk: set()}

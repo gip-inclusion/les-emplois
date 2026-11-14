@@ -8,6 +8,7 @@ def known_domains():
             *settings.ALLOWED_HOSTS,
             "diagoriente.fr",
             "cloud.info.afpa.fr",
+            "tally.so",
         ]
     )
 
