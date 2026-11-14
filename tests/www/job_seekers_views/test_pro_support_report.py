@@ -22,6 +22,9 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
+NO_RECIPIENT = "Aucun prescripteur habilité n’est rattaché à"
+
+
 @pytest.fixture
 def membership():
     return CompanyMembershipFactory(company__subject_to_iae_rules=True)
@@ -104,7 +107,16 @@ def test_create_pro_support_report_for_employer(
         reverse("job_seekers_views:details", kwargs={"public_id": contract.job_seeker.public_id}),
         fetch_redirect_response=False,
     )
-    assertMessages(response, [messages.Message(messages.SUCCESS, "Bilan d’accompagnement envoyé")])
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS,
+                f"Bilan envoyé à {advisor_membership.user.get_full_name()}, "
+                f"de {advisor_membership.organization.display_name}",
+            )
+        ],
+    )
     report = ProSupportReport.objects.get()
     assert report.job_seeker == contract.job_seeker
     assert report.company == membership.company
@@ -119,6 +131,7 @@ def test_create_pro_support_report_for_employer(
     assert report.orientation == answer.get("orientation", "")
     # The authorized prescriber is notified.
     assert [email.to for email in mailoutbox] == [[advisor_membership.user.email]]
+    assert report.notified_prescriber == advisor_membership.user
 
     # The employer is the last advisor
     last_assignment = report.job_seeker.last_assignment
@@ -129,6 +142,58 @@ def test_create_pro_support_report_for_employer(
     # Sent reports cannot be modified.
     response = client.get(create_url(contract.job_seeker))
     assert response.status_code == 404
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_shows_the_recipient_to_employer(client, membership):
+    contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+    advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
+    JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker,
+        professional=advisor_membership.user,
+        prescriber_organization=advisor_membership.organization,
+        last_action_at=datetime.datetime(2025, 3, 10, tzinfo=datetime.UTC),
+    )
+    client.force_login(membership.user)
+
+    response = client.get(create_url(contract.job_seeker))
+    assertContains(
+        response,
+        f"""<p class="mb-0">
+            Ce bilan sera envoyé à <strong>{advisor_membership.user.get_full_name()}</strong>,
+            de {advisor_membership.organization.display_name}.
+            Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu
+            pour {contract.job_seeker.get_full_name()} (en mars 2025).
+        </p>""",
+        html=True,
+        count=1,
+    )
+    assertNotContains(response, NO_RECIPIENT)
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_without_recipient_for_employer(client, mailoutbox, membership):
+    contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+    client.force_login(membership.user)
+
+    response = client.get(create_url(contract.job_seeker))
+    assertContains(response, f"{NO_RECIPIENT} {contract.job_seeker.get_full_name()}.")
+
+    response = client.post(
+        create_url(contract.job_seeker),
+        data={"autonomy": "3", "has_solution": "True", "solution": ProSupportReportSolution.TRAINING},
+    )
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS, "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne."
+            )
+        ],
+    )
+    report = ProSupportReport.objects.get()
+    assert report.notified_prescriber is None
+    assert mailoutbox == []
 
 
 @freeze_time("2026-01-15")

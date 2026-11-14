@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 
@@ -48,8 +49,29 @@
                                     {% bootstrap_field form.orientation %}
                                 {% endif %}
                             </div>
-
-                            <p>Une fois envoyé, le bilan ne pourra plus être modifié.</p>
+                            <hr class="my-4">
+                            <h3 class="h4">Destinataire du bilan</h3>
+                            {% with job_seeker_name=job_seeker.get_full_name|mask_unless:can_view_personal_information %}
+                                {% if recipient %}
+                                    {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+                                        {% fragment as content %}
+                                            <p class="mb-0">
+                                                Ce bilan sera envoyé à <strong>{{ recipient.professional.get_full_name }}</strong>, de {{ recipient.prescriber_organization.display_name }}.
+                                                Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour {{ job_seeker_name }} (en {{ recipient.last_action_at|date:"F Y" }}).
+                                            </p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% else %}
+                                    {% component_alert title=title content=content variant="warning" %}
+                                        {% fragment as title %}
+                                            Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                                        {% endfragment %}
+                                        {% fragment as content %}
+                                            <p class="mb-0">Le bilan sera enregistré dans le dossier du salarié sans être envoyé.</p>
+                                        {% endfragment %}
+                                    {% endcomponent_alert %}
+                                {% endif %}
+                            {% endwith %}
                             {% itou_buttons_form primary_label="Envoyer le bilan" primary_aria_label="Envoyer le bilan d’accompagnement" reset_url=back_url show_mandatory_fields_mention=False matomo_category="employeurs" matomo_action="submit" matomo_name="envoyer-bilan" %}
                         </form>
                     </div>
