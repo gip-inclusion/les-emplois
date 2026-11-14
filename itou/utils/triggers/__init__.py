@@ -1,19 +1,12 @@
 import contextlib
 import functools
 import json
-import logging
 import operator
 import threading
 from typing import Any
 
-from django.conf import settings
 from django.db import connection, models
 from pgtrigger import Condition, core
-
-from itou.utils.enums import ItouEnvironment
-
-
-logger = logging.getLogger(__name__)
 
 
 _context = threading.local()
@@ -26,36 +19,47 @@ def get_main_atomic_block(connection):
 
 def _set_context_connection_wrapper(execute, sql, params, many, context):
     connection = context["connection"]
+    main_atomic_block = get_main_atomic_block(connection)
     context_is_outdated = getattr(_context, "last_data_set", None) != getattr(_context, "data", None)
-    if context_is_outdated and not connection.in_atomic_block and getattr(_context, "data", None) is None:
+    if not context_is_outdated and getattr(_context, "data", None) is not None:
+        context_is_outdated = getattr(_context, "last_atomic_block_set", None) != main_atomic_block
+    if context_is_outdated and not connection.in_atomic_block:
         # If we aren't in a transaction then the context has already been flushed so we don't need
         # to call `set_config()` to empty it as `None` is the default sentinel value for `_context.data`.
         _context.last_data_set = None
+        _context.last_atomic_block_set = None
         context_is_outdated = False
     if context_is_outdated:
-        if not connection.in_atomic_block:
-            # This should not happen since set_config is called with is_local=true
-            error_msg = "Trying to define a context outside a transaction"
-            if settings.ITOU_ENVIRONMENT in [ItouEnvironment.DEV, ItouEnvironment.TEST]:
-                raise RuntimeError(error_msg)
-            else:
-                logger.error(error_msg)  # Notify issue to sentry
         # Ideally we should set the last data *after* the completion of the query, but
         # doing it here prevent the connection wrapper to be called recursively without exit
         # condition or any other kind of synchronization because of the `set_config()` query.
         _context.last_data_set = getattr(_context, "data", None)
+        _context.last_atomic_block_set = main_atomic_block
+        # Store the empty string if no context is defined to avoid storing the 'null'
+        # which is a valid JSON value that does not crash the trigger using the context
+        sql_content = "" if _context.last_data_set is None else json.dumps(_context.last_data_set)
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT set_config('itou.context', %s, true)",
-                [json.dumps(_context.last_data_set)],
+                [sql_content],
             )
 
     return execute(sql, params, many, context)
 
 
 # This is a context manager ready to be used
+@contextlib.contextmanager
 def connection_wrapper():
-    return connection.execute_wrapper(_set_context_connection_wrapper)
+    assert _set_context_connection_wrapper not in connection.execute_wrappers, (
+        "These context managers cannot be stacked"
+    )
+    try:
+        with connection.execute_wrapper(_set_context_connection_wrapper):
+            yield
+    finally:
+        if not connection.in_atomic_block or get_main_atomic_block(connection) is None:
+            _context.last_data_set = None
+            _context.last_atomic_block_set = None
 
 
 @contextlib.contextmanager
@@ -71,7 +75,7 @@ def context(*, replace_existing: bool = False, **kwargs):
     try:
         yield
     finally:
-        _context.data, _context.last_data_set = previous_data, None
+        _context.data = previous_data
 
 
 def get_current_context():
