@@ -5,6 +5,7 @@ import string
 import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -134,6 +135,11 @@ class ItouStaffFactory(UserFactory):
             phone="0707070707",
             public_id="a290260b-6dd9-4f74-a255-64aabe877b06",
         )
+
+    @factory.post_generation
+    def itou_staff_group(obj, create, extracted, **kwargs):
+        group, _created = Group.objects.get_or_create(name="itou-admin")
+        obj.groups.add(group)
 
 
 class ProfessionalFactory(UserFactory):
