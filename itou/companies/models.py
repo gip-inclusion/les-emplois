@@ -1381,19 +1381,20 @@ class ProSupportReport(models.Model):
     def __str__(self):
         return f"Bilan d’accompagnement pk={self.pk} du salarié pk={self.job_seeker_id}"
 
-    def notify_authorized_prescriber(self):
+    def get_suggested_recipient(self):
+        """The assignment of the authorized prescriber suggested to the employer to receive the report, if any."""
         from itou.users.models import JobSeekerAssignment
-        from itou.users.notifications import ProSupportReportCreatedNotification
 
-        assignment = JobSeekerAssignment.objects.get_authorized_prescriber_assignments([self.job_seeker_id]).get(
+        return JobSeekerAssignment.objects.get_authorized_prescriber_assignments([self.job_seeker_id]).get(
             self.job_seeker_id
         )
-        if assignment:
-            self.notified_prescriber = assignment.professional
-            self.save(update_fields=["notified_prescriber"])
-            ProSupportReportCreatedNotification(
-                assignment.professional, assignment.prescriber_organization, report=self
-            ).send()
+
+    def notify_prescriber(self, prescriber, organization):
+        from itou.users.notifications import ProSupportReportCreatedNotification
+
+        self.notified_prescriber = prescriber
+        self.save(update_fields=["notified_prescriber"])
+        ProSupportReportCreatedNotification(prescriber, organization, report=self).send()
 
     def get_barriers_display(self):
         return [ProSupportReportBarrier(barrier).label for barrier in self.barriers]
