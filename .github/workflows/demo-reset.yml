@@ -13,10 +13,6 @@ jobs:
     # Environment secrets are only readable by jobs that run on the branches it allows (main)
     environment: demo
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
       - name: 🤝 Set the private key for Clever SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}
@@ -29,7 +25,7 @@ jobs:
           echo "$SSH_PRIVATE_KEY" >~/.ssh/id_ed25519
 
       - name: ⏬ Install Clever Tools
-        uses: ./.github/actions/clever-cli
+        uses: $/.github/actions/clever-cli
         with:
           token: ${{ secrets.DEMO_CLEVER_TOKEN }}
           secret: ${{ secrets.DEMO_CLEVER_SECRET }}
