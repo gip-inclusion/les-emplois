@@ -1,0 +1,40 @@
+{# Periods timeline: SVG rectangles placed by attributes, whole years, the window announced in words. #}
+<div class="next-step-timeline mt-3">
+    <div class="next-step-timeline__scroll">
+        <div class="next-step-timeline__inner">
+            {% for lane in timeline.lanes %}
+                <div class="next-step-timeline__row">
+                    <span class="next-step-timeline__name">{{ lane.name }}</span>
+                    <svg class="next-step-timeline__track"
+                         viewBox="0 0 1000 24"
+                         preserveAspectRatio="none"
+                         aria-hidden="true"
+                         focusable="false">
+                        <rect class="next-step-timeline__background" x="0" y="0" width="1000" height="24" />
+                        {% for segment in lane.segments %}
+                            <rect class="next-step-timeline__segment next-step-timeline__segment--{{ segment.kind }}" x="{{ segment.x }}" y="3" width="{{ segment.width }}" height="18" vector-effect="non-scaling-stroke">
+                            <title>{{ segment.label }}, {{ segment.dates_display }}</title>
+                            </rect>
+                        {% endfor %}
+                        <line class="next-step-timeline__today" x1="{{ timeline.today_x }}" x2="{{ timeline.today_x }}" y1="0" y2="24" vector-effect="non-scaling-stroke" />
+                    </svg>
+                </div>
+            {% endfor %}
+            <div class="next-step-timeline__row" aria-hidden="true">
+                <span class="visually-hidden">Années</span>
+                <div class="next-step-timeline__years">
+                    {% for year in timeline.years %}<span>{{ year }}</span>{% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="fs-sm text-muted mt-2 mb-1">{{ timeline.window_display }} Le trait vertical marque aujourd’hui.</p>
+    <details class="fs-sm">
+        <summary>Détail des périodes</summary>
+        <ul class="list-unstyled mt-1 mb-0">
+            {% for lane in timeline.lanes %}
+                {% for segment in lane.segments %}<li>{{ lane.name }} · {{ segment.label }}, {{ segment.dates_display }}</li>{% endfor %}
+            {% endfor %}
+        </ul>
+    </details>
+</div>

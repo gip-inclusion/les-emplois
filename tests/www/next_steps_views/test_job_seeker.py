@@ -6,9 +6,10 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.models import Suspension
+from itou.companies.enums import ProSupportReportBarrier
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.companies.factories import CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import CompanyMembershipFactory, ContractFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -75,7 +76,8 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "Remplir le bilan d’accompagnement")
     assertNotContains(response, f'href="{page_url(job_seeker)}"')
     # The folded file leads to the existing tabs.
-    assertContains(response, "<details", count=5)
+    # Five parts of the file, plus the timeline periods.
+    assertContains(response, "<details", count=6)
     assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
     assertContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
 
@@ -171,3 +173,51 @@ def test_professional_assigned_with_and_without_organization_is_shown_once(clien
     assertContains(response, "· vous", count=1)
     assertContains(response, membership.organization.display_name)
     assertNotContains(response, "Aucune structure associée")
+
+
+def test_timeline_and_barriers_for_employer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract = ContractFactory(
+        company=membership.company,
+        start_date=timezone.localdate() - datetime.timedelta(days=200),
+        end_date=timezone.localdate() - datetime.timedelta(days=10),
+    )
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    report = ProSupportReportFactory(
+        contract=contract,
+        barriers=[ProSupportReportBarrier.MOBILITY, ProSupportReportBarrier.HEALTH],
+        other_barrier="Garde d’enfant",
+    )
+    # Another company's report is not theirs to read.
+    ProSupportReportFactory(contract__job_seeker=contract.job_seeker, barriers=[ProSupportReportBarrier.DIGITAL])
+    client.force_login(membership.user)
+
+    response = client.get(page_url(contract.job_seeker))
+    assertContains(response, "next-step-timeline__segment--done")
+    assertContains(response, "next-step-timeline__segment--valid")
+    assertContains(response, "Le trait vertical marque aujourd’hui.")
+    assertContains(
+        response, f"{membership.company.display_name}, du {fr(contract.start_date)} au {fr(contract.end_date)}"
+    )
+    assertContains(response, "Freins à lever")
+    assertContains(response, f"rempli le {fr(timezone.localdate(report.created_at))}")
+    assertContains(response, ProSupportReportBarrier.MOBILITY.label)
+    assertContains(response, ProSupportReportBarrier.HEALTH.label)
+    assertContains(response, "Garde d’enfant")
+    assertNotContains(response, ProSupportReportBarrier.DIGITAL.label)
+
+
+def test_barriers_without_report(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    client.force_login(membership.user)
+
+    response = client.get(page_url(JobSeekerFactory()))
+    assertContains(response, "Les freins s’affichent ici une fois le bilan d’accompagnement rempli")
+    # Nothing to draw: no PASS IAE, no contract.
+    assertNotContains(response, "next-step-timeline__track")
+
+
+def test_no_barriers_section_for_those_who_cannot_read_reports(client):
+    membership = PrescriberMembershipFactory(organization__authorized=False)
+    client.force_login(membership.user)
+    assertNotContains(client.get(page_url(JobSeekerFactory())), "Freins à lever")

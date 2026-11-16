@@ -395,3 +395,96 @@ table.table td > .modal .modal-content {
     border-radius: var(--bs-border-radius-lg);
     font-size: 1.25rem;
 }
+
+/* Periods timeline: one row per lane, the track is an SVG stretched to the row width.
+   Narrow screens scroll the timeline sideways rather than squeezing years together. */
+.next-step-timeline__scroll {
+    overflow-x: auto;
+}
+
+.next-step-timeline__inner {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    min-width: 34rem;
+}
+
+.next-step-timeline__row {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: .75rem;
+    align-items: center;
+}
+
+.next-step-timeline__name {
+    font-size: .8125rem;
+    font-weight: 700;
+}
+
+.next-step-timeline__track {
+    display: block;
+    width: 100%;
+    height: 1.5rem;
+}
+
+.next-step-timeline__background {
+    fill: var(--bs-light, #f2f3f5);
+}
+
+.next-step-timeline__segment--running {
+    fill: var(--bs-primary, #000638);
+}
+
+.next-step-timeline__segment--done {
+    fill: var(--bs-gray-500, #999baf);
+}
+
+.next-step-timeline__segment--valid {
+    fill: var(--bs-success, #18753c);
+}
+
+.next-step-timeline__segment--paused {
+    fill: var(--bs-info, #0063cb);
+    fill-opacity: .35;
+    stroke: var(--bs-info, #0063cb);
+}
+
+.next-step-timeline__segment--expired {
+    fill: none;
+    stroke: var(--bs-gray-500, #999baf);
+}
+
+.next-step-timeline__segment--asked {
+    fill: none;
+    stroke: var(--bs-warning, #b34000);
+    stroke-dasharray: 4 3;
+}
+
+.next-step-timeline__today {
+    stroke: var(--bs-body-color, #000638);
+    stroke-width: 2;
+}
+
+.next-step-timeline__years {
+    display: flex;
+}
+
+/* Whole years: equal columns, each starting on 1 January. */
+.next-step-timeline__years > span {
+    flex: 1 1 0;
+    padding-left: .25rem;
+    border-left: 1px solid var(--bs-border-color, #e6e6eb);
+    font-size: .75rem;
+    color: var(--bs-secondary-color, #727492);
+}
+
+/* Barriers columns: a sunk background holding the barrier cards. */
+.next-step-barriers__column {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    height: 100%;
+    padding: .75rem;
+    border-radius: var(--bs-border-radius-lg);
+    background-color: var(--bs-light, #f2f3f5);
+}

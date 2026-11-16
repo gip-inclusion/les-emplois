@@ -62,7 +62,10 @@
                         <section class="mb-5" aria-labelledby="next-steps-situation">
                             <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
                             <div class="c-box">
-                                {% for sentence in situation %}<p class="{% if forloop.last %}mb-0{% else %}mb-2{% endif %}">{{ sentence }}</p>{% endfor %}
+                                {% for sentence in situation %}<p class="mb-2">{{ sentence }}</p>{% endfor %}
+                                {% if timeline %}
+                                    {% include "next_steps/includes/timeline.html" with timeline=timeline only %}
+                                {% endif %}
                             </div>
                         </section>
                     {% endif %}
@@ -78,6 +81,10 @@
                             <p class="c-box text-muted mb-0">Rien à faire pour le moment.</p>
                         {% endfor %}
                     </section>
+
+                    {% if show_barriers %}
+                        {% include "next_steps/includes/barriers.html" with report=pro_support_report only %}
+                    {% endif %}
 
                     {# The file, folded: each part opens on demand and leads to the existing tab #}
                     <section aria-labelledby="next-steps-file">
