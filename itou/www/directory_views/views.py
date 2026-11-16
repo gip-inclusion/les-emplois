@@ -1,10 +1,14 @@
+import bisect
+import itertools
+
 from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+from django.db.models import Exists, OuterRef
 from django.shortcuts import render
 
 from itou.companies.models import Company, CompanyMembership
-from itou.prescribers.models import PrescriberMembership
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_request
@@ -16,60 +20,42 @@ from itou.www.directory_views.perms import can_access_directory
 DIRECTORY_RADIUS_KM = 20
 
 
-def _nearby_memberships(queryset, organization_field, users, origin):
-    coords_field = f"{organization_field}__coords"
-    return (
-        queryset.filter(
-            user__in=users,
-            **{f"{coords_field}__dwithin": (origin, D(km=DIRECTORY_RADIUS_KM))},
-        )
-        .select_related("user", organization_field)
-        .annotate(org_directory_distance_km=Distance(coords_field, origin) / 1000)
-    )
-
-
-def get_directory_people(origin):
-    directory = {}
-    users = User.objects.filter(kind=UserKind.PROFESSIONAL).exclude(directory_profile__is_opted_out=True)
-
-    for queryset, organization_field in (
-        (CompanyMembership.objects.filter(company__in=Company.objects.active()), "company"),
-        (PrescriberMembership.objects.all(), "organization"),
-    ):
-        for membership in _nearby_memberships(queryset, organization_field, users, origin):
-            try:
-                user = directory[membership.user.pk]
-            except KeyError:
-                user = membership.user
-                user.directory_organizations = []
-                directory[membership.user.pk] = user
-            org = getattr(membership, organization_field)
-            org.directory_distance_km = membership.org_directory_distance_km
-            user.directory_organizations.append(org)
-    for person in directory.values():
-        person.directory_organizations.sort(
-            key=lambda org: (
-                org.directory_distance_km,
-                org._meta.model_name,
-                org.pk,
-            )
-        )
-
-    return sorted(
-        directory.values(),
-        key=lambda person: (
-            person.last_name,
-            person.first_name,
-            person.pk,
-        ),
-    )
-
-
 @check_request(can_access_directory)
 @readonly_view
 def people_results(request, template_name="directory/people_results.html"):
-    people = get_directory_people(request.current_organization.coords)
+    origin = request.current_organization.coords
+    within = (origin, D(km=DIRECTORY_RADIUS_KM))
+    companies = Company.objects.active().filter(coords__dwithin=within)
+    prescriber_orgs = PrescriberOrganization.objects.filter(coords__dwithin=within)
+    people = (
+        User.objects.filter(kind=UserKind.PROFESSIONAL)
+        .exclude(directory_profile__is_opted_out=True)
+        .filter(
+            Exists(CompanyMembership.objects.filter(user_id=OuterRef("pk"), company__in=companies))
+            | Exists(PrescriberMembership.objects.filter(user_id=OuterRef("pk"), organization__in=prescriber_orgs))
+        )
+    ).order_by("last_name", "first_name", "pk")
+
     results = pager(people, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
+
+    people = {person.pk: person for person in results}
+    company_memberships = (
+        CompanyMembership.objects.filter(user__in=people, company__in=companies)
+        .select_related("company")
+        .annotate(org_directory_distance_km=Distance("company__coords", origin) / 1_000)
+    )
+    prescriber_memberships = (
+        PrescriberMembership.objects.filter(user__in=people, organization__in=prescriber_orgs)
+        .select_related("organization")
+        .annotate(org_directory_distance_km=Distance("organization__coords", origin) / 1_000)
+    )
+    for membership in itertools.chain(company_memberships, prescriber_memberships):
+        person = people[membership.user_id]
+        if not hasattr(person, "directory_organizations"):
+            person.directory_organizations = []
+        org = membership.get_organization()
+        org.directory_distance_km = membership.org_directory_distance_km
+        bisect.insort_right(person.directory_organizations, org, key=lambda org: org.directory_distance_km)
     context = {
         "results": results,
         "matomo_custom_title": "Annuaire pro - Personnes",
