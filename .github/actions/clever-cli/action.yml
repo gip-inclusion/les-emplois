@@ -24,7 +24,10 @@ runs:
         echo "$CLEVER_TOOLS_SHA256  $archive" | sha256sum --check --strict
         mkdir "$RUNNER_TEMP/clever-tools"
         tar --extract --gzip --file "$archive" --directory "$RUNNER_TEMP/clever-tools" --strip-components=1
-        echo "CLEVER_CLI=$RUNNER_TEMP/clever-tools/clever" >> "$GITHUB_ENV"
+      shell: bash
+    - name: 📌 Expose the Clever Tools path
+      # Kept apart from the download, so that GITHUB_ENV only receives a constant path
+      run: echo "CLEVER_CLI=$RUNNER_TEMP/clever-tools/clever" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
       shell: bash
     - name: 🔑 Log in to Clever Cloud
       # The credentials are saved in the runner's home: later steps don't need them in their environment
