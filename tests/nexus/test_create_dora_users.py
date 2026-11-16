@@ -196,14 +196,14 @@ def test(tmp_path):
         structure__siret=None,
     )
 
-    # NexusUser matching a job seeker in les empls:  ignore him
+    # NexusUser matching a job seeker in les emplois:  ignore him
     nexus_user_11 = NexusUserFactory(source=Service.DORA)
     NexusMembershipFactory(
         user=nexus_user_11,
         source=Service.DORA,
         structure__kind=random.choice(matching_company_kinds),
     )
-    JobSeekerFactory(email=nexus_user_11.email)
+    JobSeekerFactory(email=nexus_user_11.email.upper())
 
     # ---------------------------------------------------
     # Run the command
