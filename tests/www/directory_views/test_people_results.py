@@ -80,14 +80,9 @@ def test_only_organizations_within_radius(client):
     )
 
 
-def test_exclude_opted_out_email_and_distant_organization(client):
-    geispolsheim = create_city_geispolsheim()
+def test_exclude_opted_out_email(client):
     vannes = create_city_vannes()
     DirectoryActiveCity.objects.create(city=vannes)
-    CompanyMembershipFactory(
-        company__coords=geispolsheim.coords,
-        company__insee_city=geispolsheim,
-    )
     user = CompanyMembershipFactory(
         company__coords=vannes.coords,
         company__insee_city=vannes,
