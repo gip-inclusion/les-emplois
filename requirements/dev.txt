@@ -721,9 +721,9 @@ cssbeautifier==2.0.3 \
     # via
     #   -r test.txt
     #   djlint
-data-inclusion-schema==1.0.10 \
-    --hash=sha256:3e226d1944dec20185f3aa17bc3dac0cdd16ec39787bad76eecddf0fbe20b8ca \
-    --hash=sha256:46592527c4fb288da4b5e7cb1ab87b481d4fc816b066118ca135b90c2487828e
+data-inclusion-schema==1.0.11 \
+    --hash=sha256:50efbc5e99591b2de8ce7b63d3b5ce5c28b86d4e8e8caf81f28dfa6baae409d9 \
+    --hash=sha256:d66478c130f77181082d993bee8441368f21665fd4595c882860ef650edbcbf6
     # via -r test.txt
 decorator==5.3.1 \
     --hash=sha256:4cbcdd55a6efadb9dbea26b858f4fb3264567b52d69ca0d25b721b553f60ea82 \
