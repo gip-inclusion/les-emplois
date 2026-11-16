@@ -9,6 +9,7 @@ from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
     employer_has_access_to_assessments,
 )
+from itou.www.next_steps_views.access import can_view_next_steps
 
 
 register = template.Library()
@@ -74,6 +75,14 @@ NAV_ENTRIES = {
         icon="ri-home-line",
         target=reverse_lazy("dashboard:index"),
         active_view_names=["dashboard:index", "dashboard:index_stats", "home:hp"],
+    ),
+    # Experiment, see itou.www.next_steps_views.access.
+    "next-steps": NavItem(
+        label="À faire",
+        icon="ri-list-check-3",
+        target=reverse_lazy("next_steps_views:todo"),
+        active_view_names=["next_steps_views:todo"],
+        is_beta=True,
     ),
     "employers-search": NavItem(
         label="Un emploi inclusif",
@@ -308,6 +317,8 @@ def is_active(request, menu_item):
 def nav(request):
     menu_items: list[NavItem | NavGroup] = [NAV_ENTRIES["home"]]
     try:
+        if can_view_next_steps(request):
+            menu_items.append(NAV_ENTRIES["next-steps"])
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:

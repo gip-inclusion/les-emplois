@@ -382,3 +382,16 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-primary, #000638);
     color: #fff;
 }
+
+/* Prochaines étapes (experiment)
+--------------------------------------------------------------------------- */
+/* The tile's colour tells the urgency of the action (set by utility classes), its icon the kind of action. */
+.next-step__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--bs-border-radius-lg);
+    font-size: 1.25rem;
+}

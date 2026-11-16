@@ -1,0 +1,26 @@
+{% load str_filters %}
+{# One expected action: who, what, why, and a single button to the screen that handles it. #}
+<article class="c-box d-flex flex-column flex-md-row align-items-md-center gap-3 mb-2">
+    <div class="d-flex gap-3 flex-grow-1">
+        <span class="next-step__icon {% if group == "today" %}bg-danger-lighter text-danger{% elif group == "week" %}bg-warning-lighter text-warning{% else %}bg-light text-muted{% endif %}"
+              aria-hidden="true">
+            <i class="{{ action.icon }}"></i>
+        </span>
+        <div>
+            <a class="fw-bold"
+               href="{% url "job_seekers_views:details" public_id=action.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                {{ action.job_seeker.get_inverted_full_name|mask_unless:action.user_can_view_personal_information }}
+            </a>
+            <p class="h4 mb-1">{{ action.title }}</p>
+            <p class="fs-sm text-muted mb-0">{{ action.reason }}</p>
+        </div>
+    </div>
+    <div class="flex-shrink-0">
+        {% if action.url %}
+            <a class="btn btn-sm {% if group == "watch" %}btn-outline-primary{% else %}btn-primary{% endif %}"
+               href="{{ action.url }}{% if "?" in action.url %}&amp;{% else %}?{% endif %}back_url={{ request.get_full_path|urlencode }}">{{ action.call_to_action }}</a>
+        {% else %}
+            <span class="badge badge-sm rounded-pill bg-light text-muted">{{ action.status_label }}</span>
+        {% endif %}
+    </div>
+</article>

@@ -542,6 +542,14 @@ ASP_ITOU_PREFIX = "99999"
 # Kept as a setting to not let User pks or Company asp_ids in clear in the code.
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
+# Experiment "Prochaines étapes": a queue of the actions expected from the professional.
+# Off by default. Enabled for listed users, companies or prescriber organizations (pks), or for everyone on a
+# demonstration environment. Kept as settings, like the stats above, to not let pks in clear in the code.
+NEXT_STEPS_USER_PKS = json.loads(os.getenv("NEXT_STEPS_USER_PKS", "[]"))
+NEXT_STEPS_COMPANY_PKS = json.loads(os.getenv("NEXT_STEPS_COMPANY_PKS", "[]"))
+NEXT_STEPS_PRESCRIBER_ORGANIZATION_PKS = json.loads(os.getenv("NEXT_STEPS_PRESCRIBER_ORGANIZATION_PKS", "[]"))
+NEXT_STEPS_FOR_EVERYONE = os.getenv("NEXT_STEPS_FOR_EVERYONE", "False") == "True"
+
 # Slack notifications sent by cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
