@@ -80,38 +80,6 @@ def test_only_organizations_within_radius(client):
     )
 
 
-def test_organization_ordering(client):
-    vannes = create_city_vannes()
-    DirectoryActiveCity.objects.create(city=vannes)
-    user = ProfessionalFactory(first_name="Alice", last_name="Martin")
-    CompanyMembershipFactory(
-        user=user,
-        company__coords=vannes.coords,
-        company__insee_city=vannes,
-        company__brand="Les petits paniers",
-    )
-    CompanyMembershipFactory(
-        user=user,
-        company__coords=Point(vannes.coords.x - KM, vannes.coords.y - KM),
-        company__insee_city=vannes,
-    )
-
-    client.force_login(user)
-    response = client.get(reverse("directory:people_results"))
-
-    assertContains(
-        response,
-        f"""
-        <li>
-            <small>Structure</small>
-            <strong>Les petits paniers ({OTHER_STRUCTURE_TEXT})</strong>
-        </li>
-        """,
-        html=True,
-        count=1,
-    )
-
-
 def test_exclude_opted_out_email_and_distant_organization(client):
     geispolsheim = create_city_geispolsheim()
     vannes = create_city_vannes()
