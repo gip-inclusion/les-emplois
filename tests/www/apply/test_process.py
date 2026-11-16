@@ -2935,7 +2935,7 @@ class TestResumeDownload:
 class TestXpRefIae:
     @pytest.fixture(autouse=True)
     def setup_experiment(self, settings):
-        settings.XP_REF_IAE_DEPARTMENT = "83"
+        settings.XP_REF_IAE_DEPARTMENTS = ["06", "83"]
         settings.XP_REF_IAE_END_DATE = timezone.localdate()
 
     def create_job_application(self, department="83", is_siae=True):
@@ -2957,9 +2957,10 @@ class TestXpRefIae:
     def get_resume(self, client, job_application):
         return client.get(reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk}))
 
-    def test_access(self, client):
-        job_application = self.create_job_application()
-        self.login_ft_agent(client)
+    @pytest.mark.parametrize("department", ["06", "83"])
+    def test_access(self, client, department):
+        job_application = self.create_job_application(department=department)
+        self.login_ft_agent(client, department=department)
         assert self.get_details(client, job_application).status_code == 200
         assert self.get_resume(client, job_application).status_code == 302
         url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application.job_seeker.public_id})
@@ -2990,7 +2991,7 @@ class TestXpRefIae:
 
     def test_no_access_from_another_department(self, client):
         job_application = self.create_job_application()
-        self.login_ft_agent(client, department="06")
+        self.login_ft_agent(client, department="13")
         assert self.get_details(client, job_application).status_code == 404
         assert self.get_resume(client, job_application).status_code == 404
 
