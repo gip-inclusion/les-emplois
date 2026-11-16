@@ -49,12 +49,12 @@ def test_only_organizations_within_radius(client):
     user = ProfessionalFactory(first_name="Alice", last_name="Martin")
     near_name = "Near company"
     far_name = "Far company"
-    CompanyMembershipFactory(
+    near_company = CompanyMembershipFactory(
         user=user,
         company__coords=vannes.coords,
         company__insee_city=vannes,
         company__brand=near_name,
-    )
+    ).company
     CompanyMembershipFactory(
         user=user,
         company__coords=geispolsheim.coords,
@@ -65,6 +65,8 @@ def test_only_organizations_within_radius(client):
     client.force_login(user)
     response = client.get(reverse("directory:people_results"))
 
+    [user_in_page] = response.context["results"]
+    assert user_in_page.directory_organizations == [near_company]
     assertNotContains(response, OTHER_STRUCTURE_TEXT)
     assertContains(
         response,
