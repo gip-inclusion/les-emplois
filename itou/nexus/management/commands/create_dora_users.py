@@ -315,11 +315,12 @@ class Command(BaseCommand):
                 "prescribermembership_set", "companymembership_set"
             )
         }
-        self.non_pro_emplois_users = list(
-            User.objects.filter(email__in=dora_emails)
+        self.non_pro_emplois_users = [
+            email.lower()
+            for email in User.objects.filter(email__in=dora_emails)
             .exclude(kind=UserKind.PROFESSIONAL)
             .values_list("email", flat=True)
-        )
+        ]
 
         # Build a dict with of all prescriber organizations and companies using the (siret, kind) tuple as dict key
         # -----------------------------------------------------------------------------------------
