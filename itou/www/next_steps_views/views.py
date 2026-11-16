@@ -118,6 +118,8 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
     )
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
+    for action in actions:
+        action.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
 
     context = {
         "job_seeker": job_seeker,

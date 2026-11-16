@@ -21,6 +21,7 @@ from itou.rdv_insertion.enums import ParticipationStatus
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
+from itou.www.next_steps_views import journeys
 
 
 # A report stays in the queue this long: whether the prescriber read it is not recorded.
@@ -74,6 +75,10 @@ class Action:
     url: str | None = None
     call_to_action: str | None = None
     status_label: str | None = None
+    # Prepares the action in a side drawer before handing over to the existing form.
+    journey: journeys.Journey | None = None
+    # Unique on the page, set once the queue is sorted.
+    uid: str = ""
 
     @property
     def icon(self):
@@ -95,7 +100,7 @@ def _fr(value):
 def _new_job_applications(company):
     job_applications = (
         JobApplication.objects.filter(to_company=company, state=JobApplicationState.NEW, archived_at=None)
-        .select_related("job_seeker", "sender_prescriber_organization", "sender_company")
+        .select_related("job_seeker", "to_company", "sender_prescriber_organization", "sender_company")
         .order_by("created_at")
     )
     for job_application in job_applications:
@@ -112,6 +117,7 @@ def _new_job_applications(company):
             since=_date(job_application.created_at),
             url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             call_to_action="Étudier",
+            journey=journeys.job_application(job_application, sender),
         )
 
 
@@ -141,6 +147,7 @@ def _end_of_contracts(company):
                     since=end_date,
                     url=reverse("approvals:suspend", kwargs={"approval_id": approval.pk}),
                     call_to_action="Suspendre",
+                    journey=journeys.approval_suspension(approval, company, end_date),
                 )
             if not job_seeker.last_contract_has_pro_support_report:
                 yield Action(
@@ -157,6 +164,7 @@ def _end_of_contracts(company):
                         "job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}
                     ),
                     call_to_action="Remplir",
+                    journey=journeys.pro_support_report_fill(end_date, ended=True),
                 )
         elif not job_seeker.last_contract_has_pro_support_report:
             yield Action(
@@ -168,6 +176,7 @@ def _end_of_contracts(company):
                 since=end_date,
                 url=reverse("job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}),
                 call_to_action="Remplir",
+                journey=journeys.pro_support_report_fill(end_date, ended=False),
             )
 
 
@@ -204,6 +213,7 @@ def _appointments_with_undetermined_status(company):
                 },
             ),
             call_to_action="Voir",
+            journey=journeys.appointment(appointment),
         )
 
 
@@ -275,6 +285,7 @@ def _prolongation_requests_to_process(request):
                 kwargs={"prolongation_request_id": prolongation_request.pk},
             ),
             call_to_action="Traiter",
+            journey=journeys.prolongation_request(prolongation_request),
         )
 
 
@@ -305,6 +316,9 @@ def _pro_support_reports_to_request(request):
             since=end_date,
             url=reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}),
             call_to_action="Demander",
+            journey=journeys.pro_support_report_request(
+                end_date, ended=job_seeker.last_contract_ended_with_valid_approval
+            ),
         )
 
 
@@ -370,6 +384,7 @@ def _eligibility_to_validate(request):
             since=_date(job_application.created_at),
             url=reverse("eligibility_views:update_iae", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             call_to_action="Valider",
+            journey=journeys.eligibility(job_application),
         )
 
 
@@ -395,7 +410,10 @@ def expected_actions(request):
         actions = list(_prescriber_actions(request))
     else:
         actions = []
-    return sorted(actions, key=lambda action: action.since)
+    actions = sorted(actions, key=lambda action: action.since)
+    for index, action in enumerate(actions):
+        action.uid = f"next-step-{index}"
+    return actions
 
 
 def group_actions(actions):
