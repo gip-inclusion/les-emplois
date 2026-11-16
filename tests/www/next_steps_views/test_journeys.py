@@ -6,14 +6,20 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
-from itou.approvals.models import Suspension
+from itou.approvals.models import Approval, Suspension
 from itou.companies.enums import CompanyKind, ProSupportReportBarrier, ProSupportReportSolution
 from itou.companies.models import ProSupportReport
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, RefusalReason
+from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    ContractFactory,
+)
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
@@ -237,29 +243,186 @@ def test_job_application_to_processing_then_postponed(client):
     client.force_login(membership.user)
     url = journey_url("candidature", job_application.pk)
 
-    response = walk(client, url, {}, {"decision": "process"})
+    response = walk(client, url, {"decision": "process"})
     assertContains(response, "Réponse enregistrée")
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING
 
-    response = walk(client, url, {}, {"decision": "postpone"}, {"answer": "Nous revenons vers vous en janvier."})
+    response = walk(client, url, {"decision": "postpone"}, {"answer": "Nous revenons vers vous en janvier."})
     assertContains(response, JobApplicationState.POSTPONED.label)
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.POSTPONED
     assert job_application.answer == "Nous revenons vers vous en janvier."
 
 
-def test_job_application_hands_over_hiring_and_refusal(client):
-    membership = CompanyMembershipFactory()
+def test_refuse_job_application(client, mailoutbox):
+    membership = CompanyMembershipFactory(company__with_jobs=True)
+    company = membership.company
+    job_description = company.job_description_through.first()
     job_application = JobApplicationFactory(
-        to_company=membership.company, state=JobApplicationState.PROCESSING, sent_by_authorized_prescriber=True
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        sent_by_authorized_prescriber=True,
+        selected_jobs=[job_description],
     )
     client.force_login(membership.user)
     url = journey_url("candidature", job_application.pk)
 
-    response = walk(client, url, {}, {"decision": "refuse"})
-    assertContains(response, reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}))
-    response = walk(client, url, {}, {"decision": "accept"})
+    response = walk(
+        client,
+        url,
+        {"decision": "refuse"},
+        {"refusal_reason": RefusalReason.NO_POSITION, "refusal_reason_shared_with_job_seeker": "on"},
+    )
+    # As on the existing screen: the steps, the default message of the reason, the job descriptions to close.
+    assert [step.label for step in response.context["steps"]] == [
+        "Votre réponse",
+        "Motif",
+        "Message à l’usager",
+        "Message au prescripteur",
+    ]
+    assert response.context["form"]["job_seeker_answer"].value().startswith("Bonjour")
+    response = walk(
+        client,
+        url,
+        {"decision": "refuse"},
+        {"refusal_reason": RefusalReason.NO_POSITION, "refusal_reason_shared_with_job_seeker": "on"},
+        {"job_seeker_answer": "Merci pour votre candidature."},
+        {"prescriber_answer": "Plus de poste pour le moment."},
+        **HTMX,
+    )
+    assertContains(response, "Candidature déclinée")
+    assertContains(response, job_description.display_name)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.REFUSED
+    assert job_application.refusal_reason == RefusalReason.NO_POSITION
+    assert job_application.refusal_reason_shared_with_job_seeker is True
+    assert job_application.answer == "Merci pour votre candidature."
+    assert job_application.answer_to_prescriber == "Plus de poste pour le moment."
+    # Same side effects as the existing screen: notifications and the closed recruitment.
+    assert mailoutbox
+    job_description.refresh_from_db()
+    assert job_description.is_active is False
+
+
+def test_refuse_job_application_sent_by_the_job_seeker(client):
+    membership = CompanyMembershipFactory()
+    job_application = JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.PROCESSING, sent_by_job_seeker=True
+    )
+    client.force_login(membership.user)
+    url = journey_url("candidature", job_application.pk)
+
+    response = walk(
+        client,
+        url,
+        {"decision": "refuse"},
+        {"refusal_reason": RefusalReason.DID_NOT_COME},
+        {"job_seeker_answer": "Nous n’avons pas pu vous joindre."},
+    )
+    assertContains(response, "Candidature déclinée")
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.REFUSED
+    assert job_application.answer_to_prescriber == ""
+
+
+def _contract_answers(job_application):
+    hiring_start_at = timezone.localdate()
+    return {
+        "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "hiring_end_at": Approval.get_default_end_date(hiring_start_at).strftime(
+            DuetDatePickerWidget.INPUT_DATE_FORMAT
+        ),
+        "answer": "Bienvenue dans l’équipe.",
+        "hired_job": job_application.selected_jobs.first().pk,
+    }
+
+
+@pytest.fixture
+def mocked_geocoding(settings, mocker):
+    settings.API_GEOPF_BASE_URL = "http://ban-api"
+    mocker.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data", side_effect=mock_get_geocoding_data_by_ban_api_resolved
+    )
+
+
+def test_accept_job_application_with_a_prescriber_diagnosis(client, mocked_geocoding):
+    company = CompanyFactory(with_membership=True, with_jobs=True, subject_to_iae_rules=True)
+    employer = company.members.first()
+    job_seeker = JobSeekerFactory(
+        born_in_france=True, jobseeker_profile__with_pole_emploi_id=True, with_ban_api_mocked_address=True
+    )
+    IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker,
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        sent_by_authorized_prescriber=True,
+        selected_jobs=company.jobs.all()[:1],
+        hiring_end_at=None,
+    )
+    client.force_login(employer)
+    url = journey_url("candidature", job_application.pk)
+
+    response = walk(client, url, {"decision": "accept"}, _contract_answers(job_application))
+    # Nothing missing on the job seeker and a prescriber's diagnosis: the contract, then the confirmation.
+    assert [step.label for step in response.context["steps"]] == ["Votre réponse", "Contrat", "Confirmer"]
+    assertContains(response, "Bienvenue dans l’équipe.")
+
+    response = walk(client, url, {"decision": "accept"}, _contract_answers(job_application), {}, **HTMX)
+    assertContains(response, "Candidature acceptée")
+    assert response["HX-Trigger"] == "nextStepsChanged"
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.ACCEPTED
+    assert job_application.hiring_start_at == timezone.localdate()
+    assert job_application.answer == "Bienvenue dans l’équipe."
+    # Same as the existing screen: a PASS IAE is delivered.
+    assert job_application.approval is not None
+    assertContains(response, job_application.approval.number_with_spaces)
+
+
+def test_accept_job_application_with_the_employer_diagnosis(client, mocked_geocoding):
+    company = CompanyFactory(with_membership=True, with_jobs=True, kind=CompanyKind.ACI)
+    employer = company.members.first()
+    job_seeker = JobSeekerFactory(
+        born_in_france=True, jobseeker_profile__with_pole_emploi_id=True, with_ban_api_mocked_address=True
+    )
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker,
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        sent_by_job_seeker=True,
+        selected_jobs=company.jobs.all()[:1],
+        hiring_end_at=None,
+    )
+    client.force_login(employer)
+    url = journey_url("candidature", job_application.pk)
+
+    response = walk(client, url, {"decision": "accept"}, _contract_answers(job_application))
+    # No diagnosis covers the hiring: the employer's criteria come before the confirmation.
+    assert [step.label for step in response.context["steps"]] == [
+        "Votre réponse",
+        "Contrat",
+        "Éligibilité",
+        "Confirmer",
+    ]
+    response = walk(client, url, {"decision": "accept"}, _contract_answers(job_application), {"level_1_1": "on"}, {})
+    assertContains(response, "Candidature acceptée")
+    diagnosis = EligibilityDiagnosis.objects.get(job_seeker=job_seeker)
+    assert diagnosis.author_siae == company
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.ACCEPTED
+
+
+def test_geiq_hiring_is_handed_over(client):
+    membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+    job_application = JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.PROCESSING, sent_by_job_seeker=True
+    )
+    client.force_login(membership.user)
+    url = journey_url("candidature", job_application.pk)
+
+    response = walk(client, url, {"decision": "accept"})
     assertContains(response, reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk}))
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING

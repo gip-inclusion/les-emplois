@@ -7,4 +7,5 @@
     {% for field in fields %}
         {% bootstrap_field field %}
     {% endfor %}
+    {% for field in hidden_fields %}{{ field }}{% endfor %}
 {% endif %}

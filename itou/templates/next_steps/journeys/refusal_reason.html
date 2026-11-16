@@ -1,0 +1,24 @@
+{% load django_bootstrap5 %}
+{# The refusal reason, as on the existing refusal screen. #}
+{% bootstrap_form_errors form type="non_fields" %}
+{% bootstrap_field form.refusal_reason %}
+{% if job_descriptions_to_close or close_spontaneous_applications %}
+    <div class="bg-light rounded p-3 mb-3 fs-sm">
+        <p class="mb-1">
+            Avec le motif «&nbsp;Pas de recrutement en cours&nbsp;», la réception des candidatures sera désactivée pour&nbsp;:
+        </p>
+        <ul class="mb-0">
+            {% for job_description in job_descriptions_to_close %}
+                <li>
+                    la fiche de poste <strong>{{ job_description.display_name }}</strong>
+                </li>
+            {% endfor %}
+            {% if close_spontaneous_applications %}
+                <li>
+                    toutes les <strong>candidatures spontanées</strong>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+{% bootstrap_field form.refusal_reason_shared_with_job_seeker %}

@@ -40,20 +40,27 @@ def _display_forms(journey, data):
     return journey.build_forms(initial=initial)
 
 
-def _field_names(step, form):
+def _form_keys(step):
+    """A step shows one form, several (a tuple of keys), or none."""
+    if step.form is None:
+        return ()
+    return step.form if isinstance(step.form, tuple) else (step.form,)
+
+
+def _field_names(step, forms):
+    """The fields a step renders: its own subset, or every field of its forms, hidden ones included."""
     if step.fields is not None:
-        return step.fields
-    return [name for name, field in form.fields.items() if not field.widget.is_hidden]
+        return list(step.fields)
+    return [name for key in _form_keys(step) for name in forms[key].fields]
 
 
 def _step_is_valid(step, bound_forms):
-    if step.form is None:
-        return True
-    form = bound_forms[step.form]
-    form.is_valid()
+    keys = _form_keys(step)
     if step.fields is None or step.fields == []:
-        # The whole form: a confirmation step checks everything, cross-field rules included.
-        return not form.errors
+        # Whole forms: a confirmation step checks everything, cross-field rules included.
+        return all(bound_forms[key].is_valid() for key in keys)
+    form = bound_forms[keys[0]]
+    form.is_valid()
     return not any(name in form.errors for name in step.fields)
 
 
@@ -113,9 +120,11 @@ def run(journey, data):
     else:
         forms = bound_forms
         recap = []
-    form = forms.get(step.form) if step.form else None
-    field_names = _field_names(step, form) if form else []
+    keys = _form_keys(step)
+    form = forms[keys[0]] if len(keys) == 1 else None
+    field_names = _field_names(step, forms)
     shown = sorted(_shown_fields(data) | set(field_names))
+    visible = [name for name in field_names if form and not form.fields[name].widget.is_hidden]
     return {
         "journey": journey,
         "job_seeker": journey.job_seeker,
@@ -127,10 +136,13 @@ def run(journey, data):
         "is_first_step": index == 0,
         "progress": math.floor((index + 1) / len(steps) * 100),
         "form": form,
-        "fields": [form[name] for name in field_names] if form else [],
+        "fields": [form[name] for name in visible],
+        "hidden_fields": [form[name] for name in field_names if form and name not in visible],
         "carried": _carried(data, set(field_names)),
         "shown": shown,
         "recap": recap,
         "facts": journey.facts(),
         **journey.context(),
+        # A step with several forms names each of them, for templates written for them.
+        **{f"form_{key}": forms[key] for key in keys},
     }, False

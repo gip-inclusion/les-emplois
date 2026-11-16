@@ -1,9 +1,11 @@
 from dateutil.relativedelta import relativedelta
+from django import forms
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from itou.approvals.utils import get_contracts
+from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
@@ -14,12 +16,22 @@ from itou.users.perms import (
 )
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
+from itou.utils.views import with_triggers_context
 from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import Group, expected_actions, group_actions
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.situation import situation_sentences
 from itou.www.next_steps_views.timeline import build_timeline
+
+
+def _journeys_media(request):
+    """Scripts of the forms the journeys may show, loaded with the page: htmx does not run swapped scripts."""
+    media = forms.Media()
+    if request.from_employer:
+        for field in JobSeekerAddressForm.base_fields.values():
+            media += field.widget.media
+    return media
 
 
 @readonly_view
@@ -35,6 +47,7 @@ def todo(request, template_name="next_steps/todo.html"):
     context = {
         "groups": group_actions(actions),
         "pressing_count": sum(action.group != Group.WATCH for action in actions),
+        "journeys_media": _journeys_media(request),
         "matomo_custom_title": "Prochaines étapes : à faire",
     }
     return render(request, template_name, context)
@@ -138,11 +151,13 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "show_barriers": request.from_authorized_prescriber or can_fill_pro_support_report(request),
         "pro_support_report": _last_viewable_pro_support_report(request, job_seeker),
         "matomo_custom_title": "Prochaines étapes : fiche usager",
+        "journeys_media": _journeys_media(request),
     }
     return render(request, template_name, context)
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@with_triggers_context
 def journey(request, kind, pk):
     """A guided journey: in the side drawer when loaded by htmx, an ordinary page otherwise."""
     if not can_view_next_steps(request) or kind not in JOURNEYS:
@@ -154,6 +169,7 @@ def journey(request, kind, pk):
         "in_drawer": bool(request.htmx),
         "can_view_name": can_view_personal_information(request, current_journey.job_seeker),
         "matomo_custom_title": f"Prochaines étapes : parcours {kind}",
+        "journeys_media": _journeys_media(request),
     }
     template_name = "next_steps/journeys/journey.html" if request.htmx else "next_steps/journeys/page.html"
     response = render(request, template_name, context)

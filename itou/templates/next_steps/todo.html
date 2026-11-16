@@ -59,3 +59,9 @@
     </section>
     {% include "next_steps/includes/journey_drawer.html" %}
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {# Scripts of the forms the guided journeys show. #}
+    {{ journeys_media.js }}
+{% endblock %}

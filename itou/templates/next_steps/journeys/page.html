@@ -14,3 +14,9 @@
         </div>
     </section>
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {# Scripts of the forms the guided journeys show. #}
+    {{ journeys_media.js }}
+{% endblock %}

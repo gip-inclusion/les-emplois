@@ -56,7 +56,7 @@
         <form method="post"
               action="{{ journey_url }}"
               class="next-step-journey__form"
-              {% if in_drawer %}hx-post="{{ journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML"{% endif %}>
+              {% if in_drawer %}hx-post="{{ journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-disinherit="*"{% endif %}>
             {% csrf_token %}
             <input type="hidden" name="step" value="{{ step_index }}">
             {% for name in shown %}<input type="hidden" name="shown" value="{{ name }}">{% endfor %}
