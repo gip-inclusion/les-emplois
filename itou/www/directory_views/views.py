@@ -24,7 +24,7 @@ def _nearby_memberships(queryset, organization_field, users, origin):
             **{f"{coords_field}__dwithin": (origin, D(km=DIRECTORY_RADIUS_KM))},
         )
         .select_related("user", organization_field)
-        .annotate(org_directory_distance=Distance(coords_field, origin) / 1000)
+        .annotate(org_directory_distance_km=Distance(coords_field, origin) / 1000)
     )
 
 
@@ -44,7 +44,7 @@ def get_directory_people(origin):
                 user.directory_organizations = []
                 directory[membership.user.pk] = user
             org = getattr(membership, organization_field)
-            org.directory_distance_km = membership.org_directory_distance
+            org.directory_distance_km = membership.org_directory_distance_km
             user.directory_organizations.append(org)
     for person in directory.values():
         person.directory_organizations.sort(
