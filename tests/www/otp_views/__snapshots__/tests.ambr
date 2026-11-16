@@ -14,25 +14,51 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Ouvrez l’un de vos appareils configurés et recopiez le code affiché :
+                          Ouvrez l’un de vos appareils configurés et recopiez le code affiché
                       </strong>
                   </p>
                   <ol class="list-unstyled">
                       <li>
-                          Mon appareil
-                                              
-                                                  –
+                          <em>
+                              Mon appareil
+                          </em>
+                          –
                                                   Dernière utilisation le
                                                   01 juin 2026 à 12h00
                       </li>
                   </ol>
-                  <p class="mb-0">
+                  <p>
                       <strong>
                           Vous n’avez plus accès à votre appareil ?
                       </strong>
                       <a class="btn-link" href="/otp/login-with-backup-code">
-                          Cliquez ici pour entrer votre code de récupération
+                          Cliquez ici pour utiliser votre code de récupération
                       </a>
+                      .
+                  </p>
+                  <h5>
+                      Où trouver mon code ?
+                  </h5>
+                  <p>
+                      Lors de l’activation de la double authentification, vous avez associé votre compte à une
+                      <strong>
+                          application d’authentification
+                      </strong>
+                      installée sur votre téléphone ou votre ordinateur.
+                  </p>
+                  <p>
+                      Il s’agit peut-être de l’une des
+                      <a aria-label="Ouverture dans un nouvel onglet" href="/otp/apps" target="_blank">
+                          applications recommandées
+                      </a>
+                      , comme Google Authenticator, Aegis, Microsoft Authenticator, Authy, ou un gestionnaire de mots de passe comme Bitwarden.
+                  </p>
+                  <p class="mb-0">
+                      Elle affiche automatiquement un
+                      <strong>
+                          code à 6 chiffres
+                      </strong>
+                      à recopier ci-dessous.
                   </p>
               </div>
           </div>
