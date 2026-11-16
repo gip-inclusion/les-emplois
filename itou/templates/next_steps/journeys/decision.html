@@ -1,8 +1,5 @@
-{% load django_bootstrap5 %}
 {# The answer to an application, with a link to read it in full. #}
-<p class="mb-4">
+{% include "next_steps/journeys/fields.html" %}
+<p class="fs-sm mb-0">
     <a href="{{ details_url }}">Lire la candidature complète</a>
 </p>
-{% for field in fields %}
-    {% bootstrap_field field %}
-{% endfor %}

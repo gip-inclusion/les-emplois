@@ -527,3 +527,127 @@ table.table td > .modal .modal-content {
     padding: 1rem 4.5rem 1rem 1.5rem;
     border-top: 1px solid var(--bs-border-color, #e6e6eb);
 }
+
+/* Guided journeys' forms, laid out as in the prototype: a question, a hint, choices as cards. */
+.next-step-journey__question {
+    margin-bottom: .5rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.next-step-journey__legend {
+    margin-bottom: .5rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.next-step-options {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.next-step-option {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    padding: .75rem .875rem;
+    border: 1px solid var(--bs-border-color, #e6e6eb);
+    border-radius: var(--bs-border-radius, .25rem);
+    cursor: pointer;
+}
+
+.next-step-option:hover {
+    border-color: var(--bs-primary, #000638);
+}
+
+.next-step-option:has(input:checked) {
+    border-color: var(--bs-primary, #000638);
+    background-color: var(--bs-light, #f2f3f5);
+}
+
+.next-step-option input {
+    flex: none;
+    margin-top: .25rem;
+}
+
+.next-step-option__text {
+    display: flex;
+    flex-direction: column;
+    gap: .125rem;
+    min-width: 0;
+}
+
+.next-step-option__text b {
+    font-weight: 700;
+}
+
+.next-step-option__text span {
+    font-size: .875rem;
+    color: var(--bs-secondary-color, #727492);
+}
+
+/* Facts: two columns once there is room for them. */
+.next-step-facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .625rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 30rem) {
+    .next-step-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.next-step-fact {
+    display: flex;
+    flex-direction: column;
+    gap: .125rem;
+    min-width: 0;
+    padding: .625rem .75rem;
+    border: 1px solid var(--bs-border-color, #e6e6eb);
+    border-radius: var(--bs-border-radius, .25rem);
+}
+
+.next-step-fact small {
+    color: var(--bs-secondary-color, #727492);
+}
+
+.next-step-box {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin-top: 1rem;
+    padding: .875rem 1rem;
+    border-radius: var(--bs-border-radius, .25rem);
+    background-color: var(--bs-light, #f2f3f5);
+}
+
+.next-step-box--warn {
+    background-color: var(--bs-warning-bg-subtle, #fff3df);
+}
+
+.next-step-box--ok {
+    background-color: var(--bs-success-bg-subtle, #e0f7e9);
+}
+
+.next-step-recap {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    margin: 0;
+}
+
+.next-step-recap dt {
+    font-size: .875rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color, #727492);
+}
+
+.next-step-recap dd {
+    margin: 0;
+    font-weight: 700;
+}
+

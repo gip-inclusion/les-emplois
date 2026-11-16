@@ -169,7 +169,9 @@ def test_fill_pro_support_report(client, mailoutbox):
         "Orientation",
         "Envoi",
     ]
-    assertContains(response, "Vérifiez avant de valider")
+    assertContains(response, "Vérifiez avant d’envoyer")
+    # The recipient is named before sending.
+    assertContains(response, f"Le bilan sera envoyé à {advisor.get_full_name()}")
     assertContains(response, "Garde d’enfant")
     assert not ProSupportReport.objects.exists()
 

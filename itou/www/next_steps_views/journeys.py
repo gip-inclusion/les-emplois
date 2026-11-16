@@ -34,12 +34,13 @@ from itou.approvals.models import (
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, ContractType, ProSupportReportAutonomy
 from itou.companies.models import ProSupportReport
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import can_fill_pro_support_report
@@ -86,6 +87,7 @@ PASS_IAE = f"PASS{NBSP}IAE"
 FIELDS_TEMPLATE = "next_steps/journeys/fields.html"
 FACTS_TEMPLATE = "next_steps/journeys/facts.html"
 RECAP_TEMPLATE = "next_steps/journeys/recap.html"
+CRITERIA_LEVELS = [(1, AdministrativeCriteriaForm.LEVEL_1_PREFIX), (2, AdministrativeCriteriaForm.LEVEL_2_PREFIX)]
 
 
 def _fr(date):
@@ -95,15 +97,44 @@ def _fr(date):
 
 
 @dataclasses.dataclass
+class Show:
+    """How a field is shown, as in the prototype: "options" (one card per choice), "select" or "default"."""
+
+    kind: str = "default"
+    # For options: value -> (title, or None to keep the choice's label; description, or None).
+    choices: dict = dataclasses.field(default_factory=dict)
+    # Show the field's label above the cards, when the step's question does not already ask for it.
+    legend: bool = False
+
+
+DEFAULT_SHOW = Show()
+
+
+@dataclasses.dataclass
+class Box:
+    """Context shown in a step: a motif, what a choice entails, who receives what."""
+
+    text: str
+    title: str = ""
+    # "", "warn" or "ok".
+    variant: str = ""
+
+
+@dataclasses.dataclass
 class Step:
     label: str
     # The form this step shows, by key in Journey.build_forms(), and which of its fields (None: all of them).
-    form: str | None = None
+    form: str | tuple | None = None
     fields: list | None = None
     template: str = FIELDS_TEMPLATE
     submit_label: str = "Continuer"
     # A step that hands over to an existing screen instead of submitting: (label, url).
     handover: tuple | None = None
+    # The question the step asks, a hint below it, how its fields are shown, and context boxes.
+    question: str = ""
+    hint: str = ""
+    layout: dict = dataclasses.field(default_factory=dict)
+    boxes: list = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass
@@ -208,17 +239,92 @@ class ProSupportReportFillJourney(Journey):
         form.fields["has_solution"].widget.attrs = {}
         return {"report": form}
 
+    def _report_recipient(self):
+        """Who will receive the report: same query as ProSupportReport.notify_authorized_prescriber."""
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker=self.job_seeker,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at")
+            .first()
+        )
+        if assignment is None:
+            return Box("Aucun prescripteur habilité ne suit la personne : le bilan restera consultable sur sa fiche.")
+        return Box(
+            f"Le bilan sera envoyé à {assignment.professional.get_full_name()} "
+            f"({assignment.prescriber_organization.display_name}), le dernier prescripteur habilité "
+            "qui a accompagné la personne."
+        )
+
     def steps(self, data):
         if data.get("has_solution") == "False":
-            follow_up = Step("Orientation", "report", ["orientation"])
+            follow_up = Step(
+                "Orientation",
+                "report",
+                ["orientation"],
+                question="Quelle orientation serait la plus adaptée ?",
+                layout={"orientation": Show("options")},
+            )
         else:
-            follow_up = Step("Solution", "report", ["solution"])
+            follow_up = Step(
+                "Solution",
+                "report",
+                ["solution"],
+                question="Quelle solution est envisagée ?",
+                layout={"solution": Show("options")},
+            )
         return [
-            Step("Freins", "report", ["barriers", "other_barrier"]),
-            Step("Autonomie", "report", ["autonomy"]),
-            Step("La suite", "report", ["has_solution"]),
+            Step(
+                "Freins",
+                "report",
+                ["barriers", "other_barrier"],
+                question="Quels freins restent à travailler ?",
+                hint="Ne cochez rien si aucun frein n’a été identifié.",
+                layout={"barriers": Show("options")},
+            ),
+            Step(
+                "Autonomie",
+                "report",
+                ["autonomy"],
+                question="Son autonomie dans la recherche d’emploi",
+                layout={
+                    "autonomy": Show(
+                        "options",
+                        {
+                            str(level.value): (f"{level.value} sur 5", level.label)
+                            for level in ProSupportReportAutonomy
+                        },
+                    )
+                },
+            ),
+            Step(
+                "La suite",
+                "report",
+                ["has_solution"],
+                question="Une solution est-elle déjà prévue après le contrat ?",
+                hint="Un bilan comporte soit une solution envisagée, soit une orientation.",
+                layout={
+                    "has_solution": Show(
+                        "options",
+                        {
+                            "True": (None, "Emploi, formation, renouvellement…"),
+                            "False": (None, "Vous indiquerez l’accompagnement le plus adapté."),
+                        },
+                    )
+                },
+            ),
             follow_up,
-            Step("Envoi", "report", [], template=RECAP_TEMPLATE, submit_label="Envoyer le bilan"),
+            Step(
+                "Envoi",
+                "report",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Envoyer le bilan",
+                question="Vérifiez avant d’envoyer",
+                boxes=[self._report_recipient()],
+            ),
         ]
 
     def recap(self, forms):
@@ -287,9 +393,28 @@ class SuspensionJourney(Journey):
         return {"suspension": SuspensionForm(approval=self.approval, siae=self.company, data=data, initial=initial)}
 
     def steps(self, data):
+        contract = self.job_seeker.contracts.filter(company=self.company).order_by("-start_date", "-pk").first()
+        hint = f"La suspension arrête le décompte des jours du {PASS_IAE}."
+        if contract and contract.end_date and contract.has_ended:
+            hint = f"Le contrat est terminé depuis le {_fr(contract.end_date)}. " + hint
         return [
-            Step("La suspension", "suspension"),
-            Step("Vérifier", "suspension", [], template=RECAP_TEMPLATE, submit_label="Suspendre"),
+            Step(
+                "La suspension",
+                "suspension",
+                hint=hint,
+                layout={
+                    "set_default_end_date": Show("options"),
+                    "reason": Show("options", legend=True),
+                },
+            ),
+            Step(
+                "Vérifier",
+                "suspension",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Suspendre",
+                question="Vérifiez avant de suspendre",
+            ),
         ]
 
     def recap(self, forms):
@@ -479,14 +604,64 @@ class JobApplicationJourney(Journey):
 
     def steps(self, data):
         pk = self.job_application.pk
-        steps = [Step("Votre réponse", "decision", template="next_steps/journeys/decision.html")]
+        decision_choices = {
+            "process": (None, f"Statut{NBSP}: {JobApplicationState.PROCESSING.label}"),
+            "postpone": (None, f"Statut{NBSP}: {JobApplicationState.POSTPONED.label}, avec un message"),
+            "accept": (None, "Le contrat, puis la confirmation de l’embauche"),
+            "refuse": (None, f"Statut{NBSP}: {JobApplicationState.REFUSED.label}, avec un motif et un message"),
+        }
+        steps = [
+            Step(
+                "Votre réponse",
+                "decision",
+                template="next_steps/journeys/decision.html",
+                question="Votre réponse",
+                layout={"decision": Show("options", decision_choices)},
+            )
+        ]
         match data.get("decision"):
             case "postpone":
-                steps.append(Step("Message", "answer", submit_label="Mettre en attente"))
+                steps.append(
+                    Step(
+                        "Message",
+                        "answer",
+                        submit_label="Mettre en attente",
+                        question="Votre message",
+                        hint="Il sera visible par l’usager et le prescripteur.",
+                    )
+                )
             case "refuse":
+                job_descriptions, close_spontaneous_applications = _get_recruitment_to_close(
+                    self.company, [self.job_application]
+                )
+                closed = [f"la fiche de poste {job_description.display_name}" for job_description in job_descriptions]
+                if close_spontaneous_applications:
+                    closed.append("toutes les candidatures spontanées")
                 steps += [
-                    Step("Motif", "refusal_reason", template="next_steps/journeys/refusal_reason.html"),
-                    Step("Message à l’usager", "job_seeker_answer"),
+                    Step(
+                        "Motif",
+                        "refusal_reason",
+                        question="Pourquoi déclinez-vous la candidature ?",
+                        layout={
+                            "refusal_reason": Show("select"),
+                            "refusal_reason_shared_with_job_seeker": Show("options"),
+                        },
+                        boxes=[
+                            Box(
+                                f"La réception des candidatures sera désactivée pour {', '.join(closed)}.",
+                                title=f"Avec le motif «{NBSP}{RefusalReason.NO_POSITION.label}{NBSP}»",
+                                variant="warn",
+                            )
+                        ]
+                        if closed
+                        else [],
+                    ),
+                    Step(
+                        "Message à l’usager",
+                        "job_seeker_answer",
+                        question="Votre message à l’usager",
+                        hint="Il est pré-rempli d’après le motif choisi. Vous pouvez le modifier.",
+                    ),
                 ]
                 # Same condition as apply.views.batch_views.RefuseWizardView.get_steps.
                 if self.job_application.sender_kind == SenderKind.PRESCRIBER:
@@ -494,22 +669,67 @@ class JobApplicationJourney(Journey):
                     recipient = (
                         "au prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "à l’orienteur"
                     )
-                    steps.append(Step(f"Message {recipient}", "prescriber_answer"))
+                    steps.append(
+                        Step(
+                            f"Message {recipient}",
+                            "prescriber_answer",
+                            question=f"Votre message {recipient}",
+                            hint="Il n’est pas communiqué à l’usager.",
+                        )
+                    )
                 steps[-1].submit_label = "Décliner la candidature"
             case "accept" if not self.hiring_in_drawer:
                 url = reverse("apply:start-accept", kwargs={"job_application_id": pk})
-                steps.append(Step("Embauche", handover=("Commencer l’embauche", url)))
+                steps.append(
+                    Step(
+                        "Embauche",
+                        handover=("Commencer l’embauche", url),
+                        question="L’embauche se poursuit sur l’écran habituel",
+                        hint="Elle demande des informations propres à votre structure.",
+                    )
+                )
             case "accept":
                 info_forms = tuple(self._job_seeker_info_forms(None, None))
                 if info_forms:
-                    steps.append(Step("Usager", info_forms, template="next_steps/journeys/job_seeker_infos.html"))
-                steps.append(Step("Contrat", "accept", template="next_steps/journeys/contract.html"))
-                if self._iae_eligibility_needed(data):
                     steps.append(
-                        Step("Éligibilité", "criteria", template="next_steps/journeys/employer_criteria.html")
+                        Step(
+                            "Usager",
+                            info_forms,
+                            template="next_steps/journeys/job_seeker_infos.html",
+                            question="Informations à compléter",
+                            hint="Elles manquent sur son profil et sont nécessaires à l’embauche.",
+                        )
                     )
                 steps.append(
-                    Step("Confirmer", "accept", [], template=RECAP_TEMPLATE, submit_label="Accepter l’embauche")
+                    Step(
+                        "Contrat",
+                        "accept",
+                        template="next_steps/journeys/contract.html",
+                        question="Le contrat",
+                    )
+                )
+                if self._iae_eligibility_needed(data):
+                    steps.append(
+                        Step(
+                            "Éligibilité",
+                            "criteria",
+                            template="next_steps/journeys/criteria.html",
+                            question="Quels critères administratifs la personne remplit-elle ?",
+                            hint=(
+                                "Aucun diagnostic d’éligibilité valide ne couvre cette embauche. "
+                                "La pièce justificative à conserver est indiquée pour chaque critère."
+                            ),
+                        )
+                    )
+                steps.append(
+                    Step(
+                        "Confirmer",
+                        "accept",
+                        [],
+                        template=RECAP_TEMPLATE,
+                        submit_label="Accepter l’embauche",
+                        question="Vérifiez avant d’accepter l’embauche",
+                    )
                 )
             case "process":
                 steps[-1].submit_label = "Mettre à l’étude"
@@ -531,15 +751,12 @@ class JobApplicationJourney(Journey):
         return lines
 
     def context(self):
-        job_descriptions_to_close, close_spontaneous_applications = _get_recruitment_to_close(
-            self.company, [self.job_application]
-        )
         return {
             "details_url": reverse(
                 "apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}
             ),
-            "job_descriptions_to_close": job_descriptions_to_close,
-            "close_spontaneous_applications": close_spontaneous_applications,
+            "criteria_levels": CRITERIA_LEVELS,
+            "criteria_filled_from_job_seeker": None,
             "company": self.company,
             "hide_value": ContractType.OTHER.value,
             # Set by the engine when the step shows them.
@@ -690,16 +907,67 @@ class ProlongationJourney(Journey):
         }
 
     def steps(self, data):
-        steps = [Step("La demande", template=FACTS_TEMPLATE), Step("Votre décision", "decision")]
+        prolongation_request = self.prolongation_request
+        requester = prolongation_request.declared_by_siae
+        steps = [
+            Step(
+                "La demande",
+                template=FACTS_TEMPLATE,
+                question=(
+                    f"{requester.display_name if requester else 'La structure'} demande de prolonger "
+                    f"le {PASS_IAE} de {self.job_seeker.first_name}"
+                ),
+                boxes=[Box(prolongation_request.get_reason_display(), title="Motif")],
+            ),
+            Step(
+                "Votre décision",
+                "decision",
+                question="Votre décision",
+                layout={
+                    "decision": Show(
+                        "options",
+                        {
+                            "grant": (
+                                None,
+                                f"Le {PASS_IAE} est prolongé jusqu’au {_fr(prolongation_request.end_at)}.",
+                            ),
+                            "deny": (None, "La structure en est informée, avec votre motif."),
+                        },
+                    )
+                },
+            ),
+        ]
         if data.get("decision") == "deny":
-            steps += [Step("Motif", "reason"), Step("Explication", "reason_explanation")]
+            steps += [
+                Step(
+                    "Motif",
+                    "reason",
+                    question="Pourquoi refusez-vous la prolongation ?",
+                    layout={"reason": Show("options")},
+                ),
+                Step("Explication", "reason_explanation", question="Expliquez votre décision"),
+            ]
             # Same condition as approvals_views.ProlongationRequestDenyView.
             if data.get("reason") == ProlongationRequestDenyReason.IAE:
-                steps.append(Step("Actions proposées", "proposed_actions"))
+                steps.append(
+                    Step(
+                        "Actions proposées",
+                        "proposed_actions",
+                        question="Quelles actions proposez-vous à la personne ?",
+                        layout={"proposed_actions": Show("options")},
+                    )
+                )
             steps[-1].submit_label = "Refuser la prolongation"
         else:
             steps.append(
-                Step("Confirmer", "decision", [], template=RECAP_TEMPLATE, submit_label="Accepter la prolongation")
+                Step(
+                    "Confirmer",
+                    "decision",
+                    [],
+                    template=RECAP_TEMPLATE,
+                    submit_label="Accepter la prolongation",
+                    question="Vérifiez avant d’accepter la prolongation",
+                )
             )
         return steps
 
@@ -783,9 +1051,33 @@ class EligibilityJourney(Journey):
         }
 
     def steps(self, data):
+        expires_at = EligibilityDiagnosis._expiration_date(AuthorKind.PRESCRIBER)
         return [
-            Step("Les critères", "criteria", template="next_steps/journeys/eligibility_criteria.html"),
-            Step("Confirmer", "criteria", [], template=RECAP_TEMPLATE, submit_label="Valider l’éligibilité"),
+            Step(
+                "Les critères",
+                "criteria",
+                template="next_steps/journeys/criteria.html",
+                question="Quels critères administratifs avez-vous constatés ?",
+                hint=(
+                    "À l’issue d’un diagnostic socio-professionnel réalisé lors d’un entretien individuel. "
+                    "Il est recommandé de sélectionner les critères correspondants."
+                ),
+            ),
+            Step(
+                "Confirmer",
+                "criteria",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Valider l’éligibilité",
+                question=f"Vous confirmez l’éligibilité IAE de {self.job_seeker.first_name}",
+                boxes=[
+                    Box(
+                        "Pour un diagnostic réalisé par un prescripteur habilité.",
+                        title=f"Diagnostic valable jusqu’au {_fr(expires_at)}",
+                        variant="ok",
+                    )
+                ],
+            ),
         ]
 
     def recap(self, forms):
@@ -796,6 +1088,7 @@ class EligibilityJourney(Journey):
         return {
             "ITOU_DIAGNOSTIC_URL": ITOU_DIAGNOSTIC_URL,
             "criteria_filled_from_job_seeker": self.criteria_filled_from_job_seeker,
+            "criteria_levels": CRITERIA_LEVELS,
         }
 
     def done(self, forms):
@@ -868,7 +1161,11 @@ class ProSupportRequestJourney(Journey):
     def steps(self, data):
         return [
             Step(
-                "Le message", "message", template="next_steps/journeys/message.html", submit_label="Préparer l’e-mail"
+                "Le message",
+                "message",
+                submit_label="Préparer l’e-mail",
+                question="Votre message à la structure d’insertion",
+                hint="Il s’ouvrira dans votre messagerie, prêt à être envoyé. Vous pouvez le modifier ici avant.",
             )
         ]
 

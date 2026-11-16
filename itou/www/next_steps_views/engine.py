@@ -10,6 +10,8 @@ import math
 from django.db import transaction
 from django.http import QueryDict
 
+from itou.www.next_steps_views.journeys import DEFAULT_SHOW
+
 
 CONTROL_FIELDS = {"csrfmiddlewaretoken", "step", "nav", "shown"}
 
@@ -137,6 +139,8 @@ def run(journey, data):
         "progress": math.floor((index + 1) / len(steps) * 100),
         "form": form,
         "fields": [form[name] for name in visible],
+        # Each visible field with how the step shows it (see journeys.Show).
+        "field_rows": [(form[name], step.layout.get(name, DEFAULT_SHOW)) for name in visible],
         "hidden_fields": [form[name] for name in field_names if form and name not in visible],
         "carried": _carried(data, set(field_names)),
         "shown": shown,

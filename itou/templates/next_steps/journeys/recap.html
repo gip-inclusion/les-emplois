@@ -3,12 +3,13 @@
 {% if form and form.is_bound %}
     {% bootstrap_form_errors form type="non_fields" %}
 {% endif %}
-<p class="mb-3">Vérifiez avant de valider&nbsp;:</p>
-<ul class="list-data mb-0">
+<dl class="next-step-recap">
     {% for label, value in recap %}
-        <li>
-            <small>{{ label }}</small>
-            <strong>{{ value }}</strong>
-        </li>
+        <div>
+            <dt>{{ label }}</dt>
+            <dd>
+                {{ value }}
+            </dd>
+        </div>
     {% endfor %}
-</ul>
+</dl>

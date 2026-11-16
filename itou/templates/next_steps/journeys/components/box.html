@@ -1,0 +1,5 @@
+{# Context of a step, as in the prototype. #}
+<div class="next-step-box{% if box.variant %} next-step-box--{{ box.variant }}{% endif %}">
+    {% if box.title %}<b>{{ box.title }}</b>{% endif %}
+    <span>{{ box.text }}</span>
+</div>

@@ -1,9 +1,9 @@
-{# The facts an action rests on. #}
-<ul class="list-data mb-4">
+{# The facts an action rests on, in a grid as in the prototype. #}
+<div class="next-step-facts">
     {% for label, value in facts %}
-        <li>
+        <div class="next-step-fact">
             <small>{{ label }}</small>
-            <strong>{{ value }}</strong>
-        </li>
+            <b>{{ value }}</b>
+        </div>
     {% endfor %}
-</ul>
+</div>

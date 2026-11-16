@@ -62,10 +62,16 @@
             {% for name in shown %}<input type="hidden" name="shown" value="{{ name }}">{% endfor %}
             {% for name, value in carried %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
             <div class="next-step-journey__body">
+                {# As in the prototype: the facts first, then the question the step asks, then its fields. #}
                 {% if is_first_step and facts and step.template != "next_steps/journeys/facts.html" %}
                     {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
                 {% endif %}
+                {% if step.question %}<p class="next-step-journey__question">{{ step.question }}</p>{% endif %}
+                {% if step.hint %}<p class="fs-sm text-muted mb-3">{{ step.hint }}</p>{% endif %}
                 {% include step.template %}
+                {% for box in step.boxes %}
+                    {% include "next_steps/journeys/components/box.html" with box=box only %}
+                {% endfor %}
             </div>
             <div class="next-step-journey__foot">
                 {% if is_first_step %}
