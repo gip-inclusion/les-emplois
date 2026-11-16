@@ -21,7 +21,7 @@ from itou.rdv_insertion.enums import ParticipationStatus
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
-from itou.www.next_steps_views import journeys
+from itou.www.job_seekers_views.views import _pro_support_request_company_email
 
 
 # A report stays in the queue this long: whether the prescriber read it is not recorded.
@@ -75,14 +75,18 @@ class Action:
     url: str | None = None
     call_to_action: str | None = None
     status_label: str | None = None
-    # Prepares the action in a side drawer before handing over to the existing form.
-    journey: journeys.Journey | None = None
+    # The guided journey running the action in the side drawer, if any (see journeys.py).
+    journey_url: str | None = None
     # Unique on the page, set once the queue is sorted.
     uid: str = ""
 
     @property
     def icon(self):
         return self.kind.value
+
+
+def _journey_url(kind, pk):
+    return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
 
 
 def _date(value):
@@ -117,7 +121,7 @@ def _new_job_applications(company):
             since=_date(job_application.created_at),
             url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             call_to_action="Étudier",
-            journey=journeys.job_application(job_application, sender),
+            journey_url=_journey_url("candidature", job_application.pk),
         )
 
 
@@ -147,7 +151,7 @@ def _end_of_contracts(company):
                     since=end_date,
                     url=reverse("approvals:suspend", kwargs={"approval_id": approval.pk}),
                     call_to_action="Suspendre",
-                    journey=journeys.approval_suspension(approval, company, end_date),
+                    journey_url=_journey_url("suspension", approval.pk),
                 )
             if not job_seeker.last_contract_has_pro_support_report:
                 yield Action(
@@ -164,7 +168,7 @@ def _end_of_contracts(company):
                         "job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}
                     ),
                     call_to_action="Remplir",
-                    journey=journeys.pro_support_report_fill(end_date, ended=True),
+                    journey_url=_journey_url("bilan", job_seeker.public_id),
                 )
         elif not job_seeker.last_contract_has_pro_support_report:
             yield Action(
@@ -176,7 +180,7 @@ def _end_of_contracts(company):
                 since=end_date,
                 url=reverse("job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}),
                 call_to_action="Remplir",
-                journey=journeys.pro_support_report_fill(end_date, ended=False),
+                journey_url=_journey_url("bilan", job_seeker.public_id),
             )
 
 
@@ -213,7 +217,6 @@ def _appointments_with_undetermined_status(company):
                 },
             ),
             call_to_action="Voir",
-            journey=journeys.appointment(appointment),
         )
 
 
@@ -285,7 +288,7 @@ def _prolongation_requests_to_process(request):
                 kwargs={"prolongation_request_id": prolongation_request.pk},
             ),
             call_to_action="Traiter",
-            journey=journeys.prolongation_request(prolongation_request),
+            journey_url=_journey_url("prolongation", prolongation_request.pk),
         )
 
 
@@ -298,6 +301,8 @@ def _pro_support_reports_to_request(request):
         .with_last_contract_end_date(siae=None)
         .with_last_contract_has_pro_support_report(siae=None)
         .filter(last_contract_has_pro_support_report=False)
+        # Without the company's e-mail, the request cannot be prepared: the button leads to the job seeker's page.
+        .annotate(company_email=_pro_support_request_company_email())
     )
     for job_seeker in job_seekers:
         end_date = job_seeker.last_contract_end_date
@@ -316,9 +321,7 @@ def _pro_support_reports_to_request(request):
             since=end_date,
             url=reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}),
             call_to_action="Demander",
-            journey=journeys.pro_support_report_request(
-                end_date, ended=job_seeker.last_contract_ended_with_valid_approval
-            ),
+            journey_url=_journey_url("demande-bilan", job_seeker.public_id) if job_seeker.company_email else None,
         )
 
 
@@ -384,7 +387,7 @@ def _eligibility_to_validate(request):
             since=_date(job_application.created_at),
             url=reverse("eligibility_views:update_iae", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             call_to_action="Valider",
-            journey=journeys.eligibility(job_application),
+            journey_url=_journey_url("eligibilite", job_seeker.public_id),
         )
 
 

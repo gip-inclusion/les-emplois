@@ -1,0 +1,8 @@
+{% load django_bootstrap5 %}
+{# An e-mail written here and sent from the user's own mailbox. #}
+<p class="fs-sm text-muted">
+    Le message s’ouvrira dans votre messagerie, prêt à être envoyé. Vous pouvez le modifier ici avant.
+</p>
+{% for field in fields %}
+    {% bootstrap_field field %}
+{% endfor %}

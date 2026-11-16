@@ -1,54 +1,48 @@
 import datetime
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.approvals.enums import ProlongationRequestDenyReason
+from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
 from itou.approvals.models import Suspension
-from itou.companies.enums import CompanyKind, ProSupportReportBarrier
-from itou.job_applications.enums import JobApplicationState, RefusalReason
+from itou.companies.enums import CompanyKind, ProSupportReportBarrier, ProSupportReportSolution
+from itou.companies.models import ProSupportReport
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
+from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
-TODO_URL = reverse("next_steps_views:todo")
+HTMX = {"HTTP_HX_REQUEST": "true"}
 
 
-def test_the_button_opens_a_drawer_and_still_leads_to_the_form_without_javascript(client, settings):
+@pytest.fixture(autouse=True)
+def experiment_for_everyone(settings):
     settings.NEXT_STEPS_FOR_EVERYONE = True
-    membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
-    job_application = JobApplicationFactory(
-        to_company=membership.company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
-    )
-    client.force_login(membership.user)
-
-    response = client.get(TODO_URL)
-    action = response.context["groups"][0]["actions"][0]
-    form_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    # The button keeps the form as its target, Bootstrap opens the drawer instead when JavaScript runs.
-    assertContains(
-        response,
-        f'href="{form_url}?back_url={TODO_URL}"\n               data-bs-toggle="offcanvas" '
-        f'data-bs-target="#{action.uid}"',
-    )
-    assertContains(response, f'<div class="offcanvas offcanvas-end" tabindex="-1" id="{action.uid}"')
-    assertContains(response, "Ouvrir la candidature")
-    assertContains(response, job_application.sender_prescriber_organization.display_name)
-    # The refusal reasons the form offers to this kind of company.
-    assertContains(response, RefusalReason.NO_POSITION.label)
-    assertNotContains(response, RefusalReason.NON_ELIGIBLE.label)
-    assertNotContains(response, RefusalReason.AUTO.label)
 
 
-def test_suspension_journey(client, settings):
-    settings.NEXT_STEPS_FOR_EVERYONE = True
-    membership = CompanyMembershipFactory(company__kind=CompanyKind.AI)
-    company = membership.company
-    end_date = timezone.localdate() - datetime.timedelta(days=10)
+def journey_url(kind, pk):
+    return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
+
+
+def walk(client, url, *answers, **headers):
+    """Answer the steps one after the other, as the browser does: previous answers travel with each step."""
+    data, shown, response = {}, [], None
+    for index, step_answers in enumerate(answers):
+        data |= step_answers
+        shown += list(step_answers)
+        response = client.post(url, {**data, "step": index, "nav": "next", "shown": shown}, **headers)
+    return response
+
+
+def ended_contract(company, days_ago=10):
+    end_date = timezone.localdate() - datetime.timedelta(days=days_ago)
     contract = ContractFactory(company=company, start_date=end_date - datetime.timedelta(days=200), end_date=end_date)
     approval = ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
     JobApplicationFactory(
@@ -57,41 +51,317 @@ def test_suspension_journey(client, settings):
         state=JobApplicationState.ACCEPTED,
         sent_by_authorized_prescriber=True,
         hiring_start_at=contract.start_date,
+        approval=approval,
+    )
+    return contract, approval
+
+
+REPORT_ANSWERS = [
+    {"barriers": [ProSupportReportBarrier.MOBILITY], "other_barrier": "Garde d’enfant"},
+    {"autonomy": "3"},
+    {"has_solution": "False"},
+    {"orientation": "SOCIAL"},
+]
+
+
+# Engine
+# ------------------------------------------------------------------------------
+
+
+def test_off_by_default(client, settings):
+    settings.NEXT_STEPS_FOR_EVERYONE = False
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    assert client.get(journey_url("bilan", contract.job_seeker.public_id)).status_code == 404
+
+
+def test_unknown_journey_and_other_company(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(CompanyMembershipFactory(company__subject_to_iae_rules=True).company)
+    client.force_login(membership.user)
+    assert client.get(journey_url("unknown", contract.job_seeker.public_id)).status_code == 404
+    assert client.get(journey_url("bilan", contract.job_seeker.public_id)).status_code == 404
+
+
+def test_drawer_or_page(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    # Loaded by htmx: the drawer content only, with the stepper of the existing component.
+    response = client.get(url, **HTMX)
+    assertNotContains(response, "<html")
+    assertContains(response, '<div class="c-stepper mt-3 mb-0">')
+    assertContains(response, "<strong>Étape 1</strong>/5&nbsp;: Freins")
+    assertContains(response, f'hx-post="{url}"')
+    # Without JavaScript: the same journey as an ordinary page.
+    response = client.get(url)
+    assertContains(response, "<html")
+    assertNotContains(response, "hx-post")
+
+
+def test_previous_step_keeps_the_answers(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    response = walk(client, url, {"barriers": [ProSupportReportBarrier.MOBILITY]})
+    assert response.context["step"].label == "Autonomie"
+    response = client.post(
+        url, {"barriers": [ProSupportReportBarrier.MOBILITY], "shown": ["barriers"], "step": 1, "nav": "previous"}
+    )
+    assert response.context["step"].label == "Freins"
+    assert response.context["form"]["barriers"].value() == [ProSupportReportBarrier.MOBILITY]
+
+
+def test_a_step_is_not_left_with_errors(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    response = walk(client, url, {}, {})
+    assert response.context["step"].label == "Autonomie"
+    assertContains(response, "Ce champ est obligatoire.")
+
+
+def test_answers_are_validated_again_before_saving(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    # A tampered hidden answer sends the user back to its step, nothing is saved.
+    response = walk(client, url, *REPORT_ANSWERS, {"autonomy": "42"})
+    assert response.context["step"].label == "Autonomie"
+    assert not ProSupportReport.objects.exists()
+
+
+# Employers
+# ------------------------------------------------------------------------------
+
+
+def test_fill_pro_support_report(client, mailoutbox):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    advisor = JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker, prescriber_organization=PrescriberOrganizationFactory(authorized=True)
+    ).professional
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    response = walk(client, url, *REPORT_ANSWERS)
+    # The follow-up question matches the answer, then everything is shown before sending.
+    assert [step.label for step in response.context["steps"]] == [
+        "Freins",
+        "Autonomie",
+        "La suite",
+        "Orientation",
+        "Envoi",
+    ]
+    assertContains(response, "Vérifiez avant de valider")
+    assertContains(response, "Garde d’enfant")
+    assert not ProSupportReport.objects.exists()
+
+    response = walk(client, url, *REPORT_ANSWERS, {}, **HTMX)
+    assertContains(response, "Bilan envoyé")
+    assert response["HX-Trigger"] == "nextStepsChanged"
+    report = ProSupportReport.objects.get()
+    assert report.contract == contract
+    assert report.author == membership.user
+    assert report.barriers == [ProSupportReportBarrier.MOBILITY]
+    assert report.autonomy == 3
+    assert report.orientation == "SOCIAL"
+    assert report.solution == ""
+    # Same side effects as the existing screen.
+    assert [email.to for email in mailoutbox] == [[advisor.email]]
+    assertContains(response, f"Il est transmis par e-mail à {advisor.get_full_name()}.")
+    # Done: the journey is no longer available.
+    assert client.get(url).status_code == 404
+
+
+def test_fill_pro_support_report_with_a_solution(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract, _approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("bilan", contract.job_seeker.public_id)
+
+    walk(
+        client,
+        url,
+        {"barriers": []},
+        {"autonomy": "5"},
+        {"has_solution": "True"},
+        {"solution": ProSupportReportSolution.TRAINING},
+        {},
+    )
+    report = ProSupportReport.objects.get()
+    assert report.solution == ProSupportReportSolution.TRAINING
+    assert report.orientation == ""
+
+
+def test_suspend_approval(client):
+    membership = CompanyMembershipFactory(company__kind=CompanyKind.AI)
+    contract, approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("suspension", approval.pk)
+    end_at_before = approval.end_at
+
+    answers = {
+        "start_at": contract.end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "end_at": (contract.end_date + datetime.timedelta(days=90)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "reason": Suspension.Reason.FINISHED_CONTRACT,
+        "reason_explanation": "",
+    }
+    response = walk(client, url, answers)
+    assertContains(response, Suspension.Reason.FINISHED_CONTRACT.label)
+    assert not approval.suspension_set.exists()
+
+    response = walk(client, url, answers, {})
+    assertContains(response, "PASS IAE suspendu")
+    suspension = approval.suspension_set.get()
+    assert suspension.created_by == membership.user
+    assert suspension.reason == Suspension.Reason.FINISHED_CONTRACT
+    approval.refresh_from_db()
+    assert approval.end_at > end_at_before
+
+
+def test_job_application_to_processing_then_postponed(client):
+    membership = CompanyMembershipFactory()
+    job_application = JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
     )
     client.force_login(membership.user)
+    url = journey_url("candidature", job_application.pk)
 
-    response = client.get(TODO_URL)
-    assertContains(response, approval.number_with_spaces)
-    assertContains(response, Suspension.Reason.FINISHED_CONTRACT.label)
-    # Only ACI and EI may use this reason.
-    assertNotContains(response, Suspension.Reason.CONTRAT_PASSERELLE.label)
-    # The report journey of the same person.
-    assertContains(response, ProSupportReportBarrier.LITERACY.label)
-    assertContains(response, "Une fois envoyé, il ne peut plus être modifié.")
+    response = walk(client, url, {}, {"decision": "process"})
+    assertContains(response, "Réponse enregistrée")
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = walk(client, url, {}, {"decision": "postpone"}, {"answer": "Nous revenons vers vous en janvier."})
+    assertContains(response, JobApplicationState.POSTPONED.label)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.POSTPONED
+    assert job_application.answer == "Nous revenons vers vous en janvier."
 
 
-def test_prolongation_request_journey(client, settings):
-    settings.NEXT_STEPS_FOR_EVERYONE = True
+def test_job_application_hands_over_hiring_and_refusal(client):
+    membership = CompanyMembershipFactory()
+    job_application = JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.PROCESSING, sent_by_authorized_prescriber=True
+    )
+    client.force_login(membership.user)
+    url = journey_url("candidature", job_application.pk)
+
+    response = walk(client, url, {}, {"decision": "refuse"})
+    assertContains(response, reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}))
+    response = walk(client, url, {}, {"decision": "accept"})
+    assertContains(response, reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk}))
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+
+# Prescribers
+# ------------------------------------------------------------------------------
+
+
+def test_grant_prolongation_request(client):
     membership = PrescriberMembershipFactory(organization__authorized=True)
     prolongation_request = ProlongationRequestFactory(
         prescriber_organization=membership.organization, assigned_to=membership.user
     )
     client.force_login(membership.user)
+    url = journey_url("prolongation", prolongation_request.pk)
 
-    response = client.get(TODO_URL)
-    assertContains(response, escape(prolongation_request.get_reason_display()))
-    assertContains(response, prolongation_request.declared_by_siae.display_name)
-    for reason in ProlongationRequestDenyReason:
-        assertContains(response, escape(reason.label))
-    assertContains(response, "Ouvrir la demande")
+    response = walk(client, url, {}, {"decision": "grant"}, {})
+    assertContains(response, "Prolongation acceptée")
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.GRANTED
+    assert prolongation_request.processed_by == membership.user
+    # Already processed: nothing left to do.
+    assert client.get(url).status_code == 404
 
 
-def test_waiting_actions_have_no_drawer(client, settings):
-    settings.NEXT_STEPS_FOR_EVERYONE = True
-    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
-    ProlongationRequestFactory(declared_by_siae=membership.company)
+@pytest.mark.parametrize("reason", [ProlongationRequestDenyReason.IAE, ProlongationRequestDenyReason.SIAE])
+def test_deny_prolongation_request(client, reason):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prolongation_request = ProlongationRequestFactory(
+        prescriber_organization=membership.organization, assigned_to=membership.user
+    )
+    client.force_login(membership.user)
+    url = journey_url("prolongation", prolongation_request.pk)
+
+    steps = [{}, {"decision": "deny"}, {"reason": reason}, {"reason_explanation": "Lorem ipsum"}]
+    if reason == ProlongationRequestDenyReason.IAE:
+        # Only this reason asks for the proposed actions, as on the existing screen.
+        steps.append({"proposed_actions": ["SOCIAL_PARTNER"], "proposed_actions_explanation": "Lorem ipsum"})
+    response = walk(client, url, *steps)
+    assertContains(response, "Prolongation refusée")
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.DENIED
+    assert prolongation_request.deny_information.reason == reason
+
+
+def test_validate_eligibility(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory()
+    client.force_login(membership.user)
+    url = journey_url("eligibilite", job_seeker.public_id)
+
+    response = client.get(url)
+    assertContains(response, "Critères administratifs de niveau 1")
+    response = walk(client, url, {"level_1_1": "on"}, {})
+    assertContains(response, "Éligibilité validée")
+    diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=None)
+    assert diagnosis.author == membership.user
+    assert diagnosis.is_valid
+
+
+def test_no_eligibility_journey_with_a_valid_approval(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    approval = ApprovalFactory()
+    client.force_login(membership.user)
+    assert client.get(journey_url("eligibilite", approval.user.public_id)).status_code == 404
+
+
+def test_request_pro_support_report_by_email(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    end_date = timezone.localdate() - datetime.timedelta(days=10)
+    contract = ContractFactory(
+        end_date=end_date, start_date=end_date - datetime.timedelta(days=200), company__email="siae@example.com"
+    )
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker, professional=membership.user, prescriber_organization=membership.organization
+    )
+    client.force_login(membership.user)
+    url = journey_url("demande-bilan", contract.job_seeker.public_id)
+
+    response = client.get(url)
+    assertContains(response, "siae@example.com")
+    assertContains(response, contract.job_seeker.get_full_name())
+    response = walk(client, url, {"subject": "Bilan", "body": "Bonjour, pouvez-vous remplir le bilan ?"})
+    assertContains(response, "Votre e-mail est prêt")
+    assertContains(response, "mailto:siae@example.com?subject=Bilan&amp;body=Bonjour%2C%20pouvez-vous")
+
+
+# Action buttons
+# ------------------------------------------------------------------------------
+
+
+def test_action_buttons_open_the_drawer(client):
+    membership = CompanyMembershipFactory()
+    job_application = JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
     client.force_login(membership.user)
 
-    response = client.get(TODO_URL)
-    assert len(response.context["groups"][2]["actions"]) == 1
-    assertNotContains(response, 'class="offcanvas offcanvas-end"')
+    response = client.get(reverse("next_steps_views:todo"))
+    url = journey_url("candidature", job_application.pk)
+    assertContains(response, f'href="{url}"\n               hx-get="{url}"')
+    assertContains(response, 'id="next-step-drawer"')
+    assertContains(response, 'hx-trigger="nextStepsChanged from:body"')

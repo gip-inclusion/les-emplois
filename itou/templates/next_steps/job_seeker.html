@@ -26,7 +26,15 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-9">
+                <div class="s-section__col col-12 col-xxl-9"
+                     id="next-steps-job-seeker"
+                     hx-get="{{ request.get_full_path }}"
+                     hx-trigger="nextStepsChanged from:body"
+                     hx-select="#next-steps-job-seeker"
+                     hx-disinherit="*"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    {# Reloaded when a guided journey completes. Its attributes must not reach the action buttons. #}
                     {# Who follows the person #}
                     <section class="mb-5" aria-labelledby="next-steps-advisors">
                         <h2 class="h3 mb-3" id="next-steps-advisors">Accompagnement</h2>
@@ -155,4 +163,5 @@
             </div>
         </div>
     </section>
+    {% include "next_steps/includes/journey_drawer.html" %}
 {% endblock %}

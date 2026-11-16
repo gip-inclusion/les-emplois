@@ -1,0 +1,97 @@
+{% load str_filters %}
+{# A guided journey: in the side drawer (swapped in by htmx) or inside an ordinary page. #}
+<div id="next-step-journey" class="next-step-journey">
+    <div class="next-step-journey__head">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">{{ journey.title }}</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+        {% if not result and steps|length > 1 %}
+            <div class="c-stepper mt-3 mb-0">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-{{ progress }}"
+                         role="progressbar"
+                         aria-valuenow="{{ progress }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         aria-labelledby="next-step-journey-progress"></div>
+                </div>
+                <p id="next-step-journey-progress" class="mb-0">
+                    <strong>Étape {{ step_number }}</strong>/{{ steps|length }}&nbsp;: {{ step.label }}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if result %}
+        <div class="next-step-journey__body">
+            <div class="d-flex flex-column gap-3" role="status">
+                <span class="next-step__icon bg-success-lighter text-success"
+                      aria-hidden="true"><i class="ri-check-line"></i></span>
+                <p class="h3 mb-0">{{ result.title }}</p>
+                {% if result.lines %}
+                    <ul class="mb-0">
+                        {% for line in result.lines %}<li>{{ line }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        <div class="next-step-journey__foot">
+            <a class="btn btn-outline-primary"
+               href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
+            {% if result.link %}
+                <a class="btn btn-primary" href="{{ result.link.1 }}">{{ result.link.0 }}</a>
+            {% elif in_drawer %}
+                <button type="button" class="btn btn-primary" data-bs-dismiss="offcanvas">Terminer</button>
+            {% else %}
+                <a class="btn btn-primary" href="{% url "next_steps_views:todo" %}">Retour à «&nbsp;À faire&nbsp;»</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <form method="post"
+              action="{{ journey_url }}"
+              class="next-step-journey__form"
+              {% if in_drawer %}hx-post="{{ journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML"{% endif %}>
+            {% csrf_token %}
+            <input type="hidden" name="step" value="{{ step_index }}">
+            {% for name in shown %}<input type="hidden" name="shown" value="{{ name }}">{% endfor %}
+            {% for name, value in carried %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+            <div class="next-step-journey__body">
+                {% if is_first_step and facts and step.template != "next_steps/journeys/facts.html" %}
+                    {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
+                {% endif %}
+                {% include step.template %}
+            </div>
+            <div class="next-step-journey__foot">
+                {% if is_first_step %}
+                    {% if in_drawer %}
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-bs-dismiss="offcanvas">Annuler</button>
+                    {% else %}
+                        <a class="btn btn-outline-primary" href="{% url "next_steps_views:todo" %}">Annuler</a>
+                    {% endif %}
+                {% else %}
+                    <button type="submit"
+                            class="btn btn-outline-primary"
+                            name="nav"
+                            value="previous"
+                            formnovalidate>Précédent</button>
+                {% endif %}
+                {% if step.handover %}
+                    <a class="btn btn-primary" href="{{ step.handover.1 }}">{{ step.handover.0 }}</a>
+                {% else %}
+                    <button type="submit"
+                            class="btn btn-primary"
+                            name="nav"
+                            value="next">{{ step.submit_label }}</button>
+                {% endif %}
+            </div>
+        </form>
+    {% endif %}
+</div>

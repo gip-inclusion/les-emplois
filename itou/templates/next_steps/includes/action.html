@@ -1,7 +1,6 @@
 {% load str_filters %}
 {% load url_add_query %}
 {# One expected action: who (unless hide_job_seeker), what, why, and a single button to the screen that handles it. #}
-{# With a journey, Bootstrap opens it in a side drawer instead; without JavaScript, the button still leads to the screen. #}
 <article class="c-box d-flex flex-column flex-md-row align-items-md-center gap-3 mb-2">
     <div class="d-flex gap-3 flex-grow-1">
         <span class="next-step__icon {% if group == "today" %}bg-danger-lighter text-danger{% elif group == "week" %}bg-warning-lighter text-warning{% else %}bg-light text-muted{% endif %}"
@@ -19,17 +18,22 @@
         </div>
     </div>
     <div class="flex-shrink-0">
-        {% if action.url %}
-            {% url_add_query action.url back_url=request.get_full_path as action_url %}
+        {% if action.journey_url %}
+            {# The journey runs in the side drawer; without JavaScript, the same journey opens as a page. #}
             <a class="btn btn-sm {% if group == "watch" %}btn-outline-primary{% else %}btn-primary{% endif %}"
-               href="{{ action_url }}"
-               {% if action.journey %}data-bs-toggle="offcanvas" data-bs-target="#{{ action.uid }}" aria-controls="{{ action.uid }}"{% endif %}>{{ action.call_to_action }}</a>
+               href="{{ action.journey_url }}"
+               hx-get="{{ action.journey_url }}"
+               hx-target="#next-step-journey"
+               hx-swap="outerHTML"
+               hx-indicator="#next-step-journey"
+               data-bs-toggle="offcanvas"
+               data-bs-target="#next-step-drawer"
+               aria-controls="next-step-drawer">{{ action.call_to_action }}</a>
+        {% elif action.url %}
+            <a class="btn btn-sm {% if group == "watch" %}btn-outline-primary{% else %}btn-primary{% endif %}"
+               href="{% url_add_query action.url back_url=request.get_full_path %}">{{ action.call_to_action }}</a>
         {% else %}
             <span class="badge badge-sm rounded-pill bg-light text-muted">{{ action.status_label }}</span>
         {% endif %}
     </div>
 </article>
-{% if action.url and action.journey %}
-    {% url_add_query action.url back_url=request.get_full_path as journey_url %}
-    {% include "next_steps/includes/journey.html" with action=action journey=action.journey action_url=journey_url can_view_name=action.user_can_view_personal_information only %}
-{% endif %}

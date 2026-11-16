@@ -7,7 +7,12 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>
+            <h1 id="next-steps-count"
+                hx-get="{{ request.get_full_path }}"
+                hx-trigger="nextStepsChanged from:body"
+                hx-select="#next-steps-count"
+                hx-target="this"
+                hx-swap="outerHTML">
                 {% if pressing_count %}
                     {{ pressing_count }} action{{ pressing_count|pluralizefr }} vous attend{{ pressing_count|pluralizefr:"ent" }}
                 {% else %}
@@ -16,7 +21,7 @@
             </h1>
             <p>
                 Les personnes que vous accompagnez, rangées par ce qu’il faut faire pour elles.
-                Chaque bouton ouvre l’écran habituel où l’action se fait.
+                Chaque action se fait étape par étape, dans le panneau de droite.
             </p>
         {% endfragment %}
     {% endcomponent_title %}
@@ -26,7 +31,15 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-9">
+                <div class="s-section__col col-12 col-xxl-9"
+                     id="next-steps-queue"
+                     hx-get="{{ request.get_full_path }}"
+                     hx-trigger="nextStepsChanged from:body"
+                     hx-select="#next-steps-queue"
+                     hx-disinherit="*"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    {# Reloaded when a guided journey completes. Its attributes must not reach the action buttons. #}
                     {% for group in groups %}
                         <section class="mb-5" aria-labelledby="next-steps-{{ group.key }}">
                             <h2 class="h3 mb-1" id="next-steps-{{ group.key }}">
@@ -44,4 +57,5 @@
             </div>
         </div>
     </section>
+    {% include "next_steps/includes/journey_drawer.html" %}
 {% endblock %}

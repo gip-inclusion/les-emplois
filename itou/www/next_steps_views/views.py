@@ -13,9 +13,11 @@ from itou.users.perms import (
     can_view_pro_support_report,
 )
 from itou.utils.perms.utils import can_view_personal_information
-from itou.utils.readonly import readonly_view
+from itou.utils.readonly import http_methods, readonly_view
+from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import Group, expected_actions, group_actions
+from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.situation import situation_sentences
 from itou.www.next_steps_views.timeline import build_timeline
 
@@ -138,3 +140,24 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "matomo_custom_title": "Prochaines étapes : fiche usager",
     }
     return render(request, template_name, context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def journey(request, kind, pk):
+    """A guided journey: in the side drawer when loaded by htmx, an ordinary page otherwise."""
+    if not can_view_next_steps(request) or kind not in JOURNEYS:
+        raise Http404
+    current_journey = JOURNEYS[kind](request, pk)
+    context, completed = engine.run(current_journey, request.POST if request.method == "POST" else None)
+    context |= {
+        "journey_url": request.path,
+        "in_drawer": bool(request.htmx),
+        "can_view_name": can_view_personal_information(request, current_journey.job_seeker),
+        "matomo_custom_title": f"Prochaines étapes : parcours {kind}",
+    }
+    template_name = "next_steps/journeys/journey.html" if request.htmx else "next_steps/journeys/page.html"
+    response = render(request, template_name, context)
+    if completed:
+        # Pages listening to this event reload their actions.
+        response["HX-Trigger"] = "nextStepsChanged"
+    return response

@@ -488,3 +488,41 @@ table.table td > .modal .modal-content {
     border-radius: var(--bs-border-radius-lg);
     background-color: var(--bs-light, #f2f3f5);
 }
+
+/* Guided journeys: a wide side drawer with a fixed head and foot around a scrolling body. */
+.next-step-drawer {
+    --bs-offcanvas-width: min(36rem, 100%);
+}
+
+.next-step-journey {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.next-step-journey__form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.next-step-journey__head {
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--bs-border-color, #e6e6eb);
+}
+
+.next-step-journey__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+}
+
+.next-step-journey__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--bs-border-color, #e6e6eb);
+}

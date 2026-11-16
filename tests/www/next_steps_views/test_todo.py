@@ -19,6 +19,12 @@ from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
 TODO_URL = reverse("next_steps_views:todo")
+
+
+def journey_url(kind, pk):
+    return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
+
+
 NAV_LINK = f'href="{TODO_URL}"'
 
 
@@ -157,7 +163,7 @@ def test_employer_new_job_application(employer_client, employer_membership):
     assert summary(response) == [(Group.TODAY, Kind.JOB_APPLICATION, job_application.job_seeker)]
     assertContains(response, "1 action vous attend")
     assertContains(response, "Répondre à sa candidature")
-    assertContains(response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+    assertContains(response, journey_url("candidature", job_application.pk))
 
 
 def test_employer_ended_contract(employer_client, employer_membership):
@@ -170,10 +176,8 @@ def test_employer_ended_contract(employer_client, employer_membership):
         (Group.WEEK, Kind.PRO_SUPPORT_REPORT_FILL, job_seeker),
     ]
     assertContains(response, f"Le contrat est terminé depuis le {contract.end_date:%d/%m/%Y}")
-    assertContains(response, reverse("approvals:suspend", kwargs={"approval_id": job_seeker.approvals.get().pk}))
-    assertContains(
-        response, reverse("job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id})
-    )
+    assertContains(response, journey_url("suspension", job_seeker.approvals.get().pk))
+    assertContains(response, journey_url("bilan", job_seeker.public_id))
 
     # Once the report is filled, only the suspension remains.
     ProSupportReportFactory(contract=contract)
@@ -276,7 +280,7 @@ def test_prescriber_prolongation_request(prescriber_client, prescriber_membershi
     assert summary(response) == [(Group.TODAY, Kind.PROLONGATION_REQUEST, prolongation_request.approval.user)]
     assertContains(
         response,
-        reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk}),
+        journey_url("prolongation", prolongation_request.pk),
     )
 
 
@@ -310,9 +314,7 @@ def test_prescriber_eligibility_to_validate(prescriber_client, prescriber_member
 
     response = prescriber_client.get(TODO_URL)
     assert summary(response) == [(Group.WEEK, Kind.ELIGIBILITY, job_seeker)]
-    assertContains(
-        response, reverse("eligibility_views:update_iae", kwargs={"job_seeker_public_id": job_seeker.public_id})
-    )
+    assertContains(response, journey_url("eligibilite", job_seeker.public_id))
 
     IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
     assert summary(prescriber_client.get(TODO_URL)) == []

@@ -1,0 +1,10 @@
+{% load django_bootstrap5 %}
+{# The fields of the current step. #}
+{% if form %}
+    {% if step.fields is None %}
+        {% bootstrap_form_errors form type="non_fields" %}
+    {% endif %}
+    {% for field in fields %}
+        {% bootstrap_field field %}
+    {% endfor %}
+{% endif %}
