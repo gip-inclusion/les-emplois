@@ -42,10 +42,6 @@ class Directory:
 class TestAccess:
     def test_access(self, client, view):
         vannes = create_city_vannes()
-        employer = EmployerFactory(membership=False)
-        company = CompanyFactory(coords=vannes.coords, insee_city=vannes)
-        CompanyMembershipFactory(user=employer, company=company)
-
         user = EmployerFactory(membership=False)
         company = CompanyFactory()
         CompanyMembershipFactory(user=user, company=company)
@@ -71,14 +67,14 @@ class TestAccess:
         for condition in insufficient_cond:
             condition()
             clean_cache()
-            response = view.request(client, employer)
+            response = view.request(client, user)
             assert response.status_code == 403
         last_cond()
         clean_cache()
 
-        response = view.request(client, employer)
+        response = view.request(client, user)
 
-        view.assertion(response, employer)
+        view.assertion(response, user)
 
     @pytest.mark.parametrize(
         "user_factory",
