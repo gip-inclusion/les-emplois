@@ -26,6 +26,7 @@
             "js": function() {
                 "use strict";
                 window.zESettings = {
+                    analytics: false,
                     webWidget: {
                         launcher: {
                             talkLabel: {
@@ -38,9 +39,14 @@
                     "https://static.zdassets.com/ekr/snippet.js?key=cdbe12d1-fce4-4514-a35e-de03fc0a0c1a",
                     "ze-snippet",
                     function() {
+                        // Matomo is itself a tarteaucitron service: _paq may not exist yet.
+                        window._paq = window._paq || [];
                         zE(function() {
                             zE("webWidget", "setLocale", "fr");
                         });
+                        zE('webWidget:on', 'userEvent', function(e) {
+                            window._paq.push(['trackEvent', e.category, e.action, e.label]);
+                        })
                     }
                 );
             }
