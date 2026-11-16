@@ -1,5 +1,24 @@
 # Journal des modifications
 
+## 2026-11-16
+
+### Ajouté
+
+- [Connexion : Chemin utilisateur pour permettre la réinitialisation de la double authentification](https://github.com/gip-inclusion/les-emplois/pull/9147)
+- [Fiche usager : Ajout d'un onglet rendez-vous](https://github.com/gip-inclusion/les-emplois/pull/9121)
+- [Insertion : Afficher le statut BRSA du bénéficiaire d'une orientation](https://github.com/gip-inclusion/les-emplois/pull/9224)
+- [Insertion : Ajouter le Zendesk widget pour aider avec les orientations](https://github.com/gip-inclusion/les-emplois/pull/9305)
+- [Interface : Indiquer pour les contrats fantômes que l'entreprise est inactive](https://github.com/gip-inclusion/les-emplois/pull/9266)
+- [Tableau de bord : Ajoute une fonction par structure dans la modification du profil d'un professionnel](https://github.com/gip-inclusion/les-emplois/pull/9142)
+
+### Modifié
+
+- [Connexion : Amélioration des bandeaux d'information de modification pour les usagers se connectant avec un SSO](https://github.com/gip-inclusion/les-emplois/pull/9145)
+- [Fiche salarié : Utilisation du nouveau workflow traitant les modifications de date de PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/8945)
+- [Interface : N'afficher les contrats pour les SIAE que si elles ont un contrat en cours avec l'usager](https://github.com/gip-inclusion/les-emplois/pull/9241)
+- [PASS IAE : Lever la contrainte liée aux contrats en cours](https://github.com/gip-inclusion/les-emplois/pull/9265)
+- [Tech : Contournement temporaire pour relancer l’`import-iae`](https://github.com/gip-inclusion/les-emplois/pull/9275)
+
 ## 2026-11-09
 
 ### Ajouté
