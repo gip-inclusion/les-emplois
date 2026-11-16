@@ -16,11 +16,11 @@ def xp_ref_iae_job_applications(request):
     if (
         request.from_authorized_prescriber
         and request.current_organization.kind == PrescriberOrganizationKind.FT
-        and request.current_organization.department == settings.XP_REF_IAE_DEPARTMENT
+        and request.current_organization.department in settings.XP_REF_IAE_DEPARTMENTS
         and timezone.localdate() <= settings.XP_REF_IAE_END_DATE
     ):
         return JobApplication.objects.filter(
-            to_company__department=settings.XP_REF_IAE_DEPARTMENT,
+            to_company__department=request.current_organization.department,
             to_company__kind__in=CompanyKind.siae_kinds(),
         )
     return JobApplication.objects.none()
