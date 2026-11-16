@@ -117,20 +117,22 @@ def test_directory_people_ignores_inactive_companies(client):
     assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
 
 
-def test_ordering_and_pagination(client, snapshot):
+def test_alphabetical_ordering_and_pagination(client, snapshot):
     vannes = create_city_vannes()
     DirectoryActiveCity.objects.create(city=vannes)
     for i in range(10):
-        # Alphabetical ordering should not pass the test.
+        # Ordering by PK should not pass the test.
         letter = "A" if i % 2 == 0 else "M"
-        suffix = chr(i // 2 + ord(letter))
+        name = chr(i // 2 + ord(letter))
         CompanyMembershipFactory(
             company__coords=Point(vannes.coords.x + i * KM, vannes.coords.y + i * KM),
             company__insee_city=vannes,
-            user__last_name=f"{suffix}",
-            user__first_name=f"{suffix}",
+            user__last_name=name,
+            user__first_name=name,
         )
     user = CompanyMembershipFactory(
+        # Search point is farthest from Vannes.
+        # Ordering by distance should not pass the test.
         company__coords=Point(vannes.coords.x + (i + 1) * KM, vannes.coords.y + (i + 1) * KM),
         company__insee_city=vannes,
         user__first_name="Z second page",

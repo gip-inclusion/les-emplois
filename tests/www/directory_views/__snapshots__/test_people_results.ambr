@@ -1,4 +1,31 @@
 # serializer version: 1
+# name: test_alphabetical_ordering_and_pagination
+  '''
+  <ul class="pagination flex-wrap justify-content-center">
+   <li class="page-item disabled">
+    <a aria-disabled="true" class="page-link" href="/directory/?page=1" tabindex="-1">
+     Premier
+    </a>
+   </li>
+   <li class="page-item active">
+    <a aria-current="page" aria-label="Page 1" class="page-link" href="/directory/?page=1">
+     1
+    </a>
+   </li>
+   <li class="page-item">
+    <a aria-label="Page 2" class="page-link" href="/directory/?page=2">
+     2
+    </a>
+   </li>
+   <li class="page-item">
+    <a class="page-link" href="/directory/?page=2">
+     Dernier
+    </a>
+   </li>
+  </ul>
+  
+  '''
+# ---
 # name: test_display_other_organization[affiche 'Les petits paniers + 1 autre structure']
   '''
   <div class="c-box c-box--results mb-3 mb-md-4">
@@ -51,33 +78,6 @@
     </ul>
    </div>
   </div>
-  
-  '''
-# ---
-# name: test_ordering_and_pagination
-  '''
-  <ul class="pagination flex-wrap justify-content-center">
-   <li class="page-item disabled">
-    <a aria-disabled="true" class="page-link" href="/directory/?page=1" tabindex="-1">
-     Premier
-    </a>
-   </li>
-   <li class="page-item active">
-    <a aria-current="page" aria-label="Page 1" class="page-link" href="/directory/?page=1">
-     1
-    </a>
-   </li>
-   <li class="page-item">
-    <a aria-label="Page 2" class="page-link" href="/directory/?page=2">
-     2
-    </a>
-   </li>
-   <li class="page-item">
-    <a class="page-link" href="/directory/?page=2">
-     Dernier
-    </a>
-   </li>
-  </ul>
   
   '''
 # ---
