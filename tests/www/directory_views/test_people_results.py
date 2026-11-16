@@ -1,5 +1,6 @@
 from django.contrib.gis.geos import Point
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City, DirectoryActiveCity
@@ -141,7 +142,8 @@ def test_alphabetical_ordering_and_pagination(client, snapshot):
     ).user
 
     client.force_login(user)
-    response = client.get(reverse("directory:people_results"))
+    with assertSnapshotQueries(snapshot):
+        response = client.get(reverse("directory:people_results"))
 
     page = parse_response_to_soup(response)
     [pagination] = page.select("ul.pagination")
