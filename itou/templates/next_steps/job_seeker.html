@@ -1,0 +1,151 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load str_filters %}
+
+{% block title %}
+    {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% url "next_steps_views:todo" as todo_url %}
+    {% include "layout/previous_step.html" with back_url=todo_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
+            <p>
+                <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir la fiche complète</a>
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-9">
+                    {# Who follows the person #}
+                    <section class="mb-5" aria-labelledby="next-steps-advisors">
+                        <h2 class="h3 mb-3" id="next-steps-advisors">Accompagnement</h2>
+                        {% if assignments %}
+                            <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0">
+                                {% for assignment in assignments %}
+                                    <li class="c-box py-2 px-3">
+                                        {% if assignment.assigned_to_unknown_advisor %}
+                                            <strong>{{ assignment.organization.display_name }}</strong>
+                                            <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                        {% else %}
+                                            <strong>{{ assignment.professional.get_full_name }}</strong>
+                                            {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
+                                            <span class="d-block fs-sm text-muted">
+                                                {% if assignment.organization %}
+                                                    {{ assignment.organization.display_name }}
+                                                {% else %}
+                                                    Aucune structure associée
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
+                                        <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="c-box text-muted mb-0">Aucun accompagnement en cours.</p>
+                        {% endif %}
+                    </section>
+
+                    {# Where the person stands #}
+                    {% if situation %}
+                        <section class="mb-5" aria-labelledby="next-steps-situation">
+                            <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
+                            <div class="c-box">
+                                {% for sentence in situation %}<p class="{% if forloop.last %}mb-0{% else %}mb-2{% endif %}">{{ sentence }}</p>{% endfor %}
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    {# What to do for the person #}
+                    <section class="mb-5" aria-labelledby="next-steps-actions">
+                        <h2 class="h3 mb-3" id="next-steps-actions">
+                            À faire pour {{ job_seeker.first_name|mask_unless:can_view_personal_information|default:"cette personne" }}
+                        </h2>
+                        {% for action in actions %}
+                            {% include "next_steps/includes/action.html" with action=action group=action.group hide_job_seeker=True %}
+                        {% empty %}
+                            <p class="c-box text-muted mb-0">Rien à faire pour le moment.</p>
+                        {% endfor %}
+                    </section>
+
+                    {# The file, folded: each part opens on demand and leads to the existing tab #}
+                    <section aria-labelledby="next-steps-file">
+                        <h2 class="h3 mb-3" id="next-steps-file">Dossier</h2>
+                        <div class="c-box p-0">
+                            {% if request.from_iae_actor %}
+                                <details class="border-bottom px-3 py-2">
+                                    <summary class="py-1">
+                                        <strong>PASS IAE</strong>
+                                        <span class="text-muted">· {% if approval %}{{ approval.get_state_display }}{% else %}Aucun PASS IAE{% endif %}</span>
+                                    </summary>
+                                    {% if approval %}
+                                        <ul class="list-unstyled fs-sm mb-2">
+                                            <li>Numéro : {{ approval.number_with_spaces }}</li>
+                                            <li>Du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</li>
+                                            {% if approval.is_valid %}<li>Reliquat : {{ approval.get_remainder_display }}</li>{% endif %}
+                                        </ul>
+                                        <a class="fs-sm"
+                                           href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir le PASS IAE</a>
+                                    {% else %}
+                                        <p class="fs-sm mb-2">Aucun PASS IAE n’a été délivré.</p>
+                                    {% endif %}
+                                </details>
+                                <details class="border-bottom px-3 py-2">
+                                    <summary class="py-1">
+                                        <strong>Éligibilité IAE</strong>
+                                        <span class="text-muted">· {{ eligibility_summary }}</span>
+                                    </summary>
+                                    {% if iae_eligibility_diagnosis %}
+                                        <p class="fs-sm mb-2">
+                                            Diagnostic réalisé le {{ iae_eligibility_diagnosis.created_at|date:"d/m/Y" }}
+                                            {% if iae_eligibility_diagnosis.author_organization %}par {{ iae_eligibility_diagnosis.author_organization.display_name }}{% endif %}.
+                                        </p>
+                                    {% else %}
+                                        <p class="fs-sm mb-2">Il faut un diagnostic d’éligibilité valide pour être embauché en structure d’insertion.</p>
+                                    {% endif %}
+                                </details>
+                            {% endif %}
+                            {% if can_view_contracts %}
+                                <details class="border-bottom px-3 py-2">
+                                    <summary class="py-1">
+                                        <strong>Contrats</strong>
+                                        {% if contract %}
+                                            <span class="text-muted">· Dernier contrat{% if contract.company %} chez {{ contract.company.display_name }}{% endif %}</span>
+                                        {% endif %}
+                                    </summary>
+                                    <a class="fs-sm"
+                                       href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir les contrats</a>
+                                </details>
+                            {% endif %}
+                            <details class="border-bottom px-3 py-2">
+                                <summary class="py-1">
+                                    <strong>Candidatures</strong>
+                                </summary>
+                                <a class="fs-sm"
+                                   href="{% url "job_seekers_views:job_applications" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir les candidatures</a>
+                            </details>
+                            <details class="px-3 py-2">
+                                <summary class="py-1">
+                                    <strong>Informations personnelles et historique</strong>
+                                </summary>
+                                <a class="fs-sm"
+                                   href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir la fiche complète</a>
+                            </details>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

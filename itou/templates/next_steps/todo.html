@@ -34,7 +34,7 @@
                             </h2>
                             <p class="fs-sm text-muted mb-3">{{ group.help }}</p>
                             {% for action in group.actions %}
-                                {% include "next_steps/includes/action.html" with action=action group=group.key %}
+                                {% include "next_steps/includes/action.html" with action=action group=group.key hide_job_seeker=False %}
                             {% empty %}
                                 <p class="c-box text-muted mb-0">Rien pour le moment.</p>
                             {% endfor %}
