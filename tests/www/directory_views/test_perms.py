@@ -38,22 +38,33 @@ class Directory:
         )
 
 
+def directory_authorized_prescriber():
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    return membership.user, membership.organization
+
+
+def directory_employer():
+    membership = CompanyMembershipFactory()
+    return membership.user, membership.company
+
+
 @pytest.mark.parametrize("view", [Directory])
 class TestAccess:
-    def test_access(self, client, view):
+    @pytest.mark.parametrize(
+        "populate_directory",
+        [directory_employer, directory_authorized_prescriber],
+    )
+    def test_access(self, client, populate_directory, view):
         vannes = create_city_vannes()
-        user = EmployerFactory(membership=False)
-        company = CompanyFactory()
-        CompanyMembershipFactory(user=user, company=company)
-        client.force_login(user)
+        user, org = populate_directory()
 
         def set_coords_within_20kms():
-            company.coords = coords_within_directory_radius(vannes.coords)
-            company.save()
+            org.coords = coords_within_directory_radius(vannes.coords)
+            org.save()
 
         def set_insee_city_id():
-            company.insee_city = vannes
-            company.save()
+            org.insee_city = vannes
+            org.save()
 
         def set_directory_active_city():
             DirectoryActiveCity.objects.create(city=vannes)
@@ -64,6 +75,7 @@ class TestAccess:
         conditions = [set_coords_within_20kms, set_insee_city_id, set_directory_active_city]
         random.shuffle(conditions)
         *insufficient_cond, last_cond = conditions
+        client.force_login(user)
         for condition in insufficient_cond:
             condition()
             clean_cache()
