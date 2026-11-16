@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ./.github/actions/setup
+      - uses: $/.github/actions/setup
       - name: 🤹 Django tests
         env:
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
@@ -103,7 +103,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ./.github/actions/setup
+      - uses: $/.github/actions/setup
       - name: ✨ Verify quality
         run: make quality
       - name: ✨ Verify DB initialization (migrations, fixtures, ...)

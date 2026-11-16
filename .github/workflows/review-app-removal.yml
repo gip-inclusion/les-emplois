@@ -33,7 +33,7 @@ jobs:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
     - name: ⏬ Install Clever Tools
-      uses: ./.github/actions/clever-cli
+      uses: $/.github/actions/clever-cli
       with:
         token: ${{ secrets.CLEVER_TOKEN }}
         secret: ${{ secrets.CLEVER_SECRET }}
