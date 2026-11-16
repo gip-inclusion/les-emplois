@@ -3,6 +3,7 @@ import datetime
 import pytest
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
@@ -292,7 +293,7 @@ def test_refuse_job_application(client, mailoutbox):
         **HTMX,
     )
     assertContains(response, "Candidature déclinée")
-    assertContains(response, job_description.display_name)
+    assertContains(response, escape(job_description.display_name))
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.REFUSED
     assert job_application.refusal_reason == RefusalReason.NO_POSITION

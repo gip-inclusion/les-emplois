@@ -490,7 +490,11 @@ class JobApplicationJourney(Journey):
                 ]
                 # Same condition as apply.views.batch_views.RefuseWizardView.get_steps.
                 if self.job_application.sender_kind == SenderKind.PRESCRIBER:
-                    steps.append(Step("Message au prescripteur", "prescriber_answer"))
+                    # Same wording as the existing screen: an orienter is not an authorized prescriber.
+                    recipient = (
+                        "au prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "à l’orienteur"
+                    )
+                    steps.append(Step(f"Message {recipient}", "prescriber_answer"))
                 steps[-1].submit_label = "Décliner la candidature"
             case "accept" if not self.hiring_in_drawer:
                 url = reverse("apply:start-accept", kwargs={"job_application_id": pk})
@@ -507,8 +511,8 @@ class JobApplicationJourney(Journey):
                 steps.append(
                     Step("Confirmer", "accept", [], template=RECAP_TEMPLATE, submit_label="Accepter l’embauche")
                 )
-            case _:
-                steps[-1].submit_label = "Valider"
+            case "process":
+                steps[-1].submit_label = "Mettre à l’étude"
         return steps
 
     def recap(self, forms):
