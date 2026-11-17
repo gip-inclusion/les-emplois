@@ -16,6 +16,12 @@ from tests.www.directory_views.utils import KM, coords_within_directory_radius
 OTHER_STRUCTURE_TEXT = "+ 1 autre structure"
 
 
+def assertPeople(page, expected_people):
+    people_with_markup = page.find_all("h3")
+    people = [node.string.strip() for node in people_with_markup]
+    assert people == expected_people
+
+
 def test_display_other_organization(client, snapshot):
     vannes = create_city_vannes()
     DirectoryActiveCity.objects.create(city=vannes)
@@ -97,7 +103,7 @@ def test_exclude_opted_out_email(client):
     assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
 
 
-def test_directory_people_ignores_inactive_companies(client):
+def test_ignores_inactive_companies(client):
     vannes = create_city_vannes()
     DirectoryActiveCity.objects.create(city=vannes)
     CompanyFactory(
@@ -111,12 +117,12 @@ def test_directory_people_ignores_inactive_companies(client):
         company__coords=vannes.coords,
         company__insee_city=vannes,
     ).user
-    DirectoryProfile.objects.create(user=user, is_opted_out=True)
 
     client.force_login(user)
     response = client.get(reverse("directory:people_results"))
 
-    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
+    page = parse_response_to_soup(response)
+    assertPeople(page, [user.get_inverted_full_name()])
 
 
 def test_alphabetical_ordering_and_pagination(client, snapshot):
@@ -148,9 +154,7 @@ def test_alphabetical_ordering_and_pagination(client, snapshot):
     page = parse_response_to_soup(response)
     [pagination] = page.select("ul.pagination")
     assert pagination.prettify() == snapshot()
-    people_with_markup = page.find_all("h3")
-    people = [node.string.strip() for node in people_with_markup]
-    assert people == ["A A", "B B", "C C", "D D", "E E", "M M", "N N", "O O", "P P", "Q Q"]
+    assertPeople(page, ["A A", "B B", "C C", "D D", "E E", "M M", "N N", "O O", "P P", "Q Q"])
 
 
 def test_people_search_includes_nearby_other_city(client):
