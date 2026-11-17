@@ -1230,6 +1230,12 @@ class ContractQuerySet(models.QuerySet):
             Exists(Company.objects.active().filter(pk=OuterRef("company_id"))),
         )
 
+    def last_pk_lookup(self, job_seeker, company=None):
+        contracts = Contract.objects.filter(job_seeker=job_seeker)
+        if company:
+            contracts = contracts.filter(company=company)
+        return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
+
 
 class Contract(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)
