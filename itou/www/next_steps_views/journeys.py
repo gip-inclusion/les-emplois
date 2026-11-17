@@ -78,7 +78,7 @@ from itou.www.job_seekers_views.views import (
     PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
     _pro_support_request_company_email,
 )
-from itou.www.next_steps_views.period_bar import prolongation_bar
+from itou.www.next_steps_views.period_bar import approval_bar, prolongation_bar, suspension_bar
 
 
 logger = logging.getLogger(__name__)
@@ -152,6 +152,8 @@ class Result:
     lines: list
     # An optional main link: (label, url).
     link: tuple | None = None
+    # An optional period bar (see period_bar.py).
+    bar: object = None
 
 
 class Journey:
@@ -410,11 +412,19 @@ class SuspensionJourney(Journey):
         hint = f"La suspension arrête le décompte des jours du {PASS_IAE}."
         if contract and contract.end_date and contract.has_ended:
             hint = f"Le contrat est terminé depuis le {_fr(contract.end_date)}. " + hint
+        # The bar of the confirmation step shows the suspension once its dates are valid.
+        suspension_form = self.build_forms(data=data)["suspension"] if data else None
+        recap_bar = None
+        if suspension_form is not None and suspension_form.is_valid():
+            recap_bar = suspension_bar(
+                self.approval, suspension_form.cleaned_data["start_at"], suspension_form.cleaned_data["end_at"]
+            )
         return [
             Step(
                 "La suspension",
                 "suspension",
                 hint=hint,
+                bar=approval_bar(self.approval, contract_end=contract.end_date if contract else None),
                 layout={
                     "set_default_end_date": Show("options"),
                     "reason": Show("options", legend=True),
@@ -427,6 +437,7 @@ class SuspensionJourney(Journey):
                 template=RECAP_TEMPLATE,
                 submit_label="Suspendre",
                 question="Vérifiez avant de suspendre",
+                bar=recap_bar,
             ),
         ]
 
@@ -443,6 +454,7 @@ class SuspensionJourney(Journey):
         return lines
 
     def done(self, forms):
+        previous_end = self.approval.end_at
         # Same as approvals_views.suspend.
         suspension = forms["suspension"].save(commit=False)
         suspension.created_by = self.request.user
@@ -463,6 +475,7 @@ class SuspensionJourney(Journey):
                 f"motif{NBSP}: {suspension.get_reason_display()}.",
                 f"Sa date de fin passe au {_fr(self.approval.end_at)}.",
             ],
+            bar=suspension_bar(self.approval, suspension.start_at, suspension.end_at, approval_end=previous_end),
         )
 
 

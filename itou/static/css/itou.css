@@ -728,6 +728,17 @@ table.table td > .modal .modal-content {
     stroke-dasharray: 5 3;
 }
 
+.next-step-bar__part--paused {
+    fill: var(--bs-info, #0063cb);
+    fill-opacity: .2;
+    stroke: var(--bs-info, #0063cb);
+}
+
+.next-step-bar__marker--previous-end {
+    stroke: var(--bs-body-color, #000638);
+    stroke-dasharray: 2 2;
+}
+
 .next-step-bar__marker--today {
     stroke: var(--bs-body-color, #000638);
     stroke-width: 2;
@@ -775,6 +786,17 @@ table.table td > .modal .modal-content {
 .next-step-bar__key--added {
     border: 1px dashed var(--bs-warning, #b34000);
     background-color: rgba(179, 64, 0, .2);
+}
+
+.next-step-bar__key--paused {
+    border: 1px solid var(--bs-info, #0063cb);
+    background-color: rgba(0, 99, 203, .2);
+}
+
+.next-step-bar__key--previous-end {
+    width: 0;
+    border-left: 2px dotted var(--bs-body-color, #000638);
+    border-radius: 0;
 }
 
 .next-step-bar__key--contract {

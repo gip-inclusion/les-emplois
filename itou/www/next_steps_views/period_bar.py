@@ -125,3 +125,74 @@ def prolongation_bar(approval, start_at, end_at, contract_end=None):
         legend.append(LegendItem("today", "Aujourd’hui"))
     end = max([end_at, approval.end_at] + [marker.date for marker in markers])
     return _place(PeriodBar(parts=parts, markers=markers, legend=legend, start=approval.start_at, end=end))
+
+
+def _used_and_remaining(approval, today):
+    parts = []
+    if approval.start_at <= today:
+        parts.append(Part("used", approval.start_at, min(today, approval.end_at)))
+    if today < approval.end_at:
+        parts.append(Part("remaining", max(today + datetime.timedelta(days=1), approval.start_at), approval.end_at))
+    return parts
+
+
+def approval_bar(approval, contract_end=None):
+    """The PASS IAE as it stands: days used, days left, and the end of the contract."""
+    today = timezone.localdate()
+    markers = [Marker("today", today)] if approval.start_at <= today <= approval.end_at else []
+    legend = [
+        LegendItem(
+            "used",
+            f"PASS{NBSP}IAE du {_fr(approval.start_at)} au {_fr(approval.end_at)}"
+            + (
+                f", dont {duration_display(today + datetime.timedelta(days=1), approval.end_at)} restants"
+                if today < approval.end_at
+                else ""
+            ),
+        )
+    ]
+    if contract_end and approval.start_at <= contract_end <= approval.end_at:
+        markers.append(Marker("contract", contract_end))
+        legend.append(LegendItem("contract", f"Fin du contrat le {_fr(contract_end)}"))
+    if markers and markers[0].kind == "today":
+        legend.append(LegendItem("today", "Aujourd’hui"))
+    return _place(
+        PeriodBar(
+            parts=_used_and_remaining(approval, today),
+            markers=markers,
+            legend=legend,
+            start=approval.start_at,
+            end=approval.end_at,
+        )
+    )
+
+
+def suspended_end(approval_end, start_at, end_at):
+    """The PASS IAE's end once suspended: same rule as the database trigger `update_approval_end_at`."""
+    return approval_end + (end_at - start_at)
+
+
+def suspension_bar(approval, start_at, end_at, approval_end=None):
+    """The PASS IAE with a suspension: days used before it, the suspension, then the days left, pushed back.
+
+    approval_end is the PASS IAE's end before the suspension: by default its current end, for a suspension to come.
+    """
+    approval_end = approval_end or approval.end_at
+    new_end = suspended_end(approval_end, start_at, end_at)
+    parts = []
+    if approval.start_at < start_at:
+        parts.append(Part("used", approval.start_at, start_at - datetime.timedelta(days=1)))
+    parts += [Part("paused", start_at, end_at), Part("remaining", end_at + datetime.timedelta(days=1), new_end)]
+    markers = [Marker("previous-end", approval_end)]
+    legend = [
+        LegendItem("used", f"PASS{NBSP}IAE à partir du {_fr(approval.start_at)}"),
+        LegendItem(
+            "paused",
+            f"Suspension du {_fr(start_at)} au {_fr(end_at)}{NBSP}: {duration_display(start_at, end_at)}",
+        ),
+        LegendItem(
+            "previous-end",
+            f"Fin du PASS{NBSP}IAE repoussée du {_fr(approval_end)} au {_fr(new_end)}",
+        ),
+    ]
+    return _place(PeriodBar(parts=parts, markers=markers, legend=legend, start=approval.start_at, end=new_end))

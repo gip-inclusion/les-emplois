@@ -40,6 +40,9 @@
                         {% for line in result.lines %}<li>{{ line }}</li>{% endfor %}
                     </ul>
                 {% endif %}
+                {% if result.bar %}
+                    {% include "next_steps/journeys/components/period_bar.html" with bar=result.bar only %}
+                {% endif %}
                 <a class="fs-sm"
                    href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
             </div>
