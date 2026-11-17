@@ -413,6 +413,25 @@ table.table td > .modal .modal-content {
     text-decoration: underline;
 }
 
+/* Advisors: initials in a round, as in the prototype; filled for the signed-in professional. */
+.next-step__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    font-size: .875rem;
+    font-weight: 800;
+    color: var(--bs-secondary-color, #727492);
+    background-color: var(--bs-light, #f2f3f5);
+}
+
+.next-step__avatar--you {
+    color: var(--bs-white, #fff);
+    background-color: var(--bs-tertiary, #000091);
+}
+
 /* Barriers columns: a sunk background holding the barrier cards. */
 .next-step-barriers__column {
     display: flex;

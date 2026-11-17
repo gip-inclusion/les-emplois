@@ -12,12 +12,16 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
             <h1>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
-            <p>
-                <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir la fiche complète</a>
-            </p>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a class="btn btn-lg btn-outline-primary btn-ico"
+               href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                <i class="ri-file-user-line fw-medium" aria-hidden="true"></i>
+                <span>Voir la fiche complète</span>
+            </a>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -41,22 +45,31 @@
                         {% if assignments %}
                             <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0">
                                 {% for assignment in assignments %}
-                                    <li class="c-box py-2 px-3">
+                                    {# As in the prototype: initials in a round, filled for the signed-in professional. #}
+                                    <li class="c-box d-flex align-items-center gap-3 py-2 px-3">
                                         {% if assignment.assigned_to_unknown_advisor %}
-                                            <strong>{{ assignment.organization.display_name }}</strong>
-                                            <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                            <span class="next-step__avatar"
+                                                  aria-hidden="true"><i class="ri-community-line"></i></span>
                                         {% else %}
-                                            <strong>{{ assignment.professional.get_full_name }}</strong>
-                                            {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
-                                            <span class="d-block fs-sm text-muted">
-                                                {% if assignment.organization %}
-                                                    {{ assignment.organization.display_name }}
-                                                {% else %}
-                                                    Aucune structure associée
-                                                {% endif %}
-                                            </span>
+                                            <span class="next-step__avatar{% if assignment.professional_id == request.user.pk %} next-step__avatar--you{% endif %}" aria-hidden="true">{{ assignment.professional.first_name|first|upper }}{{ assignment.professional.last_name|first|upper }}</span>
                                         {% endif %}
-                                        <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
+                                        <div>
+                                            {% if assignment.assigned_to_unknown_advisor %}
+                                                <strong>{{ assignment.organization.display_name }}</strong>
+                                                <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                            {% else %}
+                                                <strong>{{ assignment.professional.get_full_name }}</strong>
+                                                {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
+                                                <span class="d-block fs-sm text-muted">
+                                                    {% if assignment.organization %}
+                                                        {{ assignment.organization.display_name }}
+                                                    {% else %}
+                                                        Aucune structure associée
+                                                    {% endif %}
+                                                </span>
+                                            {% endif %}
+                                            <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
+                                        </div>
                                     </li>
                                 {% endfor %}
                             </ul>
