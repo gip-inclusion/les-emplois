@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.utils.perms.prescriber import is_authorized_ft_prescriber
 
 
 def show_afpa_ad(user):
@@ -14,8 +14,7 @@ def xp_ref_iae_job_applications(request):
     from itou.job_applications.models import JobApplication
 
     if (
-        request.from_authorized_prescriber
-        and request.current_organization.kind == PrescriberOrganizationKind.FT
+        is_authorized_ft_prescriber(request)
         and request.current_organization.department == settings.XP_REF_IAE_DEPARTMENT
         and timezone.localdate() <= settings.XP_REF_IAE_END_DATE
     ):

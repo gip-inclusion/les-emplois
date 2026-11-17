@@ -77,7 +77,7 @@ RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = os.getenv("RDV_INSERTION_PLATEFOR
 API_GEOPF_BASE_URL = "https://data.geopf.fr"
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL", "https://api.insee.fr/metadonnees/")
-MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
+MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.gouv.fr/")
 MATOMO_SITE_ID = 220
 SECURE_CSP["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
 SECURE_CSP["script-src"].append(MATOMO_BASE_URL)  # noqa: F405

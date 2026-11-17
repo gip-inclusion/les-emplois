@@ -1159,8 +1159,8 @@ def test_add_support_remark_to_suspension(client):
     fake = fk(locale="fr_FR")
     fake_remark = fake.sentence()
 
-    # Get initial data for suspension form
-    post_data = response.context["adminform"].form.initial
+    # Get initial data for suspension form. Empty (i.e. `None`) foreign keys cannot be encoded as POST data.
+    post_data = {key: value for key, value in response.context["adminform"].form.initial.items() if value is not None}
 
     # Compose manually dict for remark inlines fields because context doesn't provide it easily
     post_data.update(
