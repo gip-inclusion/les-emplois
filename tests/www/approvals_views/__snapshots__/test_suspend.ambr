@@ -267,6 +267,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -355,6 +356,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -382,6 +384,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_action_choice[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -809,6 +812,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -897,6 +901,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -924,6 +929,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update_enddate[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -1458,6 +1464,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -1545,6 +1552,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -1571,6 +1579,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_delete[www/approvals_views/views.py]',
         ]),
         'sql': '''
@@ -2001,6 +2010,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -2089,6 +2099,7 @@
       }),
       dict({
         'origin': list([
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
@@ -2116,6 +2127,7 @@
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
           'Suspension.can_be_handled_by_siae[approvals/models.py]',
+          '_get_suspension[www/approvals_views/views.py]',
           'suspension_update[www/approvals_views/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
