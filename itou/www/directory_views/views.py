@@ -49,13 +49,20 @@ def people_results(request, template_name="directory/people_results.html"):
         .select_related("organization")
         .annotate(org_directory_distance_km=Distance("organization__coords", origin) / 1_000)
     )
+
+    def by_directory_distance(membership):
+        return membership.org_directory_distance_km
+
     for membership in itertools.chain(company_memberships, prescriber_memberships):
         person = people[membership.user_id]
-        if not hasattr(person, "directory_organizations"):
-            person.directory_organizations = []
-        org = membership.get_organization()
-        org.directory_distance_km = membership.org_directory_distance_km
-        bisect.insort_right(person.directory_organizations, org, key=lambda org: org.directory_distance_km)
+        if not hasattr(person, "directory_memberships"):
+            person.directory_memberships = []
+        bisect.insort_right(
+            person.directory_memberships,
+            membership,
+            key=by_directory_distance,
+        )
+
     context = {
         "results": results,
         "matomo_custom_title": "Annuaire pro - Personnes",
