@@ -1,3 +1,4 @@
+{% load format_filters %}
 {# What to know about an application before answering it, as in the prototype; the context boxes follow. #}
 {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
 {% if application_message %}
@@ -12,3 +13,42 @@
     {% endif %}
     <a href="{{ details_url }}">Lire la candidature complète</a>
 </p>
+{% if meeting %}
+    {# Meet before answering: the job seeker through RDV-Insertion when the company uses it, else by e-mail; the prescriber by e-mail. #}
+    <h3 class="fs-base fw-bold mt-4 mb-2">Prendre rendez-vous</h3>
+    <div class="d-flex flex-column gap-2">
+        {% for person in meeting %}
+            <div class="border rounded-2 px-3 py-2 d-flex flex-column flex-sm-row align-items-sm-center gap-2">
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">{{ person.role }}</span>
+                    <span class="d-block fw-bold">{{ person.name }}</span>
+                    {% if person.rdvi_url %}
+                        <span class="d-block fs-sm text-muted">Il ou elle choisit un créneau en ligne, avec RDV-Insertion.</span>
+                    {% elif person.phone %}
+                        <span class="d-block fs-sm text-muted">{{ person.phone|format_phone }}</span>
+                    {% endif %}
+                </div>
+                {% if person.rdvi_pending %}
+                    <span class="fs-sm text-success flex-shrink-0"
+                          role="status"><i class="ri-check-line"
+                                           aria-hidden="true"></i> Invitation envoyée</span>
+                {% elif person.rdvi_url %}
+                    {# The existing invitation of the application page: it answers with its own button, swapped in. #}
+                    <button type="button"
+                            class="btn btn-sm btn-secondary btn-ico flex-shrink-0"
+                            hx-post="{{ person.rdvi_url }}"
+                            hx-swap="outerHTML"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                        <i class="ri-calendar-event-line fw-medium" aria-hidden="true"></i>
+                        <span>Proposer un rendez-vous</span>
+                    </button>
+                {% elif person.mailto %}
+                    <a class="btn btn-sm btn-secondary btn-ico flex-shrink-0" href="{{ person.mailto }}">
+                        <i class="ri-mail-send-line fw-medium" aria-hidden="true"></i>
+                        <span>Proposer un rendez-vous</span>
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

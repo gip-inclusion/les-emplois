@@ -15,6 +15,7 @@ import logging
 import urllib.parse
 
 from django import forms
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.http import Http404
@@ -41,6 +42,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberAuthorizationStatus
+from itou.rdv_insertion.models import InvitationRequest
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import can_fill_pro_support_report
@@ -849,9 +851,69 @@ class JobApplicationJourney(Journey):
             lines.append(("Message à l’usager", accept["answer"]))
         return lines
 
+    def _meeting(self):
+        """Whom to meet before answering: the job seeker, and the prescriber who sent the application.
+
+        The job seeker gets an invitation through RDV-Insertion when the company uses it, the same as from the
+        existing application page, and picks a slot online. Otherwise, and for the prescriber, the platform has no
+        appointment tool: an e-mail with a proposal to complete, and the phone number.
+        """
+        job_application, job_seeker, company = self.job_application, self.job_seeker, self.company
+        employer = self.request.user
+        jobs = ", ".join(job.display_name for job in job_application.selected_jobs.all()) or "candidature spontanée"
+
+        def mailto(email, first_name):
+            subject = f"Candidature de {job_seeker.get_full_name()}{NBSP}: proposition de rendez-vous"
+            body = (
+                f"Bonjour {first_name},\n\n"
+                f"À la suite de la candidature de {job_seeker.get_full_name()} ({jobs}), "
+                "je vous propose un rendez-vous le … à … .\n\n"
+                f"Cordialement,\n{employer.get_full_name()}\n{company.display_name}"
+            )
+            query = urllib.parse.urlencode({"subject": subject, "body": body}, quote_via=urllib.parse.quote)
+            return f"mailto:{email}?{query}"
+
+        people = []
+        if can_view_personal_information(self.request, job_seeker):
+            rdvi = bool(company.rdv_solidarites_id)
+            people.append(
+                {
+                    "role": "L’usager",
+                    "name": job_seeker.get_full_name(),
+                    "phone": job_seeker.phone,
+                    "mailto": mailto(job_seeker.email, job_seeker.first_name) if job_seeker.email else "",
+                    "rdvi_url": (
+                        reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": job_application.pk})
+                        if rdvi
+                        else ""
+                    ),
+                    "rdvi_pending": rdvi
+                    and InvitationRequest.objects.filter(
+                        company=company,
+                        job_seeker=job_seeker,
+                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                    ).exists(),
+                }
+            )
+        sender = job_application.sender
+        if job_application.sender_kind == SenderKind.PRESCRIBER and sender:
+            organization = job_application.sender_prescriber_organization
+            people.append(
+                {
+                    "role": "Le prescripteur",
+                    "name": sender.get_full_name() + (f", {organization.display_name}" if organization else ""),
+                    "phone": sender.phone,
+                    "mailto": mailto(sender.email, sender.first_name) if sender.email else "",
+                    "rdvi_url": "",
+                    "rdvi_pending": False,
+                }
+            )
+        return people
+
     def context(self):
         job_application = self.job_application
         return {
+            "meeting": self._meeting(),
             "details_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             "application_message": job_application.message,
             "resume_url": (

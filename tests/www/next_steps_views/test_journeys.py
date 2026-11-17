@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
 from itou.approvals.models import Approval, Suspension
 from itou.companies.enums import CompanyKind, ProSupportReportBarrier, ProSupportReportSolution
-from itou.companies.models import ProSupportReport
+from itou.companies.models import Company, ProSupportReport
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -23,6 +23,7 @@ from tests.companies.factories import (
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.rdv_insertion.factories import InvitationRequestFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
@@ -271,6 +272,37 @@ def test_job_application_is_read_before_answering(client):
     response = walk(client, url, {}, **HTMX)
     assert response.context["step"].label == "Votre réponse"
     assertContains(response, 'name="decision"')
+
+
+def test_meet_the_job_seeker_or_the_prescriber_before_answering(client):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True, rdv_solidarites_id=None)
+    job_application = JobApplicationFactory(
+        to_company=company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
+    client.force_login(company.members.first())
+    url = journey_url("candidature", job_application.pk)
+
+    # Without RDV-Insertion: an e-mail with a proposal to complete, to each of them.
+    response = client.get(url, **HTMX)
+    assertContains(response, "Prendre rendez-vous")
+    assertContains(response, f'href="mailto:{job_application.job_seeker.email}?subject=')
+    assertContains(response, f'href="mailto:{job_application.sender.email}?subject=')
+    assertNotContains(
+        response, reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": job_application.pk})
+    )
+
+    # With RDV-Insertion: the job seeker gets the invitation of the existing application page.
+    Company.objects.filter(pk=company.pk).update(rdv_solidarites_id=1234)
+    response = client.get(url, **HTMX)
+    invite_url = reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": job_application.pk})
+    assertContains(response, f'hx-post="{invite_url}"')
+    assertNotContains(response, f'href="mailto:{job_application.job_seeker.email}?subject=')
+
+    # Already invited: said so, until a new invitation is possible.
+    InvitationRequestFactory(company=company, job_seeker=job_application.job_seeker)
+    response = client.get(url, **HTMX)
+    assertContains(response, "Invitation envoyée")
+    assertNotContains(response, f'hx-post="{invite_url}"')
 
 
 def test_job_application_to_processing_then_postponed(client):
