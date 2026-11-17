@@ -49,14 +49,14 @@
                 <a class="fs-sm"
                    href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
             </div>
-            {# Keep the momentum: what remains for today, and what comes next. #}
-            {% if remaining_today is not None %}
+            {# Keep the momentum: what remains within the week, and what comes next. #}
+            {% if remaining is not None %}
                 <div class="rounded-2 p-3 mt-4 d-flex flex-column gap-1 bg-success-lighter">
                     <b>
-                        {% if remaining_today %}
-                            Plus que {{ remaining_today }} action{{ remaining_today|pluralizefr }} aujourd’hui
+                        {% if remaining %}
+                            Plus que {{ remaining }} action{{ remaining|pluralizefr }} {{ remaining|pluralizefr:"vous attend,vous attendent" }}
                         {% else %}
-                            Tout est fait pour aujourd’hui
+                            Rien d’autre ne vous attend cette semaine
                         {% endif %}
                     </b>
                     {% if next_action %}

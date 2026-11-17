@@ -637,7 +637,7 @@ def test_done_today_and_next_action(client):
 
     response = walk(client, journey_url("candidature", first.pk), {}, {"decision": "process"}, **HTMX)
     # Keep the momentum: what remains today, and the next action, run in the same drawer.
-    assertContains(response, "Plus que 1 action aujourd’hui")
+    assertContains(response, "Plus que 1 action vous attend")
     next_url = journey_url("candidature", second.pk)
     assertContains(response, f'hx-get="{next_url}"')
     assertContains(response, f"Action suivante · {second.job_seeker.first_name}")

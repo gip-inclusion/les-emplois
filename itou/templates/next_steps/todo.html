@@ -43,7 +43,7 @@
                     {% for group in groups %}
                         <section class="mb-5" aria-labelledby="next-steps-{{ group.key }}">
                             <h2 class="h3 mb-1" id="next-steps-{{ group.key }}">
-                                {{ group.label }} <span class="text-muted fw-normal">{{ group.actions|length }}</span>
+                                {{ group.label }} <span class="text-muted fw-normal">{{ group.count }}</span>
                             </h2>
                             <p class="fs-sm text-muted mb-3">{{ group.help }}</p>
                             {% for action in group.actions %}
@@ -51,6 +51,19 @@
                             {% empty %}
                                 <p class="c-box text-muted mb-0">Rien pour le moment.</p>
                             {% endfor %}
+                            {% if group.folded %}
+                                {# Many job applications would push the rarer actions out of sight: the others are folded, without JavaScript. #}
+                                <details class="mb-2">
+                                    <summary class="btn btn-sm btn-link px-0">
+                                        Afficher {{ group.folded|length }} autre{{ group.folded|length|pluralizefr }} candidature{{ group.folded|length|pluralizefr }}
+                                    </summary>
+                                    <div class="mt-2">
+                                        {% for action in group.folded %}
+                                            {% include "next_steps/includes/action.html" with action=action group=group.key hide_job_seeker=False %}
+                                        {% endfor %}
+                                    </div>
+                                </details>
+                            {% endif %}
                         </section>
                     {% endfor %}
                     {% include "next_steps/includes/done_today.html" %}

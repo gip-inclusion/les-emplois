@@ -20,6 +20,7 @@ from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
 TODO_URL = reverse("next_steps_views:todo")
+NBSP = "\u00a0"
 
 
 def journey_url(kind, pk):
@@ -161,7 +162,9 @@ def test_employer_new_job_application(employer_client, employer_membership):
     )
 
     response = employer_client.get(TODO_URL)
-    assert summary(response) == [(Group.TODAY, Kind.JOB_APPLICATION, job_application.job_seeker)]
+    # Due within a week: this week's.
+    assert summary(response) == [(Group.WEEK, Kind.JOB_APPLICATION, job_application.job_seeker)]
+    assertContains(response, f"À faire d’ici le {timezone.localdate() + datetime.timedelta(days=7):%d/%m/%Y}")
     assertContains(response, "1 action vous attend")
     assertContains(response, "Répondre à sa candidature")
     assertContains(response, journey_url("candidature", job_application.pk))
@@ -172,17 +175,19 @@ def test_employer_ended_contract(employer_client, employer_membership):
     job_seeker = contract.job_seeker
 
     response = employer_client.get(TODO_URL)
+    # The suspension is due a week after the contract's end, the report a month after it.
     assert summary(response) == [
-        (Group.TODAY, Kind.APPROVAL_SUSPENSION, job_seeker),
-        (Group.WEEK, Kind.PRO_SUPPORT_REPORT_FILL, job_seeker),
+        (Group.LATE, Kind.APPROVAL_SUSPENSION, job_seeker),
+        (Group.WATCH, Kind.PRO_SUPPORT_REPORT_FILL, job_seeker),
     ]
+    assertContains(response, f"En retard de 3{NBSP}jours")
     assertContains(response, f"Le contrat est terminé depuis le {contract.end_date:%d/%m/%Y}")
     assertContains(response, journey_url("suspension", job_seeker.approvals.get().pk))
     assertContains(response, journey_url("bilan", job_seeker.public_id))
 
     # Once the report is filled, only the suspension remains.
     ProSupportReportFactory(contract=contract)
-    assert summary(employer_client.get(TODO_URL)) == [(Group.TODAY, Kind.APPROVAL_SUSPENSION, job_seeker)]
+    assert summary(employer_client.get(TODO_URL)) == [(Group.LATE, Kind.APPROVAL_SUSPENSION, job_seeker)]
 
 
 def test_employer_contract_ending_soon(employer_client, employer_membership):
@@ -192,7 +197,7 @@ def test_employer_contract_ending_soon(employer_client, employer_membership):
 
     response = employer_client.get(TODO_URL)
     assert summary(response) == [(Group.WATCH, Kind.PRO_SUPPORT_REPORT_FILL, contract.job_seeker)]
-    # Only the expected actions of today and this week are counted.
+    # Only the actions due within a week are counted.
     assertContains(response, "Rien ne vous attend")
 
 
@@ -269,7 +274,9 @@ def assign(job_seeker, membership):
 
 def test_prescriber_prolongation_request(prescriber_client, prescriber_membership):
     prolongation_request = ProlongationRequestFactory(
-        prescriber_organization=prescriber_membership.organization, assigned_to=prescriber_membership.user
+        prescriber_organization=prescriber_membership.organization,
+        assigned_to=prescriber_membership.user,
+        approval__end_at=timezone.localdate() + datetime.timedelta(days=3),
     )
     # Assigned to a colleague.
     ProlongationRequestFactory(
@@ -278,7 +285,9 @@ def test_prescriber_prolongation_request(prescriber_client, prescriber_membershi
     )
 
     response = prescriber_client.get(TODO_URL)
-    assert summary(response) == [(Group.TODAY, Kind.PROLONGATION_REQUEST, prolongation_request.approval.user)]
+    # Due 10 days after it was asked, as the platform's reminder, but the PASS IAE ends in 3 days.
+    assert summary(response) == [(Group.WEEK, Kind.PROLONGATION_REQUEST, prolongation_request.approval.user)]
+    assert [action.due for action in actions_of(response)] == [prolongation_request.approval.end_at]
     assertContains(
         response,
         journey_url("prolongation", prolongation_request.pk),
@@ -295,7 +304,8 @@ def test_prescriber_pro_support_report_to_request_then_to_read(prescriber_client
     ApprovalFactory(user=other_contract.job_seeker, start_at=other_contract.start_date)
 
     response = prescriber_client.get(TODO_URL)
-    assert summary(response) == [(Group.WEEK, Kind.PRO_SUPPORT_REPORT_REQUEST, contract.job_seeker)]
+    # Due when the SIAE's report is, a month after the contract's end.
+    assert summary(response) == [(Group.WATCH, Kind.PRO_SUPPORT_REPORT_REQUEST, contract.job_seeker)]
     # The prescriber asks for the report from the job seeker's page: only the SIAE fills it.
     assertContains(response, "C’est la SIAE qui remplit le bilan.")
     assertNotContains(response, "pro-support-report/create")
@@ -319,6 +329,65 @@ def test_prescriber_eligibility_to_validate(prescriber_client, prescriber_member
 
     IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
     assert summary(prescriber_client.get(TODO_URL)) == []
+
+
+# Order
+# ------------------------------------------------------------------------------
+
+
+def test_job_applications_do_not_hide_the_rarer_actions(employer_client, employer_membership):
+    company = employer_membership.company
+    received = timezone.now() - datetime.timedelta(days=20)
+    job_applications = [
+        JobApplicationFactory(
+            to_company=company,
+            state=JobApplicationState.NEW,
+            sent_by_authorized_prescriber=True,
+            created_at=received + datetime.timedelta(hours=hours),
+        )
+        for hours in range(5)
+    ]
+    contract = ended_contract(company)
+
+    response = employer_client.get(TODO_URL)
+    [late, *_] = response.context["groups"]
+    # All late, the nearest due date first: the job applications were due 13 days ago, the suspension 3 days ago.
+    # Beyond three job applications, the others are folded, and the suspension stays in sight.
+    assert [(action.kind, action.job_seeker) for action in late["actions"]] == [
+        (Kind.JOB_APPLICATION, job_applications[0].job_seeker),
+        (Kind.JOB_APPLICATION, job_applications[1].job_seeker),
+        (Kind.JOB_APPLICATION, job_applications[2].job_seeker),
+        (Kind.APPROVAL_SUSPENSION, contract.job_seeker),
+    ]
+    assert [action.job_seeker for action in late["folded"]] == [
+        job_applications[3].job_seeker,
+        job_applications[4].job_seeker,
+    ]
+    assert late["count"] == 6
+    assertContains(response, "Afficher 2 autres candidatures")
+    assertContains(response, f"En retard de 13{NBSP}jours", count=5)
+    assertContains(response, "6 actions vous attendent")
+
+
+def test_suspension_due_before_the_approval_ends(employer_client, employer_membership):
+    company = employer_membership.company
+    yesterday = timezone.localdate() - datetime.timedelta(days=1)
+    contract = ContractFactory(
+        company=company, start_date=yesterday - datetime.timedelta(days=200), end_date=yesterday
+    )
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date, end_at=timezone.localdate())
+    JobApplicationFactory(
+        job_seeker=contract.job_seeker,
+        to_company=company,
+        state=JobApplicationState.ACCEPTED,
+        sent_by_authorized_prescriber=True,
+        hiring_start_at=contract.start_date,
+    )
+
+    response = employer_client.get(TODO_URL)
+    # A week after the contract's end, but the PASS IAE ends today: it cannot be suspended afterwards.
+    assert summary(response)[0] == (Group.TODAY, Kind.APPROVAL_SUSPENSION, contract.job_seeker)
+    assertContains(response, "À faire aujourd’hui")
 
 
 def test_unauthorized_prescriber_has_no_iae_actions(client, settings):

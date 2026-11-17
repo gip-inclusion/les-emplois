@@ -171,13 +171,13 @@ def journey(request, kind, pk):
         "matomo_custom_title": f"Prochaines étapes : parcours {kind}",
         "journeys_media": _journeys_media(request),
         "next_action": None,
-        "remaining_today": None,
+        "remaining": None,
     }
     if completed:
         # Keep the momentum: what remains today, and the next action to run, right from the confirmation.
         actions = expected_actions(request)
         describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
-        context["remaining_today"] = sum(action.group == Group.TODAY for action in actions)
+        context["remaining"] = sum(action.group != Group.WATCH for action in actions)
         context["next_action"] = next_action(actions)
     template_name = "next_steps/journeys/journey.html" if request.htmx else "next_steps/journeys/page.html"
     response = render(request, template_name, context)

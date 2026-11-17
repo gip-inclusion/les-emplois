@@ -2,6 +2,10 @@
 
 Each rule reads existing data and returns what the signed-in professional is expected to do, every action pointing
 to the existing screen that handles it. Nothing is stored: an action disappears once the data says it is done.
+
+Each action has a due date, from what waiting costs, and its group follows from it: late, today, this week, to watch.
+The kind of action does not set its group: a job application received this morning is not more pressing than a PASS
+IAE to suspend for weeks. Within a group, the nearest due date comes first, then the oldest action.
 """
 
 import dataclasses
@@ -31,11 +35,31 @@ PRO_SUPPORT_REPORT_TO_READ_DAYS = 30
 # Older appointments with an undetermined status are left out: the queue is about what can still be acted upon.
 APPOINTMENT_STATUS_TO_SPECIFY_DAYS = 30
 
+# Due dates, in days from what starts the action. Provisional, to be settled with the team, except where noted.
+# A job application gets an answer within a week. The prescriber's eligibility diagnosis is what the employer waits
+# for to answer it, hence the same delay.
+JOB_APPLICATION_ANSWER_DAYS = 7
+# The platform reminds the prescriber of a pending prolongation request after 10 days
+# (approvals/management/commands/prolongation_requests_chores.py). Never after the PASS IAE's end.
+PROLONGATION_REQUEST_ANSWER_DAYS = 10
+# A suspension may start up to a year back (Suspension.MAX_RETROACTIVITY_DURATION_DAYS), so waiting a little loses no
+# day of PASS IAE; but once the person is hired elsewhere, this employer can no longer suspend it. A week, never after
+# the PASS IAE's end nor past the retroactivity limit.
+APPROVAL_SUSPENSION_DAYS = 7
+# The report, from the contract's end; the prescriber's request for it has the same due date.
+PRO_SUPPORT_REPORT_FILL_DAYS = 30
+PRO_SUPPORT_REPORT_READ_DAYS = 7
+# The appointment's status, once it took place.
+APPOINTMENT_STATUS_DAYS = 7
+# Beyond this many job applications in a group, the others are folded: the rarer actions must stay in sight.
+JOB_APPLICATIONS_SHOWN = 3
+
 
 NBSP = " "
 
 
 class Group(enum.StrEnum):
+    LATE = "late"
     TODAY = "today"
     WEEK = "week"
     WATCH = "watch"
@@ -45,10 +69,31 @@ class Group(enum.StrEnum):
 
 
 GROUPS = [
-    (Group.TODAY, "Aujourd’hui", "À faire sans attendre."),
-    (Group.WEEK, "Cette semaine", "À traiter d’ici vendredi."),
-    (Group.WATCH, "À surveiller", "Rien à faire tout de suite, à garder en tête."),
+    (Group.LATE, "En retard", "L’échéance est passée."),
+    (Group.TODAY, "Aujourd’hui", "L’échéance tombe aujourd’hui."),
+    (Group.WEEK, "Cette semaine", "L’échéance tombe dans les 7 prochains jours."),
+    (
+        Group.WATCH,
+        "À surveiller",
+        f"Rien d’urgent{NBSP}: l’échéance est plus loin, ou c’est à quelqu’un d’autre d’agir.",
+    ),
 ]
+WEEK_DAYS = 7
+# Beyond this many days late, the due date is shown rather than the count of days.
+LATE_DAYS_SHOWN = 30
+
+
+def due_group(due):
+    if due is None:
+        return Group.WATCH
+    today = timezone.localdate()
+    if due < today:
+        return Group.LATE
+    if due == today:
+        return Group.TODAY
+    if due <= today + datetime.timedelta(days=WEEK_DAYS):
+        return Group.WEEK
+    return Group.WATCH
 
 
 class Kind(enum.StrEnum):
@@ -69,13 +114,14 @@ class Kind(enum.StrEnum):
 
 @dataclasses.dataclass
 class Action:
-    group: Group
     kind: Kind
     job_seeker: User
     title: str
     reason: str
-    # The date the action became due: the oldest comes first in its group.
+    # The date the action started: the oldest comes first among those due the same day.
     since: datetime.date
+    # The date it should be done by, which sets its group; None when it is up to someone else.
+    due: datetime.date | None
     # Waiting actions have no button.
     url: str | None = None
     call_to_action: str | None = None
@@ -89,6 +135,24 @@ class Action:
     def icon(self):
         return self.kind.value
 
+    @property
+    def group(self):
+        return due_group(self.due)
+
+    @property
+    def due_display(self):
+        if self.due is None:
+            return ""
+        late = (timezone.localdate() - self.due).days
+        if late > LATE_DAYS_SHOWN:
+            # "474 jours" says less than a date.
+            return f"En retard depuis le {_fr(self.due)}"
+        if late > 0:
+            return f"En retard de {late}{NBSP}jour{'s' if late > 1 else ''}"
+        if late == 0:
+            return "À faire aujourd’hui"
+        return f"À faire d’ici le {_fr(self.due)}"
+
 
 def _journey_url(kind, pk):
     return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
@@ -96,6 +160,10 @@ def _journey_url(kind, pk):
 
 def _date(value):
     return timezone.localdate(value) if isinstance(value, datetime.datetime) else value
+
+
+def _after(value, days):
+    return _date(value) + datetime.timedelta(days=days)
 
 
 def _fr(value):
@@ -115,7 +183,6 @@ def _new_job_applications(company):
     for job_application in job_applications:
         sender = job_application.sender_prescriber_organization or job_application.sender_company
         yield Action(
-            group=Group.TODAY,
             kind=Kind.JOB_APPLICATION,
             job_seeker=job_application.job_seeker,
             title="Répondre à sa candidature",
@@ -124,6 +191,7 @@ def _new_job_applications(company):
                 + (f", envoyée par {sender.display_name}." if sender else ".")
             ),
             since=_date(job_application.created_at),
+            due=_after(job_application.created_at, JOB_APPLICATION_ANSWER_DAYS),
             url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             call_to_action="Étudier",
             journey_url=_journey_url("candidature", job_application.pk),
@@ -145,7 +213,6 @@ def _end_of_contracts(company):
             approval = Approval.objects.filter(user=job_seeker).valid().order_by("-start_at").first()
             if approval and approval.can_be_suspended_by_siae(company):
                 yield Action(
-                    group=Group.TODAY,
                     kind=Kind.APPROVAL_SUSPENSION,
                     job_seeker=job_seeker,
                     title="Suspendre le PASS IAE",
@@ -154,13 +221,17 @@ def _end_of_contracts(company):
                         "ses jours de PASS IAE continuent d’être décomptés tant qu’il n’est pas suspendu."
                     ),
                     since=end_date,
+                    due=min(
+                        _after(end_date, APPROVAL_SUSPENSION_DAYS),
+                        _after(end_date, Suspension.MAX_RETROACTIVITY_DURATION_DAYS),
+                        approval.end_at,
+                    ),
                     url=reverse("approvals:suspend", kwargs={"approval_id": approval.pk}),
                     call_to_action="Suspendre",
                     journey_url=_journey_url("suspension", approval.pk),
                 )
             if not job_seeker.last_contract_has_pro_support_report:
                 yield Action(
-                    group=Group.WEEK,
                     kind=Kind.PRO_SUPPORT_REPORT_FILL,
                     job_seeker=job_seeker,
                     title="Remplir le bilan d’accompagnement",
@@ -169,6 +240,7 @@ def _end_of_contracts(company):
                         "les freins restants, l’autonomie et la suite envisagée."
                     ),
                     since=end_date,
+                    due=_after(end_date, PRO_SUPPORT_REPORT_FILL_DAYS),
                     url=reverse(
                         "job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}
                     ),
@@ -177,12 +249,12 @@ def _end_of_contracts(company):
                 )
         elif not job_seeker.last_contract_has_pro_support_report:
             yield Action(
-                group=Group.WATCH,
                 kind=Kind.PRO_SUPPORT_REPORT_FILL,
                 job_seeker=job_seeker,
                 title="Remplir le bilan d’accompagnement",
                 reason=f"Le contrat se termine le {_fr(end_date)}. Le bilan peut être rempli dès maintenant.",
                 since=end_date,
+                due=_after(end_date, PRO_SUPPORT_REPORT_FILL_DAYS),
                 url=reverse("job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}),
                 call_to_action="Remplir",
                 journey_url=_journey_url("bilan", job_seeker.public_id),
@@ -205,7 +277,6 @@ def _appointments_with_undetermined_status(company):
     for participation in participations:
         appointment = participation.appointment
         yield Action(
-            group=Group.WEEK,
             kind=Kind.APPOINTMENT,
             job_seeker=participation.job_seeker,
             title=f"Préciser le statut du rendez-vous du {_fr(appointment.start_at)}",
@@ -214,6 +285,7 @@ def _appointments_with_undetermined_status(company):
                 "il se renseigne dans RDV-Insertion."
             ),
             since=_date(appointment.start_at),
+            due=_after(appointment.start_at, APPOINTMENT_STATUS_DAYS),
             url=reverse(
                 "job_seekers_views:appointment_details",
                 kwargs={
@@ -236,12 +308,12 @@ def _prolongation_requests_sent(company):
         if prolongation_request.prescriber_organization:
             decider += f" ({prolongation_request.prescriber_organization.display_name})"
         yield Action(
-            group=Group.WATCH,
             kind=Kind.WAITING,
             job_seeker=prolongation_request.approval.user,
             title="Prolongation du PASS IAE",
             reason=f"Demandée le {_fr(prolongation_request.created_at)}, en attente de la décision de {decider}.",
             since=_date(prolongation_request.created_at),
+            due=None,
             status_label=prolongation_request.get_status_display(),
         )
 
@@ -278,7 +350,6 @@ def _prolongation_requests_to_process(request):
     for prolongation_request in prolongation_requests:
         requester = prolongation_request.declared_by_siae
         yield Action(
-            group=Group.TODAY,
             kind=Kind.PROLONGATION_REQUEST,
             job_seeker=prolongation_request.approval.user,
             title="Traiter la demande de prolongation",
@@ -288,6 +359,10 @@ def _prolongation_requests_to_process(request):
                 + f". Le PASS IAE se termine le {_fr(prolongation_request.approval.end_at)}."
             ),
             since=_date(prolongation_request.created_at),
+            due=min(
+                _after(prolongation_request.created_at, PROLONGATION_REQUEST_ANSWER_DAYS),
+                prolongation_request.approval.end_at,
+            ),
             url=reverse(
                 "approvals:prolongation_request_show",
                 kwargs={"prolongation_request_id": prolongation_request.pk},
@@ -312,18 +387,17 @@ def _pro_support_reports_to_request(request):
     for job_seeker in job_seekers:
         end_date = job_seeker.last_contract_end_date
         if job_seeker.last_contract_ended_with_valid_approval:
-            group = Group.WEEK
             reason = f"Contrat terminé le {_fr(end_date)}, PASS IAE encore valide. C’est la SIAE qui remplit le bilan."
         else:
-            group = Group.WATCH
             reason = f"Le contrat se termine le {_fr(end_date)}. C’est la SIAE qui remplit le bilan."
         yield Action(
-            group=group,
             kind=Kind.PRO_SUPPORT_REPORT_REQUEST,
             job_seeker=job_seeker,
             title="Demander le bilan d’accompagnement",
             reason=reason,
             since=end_date,
+            # The SIAE's due date for the report.
+            due=_after(end_date, PRO_SUPPORT_REPORT_FILL_DAYS),
             url=reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}),
             call_to_action="Demander",
             journey_url=_journey_url("demande-bilan", job_seeker.public_id) if job_seeker.company_email else None,
@@ -345,7 +419,6 @@ def _pro_support_reports_to_read(request):
     )
     for report in reports:
         yield Action(
-            group=Group.WEEK,
             kind=Kind.PRO_SUPPORT_REPORT_READ,
             job_seeker=report.job_seeker,
             title="Lire le bilan d’accompagnement",
@@ -355,6 +428,7 @@ def _pro_support_reports_to_read(request):
                 + f", à la fin du contrat le {_fr(report.contract_end_date)}."
             ),
             since=_date(report.created_at),
+            due=_after(report.created_at, PRO_SUPPORT_REPORT_READ_DAYS),
             url=reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id}),
             call_to_action="Lire",
         )
@@ -381,7 +455,6 @@ def _eligibility_to_validate(request):
             .first()
         )
         yield Action(
-            group=Group.WEEK,
             kind=Kind.ELIGIBILITY,
             job_seeker=job_seeker,
             title="Valider l’éligibilité IAE",
@@ -390,6 +463,8 @@ def _eligibility_to_validate(request):
                 "sans diagnostic d’éligibilité ni PASS IAE valide."
             ),
             since=_date(job_application.created_at),
+            # The employer waits for it to answer the job application.
+            due=_after(job_application.created_at, JOB_APPLICATION_ANSWER_DAYS),
             url=reverse("eligibility_views:update_iae", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             call_to_action="Valider",
             journey_url=_journey_url("eligibilite", job_seeker.public_id),
@@ -411,14 +486,14 @@ def _prescriber_actions(request):
 
 
 def expected_actions(request):
-    """The actions expected from the signed-in professional, oldest first."""
+    """The actions expected from the signed-in professional, the nearest due date first, then the oldest."""
     if request.from_employer:
         actions = list(_employer_actions(request))
     elif request.from_prescriber:
         actions = list(_prescriber_actions(request))
     else:
         actions = []
-    actions = sorted(actions, key=lambda action: action.since)
+    actions = sorted(actions, key=lambda action: (action.due or datetime.date.max, action.since))
     for index, action in enumerate(actions):
         action.uid = f"next-step-{index}"
     return actions
@@ -440,10 +515,29 @@ def describe_job_seekers(actions, can_view_personal_information):
 
 
 def group_actions(actions):
-    return [
-        {"key": key, "label": label, "help": help_text, "actions": [a for a in actions if a.group == key]}
-        for key, label, help_text in GROUPS
-    ]
+    """The actions by group. Beyond JOB_APPLICATIONS_SHOWN job applications in a group, the others are folded."""
+    groups = []
+    for key, label, help_text in GROUPS:
+        shown, folded = [], []
+        for action in actions:
+            if action.group != key:
+                continue
+            applications = sum(other.kind == Kind.JOB_APPLICATION for other in shown)
+            if action.kind == Kind.JOB_APPLICATION and applications >= JOB_APPLICATIONS_SHOWN:
+                folded.append(action)
+            else:
+                shown.append(action)
+        groups.append(
+            {
+                "key": key,
+                "label": label,
+                "help": help_text,
+                "actions": shown,
+                "folded": folded,
+                "count": len(shown) + len(folded),
+            }
+        )
+    return groups
 
 
 # Done today
@@ -527,8 +621,8 @@ def done_today(request):
 
 
 def next_action(actions):
-    """The action to suggest after one is done: the first of today's, else of this week's, run in the drawer."""
-    for group in (Group.TODAY, Group.WEEK):
+    """The action to suggest after one is done: the first late one, else today's, else this week's, in the drawer."""
+    for group in (Group.LATE, Group.TODAY, Group.WEEK):
         for action in actions:
             if action.group == group and action.journey_url:
                 return action

@@ -4,7 +4,7 @@
 <article class="c-box d-flex flex-column flex-md-row align-items-md-center gap-3 mb-2">
     {# itou-theme's icon tile, coloured by urgency, then the text. #}
     <div class="c-box--results__summary flex-grow-1">
-        <i class="{{ action.icon }} {% if group == "today" %}bg-danger-lighter text-danger{% elif group == "week" %}bg-warning-lighter text-warning{% else %}bg-light text-muted{% endif %}"
+        <i class="{{ action.icon }} {% if group == "late" or group == "today" %}bg-danger-lighter text-danger{% elif group == "week" %}bg-warning-lighter text-warning{% else %}bg-light text-muted{% endif %}"
            aria-hidden="true"></i>
         <div>
             {% if not hide_job_seeker %}
@@ -16,6 +16,11 @@
             {% endif %}
             <p class="h4 mb-1">{{ action.title }}</p>
             <p class="fs-sm text-muted mb-0">{{ action.reason }}</p>
+            {% if action.due_display %}
+                <p class="fs-xs mb-0 mt-1 {% if group == "late" %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                    <i class="ri-calendar-line" aria-hidden="true"></i> {{ action.due_display }}
+                </p>
+            {% endif %}
         </div>
     </div>
     <div class="flex-shrink-0">
