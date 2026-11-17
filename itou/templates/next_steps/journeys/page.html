@@ -1,4 +1,6 @@
 {% extends "layout/base.html" %}
+{# Grey background, as in the prototype, so that the boxes stand out. #}
+{% block body_class %}p-next-steps{% endblock %}
 {# A guided journey as an ordinary page, when JavaScript does not run. #}
 
 {% block title %}{{ journey.title }} {{ block.super }}{% endblock %}
