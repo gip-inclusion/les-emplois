@@ -78,6 +78,7 @@ from itou.www.job_seekers_views.views import (
     PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
     _pro_support_request_company_email,
 )
+from itou.www.next_steps_views.period_bar import prolongation_bar
 
 
 logger = logging.getLogger(__name__)
@@ -137,6 +138,8 @@ class Step:
     hint: str = ""
     layout: dict = dataclasses.field(default_factory=dict)
     boxes: list = dataclasses.field(default_factory=list)
+    # A period bar (see period_bar.py), shown under the question.
+    bar: object = None
 
     def __post_init__(self):
         if self.template in (FACTS_TEMPLATE, "next_steps/journeys/application.html"):
@@ -997,8 +1000,21 @@ class ProlongationJourney(Journey):
             "proposed_actions": ProlongationRequestDenyInformationProposedActionsForm(data=data, initial=initial),
         }
 
+    def _bar(self):
+        prolongation_request = self.prolongation_request
+        # Contracts are visible to authorized prescribers, the only ones processing prolongation requests.
+        contract = self.job_seeker.contracts.order_by("-start_date", "-pk").first()
+        contract_end = contract.end_date if contract and not contract.has_ended else None
+        return prolongation_bar(
+            prolongation_request.approval,
+            prolongation_request.start_at,
+            prolongation_request.end_at,
+            contract_end=contract_end,
+        )
+
     def steps(self, data):
         prolongation_request = self.prolongation_request
+        bar = self._bar()
         requester = prolongation_request.declared_by_siae
         steps = [
             Step(
@@ -1008,6 +1024,7 @@ class ProlongationJourney(Journey):
                     f"{requester.display_name if requester else 'La structure'} demande de prolonger "
                     f"le {PASS_IAE} de {self.job_seeker.first_name}"
                 ),
+                bar=bar,
                 boxes=[Box(prolongation_request.get_reason_display(), title="Motif")],
             ),
             Step(
@@ -1057,6 +1074,7 @@ class ProlongationJourney(Journey):
                     [],
                     template=RECAP_TEMPLATE,
                     submit_label="Accepter la prolongation",
+                    bar=bar,
                     question="Vérifiez avant d’accepter la prolongation",
                 )
             )

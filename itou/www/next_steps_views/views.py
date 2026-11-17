@@ -50,15 +50,10 @@ def todo(request, template_name="next_steps/todo.html"):
     describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
     done = done_today(request)
     describe_job_seekers(done, lambda job_seeker: can_view_personal_information(request, job_seeker))
-    remaining_today = sum(action.group == Group.TODAY for action in actions)
     context = {
         "groups": group_actions(actions),
         "pressing_count": sum(action.group != Group.WATCH for action in actions),
-        # The day's progress: what was done today out of what was done and what remains for today.
         "done_today": done,
-        "remaining_today": remaining_today,
-        "day_total": len(done) + remaining_today,
-        "remaining_this_week": sum(action.group == Group.WEEK for action in actions),
         "journeys_media": _journeys_media(request),
         "matomo_custom_title": "Prochaines étapes : à faire",
     }

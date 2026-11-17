@@ -1,0 +1,30 @@
+{# A period's base dates, then what is added after it (see next_steps_views.period_bar). #}
+<figure class="next-step-bar mb-4">
+    <svg class="next-step-bar__track"
+         viewBox="0 0 1000 32"
+         preserveAspectRatio="none"
+         aria-hidden="true"
+         focusable="false">
+        <rect class="next-step-bar__background" x="0" y="6" width="1000" height="20" />
+        {% for part in bar.parts %}
+            <rect class="next-step-bar__part next-step-bar__part--{{ part.kind }}" x="{{ part.x }}" y="6" width="{{ part.width }}" height="20" vector-effect="non-scaling-stroke" />
+        {% endfor %}
+        {% for marker in bar.markers %}
+            <line class="next-step-bar__marker next-step-bar__marker--{{ marker.kind }}" x1="{{ marker.x }}" x2="{{ marker.x }}" y1="0" y2="32" vector-effect="non-scaling-stroke" />
+        {% endfor %}
+    </svg>
+    <div class="next-step-bar__ends">
+        <span>{{ bar.start_display }}</span>
+        <span>{{ bar.end_display }}</span>
+    </div>
+    <figcaption>
+        <ul class="next-step-bar__legend">
+            {% for item in bar.legend %}
+                <li>
+                    <span class="next-step-bar__key next-step-bar__key--{{ item.kind }}" aria-hidden="true"></span>
+                    {{ item.text }}
+                </li>
+            {% endfor %}
+        </ul>
+    </figcaption>
+</figure>

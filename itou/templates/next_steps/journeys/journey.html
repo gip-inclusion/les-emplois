@@ -91,6 +91,9 @@
                 {% endif %}
                 {% if step.question %}<p class="next-step-journey__question">{{ step.question }}</p>{% endif %}
                 {% if step.hint %}<p class="fs-sm text-muted mb-3">{{ step.hint }}</p>{% endif %}
+                {% if step.bar %}
+                    {% include "next_steps/journeys/components/period_bar.html" with bar=step.bar only %}
+                {% endif %}
                 {% include step.template %}
                 {% for box in step.boxes %}
                     {% include "next_steps/journeys/components/box.html" with box=box only %}

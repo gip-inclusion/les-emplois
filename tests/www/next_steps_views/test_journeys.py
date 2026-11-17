@@ -584,7 +584,7 @@ def test_action_buttons_open_the_drawer(client):
 # ------------------------------------------------------------------------------
 
 
-def test_day_progress_and_next_action(client):
+def test_done_today_and_next_action(client):
     membership = CompanyMembershipFactory()
     first, second = (
         JobApplicationFactory(
@@ -601,9 +601,6 @@ def test_day_progress_and_next_action(client):
     todo_url = reverse("next_steps_views:todo")
 
     response = client.get(todo_url)
-    assertContains(
-        response, '<progress class="next-steps-day__bar"\n                  value="0"\n                  max="2"'
-    )
     assertNotContains(response, "Fait aujourd’hui")
 
     response = walk(client, journey_url("candidature", first.pk), {}, {"decision": "process"}, **HTMX)
@@ -614,9 +611,6 @@ def test_day_progress_and_next_action(client):
     assertContains(response, f"Action suivante · {second.job_seeker.first_name}")
 
     response = client.get(todo_url)
-    assertContains(
-        response, '<progress class="next-steps-day__bar"\n                  value="1"\n                  max="2"'
-    )
     assertContains(response, "Fait aujourd’hui")
     assertContains(response, "candidature mise à l’étude")
     assert [item.job_seeker for item in response.context["done_today"]] == [first.job_seeker]
@@ -636,4 +630,3 @@ def test_done_today_for_a_prescriber(client):
         "prolongation acceptée",
         "éligibilité IAE validée",
     ]
-    assertContains(response, "Tout est fait pour aujourd’hui.")

@@ -677,34 +677,6 @@ table.table td > .modal .modal-content {
     font-weight: 700;
 }
 
-/* The day's progress: a native progress element, filled in tertiary blue. */
-.next-steps-day__bar {
-    display: block;
-    width: 100%;
-    height: .75rem;
-    border: 0;
-    border-radius: 999px;
-    overflow: hidden;
-    appearance: none;
-    background-color: var(--bs-light, #f2f3f5);
-    color: var(--bs-tertiary, #000091);
-}
-
-.next-steps-day__bar::-webkit-progress-bar {
-    border-radius: 999px;
-    background-color: var(--bs-light, #f2f3f5);
-}
-
-.next-steps-day__bar::-webkit-progress-value {
-    border-radius: 999px;
-    background-color: var(--bs-tertiary, #000091);
-}
-
-.next-steps-day__bar::-moz-progress-bar {
-    border-radius: 999px;
-    background-color: var(--bs-tertiary, #000091);
-}
-
 /* Done today: one line per person moved forward. */
 .next-steps-done {
     display: flex;
@@ -728,3 +700,92 @@ table.table td > .modal .modal-content {
 .next-steps-done a:focus-visible {
     text-decoration: underline;
 }
+
+/* Period bar: the PASS IAE as it stands (used, remaining), then the added period after it. */
+.next-step-bar__track {
+    display: block;
+    width: 100%;
+    height: 2rem;
+}
+
+.next-step-bar__background {
+    fill: var(--bs-light, #f2f3f5);
+}
+
+.next-step-bar__part--used {
+    fill: var(--bs-tertiary, #000091);
+}
+
+.next-step-bar__part--remaining {
+    fill: var(--bs-tertiary, #000091);
+    fill-opacity: .35;
+}
+
+.next-step-bar__part--added {
+    fill: var(--bs-warning, #b34000);
+    fill-opacity: .2;
+    stroke: var(--bs-warning, #b34000);
+    stroke-dasharray: 5 3;
+}
+
+.next-step-bar__marker--today {
+    stroke: var(--bs-body-color, #000638);
+    stroke-width: 2;
+}
+
+.next-step-bar__marker--contract {
+    stroke: var(--bs-body-color, #000638);
+    stroke-dasharray: 3 3;
+}
+
+.next-step-bar__ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: .75rem;
+    color: var(--bs-secondary-color, #727492);
+}
+
+.next-step-bar__legend {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin: .5rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: .875rem;
+}
+
+.next-step-bar__legend li {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+}
+
+.next-step-bar__key {
+    flex: none;
+    width: .875rem;
+    height: .625rem;
+    border-radius: 2px;
+}
+
+.next-step-bar__key--used {
+    background: linear-gradient(90deg, var(--bs-tertiary, #000091) 50%, rgba(0, 0, 145, .35) 50%);
+}
+
+.next-step-bar__key--added {
+    border: 1px dashed var(--bs-warning, #b34000);
+    background-color: rgba(179, 64, 0, .2);
+}
+
+.next-step-bar__key--contract {
+    width: 0;
+    border-left: 2px dashed var(--bs-body-color, #000638);
+    border-radius: 0;
+}
+
+.next-step-bar__key--today {
+    width: 0;
+    border-left: 2px solid var(--bs-body-color, #000638);
+    border-radius: 0;
+}
+
