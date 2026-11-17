@@ -427,9 +427,12 @@ def search_services_results(request, template_name="search/services/results.html
     if form.is_valid():
         city = form.cleaned_data["city"]
         keyword = form.cleaned_data["keyword"]
-        thematics = [
-            t.value for t in data_inclusion_v1.Thematique
-        ]  # FIXME(ewen): thematics filter is temporarily deactivated
+        if categories := form.cleaned_data["categories"]:
+            thematics = [
+                t.value for t in data_inclusion_v1.Thematique if any([t.value.startswith(c) for c in categories])
+            ]
+        else:
+            thematics = [t.value for t in data_inclusion_v1.Thematique]
         reception = form.cleaned_data["reception"]
         if reception == form.RECEPTION_ALL_VALUE:
             reception = ""
