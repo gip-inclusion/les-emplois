@@ -368,6 +368,9 @@ def test_create_pro_support_report_for_an_unknown_authorized_prescriber(client, 
 
     response = client.post(create_url(contract.job_seeker), data=REPORT_DATA | {"prescriber_email": email_factory()})
     assertContains(response, UNKNOWN_AUTHORIZED_PRESCRIBER)
+    # Also listed above the form, which the page scrolls to.
+    form_errors = parse_response_to_soup(response, selector="[data-emplois-give-focus-if-exist]")
+    assert UNKNOWN_AUTHORIZED_PRESCRIBER in form_errors.get_text()
     assert not ProSupportReport.objects.exists()
 
 
