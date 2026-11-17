@@ -862,6 +862,26 @@ def test_create_suspension_with_no_approval_does_raise_500(admin_client):
     assert response.status_code == 200
 
 
+def suspension_admin_form_data(suspension):
+    return {
+        "approval": suspension.approval.pk,
+        "siae": suspension.siae.pk,
+        "reason": suspension.reason,
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": 0,
+        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": 1,
+        "utils-pksupportremark-content_type-object_id-0-remark": "",
+        "utils-pksupportremark-content_type-object_id-0-id": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+    }
+
+
+def warning_messages(response):
+    return [message.message for message in response.context["messages"] if message.level == messages.WARNING]
+
+
 @freeze_time("2025-06-20", tick=False)
 def test_suspension_form(admin_client):
     initial_start_date = datetime(2025, 6, 1, tzinfo=UTC)
@@ -876,19 +896,7 @@ def test_suspension_form(admin_client):
     response = admin_client.get(url)
     assert response.status_code == 200
 
-    basic_data = {
-        "approval": suspension.approval.pk,
-        "siae": suspension.siae.pk,
-        "reason": suspension.reason,
-        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
-        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": 0,
-        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": 1,
-        "utils-pksupportremark-content_type-object_id-0-remark": "",
-        "utils-pksupportremark-content_type-object_id-0-id": "",
-        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
-        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
-    }
+    basic_data = suspension_admin_form_data(suspension)
 
     # No retroactivity: new suspension.start at > suspension.created_at
     new_start_date = datetime(2025, 6, 20, tzinfo=UTC)
@@ -927,6 +935,137 @@ def test_suspension_form(admin_client):
     assert suspension.start_at == new_start_date.date()
     assert suspension.end_at == new_end_date.date()
     assert suspension.updated_at == timezone.now()
+
+
+@freeze_time("2025-09-20", tick=False)
+def test_suspension_form_shortened_by_a_later_hiring(admin_client):
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        with_approval=True,
+        hiring_start_at=date(2025, 9, 18),
+        approval__start_at=date(2025, 2, 1),
+    )
+    initial_start_at = date(2025, 9, 14)
+    end_at = date(2025, 9, 17)
+    suspension = SuspensionFactory(
+        approval=job_application.approval,
+        reason=Suspension.Reason.BROKEN_CONTRACT,
+        start_at=initial_start_at,
+        end_at=end_at,
+        created_at=datetime(2025, 9, 14, tzinfo=UTC),
+    )
+    url = reverse("admin:approvals_suspension_change", args=(suspension.pk,))
+
+    def post(start_at, end_at=end_at, reason=Suspension.Reason.BROKEN_CONTRACT):
+        response = admin_client.post(
+            url,
+            data=suspension_admin_form_data(suspension)
+            | {
+                "reason": reason,
+                "start_at": start_at.strftime("%d/%m/%Y"),
+                "initial-start_at": suspension.start_at.strftime("%d/%m/%Y"),
+                "end_at": end_at.strftime("%d/%m/%Y"),
+                "initial-end_at": suspension.end_at.strftime("%d/%m/%Y"),
+            },
+            follow=True,
+        )
+        assertRedirects(response, reverse("admin:approvals_suspension_changelist"))
+        suspension.refresh_from_db()
+        return warning_messages(response)
+
+    # The start date is not modified: no warning
+    assert post(initial_start_at, reason=Suspension.Reason.FINISHED_CONTRACT) == []
+    assert suspension.reason == Suspension.Reason.FINISHED_CONTRACT
+
+    # The start date is modified and precedes the minimum date: saved, with a warning
+    new_start_at = date(2025, 9, 12)
+    assert post(new_start_at) == [
+        "La date de début (12/09/2025) précède la date minimum autorisée pour les employeurs (18/09/2025) : "
+        "vérifiez la cohérence avec les embauches et les suspensions précédentes."
+    ]
+    assert suspension.start_at == new_start_at
+    assert suspension.end_at == end_at
+
+    # The start date is modified and respects the minimum date: no warning
+    new_start_at = date(2025, 9, 19)
+    assert post(new_start_at, end_at=new_start_at) == []
+    assert suspension.start_at == new_start_at
+    assert suspension.end_at == new_start_at
+
+
+@freeze_time("2025-09-20", tick=False)
+def test_suspension_form_moved_to_another_approval(admin_client):
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        with_approval=True,
+        hiring_start_at=date(2025, 9, 18),
+        approval__start_at=date(2025, 2, 1),
+    )
+    suspension = SuspensionFactory(
+        approval__start_at=date(2025, 2, 1),
+        start_at=date(2025, 9, 10),
+        end_at=date(2025, 9, 12),
+    )
+
+    response = admin_client.post(
+        reverse("admin:approvals_suspension_change", args=(suspension.pk,)),
+        data=suspension_admin_form_data(suspension)
+        | {
+            "approval": job_application.approval.pk,
+            "start_at": "10/09/2025",
+            "initial-start_at": "10/09/2025",
+            "end_at": "12/09/2025",
+            "initial-end_at": "12/09/2025",
+        },
+        follow=True,
+    )
+
+    assertRedirects(response, reverse("admin:approvals_suspension_changelist"))
+    suspension.refresh_from_db()
+    assert suspension.approval == job_application.approval
+    assert warning_messages(response) == [
+        "La date de début (10/09/2025) précède la date minimum autorisée pour les employeurs (18/09/2025) : "
+        "vérifiez la cohérence avec les embauches et les suspensions précédentes."
+    ]
+
+
+@freeze_time("2025-09-20", tick=False)
+@pytest.mark.parametrize(
+    "hiring_start_at,start_at",
+    [
+        pytest.param(date(2025, 9, 18), date(2025, 9, 17), id="backdated"),
+        pytest.param(date(2025, 9, 25), date(2025, 9, 20), id="default_start_date"),
+    ],
+)
+def test_suspension_form_cannot_create_before_min_start_at(admin_client, hiring_start_at, start_at):
+    job_application = JobApplicationFactory(
+        sent_by_prescriber_alone=True,
+        with_approval=True,
+        hiring_start_at=hiring_start_at,
+        approval__start_at=date(2025, 2, 1),
+    )
+    new_suspension = Suspension(
+        approval=job_application.approval,
+        siae=job_application.to_company,
+        reason=Suspension.Reason.BROKEN_CONTRACT,
+    )
+
+    response = admin_client.post(
+        reverse("admin:approvals_suspension_add"),
+        data=suspension_admin_form_data(new_suspension)
+        | {
+            "start_at": start_at.strftime("%d/%m/%Y"),
+            "initial-start_at": "20/09/2025",
+            "end_at": start_at.strftime("%d/%m/%Y"),
+            "initial-end_at": "20/09/2025",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.context["adminform"].form.errors == {
+        "start_at": [f"La date de début minimum est : {hiring_start_at:%d/%m/%Y}."]
+    }
+    assert not Suspension.objects.exists()
 
 
 class TestAutomaticApprovalAdminViews:

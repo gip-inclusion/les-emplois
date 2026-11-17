@@ -455,7 +455,8 @@ class SuspensionForm(forms.ModelForm):
     """
     Create or edit a suspension.
 
-    Suspension.clean() will handle the validation.
+    Suspension.clean() handles the validation, but only enforces the minimum start date on creation:
+    clean_start_at() also enforces it when an employer edits a suspension.
     """
 
     set_default_end_date = forms.BooleanField(
