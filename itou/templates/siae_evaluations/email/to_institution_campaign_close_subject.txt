@@ -1,4 +1,2 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-[Contrôle a posteriori] Notification des sanctions
-{% endblock %}
+{% block subject %}[Contrôle a posteriori] Notification des sanctions{% endblock %}
