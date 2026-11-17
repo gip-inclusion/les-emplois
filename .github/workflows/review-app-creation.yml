@@ -27,6 +27,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ github.head_ref }}
+        persist-credentials: false
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
@@ -95,9 +96,10 @@ jobs:
         $CLEVER_CLI deploy --branch "$BRANCH" --alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
-      run: gh pr comment ${{ github.event.pull_request.number }} --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
+      run: gh pr comment "$PR_NUMBER" --body "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://$DEPLOY_URL)"
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
 
   redeploy:
     runs-on: ubuntu-latest
@@ -110,6 +112,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ github.head_ref }}
+        persist-credentials: false
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
