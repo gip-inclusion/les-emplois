@@ -1413,21 +1413,24 @@ class ProSupportReport(models.Model):
     def author_has_left(self):
         return self.company_id is not None and not self.company.has_member(self.author)
 
-    def notify_authorized_prescriber(self):
+    def get_last_authorized_prescriber_assignment(self, professional_id=None):
         from itou.users.models import JobSeekerAssignment
+
+        assignments = JobSeekerAssignment.objects.filter(
+            job_seeker_id=self.job_seeker_id,
+            prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+        if professional_id is not None:
+            assignments = assignments.filter(professional_id=professional_id)
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        return (
+            assignments.select_related("professional", "prescriber_organization").order_by("-last_action_at").first()
+        )
+
+    def notify_authorized_prescriber(self):
         from itou.users.notifications import ProSupportReportCreatedNotification
 
-        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
-        assignment = (
-            JobSeekerAssignment.objects.filter(
-                job_seeker_id=self.job_seeker_id,
-                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-            )
-            .select_related("professional", "prescriber_organization")
-            .order_by("-last_action_at")
-            .first()
-        )
-        if assignment:
+        if assignment := self.get_last_authorized_prescriber_assignment():
             self.notified_prescriber = assignment.professional
             self.save(update_fields=["notified_prescriber"])
             ProSupportReportCreatedNotification(
