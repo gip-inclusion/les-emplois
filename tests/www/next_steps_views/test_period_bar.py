@@ -213,6 +213,31 @@ def test_situation_bar():
 
 
 @freeze_time("2026-11-16")
+def test_situation_bar_clips_a_suspension_outside_the_approval():
+    # The application refuses it, but older or imported data may hold a suspension starting before the PASS IAE.
+    approval = ApprovalFactory(start_at=datetime.date(2025, 8, 1), end_at=datetime.date(2027, 7, 31))
+    SuspensionFactory(approval=approval, start_at=datetime.date(2024, 1, 1), end_at=datetime.date(2025, 9, 1))
+    approval.refresh_from_db()
+
+    bar = situation_bar(approval, [], where)
+
+    # Only the part within the PASS IAE is on the strip: the blocks follow each other, the PASS IAE's start first.
+    assert [(block.kind, block.start, block.end) for block in bar.blocks] == [
+        ("suspension", datetime.date(2025, 8, 1), datetime.date(2025, 9, 1)),
+        ("pass", datetime.date(2025, 9, 2), approval.end_at),
+    ]
+    assert edges(bar) == [
+        ("01/08/2025", "Début"),
+        ("01/09/2025", "Au"),
+        (f"{approval.end_at:%d/%m/%Y}", "Fin prévue"),
+    ]
+    # The dates the database holds are not hidden.
+    assert [(note.text, note.variant) for note in bar.notes] == [
+        (f"Suspension du 01/01/2024 au 01/09/2025 enregistrée en partie hors du PASS{NBSP}IAE", "warn"),
+    ]
+
+
+@freeze_time("2026-11-16")
 def test_situation_bar_expired_or_empty():
     approval = ApprovalFactory(start_at=datetime.date(2023, 2, 1), end_at=datetime.date(2025, 1, 31))
 

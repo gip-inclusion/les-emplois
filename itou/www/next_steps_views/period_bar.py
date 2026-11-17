@@ -295,6 +295,8 @@ def situation_bar(approval, contracts, where):
     Returns None when there is nothing to show.
     """
     blocks = []
+    # Suspensions shown only in part, said in a note so that the strip does not hide a date the database holds.
+    clipped = []
     if approval is not None:
         expired = approval.end_at < timezone.localdate()
         kind = "expired" if expired else "pass"
@@ -302,29 +304,37 @@ def situation_bar(approval, contracts, where):
         cursor = approval.start_at
         pieces = []
         for suspension in sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at):
-            if suspension.start_at > cursor:
-                pieces.append(Block(kind, label, "", cursor, suspension.start_at - datetime.timedelta(days=1)))
+            # Within the PASS IAE and after the previous suspension: the application refuses anything else, but older
+            # or imported data may hold it, and the blocks would overlap.
+            start, end = max(suspension.start_at, cursor), min(suspension.end_at, approval.end_at)
+            if (start, end) != (suspension.start_at, suspension.end_at):
+                outside = suspension.start_at < approval.start_at or suspension.end_at > approval.end_at
+                clipped.append((suspension, f"en partie hors du {PASS_IAE}" if outside else "sur une autre"))
+            if start > end:
+                continue
+            if start > cursor:
+                pieces.append(Block(kind, label, "", cursor, start - datetime.timedelta(days=1)))
             pieces.append(
                 Block(
                     "suspension",
                     "Suspension",
-                    short_duration(suspension.start_at, suspension.end_at),
-                    suspension.start_at,
-                    suspension.end_at,
-                    left=Edge(suspension.start_at, "Du"),
-                    right=Edge(suspension.end_at, "Au"),
+                    short_duration(start, end),
+                    start,
+                    end,
+                    left=Edge(start, "Du"),
+                    right=Edge(end, "Au"),
                 )
             )
-            cursor = suspension.end_at + datetime.timedelta(days=1)
+            cursor = end + datetime.timedelta(days=1)
         if cursor <= approval.end_at:
             pieces.append(Block(kind, label, "", cursor, approval.end_at))
         for piece in pieces:
             if piece.kind != "suspension":
                 piece.duration = short_duration(piece.start, piece.end)
-        passes = [piece for piece in pieces if piece.kind != "suspension"]
-        if passes:
-            passes[0].left = Edge(approval.start_at, "Début")
-            passes[-1].right = Edge(approval.end_at, "Fin" if expired else "Fin prévue")
+        # The PASS IAE's dates go under the strip's ends, whatever block is there.
+        if pieces:
+            pieces[0].left = Edge(approval.start_at, "Début")
+            pieces[-1].right = Edge(approval.end_at, "Fin" if expired else "Fin prévue")
         blocks += pieces
         pending = [
             request
@@ -342,7 +352,15 @@ def situation_bar(approval, contracts, where):
                     right=Edge(request.end_at, "Fin demandée"),
                 )
             )
-    notes = [_contract_note(contract, where) for contract in contracts]
+    notes = [
+        Note(
+            f"Suspension du {_fr(suspension.start_at)} au {_fr(suspension.end_at)} enregistrée {where_}",
+            variant="warn",
+            icon="ri-error-warning-line",
+        )
+        for suspension, where_ in clipped
+    ]
+    notes += [_contract_note(contract, where) for contract in contracts]
     if not blocks and not notes:
         return None
     if blocks:
