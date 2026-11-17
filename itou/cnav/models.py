@@ -18,8 +18,6 @@ class CNAVRecord(models.Model):
     profile = models.ForeignKey(JobSeekerProfile, null=True, on_delete=models.SET_NULL, related_name="cnav_records")
 
     input_data = models.JSONField(encoder=DjangoJSONEncoder)
-
-    # Result (duh)
     result = models.JSONField(encoder=DjangoJSONEncoder)
 
     last_attempt_at = models.DateTimeField(null=True)
@@ -46,7 +44,7 @@ class CNAVRecord(models.Model):
 # Lors de la création d'un compte candidat: on crée cet objet dès que toutes les informations sont récupérées,
 # on stocke la pk de cet objet dans la session et on enqueue la tache on_commit.
 # A la dernière étape, si l'usager est bien créé, on rattache l'objet à l'usager (quelque soit le résultat de l'appel
-# à la CNAV.
+# à la CNAV).
 # Si:
 #   - le pro a le droit de voir les infos de la CNAV
 #   - la CNAV a déjà répondu à notre appel
