@@ -1562,17 +1562,23 @@ class TestWebauthnSurvey:
         assertContains(response, "matomo-custom-init")
         assert self.get_survey_scripts(response) == []
 
-    def test_authenticated(self, client):
-        user = JobSeekerFactory()
+    @pytest.mark.parametrize(
+        "user_factory,expected",
+        [(JobSeekerFactory, False), (random_pro_user_factory, True)],
+        ids=("job_seeker", "pro"),
+    )
+    def test_authenticated(self, client, user_factory, expected):
+        user = user_factory()
         client.force_login(user)
         response = client.get(reverse("dashboard:index"), follow=True)
-        [script] = self.get_survey_scripts(response)
-        assert script["data-emplois-user-id"] == str(user.pk)
+        assertContains(response, "matomo-custom-init")
+        scripts = self.get_survey_scripts(response)
+        assert [script["data-emplois-user-id"] for script in scripts] == ([str(user.pk)] if expected else [])
 
     def test_hijacked(self, client):
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
-        client.post(reverse("hijack:acquire"), {"user_pk": JobSeekerFactory().pk, "next": "/"})
+        client.post(reverse("hijack:acquire"), {"user_pk": random_pro_user_factory().pk, "next": "/"})
         response = client.get(reverse("dashboard:index"), follow=True)
         assertContains(response, "matomo-custom-init")
         assert self.get_survey_scripts(response) == []
