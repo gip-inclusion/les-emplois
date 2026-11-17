@@ -14,15 +14,19 @@ jobs:
     environment: demo
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: 🤝 Set the private key for Clever SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}
         run: |
           mkdir ~/.ssh
           echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIEG+zB8Lo9ByLS5JSC8zIGQhVOAyWMHbmppafWEz8LSsz7a+IdvpBriDMamtn4OmchdQm+Y1GlTgsKB7rIM4HYtBNe0FPeMsveL6GQ/y9ztOLBKES05XOLbyZhCA2ZfXlx5SJT/5n+2SsArrcPlNkA/HWO+RyugZhApkrxmfvzLBosbE0hgts0ZJ/JbpQElYou49kDN3WwlrgYDfv6cn2r1K9No+CIvhu7ESOEG/NV+z42Fu9ZtANJiGKEBotXGwKU64cQdGvCA2CP87Yg1DSRQIpTs6OVRfEABXJ/SExtbGEuesdx/xEYIgiFdc1+7jYEtqEB+WpenWIZp8r9Cq3" >> ~/.ssh/known_hosts
           echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsvDx3AczrEJoF7WdyL8JaOTywQs3vR1AOEKW/i/Jlh" >>~/.ssh/known_hosts
           touch ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}" >~/.ssh/id_ed25519
+          echo "$SSH_PRIVATE_KEY" >~/.ssh/id_ed25519
 
       - name: ⏬ Install Clever Tools
         uses: ./.github/actions/clever-cli

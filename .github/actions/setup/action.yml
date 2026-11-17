@@ -15,7 +15,9 @@ runs:
           ALTER SYSTEM SET synchronous_commit=off;
           ALTER SYSTEM SET full_page_writes=off;
         SQL
-        docker kill --signal=SIGHUP ${{ job.services.postgres.id }}
+        docker kill --signal=SIGHUP "$POSTGRES_CONTAINER_ID"
+      env:
+        POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
       shell: bash
     # The Ubuntu mirror regularly slows down to a few kB/s: cache the packages.
     # PRs and the merge queue only restore their own caches and the ones created on main.
