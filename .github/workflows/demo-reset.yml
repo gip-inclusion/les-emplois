@@ -7,12 +7,6 @@ on:
 
 permissions: {}
 
-env:
-  ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
-  BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
-  DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
-  BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
-
 jobs:
   reset:
     runs-on: ubuntu-latest
@@ -35,6 +29,11 @@ jobs:
           secret: ${{ secrets.DEMO_CLEVER_SECRET }}
 
       - name: 🧫 Reset the demo environment on CleverCloud
+        env:
+          ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
+          BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
+          DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
+          BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
         run: |
           $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
           OUTPUT_FILE=$(mktemp)
