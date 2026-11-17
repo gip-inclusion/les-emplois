@@ -130,11 +130,17 @@ class Step:
     submit_label: str = "Continuer"
     # A step that hands over to an existing screen instead of submitting: (label, url).
     handover: tuple | None = None
+    # Whether the step's template shows the journey's facts itself, instead of above the question.
+    facts_in_template: bool = False
     # The question the step asks, a hint below it, how its fields are shown, and context boxes.
     question: str = ""
     hint: str = ""
     layout: dict = dataclasses.field(default_factory=dict)
     boxes: list = dataclasses.field(default_factory=list)
+
+    def __post_init__(self):
+        if self.template in (FACTS_TEMPLATE, "next_steps/journeys/application.html"):
+            self.facts_in_template = True
 
 
 @dataclasses.dataclass
@@ -166,6 +172,10 @@ class Journey:
 
     def steps(self, data):
         raise NotImplementedError
+
+    def steps_known(self, data):
+        """Whether the steps are all known yet: some depend on an answer to come."""
+        return True
 
     def recap(self, forms):
         """(label, value) pairs shown on a confirmation step."""
@@ -471,14 +481,17 @@ class JobApplicationJourney(Journey):
         self.company = request.current_organization
         self.job_application = get_object_or_404(
             JobApplication.objects.is_active_company_member(request.user)
+            .visible_by_employers()
             .filter(to_company=self.company)
             .select_related(
                 "job_seeker",
                 "job_seeker__jobseeker_profile",
                 "to_company",
+                "sender",
                 "sender_prescriber_organization",
                 "sender_company",
-            ),
+            )
+            .prefetch_related("selected_jobs__appellation"),
             pk=pk,
         )
         self.job_seeker = self.job_application.job_seeker
@@ -495,13 +508,80 @@ class JobApplicationJourney(Journey):
             self.company.is_subject_to_iae_rules and self.company.get_active_suspension_text_with_dates()
         )
 
+    def _sender_display(self):
+        job_application = self.job_application
+        if job_application.sender_kind == SenderKind.JOB_SEEKER:
+            return "La personne elle-même"
+        organization = job_application.sender_prescriber_organization or job_application.sender_company
+        names = [job_application.sender.get_full_name() if job_application.sender else None]
+        names.append(organization.display_name if organization else None)
+        return ", ".join(name for name in names if name)
+
     def facts(self):
         job_application = self.job_application
-        facts = [("Reçue le", _fr(job_application.created_at)), ("Statut", job_application.get_state_display())]
-        sender = job_application.sender_prescriber_organization or job_application.sender_company
-        if sender:
-            facts.append(("Envoyée par", sender.display_name))
-        return facts
+        jobs = [job_description.display_name for job_description in job_application.selected_jobs.all()]
+        return [
+            ("Reçue le", _fr(job_application.created_at)),
+            ("Envoyée par", self._sender_display()),
+            ("Poste" if len(jobs) == 1 else "Postes", ", ".join(jobs) or "Candidature spontanée"),
+            ("Statut", job_application.get_state_display()),
+        ]
+
+    def _application_boxes(self):
+        """What to know before answering: an earlier contract with the company, and the eligibility."""
+        boxes = []
+        contracts = list(self.job_seeker.contracts.filter(company=self.company).order_by("-start_date"))
+        if contracts:
+            last = contracts[0]
+            text = f"Contrat du {_fr(last.start_date)}" + (f" au {_fr(last.end_date)}" if last.end_date else "")
+            if len(contracts) > 1:
+                text += f", et {len(contracts) - 1} contrat{'s' if len(contracts) > 2 else ''} avant."
+            boxes.append(Box(text, title="Déjà en contrat chez vous"))
+        if not self.company.is_subject_to_iae_rules:
+            return boxes
+        approval = self.job_seeker.latest_approval
+        diagnosis = self.eligibility_diagnosis
+        if self.job_seeker.has_valid_approval:
+            boxes.append(
+                Box(
+                    f"Valide jusqu’au {_fr(approval.end_at)}. L’embauche ne demande pas de nouveau diagnostic.",
+                    title=f"{PASS_IAE} {approval.number_with_spaces}",
+                    variant="ok",
+                )
+            )
+        elif self.blocked_by_waiting_period:
+            # Same rule as apply.views.accept_views.check_waiting_period: hiring is not offered.
+            boxes.append(
+                Box(
+                    f"Son {PASS_IAE} a expiré le {_fr(approval.end_at)}. Jusqu’au {_fr(approval.waiting_period_end)}, "
+                    "seul un prescripteur habilité peut valider à nouveau son éligibilité.",
+                    title="Éligibilité à revalider",
+                    variant="warn",
+                )
+            )
+        elif diagnosis and diagnosis.is_considered_valid:
+            author = diagnosis.author_organization.display_name if diagnosis.author_organization else None
+            boxes.append(
+                Box(
+                    (f"Par {author}, " if author else "")
+                    + f"valable jusqu’au {_fr(diagnosis.considered_to_expire_at)}.",
+                    title="Éligibilité validée",
+                    variant="ok",
+                )
+            )
+        else:
+            boxes.append(
+                Box(
+                    f"Aucun diagnostic valide{NBSP}: vous sélectionnerez les critères administratifs "
+                    "au moment d’embaucher.",
+                    title="Éligibilité à établir",
+                    variant="warn",
+                )
+            )
+        return boxes
+
+    def steps_known(self, data):
+        return bool(data.get("decision"))
 
     def _choices(self):
         job_application = self.job_application
@@ -611,13 +691,19 @@ class JobApplicationJourney(Journey):
             "refuse": (None, f"Statut{NBSP}: {JobApplicationState.REFUSED.label}, avec un motif et un message"),
         }
         steps = [
+            # As in the prototype: what to know before answering, then the answer.
+            Step(
+                "La candidature",
+                template="next_steps/journeys/application.html",
+                question="Ce qu’il faut savoir avant de répondre",
+                boxes=self._application_boxes(),
+            ),
             Step(
                 "Votre réponse",
                 "decision",
-                template="next_steps/journeys/decision.html",
                 question="Votre réponse",
                 layout={"decision": Show("options", decision_choices)},
-            )
+            ),
         ]
         match data.get("decision"):
             case "postpone":
@@ -751,9 +837,14 @@ class JobApplicationJourney(Journey):
         return lines
 
     def context(self):
+        job_application = self.job_application
         return {
-            "details_url": reverse(
-                "apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}
+            "details_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            "application_message": job_application.message,
+            "resume_url": (
+                reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk})
+                if job_application.resume_id
+                else None
             ),
             "criteria_levels": CRITERIA_LEVELS,
             "criteria_filled_from_job_seeker": None,
@@ -970,6 +1061,9 @@ class ProlongationJourney(Journey):
                 )
             )
         return steps
+
+    def steps_known(self, data):
+        return bool(data.get("decision"))
 
     def recap(self, forms):
         prolongation_request = self.prolongation_request

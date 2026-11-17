@@ -9,9 +9,11 @@
         </span>
         <div>
             {% if not hide_job_seeker %}
-                <a class="fw-bold" href="{% url "next_steps_views:job_seeker" public_id=action.job_seeker.public_id %}">
-                    {{ action.job_seeker.get_inverted_full_name|mask_unless:action.user_can_view_personal_information }}
-                </a>
+                {# As in the prototype: the name, then the age and the city. #}
+                <p class="next-step__who fs-sm text-muted mb-1">
+                    <a class="link-tertiary fw-bold" href="{% url "next_steps_views:job_seeker" public_id=action.job_seeker.public_id %}">{{ action.job_seeker.get_inverted_full_name|mask_unless:action.user_can_view_personal_information }}</a>
+                    {% if action.job_seeker_details %}<span>{{ action.job_seeker_details }}</span>{% endif %}
+                </p>
             {% endif %}
             <p class="h4 mb-1">{{ action.title }}</p>
             <p class="fs-sm text-muted mb-0">{{ action.reason }}</p>

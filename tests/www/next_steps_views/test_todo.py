@@ -1,4 +1,5 @@
 import datetime
+import types
 
 import pytest
 from django.urls import reverse
@@ -8,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.job_applications.enums import JobApplicationState
 from itou.rdv_insertion.models import Participation
-from itou.www.next_steps_views.actions import Group, Kind
+from itou.www.next_steps_views.actions import Group, Kind, describe_job_seekers
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -330,3 +331,30 @@ def test_unauthorized_prescriber_has_no_iae_actions(client, settings):
     response = client.get(TODO_URL)
     assert summary(response) == []
     assertContains(response, "Rien ne vous attend")
+
+
+def test_actions_say_who_they_are_about(client, settings, employer_membership):
+    settings.NEXT_STEPS_FOR_EVERYONE = True
+    job_seeker = JobSeekerFactory(
+        city="Vénissieux", jobseeker_profile__birthdate=timezone.localdate() - datetime.timedelta(days=37 * 366)
+    )
+    JobApplicationFactory(
+        job_seeker=job_seeker,
+        to_company=employer_membership.company,
+        state=JobApplicationState.NEW,
+        sent_by_authorized_prescriber=True,
+    )
+    client.force_login(employer_membership.user)
+
+    response = client.get(TODO_URL)
+    # As in the prototype: the name in tertiary blue, then the age and the city.
+    assertContains(response, 'class="link-tertiary fw-bold"')
+    assertContains(response, f"<span>{job_seeker.jobseeker_profile.age} ans · Vénissieux</span>", html=True)
+
+
+def test_masked_job_seekers_show_no_age_nor_city():
+    job_seeker = JobSeekerFactory(city="Vénissieux")
+    action = types.SimpleNamespace(job_seeker=job_seeker)
+    describe_job_seekers([action], lambda job_seeker: False)
+    assert action.job_seeker_details == ""
+    assert action.user_can_view_personal_information is False

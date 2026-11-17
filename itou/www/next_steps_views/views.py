@@ -10,7 +10,6 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
-    add_user_can_view_personal_information,
     can_fill_pro_support_report,
     can_view_pro_support_report,
 )
@@ -19,7 +18,7 @@ from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
-from itou.www.next_steps_views.actions import Group, expected_actions, group_actions
+from itou.www.next_steps_views.actions import Group, describe_job_seekers, expected_actions, group_actions
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.situation import situation_sentences
 from itou.www.next_steps_views.timeline import build_timeline
@@ -41,9 +40,7 @@ def todo(request, template_name="next_steps/todo.html"):
         raise Http404
 
     actions = expected_actions(request)
-    add_user_can_view_personal_information(
-        actions, lambda job_seeker: can_view_personal_information(request, job_seeker)
-    )
+    describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
     context = {
         "groups": group_actions(actions),
         "pressing_count": sum(action.group != Group.WATCH for action in actions),
@@ -133,8 +130,7 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
     )
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
-    for action in actions:
-        action.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
+    describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
 
     context = {
         "job_seeker": job_seeker,

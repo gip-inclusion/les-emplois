@@ -11,7 +11,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
             {% endif %}
         </div>
-        {% if not result and steps|length > 1 %}
+        {% if not result and steps|length > 1 or not result and not steps_known %}
             <div class="c-stepper mt-3 mb-0">
                 <div class="progress">
                     <div class="progress-bar progress-bar-{{ progress }}"
@@ -22,7 +22,8 @@
                          aria-labelledby="next-step-journey-progress"></div>
                 </div>
                 <p id="next-step-journey-progress" class="mb-0">
-                    <strong>Étape {{ step_number }}</strong>/{{ steps|length }}&nbsp;: {{ step.label }}
+                    {# The total only once the path is known: it may depend on an answer to come. #}
+                    <strong>Étape {{ step_number }}</strong>{% if steps_known %}/{{ steps|length }}{% endif %}&nbsp;: {{ step.label }}
                 </p>
             </div>
         {% endif %}
@@ -63,7 +64,7 @@
             {% for name, value in carried %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
             <div class="next-step-journey__body">
                 {# As in the prototype: the facts first, then the question the step asks, then its fields. #}
-                {% if is_first_step and facts and step.template != "next_steps/journeys/facts.html" %}
+                {% if is_first_step and facts and not step.facts_in_template %}
                     {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
                 {% endif %}
                 {% if step.question %}<p class="next-step-journey__question">{{ step.question }}</p>{% endif %}

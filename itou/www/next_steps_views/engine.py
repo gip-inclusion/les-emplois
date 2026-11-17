@@ -127,6 +127,12 @@ def run(journey, data):
     field_names = _field_names(step, forms)
     shown = sorted(_shown_fields(data) | set(field_names))
     visible = [name for name in field_names if form and not form.fields[name].widget.is_hidden]
+    steps_known = journey.steps_known(data)
+    if steps_known:
+        progress = math.floor((index + 1) / len(steps) * 100)
+    else:
+        # The total depends on an answer to come: a fifth of the way per step, never full.
+        progress = min(20 * (index + 1), 80)
     return {
         "journey": journey,
         "job_seeker": journey.job_seeker,
@@ -136,7 +142,8 @@ def run(journey, data):
         "step_index": index,
         "step_number": index + 1,
         "is_first_step": index == 0,
-        "progress": math.floor((index + 1) / len(steps) * 100),
+        "progress": progress,
+        "steps_known": steps_known,
         "form": form,
         "fields": [form[name] for name in visible],
         # Each visible field with how the step shows it (see journeys.Show).

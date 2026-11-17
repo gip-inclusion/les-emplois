@@ -8,6 +8,7 @@ import dataclasses
 import datetime
 import enum
 
+from django.db.models import prefetch_related_objects
 from django.urls import reverse
 from django.utils import timezone
 
@@ -28,6 +29,9 @@ from itou.www.job_seekers_views.views import _pro_support_request_company_email
 PRO_SUPPORT_REPORT_TO_READ_DAYS = 30
 # Older appointments with an undetermined status are left out: the queue is about what can still be acted upon.
 APPOINTMENT_STATUS_TO_SPECIFY_DAYS = 30
+
+
+NBSP = " "
 
 
 class Group(enum.StrEnum):
@@ -417,6 +421,21 @@ def expected_actions(request):
     for index, action in enumerate(actions):
         action.uid = f"next-step-{index}"
     return actions
+
+
+def describe_job_seekers(actions, can_view_personal_information):
+    """Who each action is about, as in the prototype: the name, then the age and the city, if the user may see them."""
+    prefetch_related_objects([action.job_seeker for action in actions], "jobseeker_profile")
+    for action in actions:
+        job_seeker = action.job_seeker
+        action.user_can_view_personal_information = can_view_personal_information(job_seeker)
+        details = []
+        if action.user_can_view_personal_information:
+            if (age := job_seeker.jobseeker_profile.age) is not None:
+                details.append(f"{age}{NBSP}ans")
+            if job_seeker.city:
+                details.append(job_seeker.city)
+        action.job_seeker_details = " · ".join(details)
 
 
 def group_actions(actions):

@@ -396,6 +396,23 @@ table.table td > .modal .modal-content {
     font-size: 1.25rem;
 }
 
+/* Who an action is about: the name in tertiary blue, not underlined until hovered, then the age and the city. */
+.next-step__who {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem .625rem;
+    align-items: baseline;
+}
+
+.next-step__who a {
+    text-decoration: none;
+}
+
+.next-step__who a:hover,
+.next-step__who a:focus-visible {
+    text-decoration: underline;
+}
+
 /* Periods timeline: one row per lane, the track is an SVG stretched to the row width.
    Narrow screens scroll the timeline sideways rather than squeezing years together. */
 .next-step-timeline__scroll {
@@ -526,6 +543,15 @@ table.table td > .modal .modal-content {
     /* Room on the right for the floating cookie manager button, which would cover the main button. */
     padding: 1rem 4.5rem 1rem 1.5rem;
     border-top: 1px solid var(--bs-border-color, #e6e6eb);
+}
+
+/* Stepper widths missing from the shared progress-bar-* list: a hiring journey has six steps. */
+.next-step-journey .progress-bar-16 {
+    width: 16%;
+}
+
+.next-step-journey .progress-bar-83 {
+    width: 83%;
 }
 
 /* Guided journeys' forms, laid out as in the prototype: a question, a hint, choices as cards. */
