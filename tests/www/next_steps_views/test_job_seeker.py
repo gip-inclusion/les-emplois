@@ -202,7 +202,8 @@ def test_strip_and_barriers_for_employer(client):
     assertContains(response, "Freins à lever")
     assertContains(
         response,
-        f"Bilan d’accompagnement du {fr(timezone.localdate(report.created_at))} · {membership.company.display_name}",
+        f"Identifié le {fr(timezone.localdate(report.created_at))} dans le bilan d’accompagnement, "
+        f"par {report.author.get_full_name()} ({membership.company.display_name})",
     )
     assertContains(response, ProSupportReportBarrier.MOBILITY.label)
     assertContains(response, ProSupportReportBarrier.HEALTH.label)

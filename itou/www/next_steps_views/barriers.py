@@ -20,7 +20,7 @@ from itou.companies.enums import ProSupportReportBarrier
 from itou.eligibility.enums import AdministrativeCriteriaKind as Kind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.insertion.enums import OrientationStatus
-from itou.users.perms import can_view_pro_support_report
+from itou.users.perms import can_orient_towards_insertion_service, can_view_pro_support_report
 from itou.www.next_steps_views.advisors import visible_orientations
 
 
@@ -60,6 +60,17 @@ THEMATIC_BARRIERS = {
 
 ONGOING_ORIENTATIONS = [OrientationStatus.PENDING, OrientationStatus.ACCEPTED]
 
+# The data·inclusion category « Trouver une solution » searches services in.
+SEARCH_CATEGORIES = {
+    Barrier.MOBILITY: "mobilite",
+    Barrier.HEALTH: "sante",
+    Barrier.FAMILY: "famille",
+    Barrier.FINANCIAL: "difficultes-financieres",
+    Barrier.DIGITAL: "numerique",
+    Barrier.LEGAL: "difficultes-administratives-ou-juridiques",
+    Barrier.LITERACY: "lecture-ecriture-calcul",
+}
+
 
 def _fr(date):
     return f"{timezone.localdate(date):%d/%m/%Y}"
@@ -69,28 +80,23 @@ def _fr(date):
 class Clue:
     """Where a barrier comes from."""
 
-    # report, criterion, orientation, lifted (CSS modifiers and icons)
+    # report, criterion (to confirm), orientation (in progress), lifted: how the card shows it.
     kind: str
     text: str
     certified: bool = False
     url: str = ""
 
-    @property
-    def icon(self):
-        return {
-            "report": "ri-file-list-3-line",
-            "criterion": "ri-shield-check-line",
-            "orientation": "ri-signpost-line",
-            "lifted": "ri-checkbox-circle-line",
-        }[self.kind]
-
 
 @dataclasses.dataclass
 class Card:
     key: str
-    label: str
+    # In bold; above it, in small, the category when the name is the barrier itself (« Autre frein »).
+    name: str
+    category: str = ""
     clues: list = dataclasses.field(default_factory=list)
     in_progress: bool = False
+    # « Trouver une solution »: the services search for the barrier, around the job seeker.
+    search_url: str = ""
 
     @property
     def to_confirm(self):
@@ -112,15 +118,29 @@ class Barriers:
 
 
 def _reports(request, job_seeker):
-    reports = job_seeker.pro_support_reports.select_related("company").order_by("-created_at")
+    reports = job_seeker.pro_support_reports.select_related("company", "author").order_by("-created_at")
     if request.from_employer:
         reports = reports.filter(company=request.current_organization)
     return [report for report in reports[:2] if can_view_pro_support_report(request, report)]
 
 
 def _report_text(report):
-    by = f" · {report.company.display_name}" if report.company else ""
-    return f"Bilan d’accompagnement du {_fr(report.created_at)}{by}"
+    by = report.author.get_full_name() if report.author else ""
+    if report.company:
+        by = f"{by} ({report.company.display_name})" if by else report.company.display_name
+    return f"Identifié le {_fr(report.created_at)} dans le bilan d’accompagnement" + (f", par {by}" if by else "")
+
+
+def _search_url(request, job_seeker, key):
+    query = {"back_url": reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})}
+    if job_seeker.city_slug:
+        query["city"] = job_seeker.city_slug
+    if key in SEARCH_CATEGORIES:
+        query["category"] = SEARCH_CATEGORIES[key]
+    if can_orient_towards_insertion_service(request):
+        # As the existing job seeker page does: the search offers to orient this person.
+        query["job_seeker_public_id"] = job_seeker.public_id
+    return reverse("search:services_results", query=query)
 
 
 def _diagnoses(request, job_seeker, iae_eligibility_diagnosis):
@@ -140,8 +160,7 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
 
     def card(key):
         if key not in cards:
-            label = Barrier(key).label if key != OTHER else "Autres freins"
-            cards[key] = Card(key, label)
+            cards[key] = Card(key, Barrier(key).label)
         return cards[key]
 
     reports = _reports(request, job_seeker)
@@ -151,7 +170,7 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
         for key in latest.barriers:
             card(key).clues.append(Clue("report", _report_text(latest)))
         if latest.other_barrier:
-            card(OTHER).clues.append(Clue("report", f"{latest.other_barrier} · {_report_text(latest)}"))
+            cards[OTHER] = Card(OTHER, latest.other_barrier, "Autre frein", [Clue("report", _report_text(latest))])
         if len(reports) > 1:
             previous = reports[1]
             for key in previous.barriers:
@@ -160,7 +179,7 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                         Card(
                             key,
                             Barrier(key).label,
-                            [
+                            clues=[
                                 Clue(
                                     "lifted",
                                     f"Noté dans le bilan du {_fr(previous.created_at)}, "
@@ -181,8 +200,8 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                 card(key).clues.append(
                     Clue(
                         "criterion",
-                        f"Critère «{NBSP}{criterion.name}{NBSP}», "
-                        f"diagnostic d’éligibilité {name} du {_fr(diagnosis.created_at)}",
+                        f"critère «{NBSP}{criterion.name}{NBSP}» du diagnostic d’éligibilité {name} "
+                        f"du {_fr(diagnosis.created_at)}",
                         certified=selected.certified_at is not None,
                     )
                 )
@@ -190,7 +209,7 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
     orientations = (
         visible_orientations(request, job_seeker)
         .filter(status__in=ONGOING_ORIENTATIONS)
-        .select_related("service")
+        .select_related("service", "sender")
         .prefetch_related("service__thematics")
         .order_by("-created_at")
     )
@@ -205,20 +224,28 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
             url = reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.pk})
         for key in keys:
             card(key).in_progress = True
-            card(key).clues.insert(
-                0,
+            card(key).clues.append(
                 Clue(
                     "orientation",
-                    f"Orientation vers «{NBSP}{orientation.service.name}{NBSP}» du {_fr(orientation.created_at)} · "
-                    f"{orientation.get_status_display()}",
+                    f"orientation vers «{NBSP}{orientation.service.name}{NBSP}» le {_fr(orientation.created_at)}"
+                    + (f", par {orientation.sender.get_full_name()}" if orientation.sender else "")
+                    + f" · {orientation.get_status_display()}",
                     url=url,
-                ),
+                )
             )
+
+    for each in cards.values():
+        if any(clue.kind == "report" for clue in each.clues):
+            # Named in the latest report: the criteria hinting at it need no confirmation.
+            each.clues = [clue for clue in each.clues if clue.kind != "criterion"]
 
     order = [*Barrier.values, OTHER]
     ordered = sorted(cards.values(), key=lambda card: order.index(card.key))
+    to_work = [card for card in ordered if not card.in_progress and card.key not in lifted_keys]
+    for card_to_work in to_work:
+        card_to_work.search_url = _search_url(request, job_seeker, card_to_work.key)
     return Barriers(
-        to_work=[card for card in ordered if not card.in_progress and card.key not in lifted_keys],
+        to_work=to_work,
         in_progress=[card for card in ordered if card.in_progress],
         lifted=[card for card in lifted if card.key not in {c.key for c in ordered if c.in_progress}],
         report=latest,

@@ -87,7 +87,7 @@ def test_three_sources_in_three_columns(client, employer):
     assert keys(barriers.in_progress) == [Barrier.MOBILITY]
     # In the report before, no longer in the latest one.
     assert keys(barriers.lifted) == [Barrier.DIGITAL]
-    assertContains(response, f"Orientation vers « {orientation.service.name} »")
+    assertContains(response, f"orientation vers « {orientation.service.name} »")
     assertContains(response, "À confirmer", count=2)
 
 
@@ -123,3 +123,23 @@ def test_criteria_alone(client, employer):
     # The allowance hints at health and money; a low education level is too weak a hint.
     assert keys(barriers.to_work) == [Barrier.HEALTH, Barrier.FINANCIAL]
     assertContains(response, "Aucun bilan d’accompagnement pour le moment.")
+
+
+def test_find_a_solution_searches_services_around_the_job_seeker(client, employer):
+    job_seeker = JobSeekerFactory(with_address=True)
+    IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker, criteria_kinds=[Kind.PM])
+    client.force_login(employer)
+
+    response = page(client, job_seeker)
+    [card] = response.context["barriers"].to_work
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    assert card.search_url == reverse(
+        "search:services_results",
+        query={
+            "back_url": page_url,
+            "city": job_seeker.city_slug,
+            "category": "mobilite",
+            "job_seeker_public_id": job_seeker.public_id,
+        },
+    )
+    assertContains(response, "Trouver une solution")

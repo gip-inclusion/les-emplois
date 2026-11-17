@@ -2,43 +2,43 @@
 <section class="mb-5" aria-labelledby="next-steps-barriers">
     <h2 class="h3 mb-1" id="next-steps-barriers">Freins à lever</h2>
     <p class="fs-sm text-muted mb-3">
-        D’après les bilans d’accompagnement, les critères d’éligibilité et les orientations que vous pouvez consulter.
+        Ce qui empêche la personne d’avancer, et ce qui est déjà en route, d’après les bilans d’accompagnement, les critères d’éligibilité et les orientations que vous pouvez consulter.
         {% if not barriers.report %}Aucun bilan d’accompagnement pour le moment.{% endif %}
     </p>
     <div class="row g-3">
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">
-                    À travailler <span class="text-muted fw-normal">{{ barriers.to_work|length }}</span>
+                <h3 class="next-step-barriers__head">
+                    À travailler <small>{{ barriers.to_work|length }}</small>
                 </h3>
                 {% for card in barriers.to_work %}
                     {% include "next_steps/includes/barrier_card.html" with card=card only %}
                 {% empty %}
-                    <p class="fs-sm text-muted mb-0">Aucun frein repéré.</p>
+                    <p class="next-step-barriers__empty">Aucun</p>
                 {% endfor %}
             </div>
         </div>
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">
-                    En cours <span class="text-muted fw-normal">{{ barriers.in_progress|length }}</span>
+                <h3 class="next-step-barriers__head">
+                    En cours <small>{{ barriers.in_progress|length }}</small>
                 </h3>
                 {% for card in barriers.in_progress %}
                     {% include "next_steps/includes/barrier_card.html" with card=card only %}
                 {% empty %}
-                    <p class="fs-sm text-muted mb-0">Aucune orientation en cours vers un service qui lève un frein.</p>
+                    <p class="next-step-barriers__empty">Aucun</p>
                 {% endfor %}
             </div>
         </div>
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">
-                    Levés <span class="text-muted fw-normal">{{ barriers.lifted|length }}</span>
+                <h3 class="next-step-barriers__head">
+                    Levés <small>{{ barriers.lifted|length }}</small>
                 </h3>
                 {% for card in barriers.lifted %}
                     {% include "next_steps/includes/barrier_card.html" with card=card only %}
                 {% empty %}
-                    <p class="fs-sm text-muted mb-0">Un frein est levé quand il n’apparaît plus d’un bilan au suivant.</p>
+                    <p class="next-step-barriers__empty">Aucun</p>
                 {% endfor %}
             </div>
         </div>
