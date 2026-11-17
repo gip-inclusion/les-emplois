@@ -80,7 +80,7 @@ def _fr(date):
 class Clue:
     """Where a barrier comes from."""
 
-    # report, criterion (to confirm), orientation (in progress), lifted: how the card shows it.
+    # report, criterion, orientation (in progress), lifted: how the card shows it.
     kind: str
     text: str
     certified: bool = False
@@ -200,8 +200,8 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                 card(key).clues.append(
                     Clue(
                         "criterion",
-                        f"critère «{NBSP}{criterion.name}{NBSP}» du diagnostic d’éligibilité {name} "
-                        f"du {_fr(diagnosis.created_at)}",
+                        f"Repéré par le diagnostic d’éligibilité {name} du {_fr(diagnosis.created_at)}{NBSP}: "
+                        f"critère «{NBSP}{criterion.name}{NBSP}»",
                         certified=selected.certified_at is not None,
                     )
                 )

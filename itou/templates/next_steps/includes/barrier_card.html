@@ -3,12 +3,7 @@
     {% if card.category %}<span class="next-step-frein__cat">{{ card.category }}</span>{% endif %}
     <strong class="next-step-frein__name">{{ card.name }}</strong>
     {% for clue in card.clues %}
-        {% if clue.kind == "criterion" %}
-            <span class="next-step-frein__warn">
-                <b>À confirmer&nbsp;:</b> {{ clue.text }}
-                {% if clue.certified %}<span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>{% endif %}
-            </span>
-        {% elif clue.kind == "orientation" %}
+        {% if clue.kind == "orientation" %}
             <span class="next-step-frein__next">
                 <b>En cours&nbsp;:</b>
                 {% if clue.url %}
@@ -18,11 +13,13 @@
                 {% endif %}
             </span>
         {% else %}
-            <span class="next-step-frein__txt">{{ clue.text }}</span>
+            <span class="next-step-frein__txt">
+                {{ clue.text }}
+                {% if clue.certified %}<span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>{% endif %}
+            </span>
         {% endif %}
     {% endfor %}
     {% if card.search_url %}
-        <a class="btn btn-sm btn-outline-primary align-self-start mt-1"
-           href="{{ card.search_url }}">Trouver une solution</a>
+        <a class="btn btn-sm btn-primary align-self-start mt-1" href="{{ card.search_url }}">Trouver une solution</a>
     {% endif %}
 </article>

@@ -88,7 +88,7 @@ def test_three_sources_in_three_columns(client, employer):
     # In the report before, no longer in the latest one.
     assert keys(barriers.lifted) == [Barrier.DIGITAL]
     assertContains(response, f"orientation vers « {orientation.service.name} »")
-    assertContains(response, "À confirmer", count=2)
+    assertContains(response, "Repéré par le diagnostic d’éligibilité IAE", count=2)
 
 
 def test_the_latest_report_prevails_over_the_criteria(client, employer):
