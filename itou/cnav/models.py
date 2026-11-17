@@ -14,10 +14,16 @@ class CNAVRecord(models.Model):
         choices=CNAVRecordOrigin.choices,
     )
 
+    # Input infos
     profile = models.ForeignKey(JobSeekerProfile, null=True, on_delete=models.SET_NULL, related_name="cnav_records")
+
     input_data = models.JSONField(encoder=DjangoJSONEncoder)
+
+    # Result (duh)
     result = models.JSONField(encoder=DjangoJSONEncoder)
-    last_attempt_at = models.DateTimeField()
+
+    last_attempt_at = models.DateTimeField(null=True)
+    next_attempt_at = models.DateTimeField(null=True)
 
 
 # TODO:
