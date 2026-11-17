@@ -3,7 +3,8 @@
 Each block names its period ("PASS IAE", "Prolongation", "Suspension") with its duration, and carries its dates
 under its edges ("Début", "Fin prévue", "Fin demandée"), so the change reads at a glance. Block widths follow the
 durations on a twelve-column grid, with a minimum so that every block stays readable: they are indicative, the
-dates are exact. What does not fit in a block (days left, the end of the contract) comes as small notes below.
+dates are exact. A PASS IAE fills up as it runs, like a gauge, and its block says how long is left. What does not
+fit in a block (the end of the contract) comes as small notes below.
 """
 
 import dataclasses
@@ -80,6 +81,9 @@ class Block:
     # Where today falls in the block, in percent, and how its caption leans: start, center, end.
     today: str = ""
     today_align: str = "center"
+    # For a PASS IAE: how much of the block has run, in percent, and what is left once today is in it.
+    elapsed: str = ""
+    remaining: str = ""
 
 
 @dataclasses.dataclass
@@ -121,8 +125,11 @@ def _share_columns(blocks):
     return blocks
 
 
-def _mark_today(bar):
-    """Place today in the block that holds it: its position in the block, and how its caption leans."""
+def _mark_today(bar, remaining=""):
+    """Place today in the block that holds it: its position in the block, and how its caption leans.
+
+    The PASS IAE blocks fill up to today; the one that holds today says what is left of the PASS IAE.
+    """
     today = timezone.localdate()
     before = 0
     for block in bar.blocks:
@@ -134,18 +141,22 @@ def _mark_today(bar):
             # Near an end of the strip, the caption leans inwards rather than overflowing.
             block.today_align = "start" if position < 0.15 else "end" if position > 0.85 else "center"
             bar.today_display = _fr(today)
-            break
+            if block.kind == "pass":
+                block.elapsed = block.today
+                block.remaining = remaining
+        elif block.kind == "pass" and block.end < today:
+            block.elapsed = "100"
         before += block.columns
     return bar
 
 
-def _days_left_note(approval, today):
-    if approval.start_at <= today < approval.end_at:
-        return Note(
-            f"Il reste {duration_display(today + datetime.timedelta(days=1), approval.end_at)} sur le {PASS_IAE}.",
-            icon="ri-hourglass-line",
-        )
-    return None
+def _remaining(approval):
+    """What is left of a running PASS IAE, today included and future suspensions excluded: its "reliquat"."""
+    today = timezone.localdate()
+    days = approval.remainder.days
+    if approval.start_at > today or not days:
+        return ""
+    return duration_display(today, today + datetime.timedelta(days=days - 1))
 
 
 def approval_bar(approval, contract_end=None):
@@ -160,17 +171,16 @@ def approval_bar(approval, contract_end=None):
         left=Edge(approval.start_at, "Début"),
         right=Edge(approval.end_at, "Fin prévue"),
     )
-    notes = [note for note in [_days_left_note(approval, today)] if note]
+    notes = []
     if contract_end and contract_end < today:
         notes.append(Note(f"Contrat terminé le {_fr(contract_end)}", variant="warn", icon="ri-file-text-line"))
     elif contract_end:
         notes.append(Note(f"Contrat jusqu’au {_fr(contract_end)}", icon="ri-file-text-line"))
-    return _mark_today(PeriodBar(blocks=[block], notes=notes))
+    return _mark_today(PeriodBar(blocks=[block], notes=notes), _remaining(approval))
 
 
 def prolongation_bar(approval, start_at, end_at, contract_end=None):
     """The PASS IAE as planned, then the requested prolongation right after it."""
-    today = timezone.localdate()
     blocks = _share_columns(
         [
             Block(
@@ -192,7 +202,7 @@ def prolongation_bar(approval, start_at, end_at, contract_end=None):
             ),
         ]
     )
-    notes = [note for note in [_days_left_note(approval, today)] if note]
+    notes = []
     if contract_end:
         if contract_end <= end_at:
             notes.append(
@@ -210,7 +220,7 @@ def prolongation_bar(approval, start_at, end_at, contract_end=None):
                     icon="ri-error-warning-line",
                 )
             )
-    return _mark_today(PeriodBar(blocks=blocks, notes=notes))
+    return _mark_today(PeriodBar(blocks=blocks, notes=notes), _remaining(approval))
 
 
 def suspended_end(approval_end, start_at, end_at):
@@ -337,4 +347,4 @@ def situation_bar(approval, contracts, where):
         return None
     if blocks:
         _share_columns(blocks)
-    return _mark_today(PeriodBar(blocks=blocks, notes=notes))
+    return _mark_today(PeriodBar(blocks=blocks, notes=notes), _remaining(approval) if approval else "")

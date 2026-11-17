@@ -73,6 +73,9 @@ def test_employer_after_the_end_of_the_contract(client):
     assertNotContains(response, "Son contrat chez vous")
     assertContains(response, "next-step-frise__block--pass")
     assertContains(response, f"<b>Aujourd’hui</b> · {fr(timezone.localdate())}")
+    # The PASS IAE fills up to today, as a gauge, and says what is left of it.
+    assertContains(response, 'style="--elapsed: ')
+    assertContains(response, '<span class="fs-xs">Reste</span>')
     assertContains(response, f"Son PASS IAE est valide jusqu’au {fr(approval.end_at)}.")
     assertContains(response, "Ses jours continuent d’être décomptés tant qu’il n’est pas suspendu.")
     # What to do: the same actions as the queue, for this person only, without repeating their name.

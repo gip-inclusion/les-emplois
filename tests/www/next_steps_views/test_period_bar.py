@@ -64,8 +64,10 @@ def test_prolongation_bar():
     assert [block.today for block in bar.blocks] == ["89.5", ""]
     assert bar.blocks[0].today_align == "center"
     assert bar.today_display == "16/11/2026"
+    # The PASS IAE fills up to today and says what is left of it, today included: 77 days.
+    assert [block.elapsed for block in bar.blocks] == ["89.5", ""]
+    assert [block.remaining for block in bar.blocks] == [f"2{NBSP}mois et 16{NBSP}jours", ""]
     assert [note.text for note in bar.notes] == [
-        f"Il reste 2{NBSP}mois et 15{NBSP}jours sur le PASS{NBSP}IAE.",
         f"Fin du contrat le 31/05/2027{NBSP}: couverte par la prolongation",
     ]
 
@@ -114,6 +116,8 @@ def test_suspension_bar():
     ]
     # The suspension carries two dates: it keeps room for them, however short it is.
     assert [block.columns for block in bar.blocks] == [3, 4, 5]
+    # Today falls in the suspension: the PASS IAE before it has run, the one after it has not started.
+    assert [(block.elapsed, block.remaining) for block in bar.blocks] == [("100", ""), ("", ""), ("", "")]
     assert [note.text for note in bar.notes] == [
         f"Fin prévue avant la suspension{NBSP}: 15/03/2028, repoussée au 11/09/2028"
     ]

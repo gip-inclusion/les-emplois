@@ -460,9 +460,10 @@ table.table td > .modal .modal-content {
     min-height: 3.25rem;
 }
 
+/* A gauge: the part already run, up to today (--elapsed, set on the block), is darker than what is left. */
 .next-step-frise__block--pass {
     color: var(--bs-tertiary, #000091);
-    background-color: #daedff;
+    background: linear-gradient(90deg, #a9cdfb var(--elapsed, 0%), #e3f1ff var(--elapsed, 0%));
 }
 
 .next-step-frise__block--expired {

@@ -6,9 +6,19 @@
             {% for block in bar.blocks %}
                 <div class="col-{{ block.columns }} d-flex flex-column">
                     <div class="position-relative d-flex flex-grow-1">
-                        <div class="next-step-frise__block next-step-frise__block--{{ block.kind }} d-flex flex-column justify-content-center flex-grow-1 rounded-3 px-3 py-2 lh-sm overflow-hidden">
-                            <span class="fs-sm fw-bold">{{ block.label }}</span>
-                            <span class="fs-xs">{{ block.duration }}</span>
+                        {# A PASS IAE fills up to today, like a gauge: --elapsed is computed server side, as today's position. #}
+                        <div class="next-step-frise__block next-step-frise__block--{{ block.kind }} d-flex flex-wrap align-items-center justify-content-between column-gap-3 flex-grow-1 rounded-3 px-3 py-2 lh-sm overflow-hidden"
+                             {% if block.elapsed %}style="--elapsed: {{ block.elapsed }}%"{% endif %}>
+                            <span class="d-flex flex-column">
+                                <span class="fs-sm fw-bold">{{ block.label }}</span>
+                                <span class="fs-xs">{{ block.duration }}</span>
+                            </span>
+                            {% if block.remaining %}
+                                <span class="d-flex flex-column text-end ms-auto">
+                                    <span class="fs-xs">Reste</span>
+                                    <span class="fs-sm fw-bold">{{ block.remaining }}</span>
+                                </span>
+                            {% endif %}
                         </div>
                         {% if block.today %}
                             {# The position is computed server side: a style attribute, like the employee record progress bar. #}
