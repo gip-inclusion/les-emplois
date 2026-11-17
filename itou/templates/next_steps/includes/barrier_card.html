@@ -1,30 +1,31 @@
-{# One barrier, as in the prototype: what it is, where it comes from, what is under way, and the next move. #}
-<article class="next-step-frein">
-    <div class="next-step-frein__head">
-        <span class="next-step-frein__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></span>
-        <div class="d-flex flex-column min-w-0">
-            {% if card.category %}<span class="next-step-frein__cat">{{ card.category }}</span>{% endif %}
-            <strong class="next-step-frein__name">{{ card.name }}</strong>
+{# One barrier: its icon and name (itou-theme c-box--results__summary), where it comes from, what is under way. #}
+<article class="c-box p-3 d-flex flex-column gap-2">
+    <div class="c-box--results__summary align-items-center">
+        <i class="{{ card.icon }}" aria-hidden="true"></i>
+        <div>
+            {% if card.category %}<span class="d-block fs-xs text-muted">{{ card.category }}</span>{% endif %}
+            <span class="d-block fw-bold">{{ card.name }}</span>
         </div>
     </div>
     {% for clue in card.clues %}
         {% if clue.kind == "orientation" %}
-            <span class="next-step-frein__next">
+            <p class="fs-xs border-top pt-2 mb-0">
                 <b>En cours&nbsp;:</b>
                 {% if clue.url %}
-                    <a class="link-tertiary" href="{{ clue.url }}">{{ clue.text }}</a>
+                    <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover"
+                       href="{{ clue.url }}">{{ clue.text }}</a>
                 {% else %}
                     {{ clue.text }}
                 {% endif %}
-            </span>
+            </p>
         {% else %}
-            <span class="next-step-frein__txt">
+            <p class="fs-xs text-muted mb-0">
                 {{ clue.text }}
                 {% if clue.certified %}<span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>{% endif %}
-            </span>
+            </p>
         {% endif %}
     {% endfor %}
     {% if card.search_url %}
-        <a class="btn btn-sm btn-primary align-self-start mt-1" href="{{ card.search_url }}">Trouver une solution</a>
+        <a class="btn btn-sm btn-primary align-self-start" href="{{ card.search_url }}">Trouver une solution</a>
     {% endif %}
 </article>

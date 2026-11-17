@@ -1,7 +1,7 @@
 {# What to know about an application before answering it, as in the prototype; the context boxes follow. #}
 {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
 {% if application_message %}
-    <div class="next-step-box mt-0 mb-3">
+    <div class="rounded-2 p-3 mb-3 d-flex flex-column gap-1 bg-light">
         <b>Message de la candidature</b>
         <span>{{ application_message|linebreaksbr }}</span>
     </div>

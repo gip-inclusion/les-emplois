@@ -3,13 +3,12 @@
 {% if form and form.is_bound %}
     {% bootstrap_form_errors form type="non_fields" %}
 {% endif %}
-<dl class="next-step-recap">
+{# itou-theme's list of data: the label in small, the answer below. #}
+<ul class="list-data mb-0">
     {% for label, value in recap %}
-        <div>
-            <dt>{{ label }}</dt>
-            <dd>
-                {{ value }}
-            </dd>
-        </div>
+        <li>
+            <small>{{ label }}</small>
+            <strong>{{ value }}</strong>
+        </li>
     {% endfor %}
-</dl>
+</ul>

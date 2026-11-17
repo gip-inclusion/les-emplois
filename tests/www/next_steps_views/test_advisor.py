@@ -175,4 +175,5 @@ def test_job_seeker_page_opens_the_advisor_in_the_drawer(client):
         reverse("next_steps_views:job_seeker", kwargs={"public_id": assignment.job_seeker.public_id})
     )
     assertContains(response, f'hx-get="{advisor_url(assignment)}"')
-    assertContains(response, "next-step__avatar--you")
+    # Their own initials, filled.
+    assertContains(response, "bg-tertiary text-white")

@@ -39,20 +39,6 @@ class Act:
     def title(self):
         return ActionKind(self.kind).label[:1].upper() + ActionKind(self.kind).label[1:]
 
-    @property
-    def icon(self):
-        return {
-            ActionKind.CREATE: "ri-user-add-line",
-            ActionKind.APPLY: "ri-draft-line",
-            ActionKind.HIRE: "ri-briefcase-4-line",
-            ActionKind.ACCEPT: "ri-briefcase-4-line",
-            ActionKind.IAE_ELIGIBILITY: "ri-shield-check-line",
-            ActionKind.GEIQ_ELIGIBILITY: "ri-shield-check-line",
-            ActionKind.SELF_ASSIGN: "ri-user-follow-line",
-            ActionKind.ORIENT: "ri-signpost-line",
-            ActionKind.FILL_REPORT: "ri-file-list-3-line",
-        }[self.kind]
-
 
 def _fr(date):
     return f"{timezone.localdate(date) if isinstance(date, datetime.datetime) else date:%d/%m/%Y}"

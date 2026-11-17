@@ -1,9 +1,11 @@
-{# The facts an action rests on, in a grid as in the prototype. #}
-<div class="next-step-facts">
+{# The facts an action rests on, in a grid as in the prototype: itou-theme grid and utilities. #}
+<div class="row g-2 mb-4">
     {% for label, value in facts %}
-        <div class="next-step-fact">
-            <small>{{ label }}</small>
-            <b>{{ value }}</b>
+        <div class="col-12 col-sm-6">
+            <div class="border rounded-2 px-3 py-2 h-100">
+                <span class="d-block fs-sm text-muted">{{ label }}</span>
+                <span class="d-block fw-bold text-break">{{ value }}</span>
+            </div>
         </div>
     {% endfor %}
 </div>

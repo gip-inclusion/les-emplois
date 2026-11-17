@@ -1,33 +1,34 @@
 {# A PASS IAE and what changes it, as blocks with their dates and today (next_steps_views.period_bar). No outer margin. #}
-<figure class="next-step-frise mb-0{% if bar.today_display %} next-step-frise--today{% endif %}">
+{# itou-theme has no such strip: utilities for the layout, .next-step-frise* for the blocks' colours, the ticks and today. #}
+<figure class="mb-0{% if bar.today_display %} pt-4{% endif %}">
     {% if bar.blocks %}
         <div class="row g-1">
             {% for block in bar.blocks %}
-                <div class="col-{{ block.columns }} next-step-frise__column">
-                    <div class="next-step-frise__cell">
-                        <div class="next-step-frise__block next-step-frise__block--{{ block.kind }}">
-                            <span class="next-step-frise__label">{{ block.label }}</span>
-                            <span class="next-step-frise__duration">{{ block.duration }}</span>
+                <div class="col-{{ block.columns }} d-flex flex-column">
+                    <div class="position-relative d-flex flex-grow-1">
+                        <div class="next-step-frise__block next-step-frise__block--{{ block.kind }} d-flex flex-column justify-content-center flex-grow-1 rounded-3 px-3 py-2 lh-sm overflow-hidden">
+                            <span class="fs-sm fw-bold">{{ block.label }}</span>
+                            <span class="fs-xs">{{ block.duration }}</span>
                         </div>
                         {% if block.today %}
                             {# The position is computed server side: a style attribute, like the employee record progress bar. #}
                             <span class="next-step-frise__today next-step-frise__today--{{ block.today_align }}"
                                   style="left: {{ block.today }}%">
-                                <span class="next-step-frise__today-caption"><b>Aujourd’hui</b> {{ bar.today_display }}</span>
+                                <span class="next-step-frise__today-caption fs-xs"><b>Aujourd’hui</b> {{ bar.today_display }}</span>
                             </span>
                         {% endif %}
                     </div>
-                    <div class="next-step-frise__edges">
+                    <div class="d-flex justify-content-between gap-2 mt-1">
                         {% if block.left %}
-                            <span class="next-step-frise__edge next-step-frise__edge--left">
-                                <b>{{ block.left.date_display }}</b>
-                                <small>{{ block.left.caption }}</small>
+                            <span class="next-step-frise__edge d-flex flex-column lh-sm">
+                                <b class="fs-sm">{{ block.left.date_display }}</b>
+                                <small class="fs-xs text-muted">{{ block.left.caption }}</small>
                             </span>
                         {% endif %}
                         {% if block.right %}
-                            <span class="next-step-frise__edge next-step-frise__edge--right">
-                                <b>{{ block.right.date_display }}</b>
-                                <small>{{ block.right.caption }}</small>
+                            <span class="next-step-frise__edge next-step-frise__edge--right d-flex flex-column lh-sm ms-auto text-end">
+                                <b class="fs-sm">{{ block.right.date_display }}</b>
+                                <small class="fs-xs text-muted">{{ block.right.caption }}</small>
                             </span>
                         {% endif %}
                     </div>
@@ -36,9 +37,9 @@
         </div>
     {% endif %}
     {% if bar.notes %}
-        <figcaption class="next-step-frise__notes{% if not bar.blocks %} mt-0{% endif %}">
+        <figcaption class="d-flex flex-wrap gap-2{% if bar.blocks %} mt-3{% endif %}">
             {% for note in bar.notes %}
-                <span class="next-step-frise__note next-step-frise__note--{{ note.variant }}">
+                <span class="badge rounded-pill fs-sm fw-normal text-wrap text-start d-inline-flex align-items-center gap-1 {% if note.variant == "ok" %}bg-success-lighter text-success{% elif note.variant == "warn" %}bg-warning-lighter text-warning{% else %}bg-info-lighter text-info{% endif %}">
                     <i class="{{ note.icon }}" aria-hidden="true"></i>
                     {{ note.text }}
                 </span>

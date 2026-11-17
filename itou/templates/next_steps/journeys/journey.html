@@ -1,7 +1,7 @@
 {% load str_filters %}
 {# A guided journey: in the side drawer (swapped in by htmx) or inside an ordinary page. #}
-<div id="next-step-journey" class="next-step-journey">
-    <div class="next-step-journey__head">
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
         <div class="d-flex align-items-start gap-3">
             <div class="flex-grow-1">
                 <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
@@ -30,11 +30,12 @@
     </div>
 
     {% if result %}
-        <div class="next-step-journey__body">
+        <div class="flex-grow-1 overflow-auto p-4">
             <div class="d-flex flex-column gap-3" role="status">
-                <span class="next-step__icon bg-success-lighter text-success"
-                      aria-hidden="true"><i class="ri-check-line"></i></span>
-                <p class="h3 mb-0">{{ result.title }}</p>
+                <div class="c-box--results__summary align-items-center">
+                    <i class="ri-check-line bg-success-lighter text-success" aria-hidden="true"></i>
+                    <p class="h3 mb-0">{{ result.title }}</p>
+                </div>
                 {% if result.lines %}
                     <ul class="mb-0">
                         {% for line in result.lines %}<li>{{ line }}</li>{% endfor %}
@@ -50,7 +51,7 @@
             </div>
             {# Keep the momentum: what remains for today, and what comes next. #}
             {% if remaining_today is not None %}
-                <div class="next-step-box next-step-box--ok mt-4">
+                <div class="rounded-2 p-3 mt-4 d-flex flex-column gap-1 bg-success-lighter">
                     <b>
                         {% if remaining_today %}
                             Plus que {{ remaining_today }} action{{ remaining_today|pluralizefr }} aujourd’hui
@@ -67,7 +68,7 @@
                 {% include "next_steps/journeys/components/next_action.html" with next_action=next_action in_drawer=in_drawer style="btn-outline-primary mt-3" only %}
             {% endif %}
         </div>
-        <div class="next-step-journey__foot">
+        <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
             {% if in_drawer %}
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Terminer</button>
             {% else %}
@@ -83,18 +84,18 @@
     {% else %}
         <form method="post"
               action="{{ journey_url }}"
-              class="next-step-journey__form"
+              class="d-flex flex-column flex-grow-1 overflow-hidden"
               {% if in_drawer %}hx-post="{{ journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-disinherit="*"{% endif %}>
             {% csrf_token %}
             <input type="hidden" name="step" value="{{ step_index }}">
             {% for name in shown %}<input type="hidden" name="shown" value="{{ name }}">{% endfor %}
             {% for name, value in carried %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
-            <div class="next-step-journey__body">
+            <div class="flex-grow-1 overflow-auto p-4">
                 {# As in the prototype: the facts first, then the question the step asks, then its fields. #}
                 {% if is_first_step and facts and not step.facts_in_template %}
                     {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
                 {% endif %}
-                {% if step.question %}<p class="next-step-journey__question">{{ step.question }}</p>{% endif %}
+                {% if step.question %}<p class="fs-lg fw-bold mb-2">{{ step.question }}</p>{% endif %}
                 {% if step.hint %}<p class="fs-sm text-muted mb-3">{{ step.hint }}</p>{% endif %}
                 {% if step.bar %}
                     <div class="mb-4">
@@ -106,7 +107,7 @@
                     {% include "next_steps/journeys/components/box.html" with box=box only %}
                 {% endfor %}
             </div>
-            <div class="next-step-journey__foot">
+            <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
                 {% if is_first_step %}
                     {% if in_drawer %}
                         <button type="button"

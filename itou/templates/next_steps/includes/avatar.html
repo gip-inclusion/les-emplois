@@ -1,0 +1,9 @@
+{# An advisor's initials in a round, filled for the signed-in professional; an icon when the advisor is unknown. #}
+{# itou-theme has no avatar: utilities, and .next-step__avatar for the size only. #}
+{% if assignment.assigned_to_unknown_advisor %}
+    <span class="next-step__avatar rounded-circle bg-light text-muted d-inline-flex align-items-center justify-content-center flex-shrink-0"
+          aria-hidden="true"><i class="ri-community-line"></i></span>
+{% else %}
+    <span class="next-step__avatar rounded-circle fw-bold fs-sm d-inline-flex align-items-center justify-content-center flex-shrink-0 {% if assignment.professional_id == request.user.pk %}bg-tertiary text-white{% else %}bg-light text-muted{% endif %}"
+          aria-hidden="true">{{ assignment.professional.first_name|first|upper }}{{ assignment.professional.last_name|first|upper }}</span>
+{% endif %}

@@ -348,7 +348,7 @@ def test_actions_say_who_they_are_about(client, settings, employer_membership):
 
     response = client.get(TODO_URL)
     # As in the prototype: the name in tertiary blue, then the age and the city.
-    assertContains(response, 'class="link-tertiary fw-bold"')
+    assertContains(response, 'class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover fw-bold"')
     assertContains(response, f"<span>{job_seeker.jobseeker_profile.age} ans · Vénissieux</span>", html=True)
 
 

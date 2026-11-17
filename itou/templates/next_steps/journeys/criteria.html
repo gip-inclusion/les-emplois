@@ -16,18 +16,18 @@
 {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
 {% for level, prefix in criteria_levels %}
     <fieldset class="mb-4">
-        <legend class="next-step-journey__legend">Critères administratifs de niveau {{ level }}</legend>
-        <div class="next-step-options">
+        <legend class="fs-base fw-bold mb-2">Critères administratifs de niveau {{ level }}</legend>
+        <div class="d-flex flex-column gap-2">
             {% for field in form %}
                 {% if prefix in field.name %}
                     {% with criterion=form.OBJECTS|get_dict_item:field.name %}
-                        <label class="next-step-option">
+                        <label class="next-step-option d-flex align-items-start gap-3 border rounded-2 px-3 py-2">
                             {{ field }}
-                            <span class="next-step-option__text">
+                            <span class="d-flex flex-column gap-1">
                                 <b>{{ field.label }}</b>
-                                {% if field.help_text %}<span>{{ field.help_text }}</span>{% endif %}
+                                {% if field.help_text %}<span class="fs-sm text-muted">{{ field.help_text }}</span>{% endif %}
                                 {% if request.from_employer and criterion.written_proof %}
-                                    <span>
+                                    <span class="fs-sm text-muted">
                                         Pièce justificative&nbsp;: {{ criterion.written_proof }}
                                         {% if criterion.written_proof_validity %}({{ criterion.written_proof_validity|lower }}){% endif %}
                                     </span>
