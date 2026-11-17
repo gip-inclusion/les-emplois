@@ -231,14 +231,9 @@ class ServiceSearchForm(forms.Form):
             }
         ),
     )
-    category = forms.TypedChoiceField(
-        coerce=data_inclusion_v1.Categorie,
-        empty_value="",
-        choices=[("", "Sélectionnez une thématique")] + [(c.value, c.label) for c in data_inclusion_v1.Categorie],
-        label="Sélectionnez une thématique",
-        widget=Select2Widget(
-            attrs={"data-service-search-category": "true", "data-placeholder": "Thématique"},
-        ),
+    keyword = forms.CharField(
+        label="Entrez un mot-clé",
+        widget=forms.TextInput(attrs={"placeholder": "Mot-clé, nom de structure, thématique"}),
     )
     reception = forms.ChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil] + [(RECEPTION_ALL_VALUE, "Tous")],
