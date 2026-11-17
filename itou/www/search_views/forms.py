@@ -240,12 +240,6 @@ class ServiceSearchForm(forms.Form):
             attrs={"data-service-search-category": "true", "data-placeholder": "Thématique"},
         ),
     )
-    thematics = forms.MultipleChoiceField(
-        choices=[(t.value, t.label) for t in data_inclusion_v1.Thematique],
-        label="Besoin",
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-    )
     reception = forms.ChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil] + [(RECEPTION_ALL_VALUE, "Tous")],
         initial=data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value,
@@ -271,10 +265,6 @@ class ServiceSearchForm(forms.Form):
             data.setdefault("reception", self.base_fields["reception"].initial)
 
         super().__init__(data, *args, **kwargs)
-        if not_cleaned_category := self.data.get("category"):
-            self.fields["thematics"].choices = [
-                (t.value, t.label) for t in data_inclusion_v1.Thematique if t.value.startswith(not_cleaned_category)
-            ]
 
 
 class NewSavedSearchForm(forms.ModelForm):
