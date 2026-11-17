@@ -10,15 +10,13 @@ from itou.users.models import JobSeekerProfile
 class CNAVRecord(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    origin = models.CharField(
-        choices=CNAVRecordOrigin.choices,
-    )
+    origin = models.CharField(choices=CNAVRecordOrigin.choices)
 
     # Input infos
     profile = models.ForeignKey(JobSeekerProfile, null=True, on_delete=models.SET_NULL, related_name="cnav_records")
 
     input_data = models.JSONField(encoder=DjangoJSONEncoder)
-    result = models.JSONField(encoder=DjangoJSONEncoder)
+    result = models.JSONField(encoder=DjangoJSONEncoder, null=True)
 
     last_attempt_at = models.DateTimeField(null=True)
     next_attempt_at = models.DateTimeField(null=True)

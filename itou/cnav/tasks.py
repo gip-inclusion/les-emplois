@@ -1,11 +1,14 @@
+import dataclasses
+import datetime
 import logging
 
+import httpx
 from django.db import transaction
 from django.utils import timezone
 from huey.contrib.djhuey import on_commit_task
 
+from itou.cnav.models import CNAVRecord
 from itou.users.enums import Title
-from itou.users.models import CNAVRecord
 from itou.utils.apis.cnav import get_client
 
 
@@ -32,9 +35,9 @@ assert set(MANDATORY_FIELDS) <= set(ALLOWED_FIELDS)
 
 def _input_to_payload(input_data):
     payload = {
-        "number": input_data["nir"],
+        "number": input_data["nir"][:13],
         "name": input_data["last_name"],  # Update to birth_name if available
-        "birth_date": input_data["birthdate"],
+        "birth_date": datetime.date.fromisoformat(input_data["birthdate"]),
     }
     if "title" in input_data:
         payload["sex_code"] = {Title.M: 1, Title.MME: 2}[input_data["title"]]
@@ -46,7 +49,7 @@ def _input_to_payload(input_data):
 def retrieve_cnav_infos(record_pk):
     cnav_record = (
         CNAVRecord.objects.select_related("profile__user")
-        .select_for_update(of=("self",), nokey=True)
+        .select_for_update(of=("self",), no_key=True)
         .filter(pk=record_pk)
         .first()
     )
@@ -70,15 +73,21 @@ def retrieve_cnav_infos(record_pk):
         cnav_record.last_attempt_at = timezone.now()
         try:
             interops_result = client.identity(**payload)
-        except Exception:
+        except httpx.HTTPStatusError as exc:
+            if exc.response:
+                print(exc.response)
+            cnav_record.save(update_fields={"last_attempt_at"})
+            logger.warning("Error while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
+        except Exception as exc:
             # TODO: handle 429 error
             cnav_record.save(update_fields={"last_attempt_at"})
+            logger.warning("Error while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
         else:
-            cnav_record.result = interops_result.asdict()
+            cnav_record.result = dataclasses.asdict(interops_result)
             cnav_record.save(update_fields={"result", "last_attempt_at"})
 
 
-@on_commit_task(context=True)  # Retry once a day during 90 days.
+@on_commit_task()
 def plan_retrieve_cnav_infos(*, record_pk):
     with transaction.atomic():
         retrieve_cnav_infos(record_pk)
