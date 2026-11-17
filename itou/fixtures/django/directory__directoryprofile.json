@@ -1,0 +1,10 @@
+[
+  {
+    "fields": {
+      "is_opted_out": true,
+      "user": 155
+    },
+    "model": "directory.directoryprofile",
+    "pk": 1
+  }
+]
