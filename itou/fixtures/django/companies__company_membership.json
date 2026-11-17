@@ -248,15 +248,58 @@
   },
   {
     "fields": {
-      "company": 2,
-      "created_at": "2020-12-01T10:08:03.600Z",
+      "company": 3850,
+      "created_at": "2026-11-17T13:58:24.485Z",
+      "function": "",
       "is_active": true,
       "is_admin": true,
-      "joined_at": "2020-04-14T16:09:20Z",
+      "joined_at": "2026-11-17T13:58:24.485Z",
       "updated_by": null,
-      "user": 130
+      "user": 152
     },
     "model": "companies.companymembership",
-    "pk": 32
+    "pk": 33
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "created_at": "2026-11-17T13:58:24.489Z",
+      "function": "",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2026-11-17T13:58:24.489Z",
+      "updated_by": null,
+      "user": 153
+    },
+    "model": "companies.companymembership",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "created_at": "2026-11-17T13:58:24.492Z",
+      "function": "",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2026-11-17T13:58:24.492Z",
+      "updated_by": null,
+      "user": 154
+    },
+    "model": "companies.companymembership",
+    "pk": 35
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "created_at": "2026-11-17T13:58:24.495Z",
+      "function": "",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2026-11-17T13:58:24.495Z",
+      "updated_by": null,
+      "user": 155
+    },
+    "model": "companies.companymembership",
+    "pk": 36
   }
 ]
