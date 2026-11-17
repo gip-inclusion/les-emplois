@@ -4292,7 +4292,92 @@
                                                                                         WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
                                                                                                AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
                                                                                                                                                                                                                                WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
-                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_contract" U0
+             WHERE (U0."end_date" BETWEEN %s AND %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_prosupportreport" V0
+             WHERE V0."contract_id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                  ORDER BY U0."start_date" DESC, 1 DESC
+                  LIMIT 1)
+             LIMIT 1) AS "last_contract_has_pro_support_report",
+                 CASE
+                     WHEN (NOT EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_prosupportreport" V0
+                              WHERE V0."contract_id" =
+                                  (SELECT U0."id" AS "pk"
+                                   FROM "companies_contract" U0
+                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                   LIMIT 1)
+                              LIMIT 1)
+                           AND (EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_contract" U0
+                                   WHERE (U0."end_date" BETWEEN %s AND %s
+                                          AND U0."job_seeker_id" = ("users_user"."id"))
+                                   LIMIT 1)
+                                OR (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" V0
+                                       WHERE (V0."end_date" < %s
+                                              AND V0."id" =
+                                                (SELECT U0."id" AS "pk"
+                                                 FROM "companies_contract" U0
+                                                 WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                 ORDER BY U0."start_date" DESC, 1 DESC
+                                                 LIMIT 1))
+                                       LIMIT 1)
+                                    AND EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "approvals_approval" U0
+                                       WHERE (U0."user_id" = ("users_user"."id")
+                                              AND U0."end_at" >= %s)
+                                       LIMIT 1)))) THEN COALESCE(
+                                                                   (SELECT U1."email" AS "company__email"
+                                                                    FROM "companies_contract" U0
+                                                                    INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                    WHERE (U0."company_id" IS NOT NULL
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U1."email" = %s))
+                                                                    ORDER BY U0."start_date" DESC
+                                                                    LIMIT 1),
+                                                                   (SELECT U2."email" AS "to_company__email"
+                                                                    FROM "job_applications_jobapplication" U0
+                                                                    INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                    WHERE (U0."state" = %s
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U2."email" = %s))
+                                                                    ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                    LIMIT 1))
+                     ELSE NULL
+                 END AS "pro_support_request_company_email"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
@@ -4305,7 +4390,8 @@
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s
                                AND U0."professional_id" = %s))))
-          GROUP BY "users_user"."id"
+          GROUP BY "users_user"."id",
+                   42
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -4360,11 +4446,11 @@
           INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           WHERE ("prescribers_prescribermembership"."organization_id" = %s
                  AND "users_user"."id" IN
-                   (SELECT V1."professional_id" AS "job_seeker_assignments__professional"
-                    FROM "users_user" V0
-                    LEFT OUTER JOIN "users_jobseekerassignment" V1 ON (V0."id" = V1."job_seeker_id")
-                    WHERE (V0."kind" = %s
-                           AND V0."id" IN
+                   (SELECT W1."professional_id" AS "job_seeker_assignments__professional"
+                    FROM "users_user" W0
+                    LEFT OUTER JOIN "users_jobseekerassignment" W1 ON (W0."id" = W1."job_seeker_id")
+                    WHERE (W0."kind" = %s
+                           AND W0."id" IN
                              (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
                               FROM "users_jobseekerassignment" U0
                               WHERE ((U0."company_id" IS NULL
@@ -4373,7 +4459,7 @@
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s
                                          AND U0."professional_id" = %s))))
-                    GROUP BY V0."id",
+                    GROUP BY W0."id",
                              1))
           ORDER BY RANDOM() ASC
         ''',
@@ -4439,7 +4525,92 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT NOT EXISTS
+            (SELECT EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" BETWEEN %s AND %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                LIMIT 1) AS "contract_ending_soon",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "companies_contract" V0
+                        WHERE (V0."end_date" < %s
+                               AND V0."id" =
+                                 (SELECT U0."id" AS "pk"
+                                  FROM "companies_contract" U0
+                                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                                  ORDER BY U0."start_date" DESC, 1 DESC
+                                  LIMIT 1))
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE (U0."user_id" = ("users_user"."id")
+                               AND U0."end_at" >= %s)
+                        LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                    EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_prosupportreport" V0
+                WHERE V0."contract_id" =
+                    (SELECT U0."id" AS "pk"
+                     FROM "companies_contract" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     ORDER BY U0."start_date" DESC, 1 DESC
+                     LIMIT 1)
+                LIMIT 1) AS "last_contract_has_pro_support_report",
+                    CASE
+                        WHEN (NOT EXISTS
+                                (SELECT %s AS "a"
+                                 FROM "companies_prosupportreport" V0
+                                 WHERE V0."contract_id" =
+                                     (SELECT U0."id" AS "pk"
+                                      FROM "companies_contract" U0
+                                      WHERE U0."job_seeker_id" = ("users_user"."id")
+                                      ORDER BY U0."start_date" DESC, 1 DESC
+                                      LIMIT 1)
+                                 LIMIT 1)
+                              AND (EXISTS
+                                     (SELECT %s AS "a"
+                                      FROM "companies_contract" U0
+                                      WHERE (U0."end_date" BETWEEN %s AND %s
+                                             AND U0."job_seeker_id" = ("users_user"."id"))
+                                      LIMIT 1)
+                                   OR (EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "companies_contract" V0
+                                          WHERE (V0."end_date" < %s
+                                                 AND V0."id" =
+                                                   (SELECT U0."id" AS "pk"
+                                                    FROM "companies_contract" U0
+                                                    WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                    ORDER BY U0."start_date" DESC, 1 DESC
+                                                    LIMIT 1))
+                                          LIMIT 1)
+                                       AND EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "approvals_approval" U0
+                                          WHERE (U0."user_id" = ("users_user"."id")
+                                                 AND U0."end_at" >= %s)
+                                          LIMIT 1)))) THEN COALESCE(
+                                                                      (SELECT U1."email" AS "company__email"
+                                                                       FROM "companies_contract" U0
+                                                                       INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                       WHERE (U0."company_id" IS NOT NULL
+                                                                              AND U0."job_seeker_id" = ("users_user"."id")
+                                                                              AND NOT (U1."email" = %s))
+                                                                       ORDER BY U0."start_date" DESC
+                                                                       LIMIT 1),
+                                                                      (SELECT U2."email" AS "to_company__email"
+                                                                       FROM "job_applications_jobapplication" U0
+                                                                       INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                       WHERE (U0."state" = %s
+                                                                              AND U0."job_seeker_id" = ("users_user"."id")
+                                                                              AND NOT (U2."email" = %s))
+                                                                       ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                       LIMIT 1))
+                        ELSE NULL
+                    END AS "pro_support_request_company_email",
+                    NOT EXISTS
                (SELECT %s AS "a"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
@@ -4483,6 +4654,15 @@
                 LIMIT 1) AS "valid_eligibility_diagnosis",
           
                (SELECT U0."id" AS "id"
+                FROM "approvals_prolongationrequest" U0
+                INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                WHERE (U1."user_id" = ("users_user"."id")
+                       AND U0."prescriber_organization_id" = %s
+                       AND U0."status" = %s)
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "pending_prolongation_request",
+          
+               (SELECT U0."id" AS "id"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -4496,7 +4676,119 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment"
+                LIMIT 1) AS "active_assignment",
+                        CASE
+                            WHEN
+                                   (SELECT U0."id" AS "id"
+                                    FROM "approvals_prolongationrequest" U0
+                                    INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                    WHERE (U1."user_id" = ("users_user"."id")
+                                           AND U0."prescriber_organization_id" = %s
+                                           AND U0."status" = %s)
+                                    ORDER BY U0."created_at" DESC
+                                    LIMIT 1) IS NOT NULL THEN %s
+                            WHEN (NOT EXISTS
+                                    (SELECT %s AS "a"
+                                     FROM "companies_prosupportreport" V0
+                                     WHERE V0."contract_id" =
+                                         (SELECT U0."id" AS "pk"
+                                          FROM "companies_contract" U0
+                                          WHERE U0."job_seeker_id" = ("users_user"."id")
+                                          ORDER BY U0."start_date" DESC, 1 DESC
+                                          LIMIT 1)
+                                     LIMIT 1)
+                                  AND (EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "companies_contract" U0
+                                          WHERE (U0."end_date" BETWEEN %s AND %s
+                                                 AND U0."job_seeker_id" = ("users_user"."id"))
+                                          LIMIT 1)
+                                       OR (EXISTS
+                                             (SELECT %s AS "a"
+                                              FROM "companies_contract" V0
+                                              WHERE (V0."end_date" < %s
+                                                     AND V0."id" =
+                                                       (SELECT U0."id" AS "pk"
+                                                        FROM "companies_contract" U0
+                                                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                        ORDER BY U0."start_date" DESC, 1 DESC
+                                                        LIMIT 1))
+                                              LIMIT 1)
+                                           AND EXISTS
+                                             (SELECT %s AS "a"
+                                              FROM "approvals_approval" U0
+                                              WHERE (U0."user_id" = ("users_user"."id")
+                                                     AND U0."end_at" >= %s)
+                                              LIMIT 1)))
+                                  AND CASE
+                                          WHEN (NOT EXISTS
+                                                  (SELECT %s AS "a"
+                                                   FROM "companies_prosupportreport" V0
+                                                   WHERE V0."contract_id" =
+                                                       (SELECT U0."id" AS "pk"
+                                                        FROM "companies_contract" U0
+                                                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                        ORDER BY U0."start_date" DESC, 1 DESC
+                                                        LIMIT 1)
+                                                   LIMIT 1)
+                                                AND (EXISTS
+                                                       (SELECT %s AS "a"
+                                                        FROM "companies_contract" U0
+                                                        WHERE (U0."end_date" BETWEEN %s AND %s
+                                                               AND U0."job_seeker_id" = ("users_user"."id"))
+                                                        LIMIT 1)
+                                                     OR (EXISTS
+                                                           (SELECT %s AS "a"
+                                                            FROM "companies_contract" V0
+                                                            WHERE (V0."end_date" < %s
+                                                                   AND V0."id" =
+                                                                     (SELECT U0."id" AS "pk"
+                                                                      FROM "companies_contract" U0
+                                                                      WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                                      ORDER BY U0."start_date" DESC, 1 DESC
+                                                                      LIMIT 1))
+                                                            LIMIT 1)
+                                                         AND EXISTS
+                                                           (SELECT %s AS "a"
+                                                            FROM "approvals_approval" U0
+                                                            WHERE (U0."user_id" = ("users_user"."id")
+                                                                   AND U0."end_at" >= %s)
+                                                            LIMIT 1)))) THEN COALESCE(
+                                                                                        (SELECT U1."email" AS "company__email"
+                                                                                         FROM "companies_contract" U0
+                                                                                         INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                                         WHERE (U0."company_id" IS NOT NULL
+                                                                                                AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                                AND NOT (U1."email" = %s))
+                                                                                         ORDER BY U0."start_date" DESC
+                                                                                         LIMIT 1),
+                                                                                        (SELECT U2."email" AS "to_company__email"
+                                                                                         FROM "job_applications_jobapplication" U0
+                                                                                         INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                                         WHERE (U0."state" = %s
+                                                                                                AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                                AND NOT (U2."email" = %s))
+                                                                                         ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                                         LIMIT 1))
+                                          ELSE NULL
+                                      END IS NOT NULL) THEN %s
+                            WHEN (
+                                    (SELECT U0."id" AS "id"
+                                     FROM "eligibility_eligibilitydiagnosis" U0
+                                     WHERE (U0."expires_at" > %s
+                                            AND U0."author_kind" = %s
+                                            AND U0."job_seeker_id" = ("users_user"."id"))
+                                     ORDER BY U0."created_at" DESC
+                                     LIMIT 1) IS NULL
+                                  AND NOT EXISTS
+                                    (SELECT %s AS "a"
+                                     FROM "approvals_approval" U0
+                                     WHERE (U0."end_at" >= %s
+                                            AND U0."user_id" = ("users_user"."id"))
+                                     LIMIT 1)
+                                  AND %s) THEN %s
+                            ELSE %s
+                        END AS "action_for_job_seeker"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -4520,11 +4812,14 @@
                                    AND U0."professional_id" = %s))
                               AND U0."ended_at" IS NULL)))
              GROUP BY "users_user"."id",
-                      1,
-                      2,
-                      3,
+                      4,
                       5,
-                      6) subquery
+                      6,
+                      7,
+                      9,
+                      10,
+                      11,
+                      12) subquery
         ''',
       }),
       dict({
@@ -4576,6 +4871,91 @@
                                                                                                AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
                                                                                                                                                                                                                                WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
                                                                                                                                                                                                                                       AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_contract" U0
+             WHERE (U0."end_date" BETWEEN %s AND %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_prosupportreport" V0
+             WHERE V0."contract_id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                  ORDER BY U0."start_date" DESC, 1 DESC
+                  LIMIT 1)
+             LIMIT 1) AS "last_contract_has_pro_support_report",
+                 CASE
+                     WHEN (NOT EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_prosupportreport" V0
+                              WHERE V0."contract_id" =
+                                  (SELECT U0."id" AS "pk"
+                                   FROM "companies_contract" U0
+                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                   LIMIT 1)
+                              LIMIT 1)
+                           AND (EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_contract" U0
+                                   WHERE (U0."end_date" BETWEEN %s AND %s
+                                          AND U0."job_seeker_id" = ("users_user"."id"))
+                                   LIMIT 1)
+                                OR (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" V0
+                                       WHERE (V0."end_date" < %s
+                                              AND V0."id" =
+                                                (SELECT U0."id" AS "pk"
+                                                 FROM "companies_contract" U0
+                                                 WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                 ORDER BY U0."start_date" DESC, 1 DESC
+                                                 LIMIT 1))
+                                       LIMIT 1)
+                                    AND EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "approvals_approval" U0
+                                       WHERE (U0."user_id" = ("users_user"."id")
+                                              AND U0."end_at" >= %s)
+                                       LIMIT 1)))) THEN COALESCE(
+                                                                   (SELECT U1."email" AS "company__email"
+                                                                    FROM "companies_contract" U0
+                                                                    INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                    WHERE (U0."company_id" IS NOT NULL
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U1."email" = %s))
+                                                                    ORDER BY U0."start_date" DESC
+                                                                    LIMIT 1),
+                                                                   (SELECT U2."email" AS "to_company__email"
+                                                                    FROM "job_applications_jobapplication" U0
+                                                                    INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                    WHERE (U0."state" = %s
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U2."email" = %s))
+                                                                    ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                    LIMIT 1))
+                     ELSE NULL
+                 END AS "pro_support_request_company_email",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -4621,6 +5001,15 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
           
             (SELECT U0."id" AS "id"
+             FROM "approvals_prolongationrequest" U0
+             INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+             WHERE (U1."user_id" = ("users_user"."id")
+                    AND U0."prescriber_organization_id" = %s
+                    AND U0."status" = %s)
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "pending_prolongation_request",
+          
+            (SELECT U0."id" AS "id"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -4635,6 +5024,118 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
+                     CASE
+                         WHEN
+                                (SELECT U0."id" AS "id"
+                                 FROM "approvals_prolongationrequest" U0
+                                 INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                 WHERE (U1."user_id" = ("users_user"."id")
+                                        AND U0."prescriber_organization_id" = %s
+                                        AND U0."status" = %s)
+                                 ORDER BY U0."created_at" DESC
+                                 LIMIT 1) IS NOT NULL THEN %s
+                         WHEN (NOT EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "companies_prosupportreport" V0
+                                  WHERE V0."contract_id" =
+                                      (SELECT U0."id" AS "pk"
+                                       FROM "companies_contract" U0
+                                       WHERE U0."job_seeker_id" = ("users_user"."id")
+                                       ORDER BY U0."start_date" DESC, 1 DESC
+                                       LIMIT 1)
+                                  LIMIT 1)
+                               AND (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" U0
+                                       WHERE (U0."end_date" BETWEEN %s AND %s
+                                              AND U0."job_seeker_id" = ("users_user"."id"))
+                                       LIMIT 1)
+                                    OR (EXISTS
+                                          (SELECT %s AS "a"
+                                           FROM "companies_contract" V0
+                                           WHERE (V0."end_date" < %s
+                                                  AND V0."id" =
+                                                    (SELECT U0."id" AS "pk"
+                                                     FROM "companies_contract" U0
+                                                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                     ORDER BY U0."start_date" DESC, 1 DESC
+                                                     LIMIT 1))
+                                           LIMIT 1)
+                                        AND EXISTS
+                                          (SELECT %s AS "a"
+                                           FROM "approvals_approval" U0
+                                           WHERE (U0."user_id" = ("users_user"."id")
+                                                  AND U0."end_at" >= %s)
+                                           LIMIT 1)))
+                               AND CASE
+                                       WHEN (NOT EXISTS
+                                               (SELECT %s AS "a"
+                                                FROM "companies_prosupportreport" V0
+                                                WHERE V0."contract_id" =
+                                                    (SELECT U0."id" AS "pk"
+                                                     FROM "companies_contract" U0
+                                                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                     ORDER BY U0."start_date" DESC, 1 DESC
+                                                     LIMIT 1)
+                                                LIMIT 1)
+                                             AND (EXISTS
+                                                    (SELECT %s AS "a"
+                                                     FROM "companies_contract" U0
+                                                     WHERE (U0."end_date" BETWEEN %s AND %s
+                                                            AND U0."job_seeker_id" = ("users_user"."id"))
+                                                     LIMIT 1)
+                                                  OR (EXISTS
+                                                        (SELECT %s AS "a"
+                                                         FROM "companies_contract" V0
+                                                         WHERE (V0."end_date" < %s
+                                                                AND V0."id" =
+                                                                  (SELECT U0."id" AS "pk"
+                                                                   FROM "companies_contract" U0
+                                                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                                                   LIMIT 1))
+                                                         LIMIT 1)
+                                                      AND EXISTS
+                                                        (SELECT %s AS "a"
+                                                         FROM "approvals_approval" U0
+                                                         WHERE (U0."user_id" = ("users_user"."id")
+                                                                AND U0."end_at" >= %s)
+                                                         LIMIT 1)))) THEN COALESCE(
+                                                                                     (SELECT U1."email" AS "company__email"
+                                                                                      FROM "companies_contract" U0
+                                                                                      INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                                      WHERE (U0."company_id" IS NOT NULL
+                                                                                             AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                             AND NOT (U1."email" = %s))
+                                                                                      ORDER BY U0."start_date" DESC
+                                                                                      LIMIT 1),
+                                                                                     (SELECT U2."email" AS "to_company__email"
+                                                                                      FROM "job_applications_jobapplication" U0
+                                                                                      INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                                      WHERE (U0."state" = %s
+                                                                                             AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                             AND NOT (U2."email" = %s))
+                                                                                      ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                                      LIMIT 1))
+                                       ELSE NULL
+                                   END IS NOT NULL) THEN %s
+                         WHEN (
+                                 (SELECT U0."id" AS "id"
+                                  FROM "eligibility_eligibilitydiagnosis" U0
+                                  WHERE (U0."expires_at" > %s
+                                         AND U0."author_kind" = %s
+                                         AND U0."job_seeker_id" = ("users_user"."id"))
+                                  ORDER BY U0."created_at" DESC
+                                  LIMIT 1) IS NULL
+                               AND NOT EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "approvals_approval" U0
+                                  WHERE (U0."end_at" >= %s
+                                         AND U0."user_id" = ("users_user"."id"))
+                                  LIMIT 1)
+                               AND %s) THEN %s
+                         ELSE %s
+                     END AS "action_for_job_seeker",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -4711,13 +5212,17 @@
                                 AND U0."professional_id" = %s))
                            AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
-                   40,
-                   41,
                    42,
                    44,
                    45,
+                   46,
+                   48,
+                   49,
+                   50,
+                   51,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
+          ORDER BY 51 ASC,
+                   47 DESC,
                    "users_user"."id" DESC
           LIMIT 5
         ''',
@@ -5035,75 +5540,29 @@
                   DERAY Odile (Non précisé)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777">
-                          <i aria-label="Postuler pour BERTHELOT Paul" class="ri-draft-line">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-warning btn-ico text-nowrap" data-bs-title="Valider l’éligibilité IAE de BERTHELOT Paul" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="valider-eligibilite-iae" href="/eligibility/update/iae/77777777-7777-7777-7777-777777777777?back_url=/job-seekers/list">
+                          <i aria-label="Valider l’éligibilité IAE de BERTHELOT Paul" class="ri-pencil-line">
                           </i>
+                          <span>
+                              Valider l’éligibilité IAE
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
                           </i>
                       </button>
                       <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
+                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777">
+                              Postuler
+                          </a>
                           <a class="dropdown-item" href="/eligibility/update/iae/77777777-7777-7777-7777-777777777777?back_url=/job-seekers/list">
-                              Valider son éligibilité IAE
                           </a>
                           <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=77777777-7777-7777-7777-777777777777&back_url=%2Fjob-seekers%2Flist">
                               Orienter vers un service d’insertion
                           </a>
                           <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="create-assignment-from-list" href="/job-seekers/77777777-7777-7777-7777-777777777777/assignments/create?back_url=/job-seekers/list">
                               Ajouter mon intervention
-                          </a>
-                      </div>
-                  </div>
-              </td>
-          </tr>
-          <tr>
-              <td>
-                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
-                      WATERFORD David
-                  </a>
-              </td>
-              <td>
-                  <div class="d-flex align-items-center">
-                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-check-line">
-                          </i>
-                          Éligible à l’IAE
-                      </span>
-                  </div>
-              </td>
-              <td>
-                  30/08/2024
-              </td>
-              <td>
-                  1
-              </td>
-              <td>
-                  1
-              </td>
-              <td>
-                  DERAY Odile (Pres. Org.)
-              </td>
-              <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444">
-                          <i aria-label="Postuler pour WATERFORD David" class="ri-draft-line">
-                          </i>
-                      </a>
-                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
-                          <i aria-hidden="true" class="ri-more-2-fill">
-                          </i>
-                      </button>
-                      <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
-                          <a class="dropdown-item" href="/eligibility/update/iae/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
-                              Mettre à jour son éligibilité IAE
-                          </a>
-                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist">
-                              Orienter vers un service d’insertion
-                          </a>
-                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/44444444-4444-4444-4444-444444444444/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
-                              Modifier mon intervention
                           </a>
                       </div>
                   </div>
@@ -5141,18 +5600,23 @@
                   DERAY Odile (Pres. Org.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
-                          <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-warning btn-ico text-nowrap" data-bs-title="Valider l’éligibilité IAE de YGREC Bernard" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="valider-eligibilite-iae" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
+                          <i aria-label="Valider l’éligibilité IAE de YGREC Bernard" class="ri-pencil-line">
                           </i>
+                          <span>
+                              Valider l’éligibilité IAE
+                          </span>
                       </a>
-                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
+                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
                           </i>
                       </button>
-                      <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
+                      <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
+                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
+                              Postuler
+                          </a>
                           <a class="dropdown-item" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
-                              Valider son éligibilité IAE
                           </a>
                           <form action="/job-seekers/switch_stalled_status/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -5165,6 +5629,60 @@
                               Orienter vers un service d’insertion
                           </a>
                           <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/22222222-2222-2222-2222-222222222222/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
+                              Modifier mon intervention
+                          </a>
+                      </div>
+                  </div>
+              </td>
+          </tr>
+          <tr>
+              <td>
+                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
+                      WATERFORD David
+                  </a>
+              </td>
+              <td>
+                  <div class="d-flex align-items-center">
+                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                          <i aria-hidden="true" class="ri-check-line">
+                          </i>
+                          Éligible à l’IAE
+                      </span>
+                  </div>
+              </td>
+              <td>
+                  30/08/2024
+              </td>
+              <td>
+                  1
+              </td>
+              <td>
+                  1
+              </td>
+              <td>
+                  DERAY Odile (Pres. Org.)
+              </td>
+              <td class="text-end w-100px">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444">
+                          <i aria-label="Postuler pour WATERFORD David" class="ri-draft-line">
+                          </i>
+                          <span>
+                              Postuler
+                          </span>
+                      </a>
+                      <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
+                          <i aria-hidden="true" class="ri-more-2-fill">
+                          </i>
+                      </button>
+                      <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
+                          <a class="dropdown-item" href="/eligibility/update/iae/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
+                              Mettre à jour son éligibilité IAE
+                          </a>
+                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist">
+                              Orienter vers un service d’insertion
+                          </a>
+                          <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="edit-assignment-from-list" href="/job-seekers/44444444-4444-4444-4444-444444444444/assignments/[JobSeekerAssignment PK]/edit?back_url=/job-seekers/list">
                               Modifier mon intervention
                           </a>
                       </div>
@@ -5199,10 +5717,13 @@
                   Non précisé (ACME Inc.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
                           <i aria-label="Postuler pour XERUS Charlotte" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_4_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5258,10 +5779,13 @@
                   BIALÈS Patrick (Pres. Org.)
               </td>
               <td class="text-end w-100px">
-                  <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                      <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
+                  <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                      <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
                           <i aria-label="Postuler pour ZORRO Alain" class="ri-draft-line">
                           </i>
+                          <span>
+                              Postuler
+                          </span>
                       </a>
                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_5_action_menu" type="button">
                           <i aria-hidden="true" class="ri-more-2-fill">
@@ -5295,7 +5819,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -5523,7 +6047,92 @@
                                                                                         WHERE (NOT "users_jobseekerassignment"."assigned_to_unknown_advisor"
                                                                                                AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
                                                                                                                                                                                                                                WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
-                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb"
+                                                                                                                                                                                                                                      AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_contract" U0
+             WHERE (U0."end_date" BETWEEN %s AND %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_prosupportreport" V0
+             WHERE V0."contract_id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                  ORDER BY U0."start_date" DESC, 1 DESC
+                  LIMIT 1)
+             LIMIT 1) AS "last_contract_has_pro_support_report",
+                 CASE
+                     WHEN (NOT EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_prosupportreport" V0
+                              WHERE V0."contract_id" =
+                                  (SELECT U0."id" AS "pk"
+                                   FROM "companies_contract" U0
+                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                   LIMIT 1)
+                              LIMIT 1)
+                           AND (EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_contract" U0
+                                   WHERE (U0."end_date" BETWEEN %s AND %s
+                                          AND U0."job_seeker_id" = ("users_user"."id"))
+                                   LIMIT 1)
+                                OR (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" V0
+                                       WHERE (V0."end_date" < %s
+                                              AND V0."id" =
+                                                (SELECT U0."id" AS "pk"
+                                                 FROM "companies_contract" U0
+                                                 WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                 ORDER BY U0."start_date" DESC, 1 DESC
+                                                 LIMIT 1))
+                                       LIMIT 1)
+                                    AND EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "approvals_approval" U0
+                                       WHERE (U0."user_id" = ("users_user"."id")
+                                              AND U0."end_at" >= %s)
+                                       LIMIT 1)))) THEN COALESCE(
+                                                                   (SELECT U1."email" AS "company__email"
+                                                                    FROM "companies_contract" U0
+                                                                    INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                    WHERE (U0."company_id" IS NOT NULL
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U1."email" = %s))
+                                                                    ORDER BY U0."start_date" DESC
+                                                                    LIMIT 1),
+                                                                   (SELECT U2."email" AS "to_company__email"
+                                                                    FROM "job_applications_jobapplication" U0
+                                                                    INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                    WHERE (U0."state" = %s
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U2."email" = %s))
+                                                                    ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                    LIMIT 1))
+                     ELSE NULL
+                 END AS "pro_support_request_company_email"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
@@ -5535,7 +6144,8 @@
                             AND U0."professional_id" = %s)
                            OR (U0."company_id" IS NULL
                                AND U0."prescriber_organization_id" = %s))))
-          GROUP BY "users_user"."id"
+          GROUP BY "users_user"."id",
+                   42
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
         ''',
@@ -5590,11 +6200,11 @@
           INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           WHERE ("prescribers_prescribermembership"."organization_id" = %s
                  AND "users_user"."id" IN
-                   (SELECT V1."professional_id" AS "job_seeker_assignments__professional"
-                    FROM "users_user" V0
-                    LEFT OUTER JOIN "users_jobseekerassignment" V1 ON (V0."id" = V1."job_seeker_id")
-                    WHERE (V0."kind" = %s
-                           AND V0."id" IN
+                   (SELECT W1."professional_id" AS "job_seeker_assignments__professional"
+                    FROM "users_user" W0
+                    LEFT OUTER JOIN "users_jobseekerassignment" W1 ON (W0."id" = W1."job_seeker_id")
+                    WHERE (W0."kind" = %s
+                           AND W0."id" IN
                              (SELECT DISTINCT U0."job_seeker_id" AS "job_seeker_id"
                               FROM "users_jobseekerassignment" U0
                               WHERE ((U0."company_id" IS NULL
@@ -5602,7 +6212,7 @@
                                       AND U0."professional_id" = %s)
                                      OR (U0."company_id" IS NULL
                                          AND U0."prescriber_organization_id" = %s))))
-                    GROUP BY V0."id",
+                    GROUP BY W0."id",
                              1))
           ORDER BY RANDOM() ASC
         ''',
@@ -5667,7 +6277,92 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT NOT EXISTS
+            (SELECT EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_contract" U0
+                WHERE (U0."end_date" BETWEEN %s AND %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                LIMIT 1) AS "contract_ending_soon",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "companies_contract" V0
+                        WHERE (V0."end_date" < %s
+                               AND V0."id" =
+                                 (SELECT U0."id" AS "pk"
+                                  FROM "companies_contract" U0
+                                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                                  ORDER BY U0."start_date" DESC, 1 DESC
+                                  LIMIT 1))
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE (U0."user_id" = ("users_user"."id")
+                               AND U0."end_at" >= %s)
+                        LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                    EXISTS
+               (SELECT %s AS "a"
+                FROM "companies_prosupportreport" V0
+                WHERE V0."contract_id" =
+                    (SELECT U0."id" AS "pk"
+                     FROM "companies_contract" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     ORDER BY U0."start_date" DESC, 1 DESC
+                     LIMIT 1)
+                LIMIT 1) AS "last_contract_has_pro_support_report",
+                    CASE
+                        WHEN (NOT EXISTS
+                                (SELECT %s AS "a"
+                                 FROM "companies_prosupportreport" V0
+                                 WHERE V0."contract_id" =
+                                     (SELECT U0."id" AS "pk"
+                                      FROM "companies_contract" U0
+                                      WHERE U0."job_seeker_id" = ("users_user"."id")
+                                      ORDER BY U0."start_date" DESC, 1 DESC
+                                      LIMIT 1)
+                                 LIMIT 1)
+                              AND (EXISTS
+                                     (SELECT %s AS "a"
+                                      FROM "companies_contract" U0
+                                      WHERE (U0."end_date" BETWEEN %s AND %s
+                                             AND U0."job_seeker_id" = ("users_user"."id"))
+                                      LIMIT 1)
+                                   OR (EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "companies_contract" V0
+                                          WHERE (V0."end_date" < %s
+                                                 AND V0."id" =
+                                                   (SELECT U0."id" AS "pk"
+                                                    FROM "companies_contract" U0
+                                                    WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                    ORDER BY U0."start_date" DESC, 1 DESC
+                                                    LIMIT 1))
+                                          LIMIT 1)
+                                       AND EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "approvals_approval" U0
+                                          WHERE (U0."user_id" = ("users_user"."id")
+                                                 AND U0."end_at" >= %s)
+                                          LIMIT 1)))) THEN COALESCE(
+                                                                      (SELECT U1."email" AS "company__email"
+                                                                       FROM "companies_contract" U0
+                                                                       INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                       WHERE (U0."company_id" IS NOT NULL
+                                                                              AND U0."job_seeker_id" = ("users_user"."id")
+                                                                              AND NOT (U1."email" = %s))
+                                                                       ORDER BY U0."start_date" DESC
+                                                                       LIMIT 1),
+                                                                      (SELECT U2."email" AS "to_company__email"
+                                                                       FROM "job_applications_jobapplication" U0
+                                                                       INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                       WHERE (U0."state" = %s
+                                                                              AND U0."job_seeker_id" = ("users_user"."id")
+                                                                              AND NOT (U2."email" = %s))
+                                                                       ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                       LIMIT 1))
+                        ELSE NULL
+                    END AS "pro_support_request_company_email",
+                    NOT EXISTS
                (SELECT %s AS "a"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
@@ -5709,6 +6404,15 @@
                 LIMIT 1) AS "valid_eligibility_diagnosis",
           
                (SELECT U0."id" AS "id"
+                FROM "approvals_prolongationrequest" U0
+                INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                WHERE (U1."user_id" = ("users_user"."id")
+                       AND U0."prescriber_organization_id" = %s
+                       AND U0."status" = %s)
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "pending_prolongation_request",
+          
+               (SELECT U0."id" AS "id"
                 FROM "users_jobseekerassignment" U0
                 WHERE (((U0."company_id" IS NULL
                          AND U0."prescriber_organization_id" IS NULL
@@ -5721,7 +6425,119 @@
                        AND NOT (U0."company_id" IS NULL
                                 AND U0."prescriber_organization_id" IS NULL))
                 ORDER BY U0."updated_at" DESC
-                LIMIT 1) AS "active_assignment"
+                LIMIT 1) AS "active_assignment",
+                        CASE
+                            WHEN
+                                   (SELECT U0."id" AS "id"
+                                    FROM "approvals_prolongationrequest" U0
+                                    INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                    WHERE (U1."user_id" = ("users_user"."id")
+                                           AND U0."prescriber_organization_id" = %s
+                                           AND U0."status" = %s)
+                                    ORDER BY U0."created_at" DESC
+                                    LIMIT 1) IS NOT NULL THEN %s
+                            WHEN (NOT EXISTS
+                                    (SELECT %s AS "a"
+                                     FROM "companies_prosupportreport" V0
+                                     WHERE V0."contract_id" =
+                                         (SELECT U0."id" AS "pk"
+                                          FROM "companies_contract" U0
+                                          WHERE U0."job_seeker_id" = ("users_user"."id")
+                                          ORDER BY U0."start_date" DESC, 1 DESC
+                                          LIMIT 1)
+                                     LIMIT 1)
+                                  AND (EXISTS
+                                         (SELECT %s AS "a"
+                                          FROM "companies_contract" U0
+                                          WHERE (U0."end_date" BETWEEN %s AND %s
+                                                 AND U0."job_seeker_id" = ("users_user"."id"))
+                                          LIMIT 1)
+                                       OR (EXISTS
+                                             (SELECT %s AS "a"
+                                              FROM "companies_contract" V0
+                                              WHERE (V0."end_date" < %s
+                                                     AND V0."id" =
+                                                       (SELECT U0."id" AS "pk"
+                                                        FROM "companies_contract" U0
+                                                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                        ORDER BY U0."start_date" DESC, 1 DESC
+                                                        LIMIT 1))
+                                              LIMIT 1)
+                                           AND EXISTS
+                                             (SELECT %s AS "a"
+                                              FROM "approvals_approval" U0
+                                              WHERE (U0."user_id" = ("users_user"."id")
+                                                     AND U0."end_at" >= %s)
+                                              LIMIT 1)))
+                                  AND CASE
+                                          WHEN (NOT EXISTS
+                                                  (SELECT %s AS "a"
+                                                   FROM "companies_prosupportreport" V0
+                                                   WHERE V0."contract_id" =
+                                                       (SELECT U0."id" AS "pk"
+                                                        FROM "companies_contract" U0
+                                                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                        ORDER BY U0."start_date" DESC, 1 DESC
+                                                        LIMIT 1)
+                                                   LIMIT 1)
+                                                AND (EXISTS
+                                                       (SELECT %s AS "a"
+                                                        FROM "companies_contract" U0
+                                                        WHERE (U0."end_date" BETWEEN %s AND %s
+                                                               AND U0."job_seeker_id" = ("users_user"."id"))
+                                                        LIMIT 1)
+                                                     OR (EXISTS
+                                                           (SELECT %s AS "a"
+                                                            FROM "companies_contract" V0
+                                                            WHERE (V0."end_date" < %s
+                                                                   AND V0."id" =
+                                                                     (SELECT U0."id" AS "pk"
+                                                                      FROM "companies_contract" U0
+                                                                      WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                                      ORDER BY U0."start_date" DESC, 1 DESC
+                                                                      LIMIT 1))
+                                                            LIMIT 1)
+                                                         AND EXISTS
+                                                           (SELECT %s AS "a"
+                                                            FROM "approvals_approval" U0
+                                                            WHERE (U0."user_id" = ("users_user"."id")
+                                                                   AND U0."end_at" >= %s)
+                                                            LIMIT 1)))) THEN COALESCE(
+                                                                                        (SELECT U1."email" AS "company__email"
+                                                                                         FROM "companies_contract" U0
+                                                                                         INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                                         WHERE (U0."company_id" IS NOT NULL
+                                                                                                AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                                AND NOT (U1."email" = %s))
+                                                                                         ORDER BY U0."start_date" DESC
+                                                                                         LIMIT 1),
+                                                                                        (SELECT U2."email" AS "to_company__email"
+                                                                                         FROM "job_applications_jobapplication" U0
+                                                                                         INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                                         WHERE (U0."state" = %s
+                                                                                                AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                                AND NOT (U2."email" = %s))
+                                                                                         ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                                         LIMIT 1))
+                                          ELSE NULL
+                                      END IS NOT NULL) THEN %s
+                            WHEN (
+                                    (SELECT U0."id" AS "id"
+                                     FROM "eligibility_eligibilitydiagnosis" U0
+                                     WHERE (U0."expires_at" > %s
+                                            AND U0."author_kind" = %s
+                                            AND U0."job_seeker_id" = ("users_user"."id"))
+                                     ORDER BY U0."created_at" DESC
+                                     LIMIT 1) IS NULL
+                                  AND NOT EXISTS
+                                    (SELECT %s AS "a"
+                                     FROM "approvals_approval" U0
+                                     WHERE (U0."end_at" >= %s
+                                            AND U0."user_id" = ("users_user"."id"))
+                                     LIMIT 1)
+                                  AND %s) THEN %s
+                            ELSE %s
+                        END AS "action_for_job_seeker"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."job_seeker_id")
              WHERE ("users_user"."kind" = %s
@@ -5743,11 +6559,14 @@
                                    AND U0."prescriber_organization_id" = %s))
                               AND U0."ended_at" IS NULL)))
              GROUP BY "users_user"."id",
-                      1,
-                      2,
-                      3,
+                      4,
                       5,
-                      6) subquery
+                      6,
+                      7,
+                      9,
+                      10,
+                      11,
+                      12) subquery
         ''',
       }),
       dict({
@@ -5799,6 +6618,91 @@
                                                                                                AND "users_jobseekerassignment"."ended_at" IS NULL)) + COUNT("users_jobseekerassignment"."assigned_to_unknown_advisor") FILTER (
                                                                                                                                                                                                                                WHERE ("users_jobseekerassignment"."assigned_to_unknown_advisor"
                                                                                                                                                                                                                                       AND "users_jobseekerassignment"."ended_at" IS NULL))) AS "active_advisors_nb",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_contract" U0
+             WHERE (U0."end_date" BETWEEN %s AND %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             LIMIT 1) AS "contract_ending_soon",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "companies_contract" V0
+                     WHERE (V0."end_date" < %s
+                            AND V0."id" =
+                              (SELECT U0."id" AS "pk"
+                               FROM "companies_contract" U0
+                               WHERE U0."job_seeker_id" = ("users_user"."id")
+                               ORDER BY U0."start_date" DESC, 1 DESC
+                               LIMIT 1))
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE (U0."user_id" = ("users_user"."id")
+                            AND U0."end_at" >= %s)
+                     LIMIT 1)) AS "last_contract_ended_with_valid_approval",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_prosupportreport" V0
+             WHERE V0."contract_id" =
+                 (SELECT U0."id" AS "pk"
+                  FROM "companies_contract" U0
+                  WHERE U0."job_seeker_id" = ("users_user"."id")
+                  ORDER BY U0."start_date" DESC, 1 DESC
+                  LIMIT 1)
+             LIMIT 1) AS "last_contract_has_pro_support_report",
+                 CASE
+                     WHEN (NOT EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_prosupportreport" V0
+                              WHERE V0."contract_id" =
+                                  (SELECT U0."id" AS "pk"
+                                   FROM "companies_contract" U0
+                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                   LIMIT 1)
+                              LIMIT 1)
+                           AND (EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_contract" U0
+                                   WHERE (U0."end_date" BETWEEN %s AND %s
+                                          AND U0."job_seeker_id" = ("users_user"."id"))
+                                   LIMIT 1)
+                                OR (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" V0
+                                       WHERE (V0."end_date" < %s
+                                              AND V0."id" =
+                                                (SELECT U0."id" AS "pk"
+                                                 FROM "companies_contract" U0
+                                                 WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                 ORDER BY U0."start_date" DESC, 1 DESC
+                                                 LIMIT 1))
+                                       LIMIT 1)
+                                    AND EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "approvals_approval" U0
+                                       WHERE (U0."user_id" = ("users_user"."id")
+                                              AND U0."end_at" >= %s)
+                                       LIMIT 1)))) THEN COALESCE(
+                                                                   (SELECT U1."email" AS "company__email"
+                                                                    FROM "companies_contract" U0
+                                                                    INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                    WHERE (U0."company_id" IS NOT NULL
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U1."email" = %s))
+                                                                    ORDER BY U0."start_date" DESC
+                                                                    LIMIT 1),
+                                                                   (SELECT U2."email" AS "to_company__email"
+                                                                    FROM "job_applications_jobapplication" U0
+                                                                    INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                    WHERE (U0."state" = %s
+                                                                           AND U0."job_seeker_id" = ("users_user"."id")
+                                                                           AND NOT (U2."email" = %s))
+                                                                    ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                    LIMIT 1))
+                     ELSE NULL
+                 END AS "pro_support_request_company_email",
                  ARRAY_AGG(DISTINCT "users_jobseekerassignment"."professional_id") AS "advisors",
                  NOT EXISTS
             (SELECT %s AS "a"
@@ -5842,6 +6746,15 @@
              LIMIT 1) AS "valid_eligibility_diagnosis",
           
             (SELECT U0."id" AS "id"
+             FROM "approvals_prolongationrequest" U0
+             INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+             WHERE (U1."user_id" = ("users_user"."id")
+                    AND U0."prescriber_organization_id" = %s
+                    AND U0."status" = %s)
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "pending_prolongation_request",
+          
+            (SELECT U0."id" AS "id"
              FROM "users_jobseekerassignment" U0
              WHERE (((U0."company_id" IS NULL
                       AND U0."prescriber_organization_id" IS NULL
@@ -5855,6 +6768,118 @@
                              AND U0."prescriber_organization_id" IS NULL))
              ORDER BY U0."updated_at" DESC
              LIMIT 1) AS "active_assignment",
+                     CASE
+                         WHEN
+                                (SELECT U0."id" AS "id"
+                                 FROM "approvals_prolongationrequest" U0
+                                 INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
+                                 WHERE (U1."user_id" = ("users_user"."id")
+                                        AND U0."prescriber_organization_id" = %s
+                                        AND U0."status" = %s)
+                                 ORDER BY U0."created_at" DESC
+                                 LIMIT 1) IS NOT NULL THEN %s
+                         WHEN (NOT EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "companies_prosupportreport" V0
+                                  WHERE V0."contract_id" =
+                                      (SELECT U0."id" AS "pk"
+                                       FROM "companies_contract" U0
+                                       WHERE U0."job_seeker_id" = ("users_user"."id")
+                                       ORDER BY U0."start_date" DESC, 1 DESC
+                                       LIMIT 1)
+                                  LIMIT 1)
+                               AND (EXISTS
+                                      (SELECT %s AS "a"
+                                       FROM "companies_contract" U0
+                                       WHERE (U0."end_date" BETWEEN %s AND %s
+                                              AND U0."job_seeker_id" = ("users_user"."id"))
+                                       LIMIT 1)
+                                    OR (EXISTS
+                                          (SELECT %s AS "a"
+                                           FROM "companies_contract" V0
+                                           WHERE (V0."end_date" < %s
+                                                  AND V0."id" =
+                                                    (SELECT U0."id" AS "pk"
+                                                     FROM "companies_contract" U0
+                                                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                     ORDER BY U0."start_date" DESC, 1 DESC
+                                                     LIMIT 1))
+                                           LIMIT 1)
+                                        AND EXISTS
+                                          (SELECT %s AS "a"
+                                           FROM "approvals_approval" U0
+                                           WHERE (U0."user_id" = ("users_user"."id")
+                                                  AND U0."end_at" >= %s)
+                                           LIMIT 1)))
+                               AND CASE
+                                       WHEN (NOT EXISTS
+                                               (SELECT %s AS "a"
+                                                FROM "companies_prosupportreport" V0
+                                                WHERE V0."contract_id" =
+                                                    (SELECT U0."id" AS "pk"
+                                                     FROM "companies_contract" U0
+                                                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                     ORDER BY U0."start_date" DESC, 1 DESC
+                                                     LIMIT 1)
+                                                LIMIT 1)
+                                             AND (EXISTS
+                                                    (SELECT %s AS "a"
+                                                     FROM "companies_contract" U0
+                                                     WHERE (U0."end_date" BETWEEN %s AND %s
+                                                            AND U0."job_seeker_id" = ("users_user"."id"))
+                                                     LIMIT 1)
+                                                  OR (EXISTS
+                                                        (SELECT %s AS "a"
+                                                         FROM "companies_contract" V0
+                                                         WHERE (V0."end_date" < %s
+                                                                AND V0."id" =
+                                                                  (SELECT U0."id" AS "pk"
+                                                                   FROM "companies_contract" U0
+                                                                   WHERE U0."job_seeker_id" = ("users_user"."id")
+                                                                   ORDER BY U0."start_date" DESC, 1 DESC
+                                                                   LIMIT 1))
+                                                         LIMIT 1)
+                                                      AND EXISTS
+                                                        (SELECT %s AS "a"
+                                                         FROM "approvals_approval" U0
+                                                         WHERE (U0."user_id" = ("users_user"."id")
+                                                                AND U0."end_at" >= %s)
+                                                         LIMIT 1)))) THEN COALESCE(
+                                                                                     (SELECT U1."email" AS "company__email"
+                                                                                      FROM "companies_contract" U0
+                                                                                      INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
+                                                                                      WHERE (U0."company_id" IS NOT NULL
+                                                                                             AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                             AND NOT (U1."email" = %s))
+                                                                                      ORDER BY U0."start_date" DESC
+                                                                                      LIMIT 1),
+                                                                                     (SELECT U2."email" AS "to_company__email"
+                                                                                      FROM "job_applications_jobapplication" U0
+                                                                                      INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
+                                                                                      WHERE (U0."state" = %s
+                                                                                             AND U0."job_seeker_id" = ("users_user"."id")
+                                                                                             AND NOT (U2."email" = %s))
+                                                                                      ORDER BY U0."hiring_start_at" DESC NULLS LAST
+                                                                                      LIMIT 1))
+                                       ELSE NULL
+                                   END IS NOT NULL) THEN %s
+                         WHEN (
+                                 (SELECT U0."id" AS "id"
+                                  FROM "eligibility_eligibilitydiagnosis" U0
+                                  WHERE (U0."expires_at" > %s
+                                         AND U0."author_kind" = %s
+                                         AND U0."job_seeker_id" = ("users_user"."id"))
+                                  ORDER BY U0."created_at" DESC
+                                  LIMIT 1) IS NULL
+                               AND NOT EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "approvals_approval" U0
+                                  WHERE (U0."end_at" >= %s
+                                         AND U0."user_id" = ("users_user"."id"))
+                                  LIMIT 1)
+                               AND %s) THEN %s
+                         ELSE %s
+                     END AS "action_for_job_seeker",
                      "users_jobseekerprofile"."fields_history",
                      "users_jobseekerprofile"."user_id",
                      "users_jobseekerprofile"."birthdate",
@@ -5929,13 +6954,17 @@
                                 AND U0."prescriber_organization_id" = %s))
                            AND U0."ended_at" IS NULL)))
           GROUP BY "users_user"."id",
-                   40,
-                   41,
                    42,
                    44,
                    45,
+                   46,
+                   48,
+                   49,
+                   50,
+                   51,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 43 DESC,
+          ORDER BY 51 ASC,
+                   47 DESC,
                    "users_user"."id" DESC
           LIMIT 3
         ''',
@@ -5971,6 +7000,30 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."id" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
+          'wrapper[utils/readonly.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s,
+                                                         %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
         ''',
       }),
       dict({
@@ -6167,10 +7220,10 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-sm rounded-pill bg-warning text-white">
                       <i aria-hidden="true" class="ri-error-warning-line">
                       </i>
-                      Éligibilité IAE à valider
+                      Prolongation demandée
                   </span>
               </div>
           </td>
@@ -6187,18 +7240,21 @@
               Non précisé (Pres. Org.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
-                      <i aria-label="Postuler pour YGREC Bernard" class="ri-draft-line">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-warning btn-ico text-nowrap" data-bs-title="Traiter la demande de prolongation de PASS IAE" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="pass-iae" data-matomo-event="true" data-matomo-option="traiter-demande-prolongation" href="/approvals/prolongation/request/[ProlongationRequest PK]">
+                      <i aria-label="Traiter la demande de prolongation du PASS IAE de YGREC Bernard" class="ri-pencil-line">
                       </i>
+                      <span>
+                          Traiter la demande
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href="/eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">
-                          Valider son éligibilité IAE
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&city=brest-29">
+                          Postuler
                       </a>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=22222222-2222-2222-2222-222222222222&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                           Orienter vers un service d’insertion
@@ -6238,10 +7294,13 @@
               GRAVIER Emile (Pres. Org.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=11111111-1111-1111-1111-111111111111&city=brest-29">
                       <i aria-label="Postuler pour ZORRO Alain" class="ri-draft-line">
                       </i>
+                      <span>
+                          Postuler
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
@@ -6269,10 +7328,10 @@
           </td>
           <td>
               <div class="d-flex align-items-center">
-                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                      <i aria-hidden="true" class="ri-error-warning-line">
+                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                      <i aria-hidden="true" class="ri-pass-valid-line">
                       </i>
-                      Éligibilité IAE à valider
+                      PASS IAE valide
                   </span>
               </div>
           </td>
@@ -6289,19 +7348,19 @@
               Non précisé (ACME Inc.)
           </td>
           <td class="text-end w-100px">
-              <div aria-label="Actions rapides sur les usagers" class="d-flex justify-content-end gap-2" role="group">
-                  <a class="btn btn-sm btn-secondary btn-ico-only" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
+              <div aria-label="Actions rapides sur les accompagnements" class="d-flex justify-content-end gap-2" role="group">
+                  <a class="btn btn-sm btn-secondary btn-ico" data-bs-title="Postuler pour cet usager" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&city=brest-29">
                       <i aria-label="Postuler pour XERUS Charlotte" class="ri-draft-line">
                       </i>
+                      <span>
+                          Postuler
+                      </span>
                   </a>
                   <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d’actions" class="btn btn-sm btn-secondary btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
                       <i aria-hidden="true" class="ri-more-2-fill">
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href="/eligibility/update/iae/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">
-                          Valider son éligibilité IAE
-                      </a>
                       <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
                           Orienter vers un service d’insertion
                       </a>

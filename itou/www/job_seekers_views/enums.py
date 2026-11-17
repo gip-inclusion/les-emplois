@@ -18,3 +18,17 @@ class JobSeekerOrder(OrderEnum):
     JOB_APPLICATIONS_NB_DESC = "-job_applications_nb"
     ADVISORS_NB_ASC = "active_advisors_nb"
     ADVISORS_NB_DESC = "-active_advisors_nb"
+
+
+class ActionForJobSeeker(enum.IntEnum):
+    PROLONG_IAE_PASS = 0
+    FILL_REPORT = 1
+    ASK_FOR_REPORT = 2
+    EVALUATE_IAE_ELIGIBILITY = 3
+    APPLY = 4
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
