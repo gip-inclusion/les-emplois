@@ -95,11 +95,39 @@
                 {% endcomponent_alert %}
             {% endif %}
             {% bootstrap_field form.prescriber_email wrapper_class="form-group form-group-input-w-lg-66" %}
+            <button type="button" class="btn btn-secondary mb-3" hx-post="{% url "job_seekers_views:reload_pro_support_report_recipient" public_id=job_seeker.public_id %}" hx-target="#pro-support-report-recipient" hx-swap="outerHTML" hx-indicator="#pro-support-report-recipient" {% if form.no_known_prescriber %}data-emplois-elements-visibility-on-selection="disabled"{% if form.no_known_prescriber.value %} disabled{% endif %}{% endif %} {% matomo_event "employeurs" "clic" "verifier-email-prescripteur-bilan" %}>
+                Vérifier l’e-mail
+            </button>
+            {% if form.prescriber_from_email %}
+                <p class="mb-2" data-emplois-elements-visibility-on-selection="hidden">
+                    <i class="ri-checkbox-circle-line text-success me-1" aria-hidden="true"></i>
+                    {% if form.prescriber_organization %}
+                        {{ form.prescriber_from_email.get_full_name }} recevra le bilan.
+                    {% else %}
+                        {{ form.prescriber_from_email.get_full_name }}, de {{ form.organizations_from_email.0.display_name }}, recevra le bilan.
+                    {% endif %}
+                </p>
+            {% endif %}
             {% if form.prescriber_organization %}
                 {% bootstrap_field form.prescriber_organization wrapper_class="form-group form-group-input-w-lg-66" %}
             {% endif %}
             {% if form.no_known_prescriber %}
                 {% bootstrap_field form.no_known_prescriber wrapper_class="form-group mb-5" %}
+            {% endif %}
+            {% if suggested_recipient %}
+                <p class="mb-4">
+                    {# Displayed again without the email, so that its check is cleared too. #}
+                    <button type="button"
+                            class="btn btn-link p-0"
+                            hx-post="{% url "job_seekers_views:reload_pro_support_report_recipient" public_id=job_seeker.public_id %}"
+                            hx-vals='{"prescriber_email": ""}'
+                            hx-target="#pro-support-report-recipient"
+                            hx-swap="outerHTML"
+                            hx-indicator="#pro-support-report-recipient"
+                            {% matomo_event "employeurs" "clic" "garder-prescripteur-propose-bilan" %}>
+                        Annuler et garder {{ suggested_recipient.professional.get_full_name }}
+                    </button>
+                </p>
             {% endif %}
         </div>
     {% endwith %}

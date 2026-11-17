@@ -644,6 +644,27 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["POST"])
+@check_request(can_fill_pro_support_report)
+def reload_pro_support_report_recipient(
+    request, public_id, template_name="job_seekers_views/includes/pro_support_report_recipient.html"
+):
+    report = _get_pro_support_report_to_fill(request, public_id)
+    form = ProSupportReportForm(
+        reverse("job_seekers_views:create_pro_support_report", args=(public_id,)), data=request.POST, instance=report
+    )
+    form.is_valid()
+    # Only the checked email is reported, the employer has not sent the report yet.
+    for field_name in ["prescriber_organization", "no_known_prescriber", "displayed_recipient"]:
+        form.errors.pop(field_name, None)
+    context = {
+        "form": form,
+        "job_seeker": report.job_seeker,
+        "can_view_personal_information": can_view_personal_information(request, report.job_seeker),
+    }
+    return render(request, template_name, context)
+
+
 @readonly_view
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report.html"):
