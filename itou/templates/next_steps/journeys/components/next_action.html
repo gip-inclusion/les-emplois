@@ -1,0 +1,7 @@
+{% load str_filters %}
+{# Run the next action in the same drawer; without JavaScript, open it as a page. #}
+<a class="btn {{ style }}"
+   href="{{ next_action.journey_url }}"
+   {% if in_drawer %}hx-get="{{ next_action.journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>
+    Action suivante · {{ next_action.job_seeker.first_name|mask_unless:next_action.user_can_view_personal_information }}
+</a>

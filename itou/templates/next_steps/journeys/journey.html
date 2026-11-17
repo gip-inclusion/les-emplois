@@ -40,17 +40,39 @@
                         {% for line in result.lines %}<li>{{ line }}</li>{% endfor %}
                     </ul>
                 {% endif %}
+                <a class="fs-sm"
+                   href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
             </div>
+            {# Keep the momentum: what remains for today, and what comes next. #}
+            {% if remaining_today is not None %}
+                <div class="next-step-box next-step-box--ok mt-4">
+                    <b>
+                        {% if remaining_today %}
+                            Plus que {{ remaining_today }} action{{ remaining_today|pluralizefr }} aujourd’hui
+                        {% else %}
+                            Tout est fait pour aujourd’hui
+                        {% endif %}
+                    </b>
+                    {% if next_action %}
+                        <span>Ensuite&nbsp;: {{ next_action.title }} ({{ next_action.job_seeker.get_full_name|mask_unless:next_action.user_can_view_personal_information }}).</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if result.link and next_action %}
+                {% include "next_steps/journeys/components/next_action.html" with next_action=next_action in_drawer=in_drawer style="btn-outline-primary mt-3" only %}
+            {% endif %}
         </div>
         <div class="next-step-journey__foot">
-            <a class="btn btn-outline-primary"
-               href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
+            {% if in_drawer %}
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Terminer</button>
+            {% else %}
+                <a class="btn btn-outline-primary"
+                   href="{% url "next_steps_views:todo" %}">Retour à «&nbsp;À faire&nbsp;»</a>
+            {% endif %}
             {% if result.link %}
                 <a class="btn btn-primary" href="{{ result.link.1 }}">{{ result.link.0 }}</a>
-            {% elif in_drawer %}
-                <button type="button" class="btn btn-primary" data-bs-dismiss="offcanvas">Terminer</button>
-            {% else %}
-                <a class="btn btn-primary" href="{% url "next_steps_views:todo" %}">Retour à «&nbsp;À faire&nbsp;»</a>
+            {% elif next_action %}
+                {% include "next_steps/journeys/components/next_action.html" with next_action=next_action in_drawer=in_drawer style="btn-primary" only %}
             {% endif %}
         </div>
     {% else %}

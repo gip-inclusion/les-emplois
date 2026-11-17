@@ -1,0 +1,21 @@
+{% load str_filters %}
+{# What was done today, as in the prototype: who was moved forward, not a score. #}
+{% if done_today %}
+    <section class="mb-5" aria-labelledby="next-steps-done">
+        <h2 class="h3 mb-1" id="next-steps-done">
+            Fait aujourd’hui <span class="text-muted fw-normal">{{ done_today|length }}</span>
+        </h2>
+        <p class="fs-sm text-muted mb-3">Visible uniquement par vous.</p>
+        <ul class="next-steps-done list-unstyled mb-0">
+            {% for item in done_today %}
+                <li>
+                    <i class="ri-check-line text-success" aria-hidden="true"></i>
+                    <span>
+                        <a class="link-tertiary fw-bold" href="{% url "next_steps_views:job_seeker" public_id=item.job_seeker.public_id %}">{{ item.job_seeker.get_inverted_full_name|mask_unless:item.user_can_view_personal_information }}</a>
+                        · {{ item.label }} · {{ item.at|time:"H\hi" }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}

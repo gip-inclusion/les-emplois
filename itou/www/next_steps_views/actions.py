@@ -13,11 +13,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.approvals.enums import ProlongationRequestStatus
-from itou.approvals.models import Approval, ProlongationRequest
+from itou.approvals.models import Approval, ProlongationRequest, Suspension
 from itou.companies.enums import CompanyKind
 from itou.companies.models import ProSupportReport
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.rdv_insertion.enums import ParticipationStatus
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import UserKind
@@ -443,3 +444,92 @@ def group_actions(actions):
         {"key": key, "label": label, "help": help_text, "actions": [a for a in actions if a.group == key]}
         for key, label, help_text in GROUPS
     ]
+
+
+# Done today
+# ------------------------------------------------------------------------------
+# Read from what the platform already records, with its author and time: nothing is stored for the experiment.
+# Shown to the user only, never aggregated: it measures their activity (see the RGPD validation before production).
+# Not counted, as nothing records them: asking for a report by e-mail, reading a report, an appointment's status.
+
+TRANSITION_LABELS = {
+    "process": "candidature mise à l’étude",
+    "postpone": "candidature mise en attente",
+    "accept": "embauche acceptée",
+    "refuse": "candidature déclinée",
+}
+
+
+@dataclasses.dataclass
+class Done:
+    job_seeker: User
+    label: str
+    at: datetime.datetime
+
+
+def _today_lookup(field):
+    return {f"{field}__date": timezone.localdate()}
+
+
+def _employer_done(request):
+    company = request.current_organization
+    logs = (
+        JobApplicationTransitionLog.objects.filter(
+            user=request.user,
+            job_application__to_company=company,
+            transition__in=TRANSITION_LABELS,
+            **_today_lookup("timestamp"),
+        )
+        .select_related("job_application__job_seeker")
+        .order_by("timestamp")
+    )
+    for log in logs:
+        yield Done(log.job_application.job_seeker, TRANSITION_LABELS[log.transition], log.timestamp)
+    suspensions = Suspension.objects.filter(
+        created_by=request.user, siae=company, **_today_lookup("created_at")
+    ).select_related("approval__user")
+    for suspension in suspensions:
+        yield Done(suspension.approval.user, f"PASS{NBSP}IAE suspendu", suspension.created_at)
+    reports = ProSupportReport.objects.filter(
+        author=request.user, company=company, **_today_lookup("created_at")
+    ).select_related("job_seeker")
+    for report in reports:
+        yield Done(report.job_seeker, "bilan d’accompagnement envoyé", report.created_at)
+
+
+def _prescriber_done(request):
+    organization = request.current_organization
+    prolongation_requests = ProlongationRequest.objects.filter(
+        processed_by=request.user,
+        prescriber_organization=organization,
+        status__in=[ProlongationRequestStatus.GRANTED, ProlongationRequestStatus.DENIED],
+        **_today_lookup("processed_at"),
+    ).select_related("approval__user")
+    for prolongation_request in prolongation_requests:
+        decision = "acceptée" if prolongation_request.status == ProlongationRequestStatus.GRANTED else "refusée"
+        yield Done(prolongation_request.approval.user, f"prolongation {decision}", prolongation_request.processed_at)
+    diagnoses = EligibilityDiagnosis.objects.filter(
+        author=request.user, author_prescriber_organization=organization, **_today_lookup("created_at")
+    ).select_related("job_seeker")
+    for diagnosis in diagnoses:
+        yield Done(diagnosis.job_seeker, "éligibilité IAE validée", diagnosis.created_at)
+
+
+def done_today(request):
+    """What the signed-in professional did today among the expected actions, oldest first."""
+    if request.from_employer:
+        done = list(_employer_done(request))
+    elif request.from_authorized_prescriber:
+        done = list(_prescriber_done(request))
+    else:
+        done = []
+    return sorted(done, key=lambda item: item.at)
+
+
+def next_action(actions):
+    """The action to suggest after one is done: the first of today's, else of this week's, run in the drawer."""
+    for group in (Group.TODAY, Group.WEEK):
+        for action in actions:
+            if action.group == group and action.journey_url:
+                return action
+    return None

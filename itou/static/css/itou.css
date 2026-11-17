@@ -677,3 +677,54 @@ table.table td > .modal .modal-content {
     font-weight: 700;
 }
 
+/* The day's progress: a native progress element, filled in tertiary blue. */
+.next-steps-day__bar {
+    display: block;
+    width: 100%;
+    height: .75rem;
+    border: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    appearance: none;
+    background-color: var(--bs-light, #f2f3f5);
+    color: var(--bs-tertiary, #000091);
+}
+
+.next-steps-day__bar::-webkit-progress-bar {
+    border-radius: 999px;
+    background-color: var(--bs-light, #f2f3f5);
+}
+
+.next-steps-day__bar::-webkit-progress-value {
+    border-radius: 999px;
+    background-color: var(--bs-tertiary, #000091);
+}
+
+.next-steps-day__bar::-moz-progress-bar {
+    border-radius: 999px;
+    background-color: var(--bs-tertiary, #000091);
+}
+
+/* Done today: one line per person moved forward. */
+.next-steps-done {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.next-steps-done li {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+    font-size: .875rem;
+    color: var(--bs-secondary-color, #727492);
+}
+
+.next-steps-done a {
+    text-decoration: none;
+}
+
+.next-steps-done a:hover,
+.next-steps-done a:focus-visible {
+    text-decoration: underline;
+}

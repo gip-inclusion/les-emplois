@@ -18,7 +18,14 @@ from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
-from itou.www.next_steps_views.actions import Group, describe_job_seekers, expected_actions, group_actions
+from itou.www.next_steps_views.actions import (
+    Group,
+    describe_job_seekers,
+    done_today,
+    expected_actions,
+    group_actions,
+    next_action,
+)
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.situation import situation_sentences
 from itou.www.next_steps_views.timeline import build_timeline
@@ -41,9 +48,17 @@ def todo(request, template_name="next_steps/todo.html"):
 
     actions = expected_actions(request)
     describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
+    done = done_today(request)
+    describe_job_seekers(done, lambda job_seeker: can_view_personal_information(request, job_seeker))
+    remaining_today = sum(action.group == Group.TODAY for action in actions)
     context = {
         "groups": group_actions(actions),
         "pressing_count": sum(action.group != Group.WATCH for action in actions),
+        # The day's progress: what was done today out of what was done and what remains for today.
+        "done_today": done,
+        "remaining_today": remaining_today,
+        "day_total": len(done) + remaining_today,
+        "remaining_this_week": sum(action.group == Group.WEEK for action in actions),
         "journeys_media": _journeys_media(request),
         "matomo_custom_title": "Prochaines étapes : à faire",
     }
@@ -166,7 +181,15 @@ def journey(request, kind, pk):
         "can_view_name": can_view_personal_information(request, current_journey.job_seeker),
         "matomo_custom_title": f"Prochaines étapes : parcours {kind}",
         "journeys_media": _journeys_media(request),
+        "next_action": None,
+        "remaining_today": None,
     }
+    if completed:
+        # Keep the momentum: what remains today, and the next action to run, right from the confirmation.
+        actions = expected_actions(request)
+        describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
+        context["remaining_today"] = sum(action.group == Group.TODAY for action in actions)
+        context["next_action"] = next_action(actions)
     template_name = "next_steps/journeys/journey.html" if request.htmx else "next_steps/journeys/page.html"
     response = render(request, template_name, context)
     if completed:

@@ -40,6 +40,7 @@
                      hx-target="this"
                      hx-swap="outerHTML">
                     {# Reloaded when a guided journey completes. Its attributes must not reach the action buttons. #}
+                    {% include "next_steps/includes/day_progress.html" %}
                     {% for group in groups %}
                         <section class="mb-5" aria-labelledby="next-steps-{{ group.key }}">
                             <h2 class="h3 mb-1" id="next-steps-{{ group.key }}">
@@ -53,6 +54,7 @@
                             {% endfor %}
                         </section>
                     {% endfor %}
+                    {% include "next_steps/includes/done_today.html" %}
                 </div>
             </div>
         </div>

@@ -578,3 +578,62 @@ def test_action_buttons_open_the_drawer(client):
     assertContains(response, f'href="{url}"\n               hx-get="{url}"')
     assertContains(response, 'id="next-step-drawer"')
     assertContains(response, 'hx-trigger="nextStepsChanged from:body"')
+
+
+# Day progress and next action
+# ------------------------------------------------------------------------------
+
+
+def test_day_progress_and_next_action(client):
+    membership = CompanyMembershipFactory()
+    first, second = (
+        JobApplicationFactory(
+            to_company=membership.company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+        )
+        for _ in range(2)
+    )
+    # A colleague's answer is theirs, not the user's.
+    colleague = CompanyMembershipFactory(company=membership.company).user
+    JobApplicationFactory(
+        to_company=membership.company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    ).process(user=colleague)
+    client.force_login(membership.user)
+    todo_url = reverse("next_steps_views:todo")
+
+    response = client.get(todo_url)
+    assertContains(
+        response, '<progress class="next-steps-day__bar"\n                  value="0"\n                  max="2"'
+    )
+    assertNotContains(response, "Fait aujourd’hui")
+
+    response = walk(client, journey_url("candidature", first.pk), {}, {"decision": "process"}, **HTMX)
+    # Keep the momentum: what remains today, and the next action, run in the same drawer.
+    assertContains(response, "Plus que 1 action aujourd’hui")
+    next_url = journey_url("candidature", second.pk)
+    assertContains(response, f'hx-get="{next_url}"')
+    assertContains(response, f"Action suivante · {second.job_seeker.first_name}")
+
+    response = client.get(todo_url)
+    assertContains(
+        response, '<progress class="next-steps-day__bar"\n                  value="1"\n                  max="2"'
+    )
+    assertContains(response, "Fait aujourd’hui")
+    assertContains(response, "candidature mise à l’étude")
+    assert [item.job_seeker for item in response.context["done_today"]] == [first.job_seeker]
+
+
+def test_done_today_for_a_prescriber(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prolongation_request = ProlongationRequestFactory(
+        prescriber_organization=membership.organization, assigned_to=membership.user
+    )
+    client.force_login(membership.user)
+    walk(client, journey_url("prolongation", prolongation_request.pk), {}, {"decision": "grant"}, {})
+    walk(client, journey_url("eligibilite", JobSeekerFactory().public_id), {"level_1_1": "on"}, {})
+
+    response = client.get(reverse("next_steps_views:todo"))
+    assert [item.label for item in response.context["done_today"]] == [
+        "prolongation acceptée",
+        "éligibilité IAE validée",
+    ]
+    assertContains(response, "Tout est fait pour aujourd’hui.")
