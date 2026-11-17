@@ -1,7 +1,9 @@
 {# One barrier: its icon and name (itou-theme c-box--results__summary), where it comes from, what is under way. #}
 <article class="c-box p-3 d-flex flex-column gap-2">
-    <div class="c-box--results__summary align-items-center">
-        <i class="{{ card.icon }}" aria-hidden="true"></i>
+    <div class="d-flex align-items-center gap-2">
+        {# In the colour of the column: warning, info, success. #}
+        <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-{{ tone }}-lighter text-{{ tone }}"
+              aria-hidden="true"><i class="{{ card.icon }}"></i></span>
         <div>
             {% if card.category %}<span class="d-block fs-xs text-muted">{{ card.category }}</span>{% endif %}
             <span class="d-block fw-bold">{{ card.name }}</span>
@@ -12,8 +14,16 @@
             <p class="fs-xs border-top pt-2 mb-0">
                 <b>En cours&nbsp;:</b>
                 {% if clue.url %}
+                    {# Opens the orientation in the side drawer; without JavaScript, as a page. #}
                     <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover"
-                       href="{{ clue.url }}">{{ clue.text }}</a>
+                       href="{{ clue.url }}"
+                       hx-get="{{ clue.url }}"
+                       hx-target="#next-step-journey"
+                       hx-swap="outerHTML"
+                       hx-indicator="#next-step-journey"
+                       data-bs-toggle="offcanvas"
+                       data-bs-target="#next-step-drawer"
+                       aria-controls="next-step-drawer">{{ clue.text }}</a>
                 {% else %}
                     {{ clue.text }}
                 {% endif %}

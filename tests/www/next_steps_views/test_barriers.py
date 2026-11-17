@@ -143,3 +143,41 @@ def test_find_a_solution_searches_services_around_the_job_seeker(client, employe
         },
     )
     assertContains(response, "Trouver une solution")
+
+
+def test_an_ongoing_orientation_opens_in_the_drawer(client, employer):
+    company = employer.company_set.first()
+    job_seeker = JobSeekerFactory()
+    orientation = OrientationFactory(
+        beneficiary=job_seeker,
+        sender=employer,
+        sender_kind=SenderKind.EMPLOYER,
+        sender_company=company,
+        sender_prescriber_organization=None,
+        service=ServiceFactory(thematics=[thematic("numerique--acquerir-un-equipement")]),
+        status=OrientationStatus.ACCEPTED,
+    )
+    # Sent by another organization: not theirs to read.
+    elsewhere = OrientationFactory(beneficiary=job_seeker)
+    client.force_login(employer)
+
+    response = page(client, job_seeker)
+    [card] = response.context["barriers"].in_progress
+    panel_url = reverse(
+        "next_steps_views:orientation", kwargs={"public_id": job_seeker.public_id, "orientation_id": orientation.pk}
+    )
+    assert card.clues[-1].url == panel_url
+    assertContains(response, f'hx-get="{panel_url}"')
+
+    response = client.get(panel_url, HTTP_HX_REQUEST="true")
+    assertContains(response, orientation.service.name)
+    assertContains(response, orientation.service.structure.name)
+    assertContains(
+        response, reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.pk})
+    )
+    # Without JavaScript, a page.
+    assert client.get(panel_url).status_code == 200
+    elsewhere_url = reverse(
+        "next_steps_views:orientation", kwargs={"public_id": job_seeker.public_id, "orientation_id": elsewhere.pk}
+    )
+    assert client.get(elsewhere_url, HTTP_HX_REQUEST="true").status_code == 404

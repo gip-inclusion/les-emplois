@@ -416,6 +416,12 @@ table.table td > .modal .modal-content {
     height: 2.5rem;
 }
 
+/* A small icon tile, as on the barriers: the theme's tiles are 50px. */
+.next-step__tile {
+    width: 2rem;
+    height: 2rem;
+}
+
 /* The side drawer of guided journeys, wider than the theme's offcanvas. */
 .next-step-drawer {
     --bs-offcanvas-width: min(36rem, 100%);
@@ -499,21 +505,20 @@ table.table td > .modal .modal-content {
     left: auto;
 }
 
-/* Today: a line across its block, its caption above the strip, leaning inwards near the ends. */
+/* Today: a red line from a red pill down to its block's lower edge, never reaching the dates under the blocks,
+   so that it does not read as one of them. The pill leans inwards near the ends of the strip. */
 .next-step-frise__today {
     position: absolute;
-    top: -.375rem;
-    bottom: -.375rem;
+    top: -.5rem;
+    bottom: 0;
     width: 2px;
     margin-left: -1px;
-    border-radius: 1px;
-    background-color: var(--bs-body-color, #000638);
+    background-color: var(--bs-danger, #ce0500);
 }
 
 .next-step-frise__today-caption {
     position: absolute;
-    bottom: calc(100% + .125rem);
-    line-height: 1.2;
+    bottom: 100%;
     white-space: nowrap;
 }
 

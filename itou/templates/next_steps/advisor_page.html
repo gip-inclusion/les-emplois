@@ -1,6 +1,4 @@
-{% extends "layout/base.html" %}
-{# Grey background, as in the prototype, so that the boxes stand out. #}
-{% block body_class %}p-next-steps{% endblock %}
+{% extends "next_steps/layout.html" %}
 {# An advisor as an ordinary page, when JavaScript does not run. #}
 
 {% block title %}{{ assignment.professional.get_full_name }} {{ block.super }}{% endblock %}

@@ -1,0 +1,81 @@
+{% load badges %}
+{% load str_filters %}
+{# An orientation towards a service, in the side drawer or inside a page: where, when, by whom, its answer. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">Orientation de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-2" id="next-step-journey-title">{{ orientation.service.name }}</h2>
+                {% orientation_state_badge orientation extra_classes="badge-sm" %}
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        {# In blocks, as the facts of the guided journeys: a long value on a whole row. #}
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="border rounded-2 px-3 py-2 h-100">
+                    <span class="d-block fs-sm text-muted">Structure</span>
+                    <span class="d-block fw-bold text-break">{{ orientation.service.structure.name }}</span>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="border rounded-2 px-3 py-2 h-100">
+                    <span class="d-block fs-sm text-muted">Envoyée le</span>
+                    <span class="d-block fw-bold">{{ orientation.created_at|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="border rounded-2 px-3 py-2 h-100">
+                    <span class="d-block fs-sm text-muted">Par</span>
+                    <span class="d-block fw-bold text-break">
+                        {{ orientation.sender.get_full_name }}
+                        {% if orientation.sender_organization %}
+                            <span class="d-block fw-normal fs-sm">{{ orientation.sender_organization.display_name }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% if orientation.processing_date %}
+                <div class="col-12 col-sm-6">
+                    <div class="border rounded-2 px-3 py-2 h-100">
+                        <span class="d-block fs-sm text-muted">Traitée le</span>
+                        <span class="d-block fw-bold">{{ orientation.processing_date|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            {% endif %}
+            {% if orientation.orientation_reasons %}
+                <div class="col-12">
+                    <div class="border rounded-2 px-3 py-2 h-100">
+                        <span class="d-block fs-sm text-muted">Motif de l’orientation</span>
+                        <span class="d-block">{{ orientation.orientation_reasons|linebreaksbr }}</span>
+                    </div>
+                </div>
+            {% endif %}
+            {% if refusal_reasons %}
+                <div class="col-12">
+                    <div class="border rounded-2 px-3 py-2 h-100">
+                        <span class="d-block fs-sm text-muted">Motifs du refus</span>
+                        <span class="d-block fw-bold">{{ refusal_reasons|join:", " }}</span>
+                        {% if orientation.refusal_details %}<span class="d-block">{{ orientation.refusal_details|linebreaksbr }}</span>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+        <a class="btn btn-outline-primary btn-ico"
+           href="{% url "insertion_views:orientation_details_for_sender" orientation_id=orientation.pk %}?back_url={{ job_seeker_url|urlencode }}">
+            <i class="ri-signpost-line fw-medium" aria-hidden="true"></i>
+            <span>Voir le détail complet</span>
+        </a>
+    </div>
+</div>

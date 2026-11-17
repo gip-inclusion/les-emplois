@@ -14,7 +14,7 @@
                             {# The position is computed server side: a style attribute, like the employee record progress bar. #}
                             <span class="next-step-frise__today next-step-frise__today--{{ block.today_align }}"
                                   style="left: {{ block.today }}%">
-                                <span class="next-step-frise__today-caption fs-xs"><b>Aujourd’hui</b> {{ bar.today_display }}</span>
+                                <span class="next-step-frise__today-caption badge rounded-pill bg-danger text-white fs-xs fw-normal"><b>Aujourd’hui</b> · {{ bar.today_display }}</span>
                             </span>
                         {% endif %}
                     </div>

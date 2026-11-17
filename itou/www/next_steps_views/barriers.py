@@ -237,7 +237,11 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
         }
         url = ""
         if orientation.user_can_see_details:
-            url = reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.pk})
+            # Opens in the side drawer of the job seeker page.
+            url = reverse(
+                "next_steps_views:orientation",
+                kwargs={"public_id": job_seeker.public_id, "orientation_id": orientation.pk},
+            )
         for key in keys:
             card(key).in_progress = True
             card(key).clues.append(

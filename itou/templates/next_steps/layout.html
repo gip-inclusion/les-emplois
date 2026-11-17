@@ -1,0 +1,24 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{# The pages of the "Prochaines étapes" experiment. #}
+
+{# Grey background, as in the prototype, so that the boxes stand out. #}
+{% block body_class %}p-next-steps{% endblock %}
+
+{# The global messages of layout/base.html, but the reminder about job descriptions: keep in step with it. #}
+{% block global_messages %}
+    {% include "includes/demo_accounts.html" %}
+    {% if request.user and request.user.show_upcoming_mfa_activation_banner %}
+        {% component_alert_global content=content variant="danger" %}
+            {% fragment as content %}
+                Sécurité du compte : anticipez dès maintenant, la double authentification sera bientôt obligatoire.
+                <a href="{% url "otp_views:enrollment_step_0_intro" %}">Configurer</a>.
+            {% endfragment %}
+        {% endcomponent_alert_global %}
+    {% endif %}
+    {% component_alert_global content=content variant="info" extra_id="redirected-from-old-domain-global-alert" dismissible_once=True %}
+        {% fragment as content %}
+            La plateforme de l’inclusion change d’adresse. Elle est désormais accessible à l’adresse <a href="https://plateforme.inclusion.gouv.fr">https://plateforme.inclusion.gouv.fr</a>. La transition est automatique. Nous vous invitons cependant à mettre à jour vos favoris de navigateur.
+        {% endfragment %}
+    {% endcomponent_alert_global %}
+{% endblock %}

@@ -358,3 +358,15 @@ def test_masked_job_seekers_show_no_age_nor_city():
     describe_job_seekers([action], lambda job_seeker: False)
     assert action.job_seeker_details == ""
     assert action.user_can_view_personal_information is False
+
+
+def test_no_job_descriptions_reminder_on_the_experiment_pages(client, settings):
+    settings.NEXT_STEPS_FOR_EVERYONE = True
+    membership = CompanyMembershipFactory(
+        company__spontaneous_applications_open_since=timezone.now() - datetime.timedelta(days=61)
+    )
+    client.force_login(membership.user)
+
+    assertNotContains(client.get(TODO_URL), "deactivation-job-banner")
+    # Elsewhere, the reminder stays.
+    assertContains(client.get(reverse("dashboard:index")), "deactivation-job-banner")

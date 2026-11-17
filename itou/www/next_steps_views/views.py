@@ -9,6 +9,7 @@ from django.utils import timezone
 from itou.approvals.utils import get_contracts
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.insertion.enums import OrientationRefusalReason
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
@@ -27,7 +28,7 @@ from itou.www.next_steps_views.actions import (
     group_actions,
     next_action,
 )
-from itou.www.next_steps_views.advisors import advisor_acts
+from itou.www.next_steps_views.advisors import advisor_acts, visible_orientations
 from itou.www.next_steps_views.barriers import gather_barriers
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
@@ -212,4 +213,34 @@ def advisor(request, public_id, assignment_pk):
         "matomo_custom_title": "Prochaines étapes : accompagnateur",
     }
     template_name = "next_steps/advisor.html" if request.htmx else "next_steps/advisor_page.html"
+    return render(request, template_name, context)
+
+
+@readonly_view
+def orientation(request, public_id, orientation_id):
+    """An orientation of the job seeker towards a service, from the barriers it works on.
+
+    In the side drawer when loaded by htmx, an ordinary page otherwise. Only an orientation whose details the user
+    may read on the orientations tab of the existing job seeker page.
+    """
+    if not can_view_next_steps(request):
+        raise Http404
+    job_seeker = get_object_or_404(
+        User.objects.select_related("jobseeker_profile"), kind=UserKind.JOB_SEEKER, public_id=public_id
+    )
+    orientation = get_object_or_404(
+        visible_orientations(request, job_seeker)
+        .filter(user_can_see_details=True)
+        .select_related("service__structure", "sender", "sender_company", "sender_prescriber_organization"),
+        pk=orientation_id,
+    )
+    context = {
+        "job_seeker": job_seeker,
+        "orientation": orientation,
+        "refusal_reasons": [OrientationRefusalReason(reason).label for reason in orientation.refusal_reasons],
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "in_drawer": bool(request.htmx),
+        "matomo_custom_title": "Prochaines étapes : orientation",
+    }
+    template_name = "next_steps/orientation.html" if request.htmx else "next_steps/orientation_page.html"
     return render(request, template_name, context)
