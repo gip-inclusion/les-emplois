@@ -9,6 +9,8 @@ from urllib.parse import urljoin
 from django import forms
 from django.conf import settings
 from django.contrib.gis.forms import widgets as gis_widgets
+from django.core.exceptions import ValidationError
+from django.db import DataError
 from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
 from django_select2.forms import Select2MultipleWidget, Select2Widget
@@ -112,26 +114,26 @@ class RemoteAutocompleteSelect2WidgetMixin:
         if not isinstance(self.choices, ModelChoiceIterator):
             return super().optgroups(name, value, attrs=attrs)
         selected_choices = {c for c in selected_choices if c not in self.choices.field.empty_values}
-        # Bing bot sends NUL characters to some search forms. The
-        # value is rejected by the form (ValidationError). But it
-        # still ends up here to populate the field for redisplay,
-        # where we build an SQL query that contains a NUL character,
-        # which causes an exception: "PostgreSQL text fields cannot
-        # contain NUL (0x00) bytes".
-        if any("\x00" in c for c in selected_choices):
-            return groups
         field_name = self.choices.field.to_field_name or "pk"
         query = Q(**{f"{field_name}__in": selected_choices})
-        for obj in self.choices.queryset.filter(query):
-            option_value = self.choices.choice(obj)[0]
-            option_label = self.label_from_instance(obj)
+        try:
+            objs = list(self.choices.queryset.filter(query))
+        except DataError, ValidationError, ValueError:
+            # DataError: null byte in a string.
+            # ValidationError: invalid uuid.
+            # ValueError: a character is passed instead of an int.
+            pass
+        else:
+            for obj in objs:
+                option_value = self.choices.choice(obj)[0]
+                option_label = self.label_from_instance(obj)
 
-            selected = str(option_value) in value and (has_selected is False or self.allow_multiple_selected)
-            if selected is True and has_selected is False:
-                has_selected = True
-            index = len(default[1])
-            subgroup = default[1]
-            subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
+                selected = str(option_value) in value and (has_selected is False or self.allow_multiple_selected)
+                if selected is True and has_selected is False:
+                    has_selected = True
+                index = len(default[1])
+                subgroup = default[1]
+                subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
         return groups
 
 

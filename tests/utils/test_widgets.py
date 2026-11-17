@@ -1,8 +1,9 @@
 from django import forms
 from django.template import Context, Template
-from pytest_django.asserts import assertHTMLEqual
+from pytest_django.asserts import assertHTMLEqual, assertInHTML
 
-from itou.utils.widgets import EasyMDEEditor
+from itou.users.models import User
+from itou.utils.widgets import EasyMDEEditor, RemoteAutocompleteSelect2Widget
 
 
 class TestEasyMDEEditor:
@@ -50,4 +51,59 @@ class TestEasyMDEEditor:
             </textarea>
             </div>
             """,
+        )
+
+
+class TestRemoteAutocompleteSelect2Widget:
+    def test_null_byte(self):
+        class AutoCompleteForm(forms.Form):
+            field = forms.ModelChoiceField(
+                queryset=User.objects.all(),
+                to_field_name="last_name",
+                widget=RemoteAutocompleteSelect2Widget(),
+            )
+
+        form = AutoCompleteForm({"field": "\x00"})
+        assertInHTML(
+            """
+            <ul class="errorlist" id="id_field_error">
+            <li>Le caractère nul n’est pas autorisé.</li>
+            </ul>
+            """,
+            str(form),
+        )
+
+    def test_char_instead_of_int(self):
+        class AutoCompleteForm(forms.Form):
+            field = forms.ModelChoiceField(
+                queryset=User.objects.all(),
+                widget=RemoteAutocompleteSelect2Widget(),
+            )
+
+        form = AutoCompleteForm({"field": "a"})
+        assertInHTML(
+            """
+            <ul class="errorlist" id="id_field_error">
+            <li>Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.</li>
+            </ul>
+            """,
+            str(form),
+        )
+
+    def test_invalid_uuid(self):
+        class AutoCompleteForm(forms.Form):
+            field = forms.ModelChoiceField(
+                queryset=User.objects.all(),
+                to_field_name="public_id",
+                widget=RemoteAutocompleteSelect2Widget(),
+            )
+
+        form = AutoCompleteForm({"field": "0"})
+        assertInHTML(
+            """
+            <ul class="errorlist" id="id_field_error">
+            <li>Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.</li>
+            </ul>
+            """,
+            str(form),
         )
