@@ -749,8 +749,8 @@ def close(request, approval_id, template_name="approvals/close.html"):
     return render(request, template_name, context)
 
 
-@http_methods(db_readonly=["GET", "HEAD", "POST"])
-def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
+def _get_suspension(request, suspension_id):
+    """Fetch the given suspension the current user is allowed to edit or delete, or raise 404/403."""
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
         Suspension.objects.filter(
@@ -766,9 +766,14 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
         .prefetch_related("approval__suspension_set"),
         pk=suspension_id,
     )
-
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
+    return suspension
+
+
+@http_methods(db_readonly=["GET", "HEAD", "POST"])
+def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(
         request,
@@ -810,30 +815,13 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     Edit the given suspension.
     """
 
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     form = SuspensionForm(
         approval=suspension.approval,
-        siae=siae,
+        siae=request.current_organization,
         instance=suspension,
         data=request.POST or None,
     )
@@ -865,28 +853,11 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     form = SuspensionEndDateForm(
         approval=suspension.approval,
-        siae=siae,
+        siae=request.current_organization,
         instance=suspension,
         data=request.POST or None,
     )
@@ -931,24 +902,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     Delete the given suspension.
     """
 
-    siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(
-        Suspension.objects.filter(
-            Exists(
-                JobApplication.objects.filter(
-                    approval=OuterRef("approval_id"),
-                    to_company=siae,
-                    state=JobApplicationState.ACCEPTED,
-                )
-            )
-        )
-        .select_related("approval__user")
-        .prefetch_related("approval__suspension_set"),
-        pk=suspension_id,
-    )
-
-    if not suspension.can_be_handled_by_siae(siae):
-        raise PermissionDenied()
+    suspension = _get_suspension(request, suspension_id)
 
     back_url = get_safe_url(
         request,
