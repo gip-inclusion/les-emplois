@@ -1490,6 +1490,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                             "birthdate": self.form.cleaned_data["birthdate"],
                         },
                     )
+                    logger.info("CNAVRecord pk=%s created", cnav_record.pk)
                     plan_retrieve_cnav_infos(record_pk=cnav_record.pk)
                     self.job_seeker_session.set("cnav_record", cnav_record.pk)
                 return HttpResponseRedirect(self.get_next_url())
@@ -1651,9 +1652,16 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     "user=%s created job_seeker=%s source=%s", self.sender.pk, user.pk, self.profile.creation_source
                 )
                 if cnav_record_pk := self.job_seeker_session.get("cnav_record"):
-                    updated = CNAVRecord.objects.filter(pk=cnav_record_pk).update(profile=self.profile)
-                    if updated:
+                    cnav_record = (
+                        CNAVRecord.objects.filter(pk=cnav_record_pk)
+                        .select_for_update(of=("self",), no_key=True)
+                        .first()
+                    )
+                    if cnav_record:
+                        cnav_record.profile = self.profile
+                        cnav_record.save(update_fields={"profile"})
                         logger.info("Attached CNAVRecord pk=%s to profile=%s", cnav_record_pk, self.profile.pk)
+                        cnav_record.try_to_certify_profile()
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")

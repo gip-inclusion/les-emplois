@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
@@ -5,6 +6,10 @@ from django.db import models
 
 from itou.cnav.enums import CNAVRecordOrigin
 from itou.users.models import JobSeekerProfile
+from itou.utils.apis.cnav import InterOpsResult
+
+
+logger = logging.getLogger(__name__)
 
 
 class CNAVRecord(models.Model):
@@ -20,6 +25,22 @@ class CNAVRecord(models.Model):
 
     last_attempt_at = models.DateTimeField(null=True)
     next_attempt_at = models.DateTimeField(null=True)
+
+    def try_to_certify_profile(self):
+        if self.profile is None:
+            return
+        try:
+            interops_result = InterOpsResult(**self.result)
+        except ValueError:
+            logger.info("Unexpected result format for CNAVRecord pk=%s", self.pk)
+            return
+        if not interops_result.infos:
+            logger.info("Empty result for CNAVRecord pk=%s", self.pk)
+            return
+
+        if self.profile.nir[13:] != interops_result.infos.number:
+            return
+        # TODO: check last_name/first_name/birth_date/title/birth_place/birth_country
 
 
 # TODO:
