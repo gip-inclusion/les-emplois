@@ -235,6 +235,12 @@ class ServiceSearchForm(forms.Form):
         label="Entrez un mot-clé",
         widget=forms.TextInput(attrs={"placeholder": "Mot-clé, nom de structure, thématique"}),
     )
+    categories = forms.MultipleChoiceField(
+        choices=[(c.value, c.label) for c in data_inclusion_v1.Categorie],
+        label="Thématique",
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
     reception = forms.ChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil] + [(RECEPTION_ALL_VALUE, "Tous")],
         initial=data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value,

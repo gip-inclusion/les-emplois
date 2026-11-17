@@ -1,17 +1,20 @@
 from urllib.parse import urlencode
 
 import pytest
+from data_inclusion.schema import v1 as data_inclusion_v1
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
+from itou.insertion.enums import GenericReferenceItemKind
 from itou.insertion.models import Service
 from itou.www.search_views.forms import ServiceSearchForm
 from tests.cities.factories import create_city_vannes
 from tests.insertion.factories import (
     IN_PERSON_RECEPTION_VALUE,
     REMOTE_RECEPTION_VALUE,
+    GenericReferenceItemFactory,
     InPersonReceptionFactory,
     RemoteReceptionFactory,
     ServiceFactory,
@@ -53,7 +56,7 @@ class TestSearchServices:
             client.get(reverse("search:services_home"))
 
     def test_invalid_query_parameters(self, client):
-        response = client.get(self.URL, {"city": "foo-44"})
+        response = client.get(self.URL, {"city": "foo-44", "categories": ["foobar"]})
         assertContains(response, "Rechercher un service d'insertion")
         assertContains(response, "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.")
 
@@ -155,6 +158,10 @@ class TestSearchServices:
         simulated_page = parse_response_to_soup(
             client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD, "reception": IN_PERSON_RECEPTION_VALUE})
         )
+        [checkbox] = simulated_page.find_all(
+            "input", attrs={"type": "checkbox", "name": "categories", "value": data_inclusion_v1.Categorie.MOBILITE}
+        )
+        checkbox["checked"] = ""
         [radio_input] = simulated_page.find_all(
             "input", attrs={"type": "radio", "name": "reception", "value": REMOTE_RECEPTION_VALUE}
         )
@@ -166,11 +173,27 @@ class TestSearchServices:
         update_page_with_htmx(
             simulated_page,
             f"form[hx-get='{self.URL}']",
-            htmx_client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD, "reception": REMOTE_RECEPTION_VALUE}),
+            htmx_client.get(
+                self.URL,
+                {
+                    "city": vannes.slug,
+                    "keyword": KEYWORD,
+                    "categories": [data_inclusion_v1.Categorie.MOBILITE],
+                    "reception": REMOTE_RECEPTION_VALUE,
+                },
+            ),
         )
 
         fresh_page = parse_response_to_soup(
-            client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD, "reception": REMOTE_RECEPTION_VALUE})
+            client.get(
+                self.URL,
+                {
+                    "city": vannes.slug,
+                    "keyword": KEYWORD,
+                    "categories": [data_inclusion_v1.Categorie.MOBILITE],
+                    "reception": REMOTE_RECEPTION_VALUE,
+                },
+            )
         )
         assertSoupEqual(simulated_page, fresh_page)
 
@@ -183,6 +206,41 @@ class TestSearchServices:
 
         response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
         assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+
+    def test_categories_filter(self, client):
+        vannes = create_city_vannes()
+        thematic_metier = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="choisir-un-metier--confirmer-son-choix-de-metier",
+            label="Confirmer son choix de métier",
+        )
+        service_mobilite = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        service_metier = ServiceFactory(
+            coordinates=vannes.coords,
+            city="Vannes",
+            name="Explorer les métiers autour du " + KEYWORD,
+            thematics=[thematic_metier],
+        )
+        Service.include_inactive.update_search_index()
+
+        response = client.get(
+            self.URL, {"city": vannes.slug, "keyword": KEYWORD, "categories": [data_inclusion_v1.Categorie.MOBILITE]}
+        )
+        assertQuerySetEqual(response.context["results"], [service_mobilite])
+
+        response = client.get(
+            self.URL,
+            {
+                "city": vannes.slug,
+                "keyword": KEYWORD,
+                "categories": [data_inclusion_v1.Categorie.MOBILITE, data_inclusion_v1.Categorie.CHOISIR_UN_METIER],
+            },
+        )
+        assertQuerySetEqual(response.context["results"], [service_mobilite, service_metier])
+
+        # No category means all categories
+        response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
+        assertQuerySetEqual(response.context["results"], [service_mobilite, service_metier], ordered=False)
 
     def test_funding_labels_filter(self, client, snapshot):
         FUNDING_LABEL_FILTER = "#services-funding-labels-filter"
