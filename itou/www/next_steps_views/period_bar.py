@@ -1,8 +1,9 @@
-"""A period bar: a period's base dates, then what is added after it, on one line.
+"""Period strips: a PASS IAE and what changes it, as labelled blocks in a row.
 
-Used where a change of dates is easier seen than read: a prolongation request shows the PASS IAE as it stands (days
-used, days left) and the requested period appended after its end. Drawn server side as SVG rectangles placed by
-attributes, like the timeline, with the dates written out in a legend: the bar illustrates, the text informs.
+Each block names its period ("PASS IAE", "Prolongation", "Suspension") with its duration, and carries its dates
+under its edges ("Début", "Fin prévue", "Fin demandée"), so the change reads at a glance. Block widths follow the
+durations on a twelve-column grid, with a minimum so that every block stays readable: they are indicative, the
+dates are exact. What does not fit in a block (days left, the end of the contract) comes as small notes below.
 """
 
 import dataclasses
@@ -12,8 +13,9 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 
-WIDTH = 1000
 NBSP = " "
+PASS_IAE = f"PASS{NBSP}IAE"
+COLUMNS = 12
 
 
 def _fr(date):
@@ -34,137 +36,152 @@ def duration_display(start, end):
     return " et ".join(parts)
 
 
+def short_duration(start, end):
+    """A block's duration, rounded to the month past one month: the exact dates are written under the block."""
+    delta = relativedelta(end + datetime.timedelta(days=1), start)
+    months = delta.years * 12 + delta.months + (1 if delta.days >= 15 else 0)
+    if months < 1:
+        return duration_display(start, end)
+    years, months = divmod(months, 12)
+    parts = []
+    if years:
+        parts.append(f"{years}{NBSP}an{'s' if years > 1 else ''}")
+    if months:
+        parts.append(f"{months}{NBSP}mois")
+    return " et ".join(parts)
+
+
 @dataclasses.dataclass
-class Part:
-    # used, remaining, added (CSS modifiers)
+class Edge:
+    """A date written under a block's edge."""
+
+    date: datetime.date
+    caption: str
+
+    @property
+    def date_display(self):
+        return _fr(self.date)
+
+
+@dataclasses.dataclass
+class Block:
+    # pass, prolongation, suspension (CSS modifiers)
     kind: str
+    label: str
+    duration: str
     start: datetime.date
     end: datetime.date
-    x: str = ""
-    width: str = ""
+    # Dates under the left and right edges, if any.
+    left: Edge | None = None
+    right: Edge | None = None
+    columns: int = COLUMNS
 
 
 @dataclasses.dataclass
-class Marker:
-    # today, contract (CSS modifiers)
-    kind: str
-    date: datetime.date
-    x: str = ""
-
-
-@dataclasses.dataclass
-class LegendItem:
-    kind: str
+class Note:
     text: str
+    # info, ok, warn (CSS modifiers)
+    variant: str = "info"
+    icon: str = "ri-information-line"
 
 
 @dataclasses.dataclass
 class PeriodBar:
-    parts: list
-    markers: list
-    legend: list
-    start: datetime.date
-    end: datetime.date
-
-    @property
-    def start_display(self):
-        return _fr(self.start)
-
-    @property
-    def end_display(self):
-        return _fr(self.end)
+    blocks: list
+    notes: list = dataclasses.field(default_factory=list)
 
 
-def _place(bar):
-    days = (bar.end - bar.start).days + 1
+def _share_columns(blocks):
+    """Columns proportional to the durations, 12 in all, with a minimum to stay readable.
 
-    def position(date):
-        return (date - bar.start).days / days * WIDTH
-
-    for part in bar.parts:
-        x = position(part.start)
-        # end is inclusive. A very short period stays visible.
-        part.x, part.width = f"{x:.1f}", f"{max(position(part.end + datetime.timedelta(days=1)) - x, 3):.1f}"
-    for marker in bar.markers:
-        marker.x = f"{position(marker.date):.1f}"
-    return bar
-
-
-def prolongation_bar(approval, start_at, end_at, contract_end=None):
-    """The PASS IAE as it stands, then the requested prolongation from start_at to end_at."""
-    today = timezone.localdate()
-    parts = []
-    if approval.start_at <= today:
-        parts.append(Part("used", approval.start_at, min(today, approval.end_at)))
-    if today < approval.end_at:
-        parts.append(Part("remaining", max(today + datetime.timedelta(days=1), approval.start_at), approval.end_at))
-    parts.append(Part("added", start_at, end_at))
-    markers = []
-    if approval.start_at <= today <= end_at:
-        markers.append(Marker("today", today))
-    legend = [
-        LegendItem(
-            "used",
-            f"PASS{NBSP}IAE du {_fr(approval.start_at)} au {_fr(approval.end_at)}"
-            + (
-                f", dont {duration_display(today + datetime.timedelta(days=1), approval.end_at)} restants"
-                if today < approval.end_at
-                else ""
-            ),
-        ),
-        LegendItem(
-            "added",
-            f"Prolongation demandée{NBSP}: + {duration_display(start_at, end_at)}, jusqu’au {_fr(end_at)}",
-        ),
+    At least 3 columns, 4 for a block with a date under each edge or when there are only two blocks.
+    """
+    days = [(block.end - block.start).days + 1 for block in blocks]
+    total = sum(days)
+    columns = [
+        max(4 if len(blocks) == 2 or (block.left and block.right) else 3, round(COLUMNS * d / total))
+        for block, d in zip(blocks, days)
     ]
-    if contract_end and approval.start_at <= contract_end:
-        markers.append(Marker("contract", contract_end))
-        covered = "couverte" if contract_end <= end_at else "non couverte"
-        legend.append(LegendItem("contract", f"Fin du contrat le {_fr(contract_end)}, {covered} par la prolongation"))
-    if markers and markers[0].kind == "today":
-        legend.append(LegendItem("today", "Aujourd’hui"))
-    end = max([end_at, approval.end_at] + [marker.date for marker in markers])
-    return _place(PeriodBar(parts=parts, markers=markers, legend=legend, start=approval.start_at, end=end))
+    # Give or take the difference from the largest block, which can spare it.
+    largest = columns.index(max(columns))
+    columns[largest] += COLUMNS - sum(columns)
+    for block, count in zip(blocks, columns):
+        block.columns = count
+    return blocks
 
 
-def _used_and_remaining(approval, today):
-    parts = []
-    if approval.start_at <= today:
-        parts.append(Part("used", approval.start_at, min(today, approval.end_at)))
-    if today < approval.end_at:
-        parts.append(Part("remaining", max(today + datetime.timedelta(days=1), approval.start_at), approval.end_at))
-    return parts
+def _days_left_note(approval, today):
+    if approval.start_at <= today < approval.end_at:
+        return Note(
+            f"Il reste {duration_display(today + datetime.timedelta(days=1), approval.end_at)} sur le {PASS_IAE}.",
+            icon="ri-hourglass-line",
+        )
+    return None
 
 
 def approval_bar(approval, contract_end=None):
-    """The PASS IAE as it stands: days used, days left, and the end of the contract."""
+    """The PASS IAE as it stands, with the days left and the end of the contract."""
     today = timezone.localdate()
-    markers = [Marker("today", today)] if approval.start_at <= today <= approval.end_at else []
-    legend = [
-        LegendItem(
-            "used",
-            f"PASS{NBSP}IAE du {_fr(approval.start_at)} au {_fr(approval.end_at)}"
-            + (
-                f", dont {duration_display(today + datetime.timedelta(days=1), approval.end_at)} restants"
-                if today < approval.end_at
-                else ""
-            ),
-        )
-    ]
-    if contract_end and approval.start_at <= contract_end <= approval.end_at:
-        markers.append(Marker("contract", contract_end))
-        legend.append(LegendItem("contract", f"Fin du contrat le {_fr(contract_end)}"))
-    if markers and markers[0].kind == "today":
-        legend.append(LegendItem("today", "Aujourd’hui"))
-    return _place(
-        PeriodBar(
-            parts=_used_and_remaining(approval, today),
-            markers=markers,
-            legend=legend,
-            start=approval.start_at,
-            end=approval.end_at,
-        )
+    block = Block(
+        "pass",
+        PASS_IAE,
+        short_duration(approval.start_at, approval.end_at),
+        approval.start_at,
+        approval.end_at,
+        left=Edge(approval.start_at, "Début"),
+        right=Edge(approval.end_at, "Fin prévue"),
     )
+    notes = [note for note in [_days_left_note(approval, today)] if note]
+    if contract_end and contract_end < today:
+        notes.append(Note(f"Contrat terminé le {_fr(contract_end)}", variant="warn", icon="ri-file-text-line"))
+    elif contract_end:
+        notes.append(Note(f"Contrat jusqu’au {_fr(contract_end)}", icon="ri-file-text-line"))
+    return PeriodBar(blocks=[block], notes=notes)
+
+
+def prolongation_bar(approval, start_at, end_at, contract_end=None):
+    """The PASS IAE as planned, then the requested prolongation right after it."""
+    today = timezone.localdate()
+    blocks = _share_columns(
+        [
+            Block(
+                "pass",
+                PASS_IAE,
+                short_duration(approval.start_at, approval.end_at),
+                approval.start_at,
+                approval.end_at,
+                left=Edge(approval.start_at, "Début"),
+                right=Edge(approval.end_at, "Fin prévue"),
+            ),
+            Block(
+                "prolongation",
+                "Prolongation",
+                f"+ {short_duration(start_at, end_at)}",
+                start_at,
+                end_at,
+                right=Edge(end_at, "Fin demandée"),
+            ),
+        ]
+    )
+    notes = [note for note in [_days_left_note(approval, today)] if note]
+    if contract_end:
+        if contract_end <= end_at:
+            notes.append(
+                Note(
+                    f"Fin du contrat le {_fr(contract_end)}{NBSP}: couverte par la prolongation",
+                    variant="ok",
+                    icon="ri-checkbox-circle-line",
+                )
+            )
+        else:
+            notes.append(
+                Note(
+                    f"Fin du contrat le {_fr(contract_end)}{NBSP}: après la fin demandée",
+                    variant="warn",
+                    icon="ri-error-warning-line",
+                )
+            )
+    return PeriodBar(blocks=blocks, notes=notes)
 
 
 def suspended_end(approval_end, start_at, end_at):
@@ -173,26 +190,50 @@ def suspended_end(approval_end, start_at, end_at):
 
 
 def suspension_bar(approval, start_at, end_at, approval_end=None):
-    """The PASS IAE with a suspension: days used before it, the suspension, then the days left, pushed back.
+    """The PASS IAE until the suspension, the suspension, then the days left, pushed back after it.
 
     approval_end is the PASS IAE's end before the suspension: by default its current end, for a suspension to come.
     """
     approval_end = approval_end or approval.end_at
     new_end = suspended_end(approval_end, start_at, end_at)
-    parts = []
+    after_start = end_at + datetime.timedelta(days=1)
+    blocks = []
     if approval.start_at < start_at:
-        parts.append(Part("used", approval.start_at, start_at - datetime.timedelta(days=1)))
-    parts += [Part("paused", start_at, end_at), Part("remaining", end_at + datetime.timedelta(days=1), new_end)]
-    markers = [Marker("previous-end", approval_end)]
-    legend = [
-        LegendItem("used", f"PASS{NBSP}IAE à partir du {_fr(approval.start_at)}"),
-        LegendItem(
-            "paused",
-            f"Suspension du {_fr(start_at)} au {_fr(end_at)}{NBSP}: {duration_display(start_at, end_at)}",
+        before_end = start_at - datetime.timedelta(days=1)
+        blocks.append(
+            Block(
+                "pass",
+                PASS_IAE,
+                short_duration(approval.start_at, before_end),
+                approval.start_at,
+                before_end,
+                left=Edge(approval.start_at, "Début"),
+            )
+        )
+    blocks += [
+        Block(
+            "suspension",
+            "Suspension",
+            short_duration(start_at, end_at),
+            start_at,
+            end_at,
+            left=Edge(start_at, "Du"),
+            right=Edge(end_at, "Au"),
         ),
-        LegendItem(
-            "previous-end",
-            f"Fin du PASS{NBSP}IAE repoussée du {_fr(approval_end)} au {_fr(new_end)}",
+        Block(
+            "pass",
+            PASS_IAE,
+            short_duration(after_start, new_end),
+            after_start,
+            new_end,
+            right=Edge(new_end, "Nouvelle fin"),
         ),
     ]
-    return _place(PeriodBar(parts=parts, markers=markers, legend=legend, start=approval.start_at, end=new_end))
+    notes = [
+        Note(
+            f"Fin prévue avant la suspension{NBSP}: {_fr(approval_end)}, repoussée au {_fr(new_end)}",
+            variant="ok",
+            icon="ri-arrow-right-line",
+        )
+    ]
+    return PeriodBar(blocks=_share_columns(blocks), notes=notes)

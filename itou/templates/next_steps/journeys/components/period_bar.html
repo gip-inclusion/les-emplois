@@ -1,30 +1,37 @@
-{# A period's base dates, then what is added after it (see next_steps_views.period_bar). #}
-<figure class="next-step-bar mb-4">
-    <svg class="next-step-bar__track"
-         viewBox="0 0 1000 32"
-         preserveAspectRatio="none"
-         aria-hidden="true"
-         focusable="false">
-        <rect class="next-step-bar__background" x="0" y="6" width="1000" height="20" />
-        {% for part in bar.parts %}
-            <rect class="next-step-bar__part next-step-bar__part--{{ part.kind }}" x="{{ part.x }}" y="6" width="{{ part.width }}" height="20" vector-effect="non-scaling-stroke" />
+{# A PASS IAE and what changes it, as labelled blocks with their dates (see next_steps_views.period_bar). #}
+<figure class="next-step-frise mb-4">
+    <div class="row g-1">
+        {% for block in bar.blocks %}
+            <div class="col-{{ block.columns }}">
+                <div class="next-step-frise__block next-step-frise__block--{{ block.kind }}">
+                    <span class="next-step-frise__label">{{ block.label }}</span>
+                    <span class="next-step-frise__duration">{{ block.duration }}</span>
+                </div>
+                <div class="next-step-frise__edges">
+                    {% if block.left %}
+                        <span class="next-step-frise__edge next-step-frise__edge--left">
+                            <b>{{ block.left.date_display }}</b>
+                            <small>{{ block.left.caption }}</small>
+                        </span>
+                    {% endif %}
+                    {% if block.right %}
+                        <span class="next-step-frise__edge next-step-frise__edge--right">
+                            <b>{{ block.right.date_display }}</b>
+                            <small>{{ block.right.caption }}</small>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
         {% endfor %}
-        {% for marker in bar.markers %}
-            <line class="next-step-bar__marker next-step-bar__marker--{{ marker.kind }}" x1="{{ marker.x }}" x2="{{ marker.x }}" y1="0" y2="32" vector-effect="non-scaling-stroke" />
-        {% endfor %}
-    </svg>
-    <div class="next-step-bar__ends">
-        <span>{{ bar.start_display }}</span>
-        <span>{{ bar.end_display }}</span>
     </div>
-    <figcaption>
-        <ul class="next-step-bar__legend">
-            {% for item in bar.legend %}
-                <li>
-                    <span class="next-step-bar__key next-step-bar__key--{{ item.kind }}" aria-hidden="true"></span>
-                    {{ item.text }}
-                </li>
+    {% if bar.notes %}
+        <figcaption class="next-step-frise__notes">
+            {% for note in bar.notes %}
+                <span class="next-step-frise__note next-step-frise__note--{{ note.variant }}">
+                    <i class="{{ note.icon }}" aria-hidden="true"></i>
+                    {{ note.text }}
+                </span>
             {% endfor %}
-        </ul>
-    </figcaption>
+        </figcaption>
+    {% endif %}
 </figure>

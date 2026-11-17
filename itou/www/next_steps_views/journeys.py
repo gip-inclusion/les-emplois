@@ -444,11 +444,8 @@ class SuspensionJourney(Journey):
     def recap(self, forms):
         form = forms["suspension"]
         suspension = form.cleaned_data
-        lines = [
-            ("Du", _fr(suspension["start_at"])),
-            ("Au", _fr(suspension["end_at"])),
-            ("Motif", _label(form, "reason", suspension["reason"])),
-        ]
+        # The dates are on the strip above.
+        lines = [("Motif", _label(form, "reason", suspension["reason"]))]
         if suspension.get("reason_explanation"):
             lines.append(("Explications", suspension["reason_explanation"]))
         return lines
@@ -987,18 +984,12 @@ class ProlongationJourney(Journey):
         self.job_seeker = self.prolongation_request.approval.user
 
     def facts(self):
+        # The dates are in the strip above: here, who asks and why.
         prolongation_request = self.prolongation_request
         facts = [("Demandée le", _fr(prolongation_request.created_at))]
         if prolongation_request.declared_by_siae:
             facts.append(("Par", prolongation_request.declared_by_siae.display_name))
-        return facts + [
-            ("Motif", prolongation_request.get_reason_display()),
-            (
-                "Prolongation demandée",
-                f"du {_fr(prolongation_request.start_at)} au {_fr(prolongation_request.end_at)}",
-            ),
-            (f"Fin actuelle du {PASS_IAE}", _fr(prolongation_request.approval.end_at)),
-        ]
+        return facts + [("Motif", prolongation_request.get_reason_display())]
 
     def build_forms(self, data=None, initial=None):
         employee = self.prolongation_request.approval.user
@@ -1038,7 +1029,6 @@ class ProlongationJourney(Journey):
                     f"le {PASS_IAE} de {self.job_seeker.first_name}"
                 ),
                 bar=bar,
-                boxes=[Box(prolongation_request.get_reason_display(), title="Motif")],
             ),
             Step(
                 "Votre décision",

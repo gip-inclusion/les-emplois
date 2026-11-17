@@ -701,113 +701,119 @@ table.table td > .modal .modal-content {
     text-decoration: underline;
 }
 
-/* Period bar: the PASS IAE as it stands (used, remaining), then the added period after it. */
-.next-step-bar__track {
-    display: block;
-    width: 100%;
-    height: 2rem;
+/* Period strip: a PASS IAE and what changes it, as labelled blocks with their dates under their edges. */
+.next-step-frise__block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 3.25rem;
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    line-height: 1.25;
+    overflow: hidden;
 }
 
-.next-step-bar__background {
-    fill: var(--bs-light, #f2f3f5);
+.next-step-frise__label {
+    font-size: .875rem;
+    font-weight: 700;
 }
 
-.next-step-bar__part--used {
-    fill: var(--bs-tertiary, #000091);
+.next-step-frise__duration {
+    font-size: .8125rem;
+    opacity: .85;
 }
 
-.next-step-bar__part--remaining {
-    fill: var(--bs-tertiary, #000091);
-    fill-opacity: .35;
+.next-step-frise__block--pass {
+    color: var(--bs-tertiary, #000091);
+    background-color: #daedff;
 }
 
-.next-step-bar__part--added {
-    fill: var(--bs-warning, #b34000);
-    fill-opacity: .2;
-    stroke: var(--bs-warning, #b34000);
-    stroke-dasharray: 5 3;
+/* Hatched with a dashed edge: what is asked for or put on hold, not yet run. */
+.next-step-frise__block--prolongation {
+    color: var(--bs-warning, #b34000);
+    border: 1.5px dashed currentColor;
+    background: repeating-linear-gradient(135deg, #fff3df 0 .5rem, #ffe7c2 .5rem 1rem);
 }
 
-.next-step-bar__part--paused {
-    fill: var(--bs-info, #0063cb);
-    fill-opacity: .2;
-    stroke: var(--bs-info, #0063cb);
+.next-step-frise__block--suspension {
+    color: var(--bs-info, #0063cb);
+    border: 1.5px dashed currentColor;
+    background: repeating-linear-gradient(135deg, #eef2ff 0 .5rem, #dfe6ff .5rem 1rem);
 }
 
-.next-step-bar__marker--previous-end {
-    stroke: var(--bs-body-color, #000638);
-    stroke-dasharray: 2 2;
-}
-
-.next-step-bar__marker--today {
-    stroke: var(--bs-body-color, #000638);
-    stroke-width: 2;
-}
-
-.next-step-bar__marker--contract {
-    stroke: var(--bs-body-color, #000638);
-    stroke-dasharray: 3 3;
-}
-
-.next-step-bar__ends {
+.next-step-frise__edges {
     display: flex;
     justify-content: space-between;
+    gap: .5rem;
+    margin-top: .25rem;
+}
+
+/* A date hangs from its block's edge by a small tick. */
+.next-step-frise__edge {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding-top: .5rem;
+    line-height: 1.2;
+}
+
+.next-step-frise__edge::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: .375rem;
+    border-radius: 1px;
+    background-color: #cccdd7;
+}
+
+.next-step-frise__edge--left::before {
+    left: 0;
+}
+
+.next-step-frise__edge--right {
+    margin-left: auto;
+    text-align: right;
+}
+
+.next-step-frise__edge--right::before {
+    right: 0;
+}
+
+.next-step-frise__edge b {
+    font-size: .8125rem;
+}
+
+.next-step-frise__edge small {
     font-size: .75rem;
     color: var(--bs-secondary-color, #727492);
 }
 
-.next-step-bar__legend {
+.next-step-frise__notes {
     display: flex;
-    flex-direction: column;
-    gap: .25rem;
-    margin: .5rem 0 0;
-    padding: 0;
-    list-style: none;
-    font-size: .875rem;
-}
-
-.next-step-bar__legend li {
-    display: flex;
+    flex-wrap: wrap;
     gap: .5rem;
-    align-items: baseline;
+    margin-top: .875rem;
 }
 
-.next-step-bar__key {
-    flex: none;
-    width: .875rem;
-    height: .625rem;
-    border-radius: 2px;
+.next-step-frise__note {
+    display: inline-flex;
+    gap: .375rem;
+    align-items: center;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    font-size: .8125rem;
+    color: var(--bs-body-color, #000638);
+    background-color: var(--bs-light, #f2f3f5);
 }
 
-.next-step-bar__key--used {
-    background: linear-gradient(90deg, var(--bs-tertiary, #000091) 50%, rgba(0, 0, 145, .35) 50%);
+.next-step-frise__note--ok {
+    color: var(--bs-success, #18753c);
+    background-color: #e0f7e9;
 }
 
-.next-step-bar__key--added {
-    border: 1px dashed var(--bs-warning, #b34000);
-    background-color: rgba(179, 64, 0, .2);
-}
-
-.next-step-bar__key--paused {
-    border: 1px solid var(--bs-info, #0063cb);
-    background-color: rgba(0, 99, 203, .2);
-}
-
-.next-step-bar__key--previous-end {
-    width: 0;
-    border-left: 2px dotted var(--bs-body-color, #000638);
-    border-radius: 0;
-}
-
-.next-step-bar__key--contract {
-    width: 0;
-    border-left: 2px dashed var(--bs-body-color, #000638);
-    border-radius: 0;
-}
-
-.next-step-bar__key--today {
-    width: 0;
-    border-left: 2px solid var(--bs-body-color, #000638);
-    border-radius: 0;
+.next-step-frise__note--warn {
+    color: var(--bs-warning, #b34000);
+    background-color: #fff3df;
 }
 

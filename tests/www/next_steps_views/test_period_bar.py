@@ -15,13 +15,25 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 
 
+NBSP = " "
+
+
+def edges(bar):
+    return [
+        (edge.date_display, edge.caption)
+        for block in bar.blocks
+        for edge in (block.left, block.right)
+        if edge is not None
+    ]
+
+
 @pytest.mark.parametrize(
     "start,end,expected",
     [
-        (datetime.date(2027, 2, 1), datetime.date(2027, 5, 31), "4 mois"),
-        (datetime.date(2027, 2, 1), datetime.date(2027, 2, 12), "12 jours"),
-        (datetime.date(2027, 2, 1), datetime.date(2028, 3, 31), "1 an et 2 mois"),
-        (datetime.date(2027, 2, 1), datetime.date(2027, 3, 15), "1 mois et 15 jours"),
+        (datetime.date(2027, 2, 1), datetime.date(2027, 5, 31), f"4{NBSP}mois"),
+        (datetime.date(2027, 2, 1), datetime.date(2027, 2, 12), f"12{NBSP}jours"),
+        (datetime.date(2027, 2, 1), datetime.date(2028, 3, 31), f"1{NBSP}an et 2{NBSP}mois"),
+        (datetime.date(2027, 2, 1), datetime.date(2027, 3, 15), f"1{NBSP}mois et 15{NBSP}jours"),
     ],
 )
 def test_duration_display(start, end, expected):
@@ -39,21 +51,17 @@ def test_prolongation_bar():
         contract_end=datetime.date(2027, 5, 31),
     )
 
-    # The PASS IAE as it stands, days used then days left, and the requested period right after its end.
-    assert [(part.kind, part.start, part.end) for part in bar.parts] == [
-        ("used", datetime.date(2025, 2, 1), datetime.date(2026, 11, 16)),
-        ("remaining", datetime.date(2026, 11, 17), datetime.date(2027, 1, 31)),
-        ("added", datetime.date(2027, 2, 1), datetime.date(2027, 5, 31)),
+    # A "PASS IAE" block with its start and planned end, then a "Prolongation" block with the requested end.
+    assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
+        ("pass", f"PASS{NBSP}IAE", f"2{NBSP}ans"),
+        ("prolongation", "Prolongation", f"+ 4{NBSP}mois"),
     ]
-    assert (bar.start_display, bar.end_display) == ("01/02/2025", "31/05/2027")
-    assert bar.parts[0].x == "0.0"
-    assert float(bar.parts[2].x) + float(bar.parts[2].width) == pytest.approx(1000, abs=0.2)
-    assert [marker.kind for marker in bar.markers] == ["today", "contract"]
-    assert [item.text for item in bar.legend] == [
-        "PASS IAE du 01/02/2025 au 31/01/2027, dont 2 mois et 15 jours restants",
-        "Prolongation demandée : + 4 mois, jusqu’au 31/05/2027",
-        "Fin du contrat le 31/05/2027, couverte par la prolongation",
-        "Aujourd’hui",
+    assert edges(bar) == [("01/02/2025", "Début"), ("31/01/2027", "Fin prévue"), ("31/05/2027", "Fin demandée")]
+    # Widths follow the durations on twelve columns, each block staying readable.
+    assert [block.columns for block in bar.blocks] == [8, 4]
+    assert [note.text for note in bar.notes] == [
+        f"Il reste 2{NBSP}mois et 15{NBSP}jours sur le PASS{NBSP}IAE.",
+        f"Fin du contrat le 31/05/2027{NBSP}: couverte par la prolongation",
     ]
 
 
@@ -76,8 +84,9 @@ def test_prolongation_request_shows_the_bar(client, settings):
 
     url = reverse("next_steps_views:journey", kwargs={"kind": "prolongation", "pk": prolongation_request.pk})
     response = client.get(url, HTTP_HX_REQUEST="true")
-    assertContains(response, "next-step-bar__part--added")
-    assertContains(response, "Fin du contrat le 30/06/2027, non couverte par la prolongation")
+    assertContains(response, "next-step-frise__block--prolongation")
+    assertContains(response, "Fin demandée")
+    assertContains(response, f"Fin du contrat le 30/06/2027{NBSP}: après la fin demandée")
 
 
 @freeze_time("2026-11-16")
@@ -86,15 +95,23 @@ def test_suspension_bar():
 
     bar = suspension_bar(approval, datetime.date(2026, 11, 1), datetime.date(2027, 4, 30))
 
-    # Days used, the suspension, then the days left, pushed back after it.
-    assert [(part.kind, part.start, part.end) for part in bar.parts] == [
-        ("used", datetime.date(2026, 3, 16), datetime.date(2026, 10, 31)),
-        ("paused", datetime.date(2026, 11, 1), datetime.date(2027, 4, 30)),
-        ("remaining", datetime.date(2027, 5, 1), datetime.date(2028, 9, 11)),
+    # The PASS IAE until the suspension, the suspension, then the days left, pushed back after it.
+    assert [(block.kind, block.start, block.end) for block in bar.blocks] == [
+        ("pass", datetime.date(2026, 3, 16), datetime.date(2026, 10, 31)),
+        ("suspension", datetime.date(2026, 11, 1), datetime.date(2027, 4, 30)),
+        ("pass", datetime.date(2027, 5, 1), datetime.date(2028, 9, 11)),
     ]
-    assert [marker.kind for marker in bar.markers] == ["previous-end"]
-    assert bar.legend[1].text == "Suspension du 01/11/2026 au 30/04/2027 : 6 mois"
-    assert bar.legend[2].text == "Fin du PASS IAE repoussée du 15/03/2028 au 11/09/2028"
+    assert edges(bar) == [
+        ("16/03/2026", "Début"),
+        ("01/11/2026", "Du"),
+        ("30/04/2027", "Au"),
+        ("11/09/2028", "Nouvelle fin"),
+    ]
+    # The suspension carries two dates: it keeps room for them, however short it is.
+    assert [block.columns for block in bar.blocks] == [3, 4, 5]
+    assert [note.text for note in bar.notes] == [
+        f"Fin prévue avant la suspension{NBSP}: 15/03/2028, repoussée au 11/09/2028"
+    ]
 
 
 @freeze_time("2026-11-16")
@@ -121,7 +138,7 @@ def test_suspension_journey_shows_the_bars_and_matches_the_database(client, sett
 
     # The PASS IAE as it stands, with the end of the contract.
     response = client.get(url, HTTP_HX_REQUEST="true")
-    assertContains(response, "Fin du contrat le 31/10/2026")
+    assertContains(response, "Contrat terminé le 31/10/2026")
 
     answers = {
         "start_at": "2026-11-01",
@@ -131,10 +148,11 @@ def test_suspension_journey_shows_the_bars_and_matches_the_database(client, sett
     }
     shown = list(answers)
     response = client.post(url, {**answers, "step": 0, "nav": "next", "shown": shown}, HTTP_HX_REQUEST="true")
-    assertContains(response, "Fin du PASS IAE repoussée du 15/03/2028 au 11/09/2028")
+    announced = f"Fin prévue avant la suspension{NBSP}: 15/03/2028, repoussée au 11/09/2028"
+    assertContains(response, announced)
 
     response = client.post(url, {**answers, "step": 1, "nav": "next", "shown": shown}, HTTP_HX_REQUEST="true")
     approval.refresh_from_db()
-    # The bar announced the date the database trigger set.
+    # The strip announced the date the database trigger set.
     assert approval.end_at == datetime.date(2028, 9, 11)
-    assertContains(response, "Fin du PASS IAE repoussée du 15/03/2028 au 11/09/2028")
+    assertContains(response, announced)
