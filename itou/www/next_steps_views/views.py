@@ -28,6 +28,7 @@ from itou.www.next_steps_views.actions import (
     group_actions,
     next_action,
 )
+from itou.www.next_steps_views.advisors import advisor_acts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
 from itou.www.next_steps_views.situation import contract_place, situation_sentences
@@ -193,3 +194,32 @@ def journey(request, kind, pk):
         # Pages listening to this event reload their actions.
         response["HX-Trigger"] = "nextStepsChanged"
     return response
+
+
+@readonly_view
+def advisor(request, public_id, assignment_pk):
+    """An advisor of the job seeker: who they are, how to reach them, and their acts for the job seeker.
+
+    In the side drawer when loaded by htmx, an ordinary page otherwise. Same access rule as the job seeker's page.
+    """
+    if not can_view_next_steps(request):
+        raise Http404
+    job_seeker = get_object_or_404(
+        User.objects.select_related("jobseeker_profile"), kind=UserKind.JOB_SEEKER, public_id=public_id
+    )
+    assignment = get_object_or_404(
+        JobSeekerAssignment.objects.select_related("professional", "company", "prescriber_organization"),
+        pk=assignment_pk,
+        job_seeker=job_seeker,
+    )
+    assignment.job_seeker = job_seeker
+    context = {
+        "job_seeker": job_seeker,
+        "assignment": assignment,
+        "acts": advisor_acts(request, assignment),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "in_drawer": bool(request.htmx),
+        "matomo_custom_title": "Prochaines étapes : accompagnateur",
+    }
+    template_name = "next_steps/advisor.html" if request.htmx else "next_steps/advisor_page.html"
+    return render(request, template_name, context)

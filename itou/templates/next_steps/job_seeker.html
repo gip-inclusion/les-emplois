@@ -46,30 +46,42 @@
                             <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0">
                                 {% for assignment in assignments %}
                                     {# As in the prototype: initials in a round, filled for the signed-in professional. #}
-                                    <li class="c-box d-flex align-items-center gap-3 py-2 px-3">
-                                        {% if assignment.assigned_to_unknown_advisor %}
-                                            <span class="next-step__avatar"
-                                                  aria-hidden="true"><i class="ri-community-line"></i></span>
-                                        {% else %}
-                                            <span class="next-step__avatar{% if assignment.professional_id == request.user.pk %} next-step__avatar--you{% endif %}" aria-hidden="true">{{ assignment.professional.first_name|first|upper }}{{ assignment.professional.last_name|first|upper }}</span>
-                                        {% endif %}
-                                        <div>
+                                    {# A click opens the advisor in the side drawer; without JavaScript, as a page. #}
+                                    <li>
+                                        {% url "next_steps_views:advisor" public_id=job_seeker.public_id assignment_pk=assignment.pk as advisor_url %}
+                                        <a class="c-box next-step-advisor d-flex align-items-center gap-3 py-2 px-3"
+                                           href="{{ advisor_url }}"
+                                           hx-get="{{ advisor_url }}"
+                                           hx-target="#next-step-journey"
+                                           hx-swap="outerHTML"
+                                           hx-indicator="#next-step-journey"
+                                           data-bs-toggle="offcanvas"
+                                           data-bs-target="#next-step-drawer"
+                                           aria-controls="next-step-drawer">
                                             {% if assignment.assigned_to_unknown_advisor %}
-                                                <strong>{{ assignment.organization.display_name }}</strong>
-                                                <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                                <span class="next-step__avatar"
+                                                      aria-hidden="true"><i class="ri-community-line"></i></span>
                                             {% else %}
-                                                <strong>{{ assignment.professional.get_full_name }}</strong>
-                                                {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
-                                                <span class="d-block fs-sm text-muted">
-                                                    {% if assignment.organization %}
-                                                        {{ assignment.organization.display_name }}
-                                                    {% else %}
-                                                        Aucune structure associée
-                                                    {% endif %}
-                                                </span>
+                                                <span class="next-step__avatar{% if assignment.professional_id == request.user.pk %} next-step__avatar--you{% endif %}" aria-hidden="true">{{ assignment.professional.first_name|first|upper }}{{ assignment.professional.last_name|first|upper }}</span>
                                             {% endif %}
-                                            <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
-                                        </div>
+                                            <div>
+                                                {% if assignment.assigned_to_unknown_advisor %}
+                                                    <strong>{{ assignment.organization.display_name }}</strong>
+                                                    <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                                {% else %}
+                                                    <strong>{{ assignment.professional.get_full_name }}</strong>
+                                                    {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
+                                                    <span class="d-block fs-sm text-muted">
+                                                        {% if assignment.organization %}
+                                                            {{ assignment.organization.display_name }}
+                                                        {% else %}
+                                                            Aucune structure associée
+                                                        {% endif %}
+                                                    </span>
+                                                {% endif %}
+                                                <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
+                                            </div>
+                                        </a>
                                     </li>
                                 {% endfor %}
                             </ul>

@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+{# An advisor as an ordinary page, when JavaScript does not run. #}
+
+{% block title %}{{ assignment.professional.get_full_name }} {{ block.super }}{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-lg-8 col-xxl-6">
+                    <div class="c-box">{% include "next_steps/advisor.html" %}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

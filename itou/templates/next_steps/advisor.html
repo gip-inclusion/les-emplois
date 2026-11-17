@@ -1,0 +1,122 @@
+{% load enums %}
+{% load str_filters %}
+{% load url_add_query %}
+{% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
+{# An advisor of the job seeker, in the side drawer or inside a page: who, how to reach them, their acts. #}
+<div id="next-step-journey" class="next-step-journey">
+    <div class="next-step-journey__head">
+        <div class="d-flex align-items-center gap-3">
+            {% if assignment.assigned_to_unknown_advisor %}
+                <span class="next-step__avatar" aria-hidden="true"><i class="ri-community-line"></i></span>
+            {% else %}
+                <span class="next-step__avatar{% if assignment.professional_id == request.user.pk %} next-step__avatar--you{% endif %}" aria-hidden="true">{{ assignment.professional.first_name|first|upper }}{{ assignment.professional.last_name|first|upper }}</span>
+            {% endif %}
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">Accompagne {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">
+                    {% if assignment.assigned_to_unknown_advisor %}
+                        {{ assignment.organization.display_name }}
+                    {% else %}
+                        {{ assignment.professional.get_full_name }}
+                        {% if assignment.professional_id == request.user.pk %}<span class="text-muted fw-normal">· vous</span>{% endif %}
+                    {% endif %}
+                </h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button"
+                        class="btn-close align-self-start"
+                        data-bs-dismiss="offcanvas"
+                        aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="next-step-journey__body">
+        {# Contact details as on the existing advisors tab: behind a button, never for oneself. #}
+        <form id="display-contact-info-form">
+            {% csrf_token %}
+        </form>
+        <ul class="list-data mb-4">
+            <li>
+                <small>Structure</small>
+                <span>
+                    {% if assignment.assigned_to_unknown_advisor %}
+                        Accompagnateur non renseigné
+                    {% elif assignment.organization %}
+                        {{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}
+                    {% else %}
+                        Aucune structure associée
+                    {% endif %}
+                </span>
+            </li>
+            <li>
+                <small>Accompagne depuis le</small>
+                <span>{{ assignment.created_at|date:"d/m/Y" }}</span>
+            </li>
+            {% if assignment.advisor != request.user %}
+                {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+                    <li>
+                        <small>Adresse e-mail</small>
+                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                    </li>
+                {% endif %}
+                {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
+                    <li>
+                        <small>Téléphone</small>
+                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                    </li>
+                {% elif assignment.organization %}
+                    <li>
+                        <small>Adresse e-mail de la structure</small>
+                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                    </li>
+                    <li>
+                        <small>Téléphone de la structure</small>
+                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                    </li>
+                {% endif %}
+            {% endif %}
+            {% if assignment.reason %}
+                <li class="has-forced-line-break">
+                    <small>Motif de l’accompagnement</small>
+                    <span>{{ assignment.reason }}</span>
+                </li>
+            {% endif %}
+        </ul>
+
+        <h3 class="h4 mb-1">Ses actes</h3>
+        <p class="fs-sm text-muted mb-3">
+            Retrouvés dans les candidatures, diagnostics, bilans et orientations que vous pouvez consulter, du plus récent au plus ancien.
+        </p>
+        {% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+        <ol class="list-unstyled next-step-acts mb-0">
+            {% for act in acts %}
+                <li class="next-step-acts__item">
+                    <span class="next-step__icon bg-light text-muted"
+                          aria-hidden="true"><i class="{{ act.icon }}"></i></span>
+                    <div class="flex-grow-1">
+                        <p class="fw-bold mb-0">
+                            {% if act.url %}
+                                <a class="link-tertiary"
+                                   href="{% url_add_query act.url back_url=job_seeker_url %}">{{ act.title }}</a>
+                            {% else %}
+                                {{ act.title }}
+                            {% endif %}
+                        </p>
+                        {% if act.detail %}<p class="fs-sm text-muted mb-0">{{ act.detail }}</p>{% endif %}
+                    </div>
+                    <time class="fs-sm text-muted flex-shrink-0"
+                          datetime="{{ act.at|date:"Y-m-d" }}">{{ act.at|date:"d/m/Y" }}</time>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="next-step-journey__foot">
+        <a class="btn btn-outline-primary btn-ico"
+           href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ job_seeker_url|urlencode }}">
+            <i class="ri-team-line fw-medium" aria-hidden="true"></i>
+            <span>Tous les accompagnateurs</span>
+        </a>
+    </div>
+</div>

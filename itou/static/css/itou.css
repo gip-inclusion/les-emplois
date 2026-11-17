@@ -432,6 +432,40 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-tertiary, #000091);
 }
 
+/* An advisor's box opens their panel: a link that looks like a box. */
+.next-step-advisor {
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s ease-in-out;
+}
+
+.next-step-advisor:hover,
+.next-step-advisor:focus-visible {
+    border-color: var(--bs-tertiary, #000091);
+}
+
+/* An advisor's acts: icon, what and where, date on the right. */
+.next-step-acts__item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .75rem 0;
+    border-bottom: 1px solid var(--bs-border-color, #e6e6eb);
+}
+
+.next-step-acts__item:last-child {
+    border-bottom: 0;
+}
+
+.next-step-acts__item a {
+    text-decoration: none;
+}
+
+.next-step-acts__item a:hover,
+.next-step-acts__item a:focus-visible {
+    text-decoration: underline;
+}
+
 /* Barriers columns: a sunk background holding the barrier cards. */
 .next-step-barriers__column {
     display: flex;
