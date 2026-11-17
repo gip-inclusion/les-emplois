@@ -500,6 +500,35 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-light, #f2f3f5);
 }
 
+/* Where a barrier comes from: one small line per source, its icon on the left. */
+.next-step-clues {
+    display: flex;
+    flex-direction: column;
+    gap: .375rem;
+}
+
+.next-step-clue {
+    display: flex;
+    gap: .375rem;
+    font-size: .8125rem;
+    line-height: 1.35;
+    color: var(--bs-secondary-color, #727492);
+}
+
+.next-step-clue > i {
+    flex: none;
+    margin-top: .0625rem;
+}
+
+.next-step-clue a {
+    text-decoration: none;
+}
+
+.next-step-clue a:hover,
+.next-step-clue a:focus-visible {
+    text-decoration: underline;
+}
+
 /* Guided journeys: a wide side drawer with a fixed head and foot around a scrolling body. */
 .next-step-drawer {
     --bs-offcanvas-width: min(36rem, 100%);

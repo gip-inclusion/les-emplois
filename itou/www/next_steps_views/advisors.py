@@ -88,7 +88,7 @@ def _job_application_url(request, job_application):
     return reverse(name, kwargs={"job_application_id": job_application.pk})
 
 
-def _orientations(request, job_seeker):
+def visible_orientations(request, job_seeker):
     """Same scopes as job_seekers_views.OrientationsTabView.get_orientations."""
     scope = (
         {"sender_company": request.current_organization}
@@ -177,7 +177,7 @@ def advisor_acts(request, assignment):
             acts.append(Act(ActionKind.FILL_REPORT, report.created_at, url=url))
 
     orientations = (
-        _orientations(request, job_seeker)
+        visible_orientations(request, job_seeker)
         .filter(sender=advisor)
         .filter(_same_organization(assignment, "sender_company", "sender_prescriber_organization"))
         .select_related("service")

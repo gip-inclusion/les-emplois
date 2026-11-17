@@ -1,0 +1,26 @@
+{# One barrier and where it comes from: a report, an eligibility criterion, an orientation. #}
+<article class="c-box p-3">
+    <div class="d-flex align-items-start justify-content-between gap-2">
+        <strong>{{ card.label }}</strong>
+        {% if card.to_confirm %}
+            <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning flex-shrink-0">À confirmer</span>
+        {% endif %}
+    </div>
+    <ul class="list-unstyled next-step-clues mt-2 mb-0">
+        {% for clue in card.clues %}
+            <li class="next-step-clue">
+                <i class="{{ clue.icon }}" aria-hidden="true"></i>
+                <span>
+                    {% if clue.url %}
+                        <a class="link-tertiary" href="{{ clue.url }}">{{ clue.text }}</a>
+                    {% else %}
+                        {{ clue.text }}
+                    {% endif %}
+                    {% if clue.certified %}
+                        <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>
+                    {% endif %}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+</article>

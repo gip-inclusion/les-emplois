@@ -13,7 +13,6 @@ from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     can_fill_pro_support_report,
-    can_view_pro_support_report,
 )
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
@@ -29,6 +28,7 @@ from itou.www.next_steps_views.actions import (
     next_action,
 )
 from itou.www.next_steps_views.advisors import advisor_acts
+from itou.www.next_steps_views.barriers import gather_barriers
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
 from itou.www.next_steps_views.situation import contract_place, situation_sentences
@@ -89,17 +89,6 @@ def _contracts_for_situation(job_seeker, approval):
     return list(contracts.select_related("company").order_by("start_date"))
 
 
-def _last_viewable_pro_support_report(request, job_seeker):
-    """The barriers come from the latest report: the only place where the platform records them."""
-    reports = job_seeker.pro_support_reports.select_related("company").order_by("-created_at")
-    if request.from_employer:
-        reports = reports.filter(company=request.current_organization)
-    report = reports.first()
-    if report and can_view_pro_support_report(request, report):
-        return report
-    return None
-
-
 @readonly_view
 def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
     """A job seeker's page centred on actions: who follows them, where they stand, what to do, the folded file.
@@ -142,6 +131,7 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         situation_strip = situation_bar(approval, contracts, functools.partial(contract_place, request))
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
+    show_barriers = request.from_authorized_prescriber or can_fill_pro_support_report(request)
     describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
 
     context = {
@@ -157,8 +147,8 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
         "eligibility_summary": eligibility_summary,
         "situation_bar": situation_strip,
-        "show_barriers": request.from_authorized_prescriber or can_fill_pro_support_report(request),
-        "pro_support_report": _last_viewable_pro_support_report(request, job_seeker),
+        "show_barriers": show_barriers,
+        "barriers": gather_barriers(request, job_seeker, iae_eligibility_diagnosis) if show_barriers else None,
         "matomo_custom_title": "Prochaines étapes : fiche usager",
         "journeys_media": _journeys_media(request),
     }

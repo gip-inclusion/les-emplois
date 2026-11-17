@@ -1,50 +1,45 @@
-{# Barriers in three columns. The platform only records the barriers of the latest pro support report, #}
-{# not their progress: they all start in « À travailler », and the other columns say so instead of staying silent. #}
+{# Barriers in three columns, from the reports, the eligibility criteria and the orientations (next_steps_views.barriers). #}
 <section class="mb-5" aria-labelledby="next-steps-barriers">
     <h2 class="h3 mb-1" id="next-steps-barriers">Freins à lever</h2>
-    {% if report %}
-        <p class="fs-sm text-muted mb-3">
-            Identifiés dans le bilan d’accompagnement rempli le {{ report.created_at|date:"d/m/Y" }}{% if report.company %} par {{ report.company.display_name }}{% endif %}.
-        </p>
-    {% else %}
-        <p class="fs-sm text-muted mb-3">
-            Les freins s’affichent ici une fois le bilan d’accompagnement rempli par la structure d’insertion.
-        </p>
-    {% endif %}
+    <p class="fs-sm text-muted mb-3">
+        D’après les bilans d’accompagnement, les critères d’éligibilité et les orientations que vous pouvez consulter.
+        {% if not barriers.report %}Aucun bilan d’accompagnement pour le moment.{% endif %}
+    </p>
     <div class="row g-3">
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">À travailler</h3>
-                {% if report %}
-                    {% for barrier in report.get_barriers_display %}
-                        <div class="c-box p-3">
-                            <strong>{{ barrier }}</strong>
-                        </div>
-                    {% endfor %}
-                    {% if report.other_barrier %}
-                        <div class="c-box p-3">
-                            <span class="d-block fs-sm text-muted">Autres freins identifiés</span>
-                            <strong>{{ report.other_barrier }}</strong>
-                        </div>
-                    {% endif %}
-                    {% if not report.barriers and not report.other_barrier %}
-                        <p class="fs-sm text-muted mb-0">Aucun frein identifié dans le bilan.</p>
-                    {% endif %}
-                {% else %}
-                    <p class="fs-sm text-muted mb-0">Aucun bilan pour le moment.</p>
-                {% endif %}
+                <h3 class="h5 mb-0">
+                    À travailler <span class="text-muted fw-normal">{{ barriers.to_work|length }}</span>
+                </h3>
+                {% for card in barriers.to_work %}
+                    {% include "next_steps/includes/barrier_card.html" with card=card only %}
+                {% empty %}
+                    <p class="fs-sm text-muted mb-0">Aucun frein repéré.</p>
+                {% endfor %}
             </div>
         </div>
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">En cours</h3>
-                <p class="fs-sm text-muted mb-0">Le suivi des démarches sur un frein n’existe pas encore sur la plateforme.</p>
+                <h3 class="h5 mb-0">
+                    En cours <span class="text-muted fw-normal">{{ barriers.in_progress|length }}</span>
+                </h3>
+                {% for card in barriers.in_progress %}
+                    {% include "next_steps/includes/barrier_card.html" with card=card only %}
+                {% empty %}
+                    <p class="fs-sm text-muted mb-0">Aucune orientation en cours vers un service qui lève un frein.</p>
+                {% endfor %}
             </div>
         </div>
         <div class="col-12 col-md-4">
             <div class="next-step-barriers__column">
-                <h3 class="h5 mb-0">Levés</h3>
-                <p class="fs-sm text-muted mb-0">Indiquer qu’un frein est levé n’est pas encore possible sur la plateforme.</p>
+                <h3 class="h5 mb-0">
+                    Levés <span class="text-muted fw-normal">{{ barriers.lifted|length }}</span>
+                </h3>
+                {% for card in barriers.lifted %}
+                    {% include "next_steps/includes/barrier_card.html" with card=card only %}
+                {% empty %}
+                    <p class="fs-sm text-muted mb-0">Un frein est levé quand il n’apparaît plus d’un bilan au suivant.</p>
+                {% endfor %}
             </div>
         </div>
     </div>

@@ -200,7 +200,10 @@ def test_strip_and_barriers_for_employer(client):
     assertContains(response, "next-step-frise__block--pass")
     assertContains(response, f"Contrat chez vous du {fr(contract.start_date)} au {fr(contract.end_date)}")
     assertContains(response, "Freins à lever")
-    assertContains(response, f"rempli le {fr(timezone.localdate(report.created_at))}")
+    assertContains(
+        response,
+        f"Bilan d’accompagnement du {fr(timezone.localdate(report.created_at))} · {membership.company.display_name}",
+    )
     assertContains(response, ProSupportReportBarrier.MOBILITY.label)
     assertContains(response, ProSupportReportBarrier.HEALTH.label)
     assertContains(response, "Garde d’enfant")
@@ -212,7 +215,7 @@ def test_barriers_without_report(client):
     client.force_login(membership.user)
 
     response = client.get(page_url(JobSeekerFactory()))
-    assertContains(response, "Les freins s’affichent ici une fois le bilan d’accompagnement rempli")
+    assertContains(response, "Aucun bilan d’accompagnement pour le moment.")
     # Nothing to draw: no PASS IAE, no contract.
     assertNotContains(response, "next-step-frise")
 
