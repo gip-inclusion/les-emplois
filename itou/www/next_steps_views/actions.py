@@ -12,6 +12,7 @@ import dataclasses
 import datetime
 import enum
 
+from dateutil.relativedelta import relativedelta
 from django.db.models import prefetch_related_objects
 from django.urls import reverse
 from django.utils import timezone
@@ -79,8 +80,20 @@ GROUPS = [
     ),
 ]
 WEEK_DAYS = 7
-# Beyond this many days late, the due date is shown rather than the count of days.
-LATE_DAYS_SHOWN = 30
+
+
+def elapsed_display(since):
+    """Time elapsed since a date, in the unit that reads best: "3 jours", "2 semaines", "5 mois"."""
+    today = timezone.localdate()
+    days = (today - since).days
+    if days < 1:
+        return "aujourd’hui"
+    if days < 14:
+        return f"{days}{NBSP}jour{'s' if days > 1 else ''}"
+    if days < 60:
+        return f"{days // 7}{NBSP}semaines"
+    delta = relativedelta(today, since)
+    return f"{delta.years * 12 + delta.months}{NBSP}mois"
 
 
 def due_group(due):
@@ -141,14 +154,14 @@ class Action:
 
     @property
     def due_display(self):
+        if self.kind == Kind.JOB_APPLICATION:
+            # What the person and the sender live: how long they have waited, since it was received.
+            return f"En attente de réponse depuis {elapsed_display(self.since)}"
         if self.due is None:
             return ""
         late = (timezone.localdate() - self.due).days
-        if late > LATE_DAYS_SHOWN:
-            # "474 jours" says less than a date.
-            return f"En retard depuis le {_fr(self.due)}"
         if late > 0:
-            return f"En retard de {late}{NBSP}jour{'s' if late > 1 else ''}"
+            return f"En retard de {elapsed_display(self.due)}"
         if late == 0:
             return "À faire aujourd’hui"
         return f"À faire d’ici le {_fr(self.due)}"

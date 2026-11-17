@@ -4,12 +4,13 @@ import types
 import pytest
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.job_applications.enums import JobApplicationState
 from itou.rdv_insertion.models import Participation
-from itou.www.next_steps_views.actions import Group, Kind, describe_job_seekers
+from itou.www.next_steps_views.actions import Group, Kind, describe_job_seekers, elapsed_display
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -164,7 +165,8 @@ def test_employer_new_job_application(employer_client, employer_membership):
     response = employer_client.get(TODO_URL)
     # Due within a week: this week's.
     assert summary(response) == [(Group.WEEK, Kind.JOB_APPLICATION, job_application.job_seeker)]
-    assertContains(response, f"À faire d’ici le {timezone.localdate() + datetime.timedelta(days=7):%d/%m/%Y}")
+    # How long it has waited, rather than its due date.
+    assertContains(response, "En attente de réponse depuis aujourd’hui")
     assertContains(response, "1 action vous attend")
     assertContains(response, "Répondre à sa candidature")
     assertContains(response, journey_url("candidature", job_application.pk))
@@ -365,8 +367,25 @@ def test_job_applications_do_not_hide_the_rarer_actions(employer_client, employe
     ]
     assert late["count"] == 6
     assertContains(response, "Afficher 2 autres candidatures")
-    assertContains(response, f"En retard de 13{NBSP}jours", count=5)
+    assertContains(response, f"En attente de réponse depuis 2{NBSP}semaines", count=5)
     assertContains(response, "6 actions vous attendent")
+
+
+@pytest.mark.parametrize(
+    "days,expected",
+    [
+        (0, "aujourd’hui"),
+        (1, f"1{NBSP}jour"),
+        (13, f"13{NBSP}jours"),
+        (14, f"2{NBSP}semaines"),
+        (59, f"8{NBSP}semaines"),
+        (60, f"1{NBSP}mois"),
+        (474, f"15{NBSP}mois"),
+    ],
+)
+@freeze_time("2026-11-17")
+def test_elapsed_display(days, expected):
+    assert elapsed_display(timezone.localdate() - datetime.timedelta(days=days)) == expected
 
 
 def test_suspension_due_before_the_approval_ends(employer_client, employer_membership):
