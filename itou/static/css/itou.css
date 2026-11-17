@@ -635,6 +635,24 @@ table.table td > .modal .modal-content {
     color: var(--bs-secondary-color, #727492);
 }
 
+/* A long value takes the whole row. */
+.next-step-fact--wide {
+    grid-column: 1 / -1;
+}
+
+/* A contact revealed on demand: the button and the address it shows read left-aligned, and wrap. */
+.next-step-fact .btn-link {
+    text-align: left;
+}
+
+.next-step-fact b {
+    overflow-wrap: anywhere;
+}
+
+.next-step-fact .btn-link .stable-text span {
+    display: inline;
+}
+
 .next-step-box {
     display: flex;
     flex-direction: column;

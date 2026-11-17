@@ -36,10 +36,11 @@
         <form id="display-contact-info-form">
             {% csrf_token %}
         </form>
-        <ul class="list-data mb-4">
-            <li>
+        {# In blocks, as the facts of the guided journeys. #}
+        <div class="next-step-facts">
+            <div class="next-step-fact next-step-fact--wide">
                 <small>Structure</small>
-                <span>
+                <b>
                     {% if assignment.assigned_to_unknown_advisor %}
                         Accompagnateur non renseigné
                     {% elif assignment.organization %}
@@ -47,42 +48,50 @@
                     {% else %}
                         Aucune structure associée
                     {% endif %}
-                </span>
-            </li>
-            <li>
-                <small>Accompagne depuis le</small>
-                <span>{{ assignment.created_at|date:"d/m/Y" }}</span>
-            </li>
+                </b>
+            </div>
             {% if assignment.advisor != request.user %}
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
-                    <li>
+                    <div class="next-step-fact next-step-fact--wide">
                         <small>Adresse e-mail</small>
-                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
-                    </li>
+                        <div>
+                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                        </div>
+                    </div>
                 {% endif %}
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
-                    <li>
+                    <div class="next-step-fact">
                         <small>Téléphone</small>
-                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
-                    </li>
+                        <div>
+                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                        </div>
+                    </div>
                 {% elif assignment.organization %}
-                    <li>
-                        <small>Adresse e-mail de la structure</small>
-                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
-                    </li>
-                    <li>
+                    <div class="next-step-fact next-step-fact--wide">
+                        <small>E-mail de la structure</small>
+                        <div>
+                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                        </div>
+                    </div>
+                    <div class="next-step-fact">
                         <small>Téléphone de la structure</small>
-                        {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
-                    </li>
+                        <div>
+                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                        </div>
+                    </div>
                 {% endif %}
             {% endif %}
+            <div class="next-step-fact">
+                <small>Accompagne depuis le</small>
+                <b>{{ assignment.created_at|date:"d/m/Y" }}</b>
+            </div>
             {% if assignment.reason %}
-                <li class="has-forced-line-break">
+                <div class="next-step-fact next-step-fact--wide">
                     <small>Motif de l’accompagnement</small>
-                    <span>{{ assignment.reason }}</span>
-                </li>
+                    <span>{{ assignment.reason|linebreaksbr }}</span>
+                </div>
             {% endif %}
-        </ul>
+        </div>
 
         <h3 class="h4 mb-1">Ses actes</h3>
         <p class="fs-sm text-muted mb-3">

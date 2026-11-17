@@ -161,7 +161,7 @@ def test_unknown_advisor_and_page_without_javascript(client):
     # Their acts are not those of the professional who recorded the assignment: the last one only.
     assert [act.kind for act in response.context["acts"]] == [ActionKind.SELF_ASSIGN]
     assertContains(response, "Accompagnateur non renseigné")
-    assertContains(response, "Adresse e-mail de la structure")
+    assertContains(response, "E-mail de la structure")
 
 
 def test_job_seeker_page_opens_the_advisor_in_the_drawer(client):
