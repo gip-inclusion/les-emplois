@@ -1,3 +1,5 @@
+import functools
+
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.http import Http404
@@ -27,8 +29,8 @@ from itou.www.next_steps_views.actions import (
     next_action,
 )
 from itou.www.next_steps_views.journeys import JOURNEYS
-from itou.www.next_steps_views.situation import situation_sentences
-from itou.www.next_steps_views.timeline import build_timeline
+from itou.www.next_steps_views.period_bar import situation_bar
+from itou.www.next_steps_views.situation import contract_place, situation_sentences
 
 
 def _journeys_media(request):
@@ -76,7 +78,7 @@ def _eligibility_summary(diagnosis, approval):
     return "Aucun diagnostic en cours de validité"
 
 
-def _contracts_for_timeline(job_seeker, approval):
+def _contracts_for_situation(job_seeker, approval):
     # Same contracts as job_seekers_views.ContractsTabView.
     if approval is None or not approval.is_valid:
         two_years_ago = timezone.localdate() - relativedelta(years=2)
@@ -130,14 +132,13 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
             job_seeker, for_siae=request.current_organization if request.from_employer else None
         )
     eligibility_summary = _eligibility_summary(iae_eligibility_diagnosis, approval)
-    contracts = None
+    contracts = []
     if _can_view_contracts(request):
         contract = job_seeker.contracts.select_related("company").order_by("-start_date", "-pk").first()
-        contracts = _contracts_for_timeline(job_seeker, approval)
-    timeline = build_timeline(
-        approvals=([approval] if approval else []) if request.from_iae_actor else None,
-        contracts=contracts,
-    )
+        contracts = _contracts_for_situation(job_seeker, approval)
+    situation_strip = None
+    if request.from_iae_actor:
+        situation_strip = situation_bar(approval, contracts, functools.partial(contract_place, request))
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
     describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
@@ -146,14 +147,15 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "job_seeker": job_seeker,
         "can_view_personal_information": can_view_personal_information(request, job_seeker),
         "assignments": assignments,
-        "situation": situation_sentences(request, approval, contract, _can_view_contracts(request)),
+        # The contracts shown on the strip need no sentence.
+        "situation": situation_sentences(request, approval, contract, _can_view_contracts(request) and not contracts),
         "actions": actions,
         "approval": approval,
         "contract": contract,
         "can_view_contracts": _can_view_contracts(request),
         "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
         "eligibility_summary": eligibility_summary,
-        "timeline": timeline,
+        "situation_bar": situation_strip,
         "show_barriers": request.from_authorized_prescriber or can_fill_pro_support_report(request),
         "pro_support_report": _last_viewable_pro_support_report(request, job_seeker),
         "matomo_custom_title": "Prochaines étapes : fiche usager",

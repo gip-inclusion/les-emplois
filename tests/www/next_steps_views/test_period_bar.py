@@ -5,11 +5,12 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains
 
+from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import Suspension
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
-from itou.www.next_steps_views.period_bar import duration_display, prolongation_bar, suspension_bar
-from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
+from itou.www.next_steps_views.period_bar import duration_display, prolongation_bar, situation_bar, suspension_bar
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -59,6 +60,10 @@ def test_prolongation_bar():
     assert edges(bar) == [("01/02/2025", "Début"), ("31/01/2027", "Fin prévue"), ("31/05/2027", "Fin demandée")]
     # Widths follow the durations on twelve columns, each block staying readable.
     assert [block.columns for block in bar.blocks] == [8, 4]
+    # Today falls in the PASS IAE block, near its end: 653 days out of 730.
+    assert [block.today for block in bar.blocks] == ["89.5", ""]
+    assert bar.blocks[0].today_align == "center"
+    assert bar.today_display == "16/11/2026"
     assert [note.text for note in bar.notes] == [
         f"Il reste 2{NBSP}mois et 15{NBSP}jours sur le PASS{NBSP}IAE.",
         f"Fin du contrat le 31/05/2027{NBSP}: couverte par la prolongation",
@@ -156,3 +161,62 @@ def test_suspension_journey_shows_the_bars_and_matches_the_database(client, sett
     # The strip announced the date the database trigger set.
     assert approval.end_at == datetime.date(2028, 9, 11)
     assertContains(response, announced)
+
+
+def where(contract):
+    return f"chez {contract.company.display_name}"
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar():
+    approval = ApprovalFactory(start_at=datetime.date(2025, 2, 1), end_at=datetime.date(2027, 3, 31))
+    SuspensionFactory(approval=approval, start_at=datetime.date(2025, 9, 1), end_at=datetime.date(2025, 10, 31))
+    ProlongationRequestFactory(
+        approval=approval, start_at=datetime.date(2027, 4, 1), end_at=datetime.date(2027, 7, 31)
+    )
+    ProlongationRequestFactory(
+        approval=approval,
+        start_at=datetime.date(2027, 4, 1),
+        end_at=datetime.date(2027, 5, 31),
+        status=ProlongationRequestStatus.DENIED,
+        processed=True,
+    )
+    done = ContractFactory(start_date=datetime.date(2025, 2, 1), end_date=datetime.date(2025, 8, 31))
+    running = ContractFactory(start_date=datetime.date(2025, 11, 1), end_date=datetime.date(2027, 3, 31))
+
+    bar = situation_bar(approval, [done, running], where)
+
+    # The PASS IAE around its suspension, then the pending prolongation request only.
+    assert [(block.kind, block.label, block.start, block.end) for block in bar.blocks] == [
+        ("pass", f"PASS{NBSP}IAE", datetime.date(2025, 2, 1), datetime.date(2025, 8, 31)),
+        ("suspension", "Suspension", datetime.date(2025, 9, 1), datetime.date(2025, 10, 31)),
+        ("pass", f"PASS{NBSP}IAE", datetime.date(2025, 11, 1), datetime.date(2027, 3, 31)),
+        ("prolongation", "Prolongation demandée", datetime.date(2027, 4, 1), datetime.date(2027, 7, 31)),
+    ]
+    assert edges(bar) == [
+        ("01/02/2025", "Début"),
+        ("01/09/2025", "Du"),
+        ("31/10/2025", "Au"),
+        ("31/03/2027", "Fin prévue"),
+        ("31/07/2027", "Fin demandée"),
+    ]
+    assert sum(block.columns for block in bar.blocks) == 12
+    assert [block.today != "" for block in bar.blocks] == [False, False, True, False]
+    assert [(note.text, note.variant) for note in bar.notes] == [
+        (f"Contrat chez {done.company.display_name} du 01/02/2025 au 31/08/2025", "info"),
+        (f"Contrat chez {running.company.display_name} depuis le 01/11/2025, jusqu’au 31/03/2027", "ok"),
+    ]
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar_expired_or_empty():
+    approval = ApprovalFactory(start_at=datetime.date(2023, 2, 1), end_at=datetime.date(2025, 1, 31))
+
+    bar = situation_bar(approval, [], where)
+
+    [block] = bar.blocks
+    assert (block.kind, block.label) == ("expired", f"PASS{NBSP}IAE expiré")
+    assert edges(bar) == [("01/02/2023", "Début"), ("31/01/2025", "Fin")]
+    # Today is past the strip: no marker.
+    assert bar.today_display == ""
+    assert situation_bar(None, [], where) is None

@@ -41,7 +41,9 @@
                     </ul>
                 {% endif %}
                 {% if result.bar %}
-                    {% include "next_steps/journeys/components/period_bar.html" with bar=result.bar only %}
+                    <div class="mb-4">
+                        {% include "next_steps/journeys/components/period_bar.html" with bar=result.bar only %}
+                    </div>
                 {% endif %}
                 <a class="fs-sm"
                    href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
@@ -95,7 +97,9 @@
                 {% if step.question %}<p class="next-step-journey__question">{{ step.question }}</p>{% endif %}
                 {% if step.hint %}<p class="fs-sm text-muted mb-3">{{ step.hint }}</p>{% endif %}
                 {% if step.bar %}
-                    {% include "next_steps/journeys/components/period_bar.html" with bar=step.bar only %}
+                    <div class="mb-4">
+                        {% include "next_steps/journeys/components/period_bar.html" with bar=step.bar only %}
+                    </div>
                 {% endif %}
                 {% include step.template %}
                 {% for box in step.boxes %}

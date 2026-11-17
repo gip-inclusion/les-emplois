@@ -1,4 +1,4 @@
-"""Period strips: a PASS IAE and what changes it, as labelled blocks in a row.
+"""Period strips: a PASS IAE and what changes it, as labelled blocks in a row, with today marked.
 
 Each block names its period ("PASS IAE", "Prolongation", "Suspension") with its duration, and carries its dates
 under its edges ("Début", "Fin prévue", "Fin demandée"), so the change reads at a glance. Block widths follow the
@@ -11,6 +11,8 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+
+from itou.approvals.enums import ProlongationRequestStatus
 
 
 NBSP = " "
@@ -75,6 +77,9 @@ class Block:
     left: Edge | None = None
     right: Edge | None = None
     columns: int = COLUMNS
+    # Where today falls in the block, in percent, and how its caption leans: start, center, end.
+    today: str = ""
+    today_align: str = "center"
 
 
 @dataclasses.dataclass
@@ -89,25 +94,49 @@ class Note:
 class PeriodBar:
     blocks: list
     notes: list = dataclasses.field(default_factory=list)
+    # Set when today falls in one of the blocks.
+    today_display: str = ""
 
 
 def _share_columns(blocks):
     """Columns proportional to the durations, 12 in all, with a minimum to stay readable.
 
-    At least 3 columns, 4 for a block with a date under each edge or when there are only two blocks.
+    At least 3 columns, 4 for a block with a date under each edge or when there are only two blocks, and less when
+    there are many blocks.
     """
     days = [(block.end - block.start).days + 1 for block in blocks]
     total = sum(days)
-    columns = [
-        max(4 if len(blocks) == 2 or (block.left and block.right) else 3, round(COLUMNS * d / total))
-        for block, d in zip(blocks, days)
+    minimums = [
+        min(4 if len(blocks) == 2 or (block.left and block.right) else 3, COLUMNS // len(blocks)) for block in blocks
     ]
-    # Give or take the difference from the largest block, which can spare it.
-    largest = columns.index(max(columns))
-    columns[largest] += COLUMNS - sum(columns)
+    columns = [max(minimum, round(COLUMNS * d / total)) for minimum, d in zip(minimums, days)]
+    # Give or take the difference from the largest blocks, which can spare it.
+    while sum(columns) > COLUMNS:
+        spare = max(range(len(blocks)), key=lambda i: columns[i] - minimums[i])
+        columns[spare] -= 1
+    while sum(columns) < COLUMNS:
+        columns[columns.index(max(columns))] += 1
     for block, count in zip(blocks, columns):
         block.columns = count
     return blocks
+
+
+def _mark_today(bar):
+    """Place today in the block that holds it: its position in the block, and how its caption leans."""
+    today = timezone.localdate()
+    before = 0
+    for block in bar.blocks:
+        if block.start <= today <= block.end:
+            share = ((today - block.start).days + 0.5) / ((block.end - block.start).days + 1)
+            # Formatted here: the template localization would write decimals with a comma.
+            block.today = f"{share * 100:.1f}"
+            position = (before + share * block.columns) / COLUMNS
+            # Near an end of the strip, the caption leans inwards rather than overflowing.
+            block.today_align = "start" if position < 0.15 else "end" if position > 0.85 else "center"
+            bar.today_display = _fr(today)
+            break
+        before += block.columns
+    return bar
 
 
 def _days_left_note(approval, today):
@@ -136,7 +165,7 @@ def approval_bar(approval, contract_end=None):
         notes.append(Note(f"Contrat terminé le {_fr(contract_end)}", variant="warn", icon="ri-file-text-line"))
     elif contract_end:
         notes.append(Note(f"Contrat jusqu’au {_fr(contract_end)}", icon="ri-file-text-line"))
-    return PeriodBar(blocks=[block], notes=notes)
+    return _mark_today(PeriodBar(blocks=[block], notes=notes))
 
 
 def prolongation_bar(approval, start_at, end_at, contract_end=None):
@@ -181,7 +210,7 @@ def prolongation_bar(approval, start_at, end_at, contract_end=None):
                     icon="ri-error-warning-line",
                 )
             )
-    return PeriodBar(blocks=blocks, notes=notes)
+    return _mark_today(PeriodBar(blocks=blocks, notes=notes))
 
 
 def suspended_end(approval_end, start_at, end_at):
@@ -236,4 +265,76 @@ def suspension_bar(approval, start_at, end_at, approval_end=None):
             icon="ri-arrow-right-line",
         )
     ]
-    return PeriodBar(blocks=_share_columns(blocks), notes=notes)
+    return _mark_today(PeriodBar(blocks=_share_columns(blocks), notes=notes))
+
+
+def _contract_note(contract, where):
+    if contract.has_ended:
+        dates = f"du {_fr(contract.start_date)} au {_fr(contract.end_date)}" if contract.end_date else "terminé"
+        return Note(f"Contrat {where(contract)} {dates}", icon="ri-file-text-line")
+    dates = f"depuis le {_fr(contract.start_date)}"
+    if contract.end_date:
+        dates += f", jusqu’au {_fr(contract.end_date)}"
+    return Note(f"Contrat {where(contract)} {dates}", variant="ok", icon="ri-file-text-line")
+
+
+def situation_bar(approval, contracts, where):
+    """The job seeker's PASS IAE with its suspensions and a pending prolongation, then their contracts as notes.
+
+    approval may be None and contracts empty; where(contract) says where the contract is, "chez vous" for instance.
+    Returns None when there is nothing to show.
+    """
+    blocks = []
+    if approval is not None:
+        expired = approval.end_at < timezone.localdate()
+        kind = "expired" if expired else "pass"
+        label = f"{PASS_IAE} expiré" if expired else PASS_IAE
+        cursor = approval.start_at
+        pieces = []
+        for suspension in sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at):
+            if suspension.start_at > cursor:
+                pieces.append(Block(kind, label, "", cursor, suspension.start_at - datetime.timedelta(days=1)))
+            pieces.append(
+                Block(
+                    "suspension",
+                    "Suspension",
+                    short_duration(suspension.start_at, suspension.end_at),
+                    suspension.start_at,
+                    suspension.end_at,
+                    left=Edge(suspension.start_at, "Du"),
+                    right=Edge(suspension.end_at, "Au"),
+                )
+            )
+            cursor = suspension.end_at + datetime.timedelta(days=1)
+        if cursor <= approval.end_at:
+            pieces.append(Block(kind, label, "", cursor, approval.end_at))
+        for piece in pieces:
+            if piece.kind != "suspension":
+                piece.duration = short_duration(piece.start, piece.end)
+        passes = [piece for piece in pieces if piece.kind != "suspension"]
+        if passes:
+            passes[0].left = Edge(approval.start_at, "Début")
+            passes[-1].right = Edge(approval.end_at, "Fin" if expired else "Fin prévue")
+        blocks += pieces
+        pending = [
+            request
+            for request in approval.prolongationrequest_set.all()
+            if request.status == ProlongationRequestStatus.PENDING
+        ]
+        for request in pending:
+            blocks.append(
+                Block(
+                    "prolongation",
+                    "Prolongation demandée",
+                    f"+ {short_duration(request.start_at, request.end_at)}",
+                    request.start_at,
+                    request.end_at,
+                    right=Edge(request.end_at, "Fin demandée"),
+                )
+            )
+    notes = [_contract_note(contract, where) for contract in contracts]
+    if not blocks and not notes:
+        return None
+    if blocks:
+        _share_columns(blocks)
+    return _mark_today(PeriodBar(blocks=blocks, notes=notes))

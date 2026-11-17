@@ -71,8 +71,10 @@
                             <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
                             <div class="c-box">
                                 {% for sentence in situation %}<p class="mb-2">{{ sentence }}</p>{% endfor %}
-                                {% if timeline %}
-                                    {% include "next_steps/includes/timeline.html" with timeline=timeline only %}
+                                {% if situation_bar %}
+                                    <div class="mt-3">
+                                        {% include "next_steps/journeys/components/period_bar.html" with bar=situation_bar only %}
+                                    </div>
                                 {% endif %}
                             </div>
                         </section>

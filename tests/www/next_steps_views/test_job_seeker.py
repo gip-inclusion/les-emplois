@@ -68,7 +68,11 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "· vous", count=1)
     assertContains(response, advisor.get_full_name())
     # Where the person stands.
-    assertContains(response, f"Son contrat chez vous est terminé depuis le {fr(end_date)}.")
+    # The contract is on the strip, with the PASS IAE and today: no sentence repeats it.
+    assertContains(response, f"Contrat chez vous du {fr(contract.start_date)} au {fr(end_date)}")
+    assertNotContains(response, "Son contrat chez vous")
+    assertContains(response, "next-step-frise__block--pass")
+    assertContains(response, f"<b>Aujourd’hui</b> {fr(timezone.localdate())}")
     assertContains(response, f"Son PASS IAE est valide jusqu’au {fr(approval.end_at)}.")
     assertContains(response, "Ses jours continuent d’être décomptés tant qu’il n’est pas suspendu.")
     # What to do: the same actions as the queue, for this person only, without repeating their name.
@@ -76,8 +80,8 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "Remplir le bilan d’accompagnement")
     assertNotContains(response, f'href="{page_url(job_seeker)}"')
     # The folded file leads to the existing tabs.
-    # Five parts of the file, plus the timeline periods.
-    assertContains(response, "<details", count=6)
+    # Five parts of the file.
+    assertContains(response, "<details", count=5)
     assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
     assertContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
 
@@ -175,7 +179,7 @@ def test_professional_assigned_with_and_without_organization_is_shown_once(clien
     assertNotContains(response, "Aucune structure associée")
 
 
-def test_timeline_and_barriers_for_employer(client):
+def test_strip_and_barriers_for_employer(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     contract = ContractFactory(
         company=membership.company,
@@ -193,12 +197,8 @@ def test_timeline_and_barriers_for_employer(client):
     client.force_login(membership.user)
 
     response = client.get(page_url(contract.job_seeker))
-    assertContains(response, "next-step-timeline__segment--done")
-    assertContains(response, "next-step-timeline__segment--valid")
-    assertContains(response, "Le trait vertical marque aujourd’hui.")
-    assertContains(
-        response, f"{membership.company.display_name}, du {fr(contract.start_date)} au {fr(contract.end_date)}"
-    )
+    assertContains(response, "next-step-frise__block--pass")
+    assertContains(response, f"Contrat chez vous du {fr(contract.start_date)} au {fr(contract.end_date)}")
     assertContains(response, "Freins à lever")
     assertContains(response, f"rempli le {fr(timezone.localdate(report.created_at))}")
     assertContains(response, ProSupportReportBarrier.MOBILITY.label)
@@ -214,7 +214,7 @@ def test_barriers_without_report(client):
     response = client.get(page_url(JobSeekerFactory()))
     assertContains(response, "Les freins s’affichent ici une fois le bilan d’accompagnement rempli")
     # Nothing to draw: no PASS IAE, no contract.
-    assertNotContains(response, "next-step-timeline__track")
+    assertNotContains(response, "next-step-frise")
 
 
 def test_no_barriers_section_for_those_who_cannot_read_reports(client):

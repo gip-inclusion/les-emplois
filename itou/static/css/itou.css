@@ -413,88 +413,6 @@ table.table td > .modal .modal-content {
     text-decoration: underline;
 }
 
-/* Periods timeline: one row per lane, the track is an SVG stretched to the row width.
-   Narrow screens scroll the timeline sideways rather than squeezing years together. */
-.next-step-timeline__scroll {
-    overflow-x: auto;
-}
-
-.next-step-timeline__inner {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    min-width: 34rem;
-}
-
-.next-step-timeline__row {
-    display: grid;
-    grid-template-columns: 5.5rem minmax(0, 1fr);
-    gap: .75rem;
-    align-items: center;
-}
-
-.next-step-timeline__name {
-    font-size: .8125rem;
-    font-weight: 700;
-}
-
-.next-step-timeline__track {
-    display: block;
-    width: 100%;
-    height: 1.5rem;
-}
-
-.next-step-timeline__background {
-    fill: var(--bs-light, #f2f3f5);
-}
-
-.next-step-timeline__segment--running {
-    fill: var(--bs-primary, #000638);
-}
-
-.next-step-timeline__segment--done {
-    fill: var(--bs-gray-500, #999baf);
-}
-
-.next-step-timeline__segment--valid {
-    fill: var(--bs-success, #18753c);
-}
-
-.next-step-timeline__segment--paused {
-    fill: var(--bs-info, #0063cb);
-    fill-opacity: .35;
-    stroke: var(--bs-info, #0063cb);
-}
-
-.next-step-timeline__segment--expired {
-    fill: none;
-    stroke: var(--bs-gray-500, #999baf);
-}
-
-.next-step-timeline__segment--asked {
-    fill: none;
-    stroke: var(--bs-warning, #b34000);
-    stroke-dasharray: 4 3;
-}
-
-.next-step-timeline__today {
-    stroke: var(--bs-body-color, #000638);
-    stroke-width: 2;
-}
-
-.next-step-timeline__years {
-    display: flex;
-}
-
-/* Whole years: equal columns, each starting on 1 January. */
-.next-step-timeline__years > span {
-    flex: 1 1 0;
-    padding-left: .25rem;
-    border-left: 1px solid var(--bs-border-color, #e6e6eb);
-    font-size: .75rem;
-    color: var(--bs-secondary-color, #727492);
-}
-
 /* Barriers columns: a sunk background holding the barrier cards. */
 .next-step-barriers__column {
     display: flex;
@@ -815,5 +733,62 @@ table.table td > .modal .modal-content {
 .next-step-frise__note--warn {
     color: var(--bs-warning, #b34000);
     background-color: #fff3df;
+}
+
+.next-step-frise__block--expired {
+    color: var(--bs-secondary-color, #727492);
+    background-color: var(--bs-light, #f2f3f5);
+}
+
+/* Today: a line across its block, its caption above the strip. */
+.next-step-frise--today {
+    padding-top: 1.5rem;
+}
+
+/* Blocks of a strip share its height, so that the dates under them line up. */
+.next-step-frise__column {
+    display: flex;
+    flex-direction: column;
+}
+
+.next-step-frise__cell {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.next-step-frise__cell > .next-step-frise__block {
+    flex: 1 1 auto;
+}
+
+.next-step-frise__today {
+    position: absolute;
+    top: -.375rem;
+    bottom: -.375rem;
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background-color: var(--bs-body-color, #000638);
+}
+
+.next-step-frise__today-caption {
+    position: absolute;
+    bottom: calc(100% + .125rem);
+    font-size: .75rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.next-step-frise__today--start .next-step-frise__today-caption {
+    left: 0;
+}
+
+.next-step-frise__today--center .next-step-frise__today-caption {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.next-step-frise__today--end .next-step-frise__today-caption {
+    right: 0;
 }
 

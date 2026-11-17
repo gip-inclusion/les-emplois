@@ -11,7 +11,7 @@ def _fr(date):
     return f"{date:%d/%m/%Y}"
 
 
-def _where(request, contract):
+def contract_place(request, contract):
     if contract.company is None:
         return "en structure d’insertion"
     if request.from_employer and contract.company_id == request.current_organization.pk:
@@ -22,7 +22,7 @@ def _where(request, contract):
 def contract_sentence(request, contract):
     if contract is None:
         return "Aucun contrat en structure d’insertion connu."
-    where = _where(request, contract)
+    where = contract_place(request, contract)
     if not contract.has_ended:
         if contract.end_date:
             return f"En contrat {where} depuis le {_fr(contract.start_date)}, jusqu’au {_fr(contract.end_date)}."
