@@ -11,8 +11,7 @@
             <div class="col-12 col-md-4">
                 <div class="next-step-barriers__column">
                     <h3 class="next-step-barriers__head">
-                        À travailler
-                        <span class="next-step-barriers__count">{{ barriers.to_work|length }}</span>
+                        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning next-step-barriers__badge">À travailler</span>
                     </h3>
                     {% for card in barriers.to_work %}
                         {% include "next_steps/includes/barrier_card.html" with card=card only %}
@@ -24,8 +23,7 @@
             <div class="col-12 col-md-4">
                 <div class="next-step-barriers__column">
                     <h3 class="next-step-barriers__head">
-                        En cours
-                        <span class="next-step-barriers__count">{{ barriers.in_progress|length }}</span>
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info next-step-barriers__badge">En cours</span>
                     </h3>
                     {% for card in barriers.in_progress %}
                         {% include "next_steps/includes/barrier_card.html" with card=card only %}
@@ -37,8 +35,7 @@
             <div class="col-12 col-md-4">
                 <div class="next-step-barriers__column">
                     <h3 class="next-step-barriers__head">
-                        Levés
-                        <span class="next-step-barriers__count">{{ barriers.lifted|length }}</span>
+                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success next-step-barriers__badge">Levés</span>
                     </h3>
                     {% for card in barriers.lifted %}
                         {% include "next_steps/includes/barrier_card.html" with card=card only %}

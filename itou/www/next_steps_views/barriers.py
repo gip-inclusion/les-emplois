@@ -60,6 +60,18 @@ THEMATIC_BARRIERS = {
 
 ONGOING_ORIENTATIONS = [OrientationStatus.PENDING, OrientationStatus.ACCEPTED]
 
+# Remix icons.
+BARRIER_ICONS = {
+    Barrier.HEALTH: "ri-heart-pulse-line",
+    Barrier.MOBILITY: "ri-car-line",
+    Barrier.FAMILY: "ri-parent-line",
+    Barrier.FINANCIAL: "ri-wallet-3-line",
+    Barrier.DIGITAL: "ri-computer-line",
+    Barrier.LEGAL: "ri-scales-3-line",
+    Barrier.LITERACY: "ri-book-open-line",
+    OTHER: "ri-question-line",
+}
+
 # The data·inclusion category « Trouver une solution » searches services in.
 SEARCH_CATEGORIES = {
     Barrier.MOBILITY: "mobilite",
@@ -97,6 +109,10 @@ class Card:
     in_progress: bool = False
     # « Trouver une solution »: the services search for the barrier, around the job seeker.
     search_url: str = ""
+
+    @property
+    def icon(self):
+        return BARRIER_ICONS[self.key]
 
     @property
     def to_confirm(self):

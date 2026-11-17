@@ -508,25 +508,14 @@ table.table td > .modal .modal-content {
 }
 
 .next-step-barriers__head {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    margin: 0 0 .125rem;
-    font-size: 1rem;
-    font-weight: 800;
+    margin: 0;
+    font-size: inherit;
+    line-height: 1;
 }
 
-.next-step-barriers__count {
-    display: inline-grid;
-    place-items: center;
-    min-width: 1.5rem;
-    height: 1.5rem;
-    padding: 0 .375rem;
-    border-radius: 999px;
-    font-size: .75rem;
-    font-weight: 700;
-    color: var(--bs-secondary-color, #727492);
-    background-color: var(--bs-white, #fff);
+/* A light badge on the grey column: a thin outline in its own colour keeps it readable. */
+.next-step-barriers__badge {
+    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
 }
 
 .next-step-barriers__empty {
@@ -545,6 +534,25 @@ table.table td > .modal .modal-content {
     border: 1px solid var(--bs-border-color, #e6e6eb);
     border-radius: var(--bs-border-radius, .25rem);
     background-color: var(--bs-white, #fff);
+}
+
+.next-step-frein__head {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+}
+
+/* The barrier's icon, on a light tile. */
+.next-step-frein__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--bs-border-radius, .25rem);
+    font-size: 1rem;
+    color: var(--bs-tertiary, #000091);
+    background-color: #eef2ff;
 }
 
 .next-step-frein__cat {

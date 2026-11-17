@@ -1,7 +1,12 @@
 {# One barrier, as in the prototype: what it is, where it comes from, what is under way, and the next move. #}
 <article class="next-step-frein">
-    {% if card.category %}<span class="next-step-frein__cat">{{ card.category }}</span>{% endif %}
-    <strong class="next-step-frein__name">{{ card.name }}</strong>
+    <div class="next-step-frein__head">
+        <span class="next-step-frein__icon" aria-hidden="true"><i class="{{ card.icon }}"></i></span>
+        <div class="d-flex flex-column min-w-0">
+            {% if card.category %}<span class="next-step-frein__cat">{{ card.category }}</span>{% endif %}
+            <strong class="next-step-frein__name">{{ card.name }}</strong>
+        </div>
+    </div>
     {% for clue in card.clues %}
         {% if clue.kind == "orientation" %}
             <span class="next-step-frein__next">
