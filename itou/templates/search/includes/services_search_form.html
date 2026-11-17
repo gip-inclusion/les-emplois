@@ -11,13 +11,13 @@
         </label>
         {{ form.city }}
     </div>
-    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl{% endif %} flex-nowrap align-items-center">
-        <label class="input-group-text input-group-text-compass mb-0" for="{{ form.category.id_for_label }}">
-            <span class="visually-hidden">{{ form.category.label }}</span>
+    <div class="input-group input-group-search {% if is_home %}input-group-lg{% else %}input-group-xl{% endif %} flex-nowrap align-items-center">
+        <label class="input-group-text input-group-text-compass mb-0" for="{{ form.keyword.id_for_label }}">
+            <span class="visually-hidden">{{ form.keyword.label }}</span>
             <i class="ri-compass-3-line fw-medium ri-xl {% if is_home %}text-tertiary{% else %}text-disabled{% endif %}"
                aria-hidden="true"></i>
         </label>
-        {{ form.category }}
+        {% bootstrap_field form.keyword show_label=False wrapper_class="w-100" %}
     </div>
     <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl{% endif %}">
         <button type="submit"
