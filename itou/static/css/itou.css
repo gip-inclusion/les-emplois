@@ -561,9 +561,9 @@ table.table td > .modal .modal-content {
     color: var(--bs-secondary-color, #727492);
 }
 
+/* Same type as an advisor's name on the job seeker page. */
 .next-step-frein__name {
-    font-weight: 800;
-    line-height: 1.3;
+    font-weight: 700;
 }
 
 .next-step-frein__txt,
