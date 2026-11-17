@@ -52,6 +52,11 @@ urlpatterns = [
         name="create_pro_support_report",
     ),
     path(
+        "<uuid:public_id>/pro-support-report/reload-recipient",
+        views.reload_pro_support_report_recipient,
+        name="reload_pro_support_report_recipient",
+    ),
+    path(
         "pro-support-report/<uuid:public_id>",
         views.pro_support_report,
         name="pro_support_report",
