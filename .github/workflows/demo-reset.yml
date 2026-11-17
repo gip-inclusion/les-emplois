@@ -10,11 +10,6 @@ permissions: {}
 env:
   ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
   BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
-  CLEVER_CLI: clever-tools-latest_linux/clever
-  CLEVER_CLI_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
-  CLEVER_CLI_TAR_FILE: clever-tools-latest_linux.tar.gz
-  CLEVER_SECRET: ${{ secrets.DEMO_CLEVER_SECRET }}
-  CLEVER_TOKEN: ${{ secrets.DEMO_CLEVER_TOKEN }}
   DORA_TOKEN: ${{ secrets.DEMO_DORA_TOKEN }}
   BREVO_TOKEN: ${{ secrets.DEMO_BREVO_TOKEN }}
 
@@ -22,6 +17,8 @@ jobs:
   reset:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
       - name: 🤝 Set the private key for Clever SSH
         run: |
           mkdir ~/.ssh
@@ -31,12 +28,14 @@ jobs:
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}" >~/.ssh/id_ed25519
 
+      - name: ⏬ Install Clever Tools
+        uses: ./.github/actions/clever-cli
+        with:
+          token: ${{ secrets.DEMO_CLEVER_TOKEN }}
+          secret: ${{ secrets.DEMO_CLEVER_SECRET }}
+
       - name: 🧫 Reset the demo environment on CleverCloud
         run: |
-          curl $CLEVER_CLI_DOWNLOAD_URL > $CLEVER_CLI_TAR_FILE
-          tar -xvf $CLEVER_CLI_TAR_FILE
-          echo "Clever CLI version: $($CLEVER_CLI version)"
-          $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
           $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
           OUTPUT_FILE=$(mktemp)
           # Always returns error code 0, as the SSH command succeeds.
