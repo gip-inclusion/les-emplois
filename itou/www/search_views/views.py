@@ -427,9 +427,9 @@ def search_services_results(request, template_name="search/services/results.html
     if form.is_valid():
         city = form.cleaned_data["city"]
         category = form.cleaned_data["category"]
-        thematics = form.cleaned_data["thematics"] or [
-            t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
-        ]
+        thematics = [
+            t.value for t in data_inclusion_v1.Thematique
+        ]  # FIXME(ewen): thematics filter is temporarily deactivated
         reception = form.cleaned_data["reception"]
         if reception == form.RECEPTION_ALL_VALUE:
             reception = ""
