@@ -468,9 +468,9 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
             ),
             models.CheckConstraint(
                 name="inclusion_staff",
-                violation_error_message="Cet adresse email n'est pas autorisée pour les administrateurs.",
+                violation_error_message="Cet adresse email n’est pas autorisée pour les administrateurs.",
                 condition=models.Q(
-                    ~models.Q(is_staff=True, is_active=True) | models.Q(email__icontains="@inclusion.gouv.fr")
+                    ~models.Q(is_staff=True, is_active=True) | models.Q(email__endswith="@inclusion.gouv.fr")
                 ),
             ),
         ]
