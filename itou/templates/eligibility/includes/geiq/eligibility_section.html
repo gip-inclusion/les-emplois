@@ -17,7 +17,7 @@
 
                     <h2 class="h3">Souhaitez-vous préciser la situation administrative de l’usager ?</h2>
                     <p>Si vous souhaitez bénéficier de l’aide à l’accompagnement, veuillez renseigner les critères de l’usager ci-dessous et vous assurer de pouvoir fournir les justificatifs associés.</p>
-                    <form id="check_geiq_eligibility" hx-target="#geiq_form">
+                    <form id="check_geiq_eligibility" hx-target="#geiq_form" hx-indicator="#geiq_form">
                         {% csrf_token %}
                         {% bootstrap_field form.choice form_check_class="form-check-inline me-4" show_label=False %}
                     </form>
