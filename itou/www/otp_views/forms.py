@@ -96,7 +96,10 @@ class VerifyOTPForm(forms.Form):
         {
             "maxlength": 6,
             "autocomplete": "one-time-code",
+            "inputmode": "numeric",
+            "pattern": "[0-9]*",
             "autofocus": True,
+            "placeholder": "123456",
         }
     )
 
