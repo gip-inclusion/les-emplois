@@ -68,7 +68,7 @@ class Edge:
 
 @dataclasses.dataclass
 class Block:
-    # pass, prolongation, suspension (CSS modifiers)
+    # pass, expired, prolongation, suspension, gap: no PASS IAE (CSS modifiers)
     kind: str
     label: str
     duration: str
@@ -300,7 +300,8 @@ def situation_bar(approval, contracts, where):
     if approval is not None:
         expired = approval.end_at < timezone.localdate()
         kind = "expired" if expired else "pass"
-        label = f"{PASS_IAE} expiré" if expired else PASS_IAE
+        # Greyed out when expired: the block without PASS IAE that follows says since when.
+        label = PASS_IAE
         cursor = approval.start_at
         pieces = []
         for suspension in sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at):
@@ -352,6 +353,15 @@ def situation_bar(approval, contracts, where):
                     right=Edge(request.end_at, "Fin demandée"),
                 )
             )
+        # Today is always on the strip: when it falls before or after the PASS IAE, a block without PASS IAE leads
+        # to it, so that the strip reads "there was one, there is none today" or "there will be one".
+        today = timezone.localdate()
+        if blocks and today > blocks[-1].end:
+            start = blocks[-1].end + datetime.timedelta(days=1)
+            blocks.append(Block("gap", f"Sans {PASS_IAE}", f"depuis {short_duration(start, today)}", start, today))
+        elif blocks and today < blocks[0].start:
+            end = blocks[0].start - datetime.timedelta(days=1)
+            blocks.insert(0, Block("gap", f"{PASS_IAE} à venir", f"dans {short_duration(today, end)}", today, end))
     notes = [
         Note(
             f"Suspension du {_fr(suspension.start_at)} au {_fr(suspension.end_at)} enregistrée {where_}",

@@ -471,6 +471,13 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-light, #f8f8f8);
 }
 
+/* No PASS IAE, before or after it, up to today: an empty slot. */
+.next-step-frise__block--gap {
+    color: var(--bs-secondary-color, #727492);
+    border: 1.5px dashed currentColor;
+    background-color: var(--bs-white, #fff);
+}
+
 /* Hatched with a dashed edge: what is asked for or put on hold, not yet run. */
 .next-step-frise__block--prolongation {
     color: var(--bs-warning, #b34000);

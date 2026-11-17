@@ -41,6 +41,13 @@
                                 <small class="fs-xs text-muted">{{ block.right.caption }}</small>
                             </span>
                         {% endif %}
+                        {% if not block.left and not block.right %}
+                            {# Room for dates all the same, so that every block of the strip has the same height. #}
+                            <span class="next-step-frise__edge d-flex flex-column lh-sm invisible" aria-hidden="true">
+                                <b class="fs-sm">&nbsp;</b>
+                                <small class="fs-xs">&nbsp;</small>
+                            </span>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

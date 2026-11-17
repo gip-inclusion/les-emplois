@@ -243,9 +243,28 @@ def test_situation_bar_expired_or_empty():
 
     bar = situation_bar(approval, [], where)
 
-    [block] = bar.blocks
-    assert (block.kind, block.label) == ("expired", f"PASS{NBSP}IAE expiré")
+    # The PASS IAE greyed out, then a block without PASS IAE up to today, which is always on the strip.
+    assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
+        ("expired", f"PASS{NBSP}IAE", f"2{NBSP}ans"),
+        ("gap", f"Sans PASS{NBSP}IAE", f"depuis 1{NBSP}an et 10{NBSP}mois"),
+    ]
     assert edges(bar) == [("01/02/2023", "Début"), ("31/01/2025", "Fin")]
-    # Today is past the strip: no marker.
-    assert bar.today_display == ""
+    assert [block.today != "" for block in bar.blocks] == [False, True]
+    assert bar.blocks[1].today_align == "end"
+    assert bar.today_display == "16/11/2026"
     assert situation_bar(None, [], where) is None
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar_before_the_approval():
+    approval = ApprovalFactory(start_at=datetime.date(2027, 2, 1), end_at=datetime.date(2029, 1, 31))
+
+    bar = situation_bar(approval, [], where)
+
+    # A block without PASS IAE from today, which is always on the strip, then the PASS IAE.
+    assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
+        ("gap", f"PASS{NBSP}IAE à venir", f"dans 3{NBSP}mois"),
+        ("pass", f"PASS{NBSP}IAE", f"2{NBSP}ans"),
+    ]
+    assert [block.today != "" for block in bar.blocks] == [True, False]
+    assert bar.blocks[0].today_align == "start"
