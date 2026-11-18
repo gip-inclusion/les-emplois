@@ -1,15 +1,12 @@
 {% load next_steps_facts %}
-{# The facts an action rests on, in a grid as in the prototype: itou-theme grid and utilities. #}
-{# Two by two; a last one left alone takes the whole row, so that the blocks line up. Each with its grey tile. #}
-<div class="row g-2 mb-4">
+{# The facts an action rests on, stacked on the whole width as the side drawers' frames, each with its grey tile. #}
+<div class="d-flex flex-column gap-2 mb-4">
     {% for label, value in facts %}
-        <div class="col-12{% if not forloop.last or forloop.counter|divisibleby:2 %} col-sm-6{% endif %}">
-            <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
-                {% include "next_steps/includes/fact_tile.html" with icon=label|fact_icon only %}
-                <div class="flex-grow-1">
-                    <span class="d-block fs-sm text-muted">{{ label }}</span>
-                    <span class="d-block fw-bold text-break">{{ value }}</span>
-                </div>
+        <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+            {% include "next_steps/includes/fact_tile.html" with icon=label|fact_icon only %}
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ label }}</span>
+                <span class="d-block fw-bold text-break">{{ value }}</span>
             </div>
         </div>
     {% endfor %}
