@@ -97,11 +97,11 @@
                                     </div>
                                 {% endif %}
                                 {% if contract_lines %}
-                                    {# Whether a contract runs and whether the PASS IAE covers it; each opens in the side drawer. #}
+                                    {# Each contract as a card, in the colour of how the PASS IAE covers it; it opens in the side drawer. #}
                                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0 mt-3">
                                         {% for line in contract_lines %}
-                                            <li class="d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
-                                                <a class="link-tertiary fw-bold fs-sm"
+                                            <li>
+                                                <a class="next-step-contract d-flex align-items-center gap-3 border rounded-3 px-3 py-2 text-reset text-decoration-none"
                                                    href="{{ line.url }}"
                                                    hx-get="{{ line.url }}"
                                                    hx-target="#next-step-journey"
@@ -109,11 +109,19 @@
                                                    hx-indicator="#next-step-journey"
                                                    data-bs-toggle="offcanvas"
                                                    data-bs-target="#next-step-drawer"
-                                                   aria-controls="next-step-drawer"><i class="ri-file-text-line" aria-hidden="true"></i> {{ line.label }}</a>
-                                                <span class="badge badge-sm rounded-pill {% if line.ongoing %}bg-success-lighter text-success{% else %}bg-light text-muted{% endif %}">
-                                                    {% if line.ongoing %}En cours{% else %}Terminé{% endif %}
-                                                </span>
-                                                {% include "next_steps/includes/note_badge.html" with note=line.coverage only %}
+                                                   aria-controls="next-step-drawer">
+                                                    <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-{{ line.tone }}-lighter text-{{ line.tone }}"
+                                                          aria-hidden="true"><i class="ri-file-text-line"></i></span>
+                                                    <span class="flex-grow-1 lh-sm">
+                                                        <span class="d-block fw-bold">{{ line.label }}</span>
+                                                        <span class="d-block fs-sm text-muted">
+                                                            {{ line.period }} · {% if line.ongoing %}en cours{% else %}terminé{% endif %}
+                                                        </span>
+                                                        <span class="d-block fs-sm text-{{ line.tone }} mt-1">{{ line.coverage.text }}</span>
+                                                    </span>
+                                                    <i class="ri-arrow-right-s-line fs-lg text-tertiary flex-shrink-0"
+                                                       aria-hidden="true"></i>
+                                                </a>
                                             </li>
                                         {% endfor %}
                                     </ul>

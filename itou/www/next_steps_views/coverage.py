@@ -92,6 +92,11 @@ class ContractLine:
     # Its details in the side drawer.
     url: str
 
+    @property
+    def tone(self):
+        """The theme colour of how the PASS IAE covers it."""
+        return {"ok": "success", "warn": "warning"}.get(self.coverage.variant, "info")
+
 
 def contract_lines(job_seeker, approval, contracts, where):
     """The contracts, latest first, each with how the PASS IAE covers it."""
