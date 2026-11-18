@@ -35,12 +35,13 @@ from itou.approvals.models import (
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
-from itou.companies.enums import CompanyKind, ContractType, ProSupportReportAutonomy
+from itou.companies.enums import CompanyKind, ContractType, ProSupportReportAutonomy, ProSupportReportBarrier
 from itou.companies.models import ProSupportReport
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.rdv_insertion.models import InvitationRequest
 from itou.users.enums import ActionKind, UserKind
@@ -80,6 +81,7 @@ from itou.www.job_seekers_views.views import (
     PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
     _pro_support_request_company_email,
 )
+from itou.www.next_steps_views.barriers import BARRIER_ICONS, CRITERIA_BARRIERS
 from itou.www.next_steps_views.period_bar import approval_bar, prolongation_bar, suspension_bar
 
 
@@ -1192,6 +1194,38 @@ class ProlongationJourney(Journey):
         return Result(title="Prolongation refusée", lines=["La structure qui l’a demandée en est informée."])
 
 
+class BarriersForm(forms.Form):
+    """The barriers the professional confirms, among those the report knows. Unchecked: dismissed or not stated."""
+
+    barriers = forms.MultipleChoiceField(
+        label="Freins à lever",
+        choices=ProSupportReportBarrier.choices,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    def __init__(self, *args, suggested=None, hints=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The barriers checked at first, and where each comes from, by barrier.
+        self.suggested = suggested or []
+        self.hints = hints or {}
+
+    def options(self):
+        """Each barrier with its icon, whether it is checked and where it comes from, for the step's template."""
+        checked = set(self["barriers"].value() or [])
+        return [
+            {
+                "value": value,
+                "label": label,
+                "icon": BARRIER_ICONS[value],
+                "checked": value in checked,
+                "hint": self.hints.get(value, ""),
+                "id": f"id_barriers_{index}",
+            }
+            for index, (value, label) in enumerate(self.fields["barriers"].choices)
+        ]
+
+
 class EligibilityJourney(Journey):
     title = "Valider l’éligibilité IAE"
 
@@ -1213,6 +1247,8 @@ class EligibilityJourney(Journey):
         return [("Candidature du", _fr(job_application.created_at)), ("Chez", job_application.to_company.display_name)]
 
     def build_forms(self, data=None, initial=None):
+        # The barriers' default depends on the criteria chosen first: only computed for a display (see engine).
+        displayed = initial
         if data is None and initial is None:
             # Same initial criteria as eligibility_views.BaseIAEEligibilityViewForPrescriber.
             initial = {}
@@ -1221,11 +1257,57 @@ class EligibilityJourney(Journey):
             elif self.job_seeker.last_checked_at > timezone.now() - timezone.timedelta(hours=24):
                 self.criteria_filled_from_job_seeker = get_criteria_from_job_seeker(self.job_seeker)
                 initial["administrative_criteria"] = self.criteria_filled_from_job_seeker
+        criteria_form = AdministrativeCriteriaForm(
+            is_authorized_prescriber=True, siae=None, data=data, initial=initial
+        )
+        suggested, hints = self._suggested_barriers(criteria_form)
+        barriers_initial = None
+        if displayed is not None:
+            # Not answered yet: the barriers the chosen criteria and the earlier statements suggest.
+            answered = displayed.get("barriers")
+            barriers_initial = {"barriers": suggested if answered is None else answered}
         return {
-            "criteria": AdministrativeCriteriaForm(
-                is_authorized_prescriber=True, siae=None, data=data, initial=initial
-            )
+            "criteria": criteria_form,
+            "barriers": BarriersForm(data=data, initial=barriers_initial, suggested=suggested, hints=hints),
         }
+
+    def _statements(self):
+        if not hasattr(self, "_latest_statements"):
+            self._latest_statements = (
+                JobSeekerBarrier.objects.filter(job_seeker=self.job_seeker)
+                .select_related("author", "author_prescriber_organization")
+                .latest_by_barrier()
+            )
+        return self._latest_statements
+
+    def _suggested_barriers(self, criteria_form):
+        """The barriers to check at first, and where each comes from: the chosen criteria, the earlier statements.
+
+        A barrier dismissed before stays unchecked, even if a criterion hints at it again: no need to dismiss it at
+        each validation.
+        """
+        hints = {}
+        for name, criterion in criteria_form.OBJECTS.items():
+            if name in criteria_form.fields and criteria_form[name].value():
+                for key in CRITERIA_BARRIERS.get(criterion.kind, []):
+                    hints.setdefault(key, f"Critère{NBSP}: {criterion.name}")
+        suggested = set(hints)
+        for key, statement in self._statements().items():
+            by = statement.author.get_full_name() if statement.author else ""
+            if statement.author_prescriber_organization:
+                by = (
+                    f"{by} ({statement.author_prescriber_organization.display_name})"
+                    if by
+                    else (statement.author_prescriber_organization.display_name)
+                )
+            when = f"le {_fr(statement.created_at)}" + (f" par {by}" if by else "")
+            if statement.status == BarrierStatus.CONFIRMED:
+                suggested.add(key)
+                hints[key] = f"Confirmé {when}"
+            else:
+                suggested.discard(key)
+                hints[key] = f"Écarté {when}"
+        return sorted(suggested, key=list(ProSupportReportBarrier.values).index), hints
 
     def steps(self, data):
         expires_at = EligibilityDiagnosis._expiration_date(AuthorKind.PRESCRIBER)
@@ -1241,8 +1323,19 @@ class EligibilityJourney(Journey):
                 ),
             ),
             Step(
+                "Les freins",
+                "barriers",
+                template="next_steps/journeys/barriers.html",
+                question=f"Les freins à lever pour {self.job_seeker.first_name}",
+                hint=(
+                    "Les critères que vous avez cochés laissent penser à ces freins. Décochez ceux qui ne "
+                    "s’appliquent pas, ajoutez ceux que vous avez constatés. Ils apparaîtront dans "
+                    f"«{NBSP}Freins à lever{NBSP}», visibles des professionnels qui accompagnent la personne."
+                ),
+            ),
+            Step(
                 "Confirmer",
-                "criteria",
+                ("criteria", "barriers"),
                 [],
                 template=RECAP_TEMPLATE,
                 submit_label="Valider l’éligibilité",
@@ -1259,7 +1352,11 @@ class EligibilityJourney(Journey):
 
     def recap(self, forms):
         criteria = forms["criteria"].cleaned_data
-        return [("Critères administratifs", ", ".join(c.name for c in criteria) or "Aucun critère sélectionné")]
+        barriers = [ProSupportReportBarrier(key).label for key in forms["barriers"].cleaned_data["barriers"]]
+        return [
+            ("Critères administratifs", ", ".join(c.name for c in criteria) or "Aucun critère sélectionné"),
+            ("Freins à lever", ", ".join(barriers) or "Aucun frein"),
+        ]
 
     def context(self):
         return {
@@ -1286,7 +1383,42 @@ class EligibilityJourney(Journey):
                 administrative_criteria=forms["criteria"].cleaned_data,
             )
         diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, None)
-        return Result(title="Éligibilité validée", lines=[f"Valable jusqu’au {_fr(diagnosis.expires_at)}."])
+        confirmed = self._save_barriers(forms["barriers"], diagnosis)
+        lines = [f"Valable jusqu’au {_fr(diagnosis.expires_at)}."]
+        if confirmed:
+            lines.append(
+                f"{len(confirmed)} frein{'s' if len(confirmed) > 1 else ''} à lever{NBSP}: "
+                + ", ".join(ProSupportReportBarrier(key).label for key in confirmed)
+                + "."
+            )
+        return Result(title="Éligibilité validée", lines=lines)
+
+    def _save_barriers(self, barriers_form, diagnosis):
+        """State each checked barrier as confirmed, each suggested one unchecked as dismissed."""
+        request = self.request
+        checked = barriers_form.cleaned_data["barriers"]
+        dismissed = [key for key in barriers_form.suggested if key not in checked]
+        # A barrier confirmed before and unchecked now is dismissed too.
+        dismissed += [
+            key
+            for key, statement in self._statements().items()
+            if statement.status == BarrierStatus.CONFIRMED and key not in checked and key not in dismissed
+        ]
+        JobSeekerBarrier.objects.bulk_create(
+            [
+                JobSeekerBarrier(
+                    job_seeker=self.job_seeker,
+                    barrier=key,
+                    status=status,
+                    eligibility_diagnosis=diagnosis,
+                    author=request.user,
+                    author_prescriber_organization=request.current_organization,
+                )
+                for keys, status in ((checked, BarrierStatus.CONFIRMED), (dismissed, BarrierStatus.DISMISSED))
+                for key in keys
+            ]
+        )
+        return checked
 
 
 class ProSupportRequestForm(forms.Form):

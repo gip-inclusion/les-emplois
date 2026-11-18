@@ -10,8 +10,10 @@ from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequ
 from itou.approvals.models import Approval, Suspension
 from itou.companies.enums import CompanyKind, ProSupportReportBarrier, ProSupportReportSolution
 from itou.companies.models import Company, ProSupportReport
-from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState, RefusalReason
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -37,6 +39,14 @@ def experiment_for_everyone(settings):
 
 def journey_url(kind, pk):
     return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
+
+
+NBSP = " "
+
+
+def checked_barriers(response):
+    """The barriers checked on the eligibility journey's barriers step."""
+    return [option["value"] for option in response.context["form"].options() if option["checked"]]
 
 
 def walk(client, url, *answers, **headers):
@@ -559,11 +569,69 @@ def test_validate_eligibility(client):
 
     response = client.get(url)
     assertContains(response, "Critères administratifs de niveau 1")
-    response = walk(client, url, {"level_1_1": "on"}, {})
+    response = walk(client, url, {"level_1_1": "on"}, {}, {})
     assertContains(response, "Éligibilité validée")
     diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=None)
     assert diagnosis.author == membership.user
     assert diagnosis.is_valid
+
+
+def test_validate_eligibility_states_the_barriers(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(first_name="Sami")
+    rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+    client.force_login(membership.user)
+    url = journey_url("eligibilite", job_seeker.public_id)
+
+    # The criteria first, then the barriers they hint at, checked, with where each comes from.
+    response = walk(client, url, {rsa.key: "on"})
+    assertContains(response, "Les freins à lever pour Sami")
+    assertContains(response, f"Critère{NBSP}: {rsa.name}")
+    assert "FINANCIAL" in checked_barriers(response)
+    assert "MOBILITY" not in checked_barriers(response)
+
+    # Not the financial situation, but mobility.
+    response = walk(client, url, {rsa.key: "on"}, {"barriers": [ProSupportReportBarrier.MOBILITY]}, {})
+    assertContains(response, "Éligibilité validée")
+    assertContains(response, f"1 frein à lever{NBSP}: Mobilité.")
+    diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=None)
+    assert sorted(
+        JobSeekerBarrier.objects.filter(job_seeker=job_seeker).values_list(
+            "barrier", "status", "eligibility_diagnosis", "author", "author_prescriber_organization"
+        )
+    ) == [
+        ("FINANCIAL", BarrierStatus.DISMISSED, diagnosis.pk, membership.user.pk, membership.organization.pk),
+        ("MOBILITY", BarrierStatus.CONFIRMED, diagnosis.pk, membership.user.pk, membership.organization.pk),
+    ]
+
+    # On the job seeker's page: mobility to work on, confirmed; the financial situation no longer hinted at.
+    response = client.get(reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id}))
+    barriers = response.context["barriers"]
+    assert [card.key for card in barriers.to_work] == [ProSupportReportBarrier.MOBILITY]
+    assert [clue.kind for clue in barriers.to_work[0].clues] == ["confirmed"]
+    assertContains(response, "à la validation de l’éligibilité")
+
+    # At the next validation, what was stated comes back: mobility checked, the financial situation not.
+    response = walk(client, url, {rsa.key: "on"})
+    assertContains(response, "Confirmé le")
+    assertContains(response, "Écarté le")
+    assert "MOBILITY" in checked_barriers(response)
+    assert "FINANCIAL" not in checked_barriers(response)
+
+
+def test_validate_eligibility_without_barriers_hinted(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory()
+    client.force_login(membership.user)
+    url = journey_url("eligibilite", job_seeker.public_id)
+    deld = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.DELD)
+
+    # No barrier hinted at: the step says so, and can be passed.
+    response = walk(client, url, {deld.key: "on"})
+    assertContains(response, "Aucun frein repéré par les critères.")
+    response = walk(client, url, {deld.key: "on"}, {}, {})
+    assertContains(response, "Éligibilité validée")
+    assert not JobSeekerBarrier.objects.filter(job_seeker=job_seeker).exists()
 
 
 def test_no_eligibility_journey_with_a_valid_approval(client):
@@ -655,7 +723,7 @@ def test_done_today_for_a_prescriber(client):
     )
     client.force_login(membership.user)
     walk(client, journey_url("prolongation", prolongation_request.pk), {}, {"decision": "grant"}, {})
-    walk(client, journey_url("eligibilite", JobSeekerFactory().public_id), {"level_1_1": "on"}, {})
+    walk(client, journey_url("eligibilite", JobSeekerFactory().public_id), {"level_1_1": "on"}, {}, {})
 
     response = client.get(reverse("next_steps_views:todo"))
     assert [item.label for item in response.context["done_today"]] == [

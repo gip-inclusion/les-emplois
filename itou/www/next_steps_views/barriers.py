@@ -20,6 +20,7 @@ from itou.companies.enums import ProSupportReportBarrier
 from itou.eligibility.enums import AdministrativeCriteriaKind as Kind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.insertion.enums import OrientationStatus
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
 from itou.users.perms import can_orient_towards_insertion_service, can_view_pro_support_report
 from itou.www.next_steps_views.advisors import visible_orientations
 
@@ -92,7 +93,7 @@ def _fr(date):
 class Clue:
     """Where a barrier comes from."""
 
-    # report, criterion, orientation (in progress), lifted: how the card shows it.
+    # report, criterion, confirmed (when validating the eligibility), orientation (in progress), lifted.
     kind: str
     text: str
     certified: bool = False
@@ -145,6 +146,14 @@ def _report_text(report):
     if report.company:
         by = f"{by} ({report.company.display_name})" if by else report.company.display_name
     return f"Identifié le {_fr(report.created_at)} dans le bilan d’accompagnement" + (f", par {by}" if by else "")
+
+
+def _statement_text(statement):
+    by = statement.author.get_full_name() if statement.author else ""
+    if statement.author_prescriber_organization:
+        organization = statement.author_prescriber_organization.display_name
+        by = f"{by} ({organization})" if by else organization
+    return f"Confirmé le {_fr(statement.created_at)} à la validation de l’éligibilité" + (f", par {by}" if by else "")
 
 
 def _search_url(request, job_seeker, key):
@@ -221,6 +230,25 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                         certified=selected.certified_at is not None,
                     )
                 )
+
+    # What the professionals stated when validating the eligibility: it prevails over the criteria, and over the
+    # latest report when more recent.
+    statements = (
+        JobSeekerBarrier.objects.filter(job_seeker=job_seeker)
+        .select_related("author", "author_prescriber_organization")
+        .latest_by_barrier()
+    )
+    for key, statement in statements.items():
+        if latest and latest.created_at > statement.created_at:
+            continue
+        if key in cards:
+            cards[key].clues = [clue for clue in cards[key].clues if clue.kind not in ("criterion", "report")]
+        if statement.status == BarrierStatus.CONFIRMED:
+            card(key).clues.insert(0, Clue("confirmed", _statement_text(statement)))
+            lifted = [lifted_card for lifted_card in lifted if lifted_card.key != key]
+            lifted_keys.discard(key)
+        elif key in cards and not cards[key].clues:
+            del cards[key]
 
     orientations = (
         visible_orientations(request, job_seeker)
