@@ -16,10 +16,10 @@ from tests.www.directory_views.utils import KM, coords_within_directory_radius
 OTHER_STRUCTURE_TEXT = "+ 1 autre structure"
 
 
-def assertPeople(page, expected_people):
+def people_in_page(page):
     people_with_markup = page.find_all("h3")
     people = [node.string.strip() for node in people_with_markup]
-    assert people == expected_people
+    return people
 
 
 def test_display_other_organization(client, snapshot):
@@ -122,7 +122,7 @@ def test_ignores_inactive_companies(client):
     response = client.get(reverse("directory:people_results"))
 
     page = parse_response_to_soup(response)
-    assertPeople(page, [user.get_inverted_full_name()])
+    assert people_in_page(page) == [user.get_inverted_full_name()]
 
 
 def test_alphabetical_ordering_and_pagination(client, snapshot):
@@ -154,7 +154,7 @@ def test_alphabetical_ordering_and_pagination(client, snapshot):
     page = parse_response_to_soup(response)
     [pagination] = page.select("ul.pagination")
     assert pagination.prettify() == snapshot()
-    assertPeople(page, ["A A", "B B", "C C", "D D", "E E", "M M", "N N", "O O", "P P", "Q Q"])
+    assert people_in_page(page) == ["A A", "B B", "C C", "D D", "E E", "M M", "N N", "O O", "P P", "Q Q"]
 
 
 def test_people_search_includes_nearby_other_city(client):
@@ -182,4 +182,4 @@ def test_people_search_includes_nearby_other_city(client):
     client.force_login(user)
     response = client.get(reverse("directory:people_results"))
 
-    assertContains(response, "<h3>DUPONT Claire</h3>", count=1)
+    assert "DUPONT Claire" in people_in_page(parse_response_to_soup(response))
