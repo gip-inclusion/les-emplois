@@ -1,14 +1,21 @@
 {% load str_filters %}
-{# A report on the job seeker, in the side drawer or inside a page. #}
-{# Its facts as on job_seekers_views/pro_support_report.html, which has no include to share: keep them in step. #}
+{# A report on the job seeker, in the side drawer or inside a page: the same facts as its own page, in sections. #}
+{# job_seekers_views/pro_support_report.html has no include to share: keep the two in step. #}
 <div id="next-step-journey" class="d-flex flex-column h-100">
     <div class="px-4 pt-4 pb-3 border-bottom">
         <div class="d-flex align-items-start gap-3">
             <div class="flex-grow-1">
                 <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
                 <h2 class="h3 mb-1" id="next-step-journey-title">Bilan d’accompagnement</h2>
-                <span class="d-block fs-sm">
+                <span class="d-block fs-sm text-muted">
                     Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.company %}, {{ report.company.display_name }}{% endif %}
+                </span>
+                <span class="badge badge-sm rounded-pill mt-2 {% if contract_has_ended %}bg-light text-muted{% else %}bg-success-lighter text-success{% endif %}">
+                    {% if contract_has_ended %}
+                        Contrat terminé le {{ report.contract_end_date|date:"d/m/Y" }}
+                    {% else %}
+                        Contrat en cours, fin le {{ report.contract_end_date|date:"d/m/Y" }}
+                    {% endif %}
                 </span>
             </div>
             {% if in_drawer %}
@@ -18,49 +25,56 @@
     </div>
 
     <div class="flex-grow-1 overflow-auto p-4">
-        <ul class="list-data mb-0">
-            <li>
-                <small>Situation du contrat</small>
-                <strong>
-                    {% if contract_has_ended %}
-                        Terminé le {{ report.contract_end_date|date:"d/m/Y" }}
-                    {% else %}
-                        En cours, fin le {{ report.contract_end_date|date:"d/m/Y" }}
-                    {% endif %}
-                </strong>
-            </li>
-            <li>
-                <small>Freins périphériques</small>
-                <div>
-                    {% for barrier in report.get_barriers_display %}<strong class="d-block">{{ barrier }}</strong>{% endfor %}
-                    {% if report.other_barrier %}
-                        <strong class="d-block">Autres freins identifiés&nbsp;: {{ report.other_barrier }}</strong>
-                    {% elif not report.barriers %}
-                        <strong>Aucun frein identifié</strong>
-                    {% endif %}
-                </div>
-            </li>
-            <li>
-                <small>Autonomie dans la recherche d’emploi</small>
-                <div>
-                    <strong class="d-block">{{ report.autonomy }} sur 5</strong>
-                    <span>{{ report.get_autonomy_display }}</span>
-                </div>
-            </li>
-            <li>
-                <small>Solution après le contrat</small>
-                {% if report.solution %}
-                    <strong>{{ report.get_solution_display }}</strong>
-                {% else %}
-                    <strong>Aucune solution prévue à ce jour</strong>
-                {% endif %}
-            </li>
-            {% if report.orientation %}
-                <li>
-                    <small>Orientation la plus adaptée</small>
-                    <span>La structure recommande une orientation <strong>{{ report.get_orientation_display|lower }}</strong>.</span>
-                </li>
+        {# Barriers, with the icons of the « Freins à lever » section. #}
+        <section class="mb-4" aria-labelledby="next-step-report-barriers">
+            <h3 class="h5 mb-2" id="next-step-report-barriers">Freins périphériques</h3>
+            {% if barriers %}
+                <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                    {% for label, icon in barriers %}
+                        <li class="d-flex align-items-center gap-2">
+                            <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-warning-lighter text-warning"
+                                  aria-hidden="true"><i class="{{ icon }}"></i></span>
+                            <span>{{ label }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted mb-0">Aucun frein identifié</p>
             {% endif %}
-        </ul>
+        </section>
+
+        {# Autonomy on a five-step gauge, then its meaning. #}
+        <section class="mb-4" aria-labelledby="next-step-report-autonomy">
+            <h3 class="h5 mb-2" id="next-step-report-autonomy">Autonomie dans la recherche d’emploi</h3>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="next-step-gauge d-flex gap-1 flex-grow-1" aria-hidden="true">
+                    {% for filled in autonomy_steps %}
+                        <span class="flex-grow-1 rounded-pill {% if filled %}bg-info{% else %}bg-light border{% endif %}"></span>
+                    {% endfor %}
+                </span>
+                <b class="flex-shrink-0">{{ report.autonomy }} sur 5</b>
+            </div>
+            <p class="fs-sm text-muted mb-0">{{ report.get_autonomy_display }}</p>
+        </section>
+
+        <section aria-labelledby="next-step-report-after">
+            <h3 class="h5 mb-2" id="next-step-report-after">Après le contrat</h3>
+            <ul class="list-data mb-0">
+                <li>
+                    <small>Solution</small>
+                    {% if report.solution %}
+                        <strong>{{ report.get_solution_display }}</strong>
+                    {% else %}
+                        <strong>Aucune solution prévue à ce jour</strong>
+                    {% endif %}
+                </li>
+                {% if report.orientation %}
+                    <li>
+                        <small>Orientation recommandée</small>
+                        <strong>{{ report.get_orientation_display|capfirst }}</strong>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
     </div>
 </div>

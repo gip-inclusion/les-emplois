@@ -112,7 +112,8 @@ def _approval_part(approval, job_seeker):
         badge_label=badge_label,
         badge_classes=_badge(badge_tone),
         link_label=f"Voir le PASS{NBSP}IAE",
-        link_url=reverse("approvals:details", kwargs={"public_id": approval.public_id}),
+        link_url=reverse("next_steps_views:approval", kwargs={"public_id": job_seeker.public_id}),
+        link_in_drawer=True,
     )
 
 

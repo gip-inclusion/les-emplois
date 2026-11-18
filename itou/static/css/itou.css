@@ -422,6 +422,11 @@ table.table td > .modal .modal-content {
     height: 2rem;
 }
 
+/* A score on a gauge of steps, as the autonomy in a report. */
+.next-step-gauge > span {
+    height: .5rem;
+}
+
 /* The job seeker's file: folded parts whose whole summary line opens them, with a chevron instead of the marker. */
 .next-step-file summary {
     cursor: pointer;

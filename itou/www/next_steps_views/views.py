@@ -6,9 +6,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from itou.approvals.models import Suspension
+from itou.approvals.enums import ProlongationRequestStatus
+from itou.approvals.models import Approval, Suspension
+from itou.approvals.perms import can_view_approval_details
 from itou.approvals.utils import get_contracts
 from itou.common_apps.address.forms import JobSeekerAddressForm
+from itou.companies.enums import ProSupportReportBarrier
 from itou.companies.models import ProSupportReport
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.insertion.enums import OrientationRefusalReason
@@ -38,7 +41,7 @@ from itou.www.next_steps_views.advisors import (
     advisor_acts,
     visible_orientations,
 )
-from itou.www.next_steps_views.barriers import gather_barriers
+from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER, gather_barriers
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
@@ -355,11 +358,70 @@ def pro_support_report(request, public_id, report_id):
     )
     if not can_view_pro_support_report(request, report):
         raise Http404
+    barriers = [(barrier.label, BARRIER_ICONS[barrier]) for barrier in map(ProSupportReportBarrier, report.barriers)]
+    if report.other_barrier:
+        barriers.append((f"Autre frein : {report.other_barrier}", BARRIER_ICONS[OTHER]))
     context = {
         "job_seeker": job_seeker,
         "report": report,
+        "barriers": barriers,
+        # Five steps, filled up to the autonomy.
+        "autonomy_steps": [step <= report.autonomy for step in range(1, 6)],
         "contract_has_ended": report.contract_end_date < timezone.localdate(),
         "can_view_name": can_view_personal_information(request, job_seeker),
         "matomo_custom_title": "Prochaines étapes : bilan d’accompagnement",
     }
     return _drawer_or_page(request, "next_steps/pro_support_report.html", "Bilan d’accompagnement", context)
+
+
+@readonly_view
+def approval(request, public_id):
+    """The job seeker's PASS IAE, as in their file: its strip, period, remainder, suspensions and prolongations.
+
+    Same rule as the PASS IAE's own page, which keeps the actions (suspend, prolong).
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    if not request.from_iae_actor:
+        raise Http404
+    approval = (
+        Approval.objects.filter(user=job_seeker).prefetch_related("suspension_set__siae").order_by("-start_at").first()
+    )
+    if approval is None or not can_view_approval_details(request, approval):
+        raise Http404
+    prolongations = [
+        {
+            "start_at": prolongation.start_at,
+            "end_at": prolongation.end_at,
+            "reason": prolongation.get_reason_display(),
+            "by": prolongation.declared_by_siae.display_name if prolongation.declared_by_siae else "",
+            "status": "Acceptée",
+            "badge_classes": "bg-success-lighter text-success",
+        }
+        for prolongation in approval.prolongation_set.select_related("declared_by_siae")
+    ] + [
+        {
+            "start_at": request_.start_at,
+            "end_at": request_.end_at,
+            "reason": request_.get_reason_display(),
+            "by": request_.declared_by_siae.display_name if request_.declared_by_siae else "",
+            "status": request_.get_status_display(),
+            "badge_classes": "bg-danger-lighter text-danger"
+            if request_.status == ProlongationRequestStatus.DENIED
+            else "bg-info-lighter text-info",
+        }
+        # The requests not yet granted: a granted one is a prolongation above.
+        for request_ in approval.prolongationrequest_set.filter(prolongation__isnull=True).select_related(
+            "declared_by_siae"
+        )
+    ]
+    context = {
+        "job_seeker": job_seeker,
+        "approval": approval,
+        # The PASS IAE alone: the contracts are in the file.
+        "bar": situation_bar(approval, [], functools.partial(contract_place, request)),
+        "suspensions": sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at, reverse=True),
+        "prolongations": sorted(prolongations, key=lambda prolongation: prolongation["start_at"], reverse=True),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : PASS IAE",
+    }
+    return _drawer_or_page(request, "next_steps/approval.html", "PASS IAE", context)

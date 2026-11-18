@@ -87,7 +87,7 @@ def test_employer_after_the_end_of_the_contract(client):
     # information. Without any report, that part is a plain line, with nothing to open.
     assertContains(response, '<details class="next-step-file', count=5)
     assertContains(response, '<div class="d-flex align-items-center gap-3 px-3 px-md-4 py-3 border-top"', count=1)
-    assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
+    assertContains(response, reverse("next_steps_views:approval", kwargs={"public_id": job_seeker.public_id}))
     assertContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
     # Each summary line says enough to skip opening it.
     assertContains(response, f"Du {fr(approval.start_at)} au {fr(approval.end_at)}")
@@ -400,12 +400,53 @@ def test_pro_support_report_drawer(client):
     # The file's "Lire le bilan" opens it in the side drawer.
     assertContains(client.get(page_url(job_seeker)), f'hx-get="{url}"')
     response = client.get(url, HTTP_HX_REQUEST="true")
-    assertContains(response, f"Terminé le {fr(end_date)}")
+    assertContains(response, f"Contrat terminé le {fr(end_date)}")
+    # Each barrier with its icon, the autonomy on a gauge of five steps.
     assertContains(response, ProSupportReportBarrier.MOBILITY.label)
+    assertContains(response, "ri-car-line")
     assertContains(response, f"{report.autonomy} sur 5")
+    assertContains(response, 'class="flex-grow-1 rounded-pill bg-info"', count=report.autonomy)
     # Without JavaScript, a page.
     assertContains(client.get(url), ProSupportReportBarrier.MOBILITY.label)
 
     # Another company's employer may not read it.
+    client.force_login(CompanyMembershipFactory(company__subject_to_iae_rules=True).user)
+    assert client.get(url, HTTP_HX_REQUEST="true").status_code == 404
+
+
+def test_approval_drawer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    approval = ApprovalFactory(start_at=timezone.localdate() - datetime.timedelta(days=100))
+    job_seeker = approval.user
+    JobApplicationFactory(
+        job_seeker=job_seeker,
+        to_company=membership.company,
+        state=JobApplicationState.ACCEPTED,
+        sent_by_authorized_prescriber=True,
+        approval=approval,
+    )
+    suspension = SuspensionFactory(
+        approval=approval,
+        start_at=timezone.localdate() - datetime.timedelta(days=50),
+        end_at=timezone.localdate() - datetime.timedelta(days=20),
+        reason=Suspension.Reason.SICKNESS,
+        siae=membership.company,
+    )
+    approval.refresh_from_db()
+    client.force_login(membership.user)
+
+    url = reverse("next_steps_views:approval", kwargs={"public_id": job_seeker.public_id})
+    # The file's « Voir le PASS IAE » opens it in the side drawer.
+    assertContains(client.get(page_url(job_seeker)), f'hx-get="{url}"')
+    response = client.get(url, HTTP_HX_REQUEST="true")
+    assertContains(response, approval.number_with_spaces)
+    assertContains(response, "next-step-frise__block--pass")
+    assertContains(response, f"Du {fr(suspension.start_at)} au {fr(suspension.end_at)}")
+    assertContains(response, Suspension.Reason.SICKNESS.label)
+    assertContains(response, "Aucune prolongation")
+    # Its own page keeps the actions.
+    assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
+
+    # An employer who never received an application from them may not see it.
     client.force_login(CompanyMembershipFactory(company__subject_to_iae_rules=True).user)
     assert client.get(url, HTTP_HX_REQUEST="true").status_code == 404

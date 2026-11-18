@@ -44,9 +44,14 @@
 
     <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
         {# pe-8: room on the right for the floating cookie manager button. #}
-        {% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+        {# The PASS IAE in the same drawer. #}
+        {% url "next_steps_views:approval" public_id=job_seeker.public_id as approval_url %}
         <a class="btn btn-outline-primary btn-ico"
-           href="{% url "approvals:details" public_id=suspension.approval.public_id %}?back_url={{ job_seeker_url|urlencode }}">
+           href="{{ approval_url }}"
+           hx-get="{{ approval_url }}"
+           hx-target="#next-step-journey"
+           hx-swap="outerHTML"
+           hx-indicator="#next-step-journey">
             <i class="ri-pass-valid-line fw-medium" aria-hidden="true"></i>
             <span>Voir le PASS&nbsp;IAE</span>
         </a>
