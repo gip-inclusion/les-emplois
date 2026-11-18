@@ -32,13 +32,14 @@
         <div class="d-flex flex-column gap-2">
             {% for selected in criteria %}
                 <div class="border rounded-2 px-3 py-2 d-flex flex-wrap align-items-center column-gap-2">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-shield-check-line" only %}
                     <span class="fw-bold">{{ selected.administrative_criteria.name }}</span>
                     {% if selected.certified_at %}
                         <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>
                     {% endif %}
                 </div>
             {% empty %}
-                <div class="border rounded-2 px-3 py-2 text-muted">Aucun critère renseigné.</div>
+                <div class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-shield-check-line" only %}<div class="flex-grow-1">Aucun critère renseigné.</div></div>
             {% endfor %}
         </div>
     </div>

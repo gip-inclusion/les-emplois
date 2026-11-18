@@ -37,67 +37,89 @@
         {# In blocks, as the facts of the guided journeys: a long value on a whole row. #}
         <div class="row g-2 mb-4">
             <div class="col-12">
-                <div class="border rounded-2 px-3 py-2 h-100">
-                    <span class="d-block fs-sm text-muted">Structure</span>
-                    <span class="d-block fw-bold text-break">
-                        {% if assignment.assigned_to_unknown_advisor %}
-                            Accompagnateur non renseigné
-                        {% elif assignment.organization %}
-                            {{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}
-                        {% else %}
-                            Aucune structure associée
-                        {% endif %}
-                    </span>
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-building-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Structure</span>
+                        <span class="d-block fw-bold text-break">
+                            {% if assignment.assigned_to_unknown_advisor %}
+                                Accompagnateur non renseigné
+                            {% elif assignment.organization %}
+                                {{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}
+                            {% else %}
+                                Aucune structure associée
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
             </div>
             {% if assignment.advisor != request.user %}
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
                     <div class="col-12">
-                        <div class="border rounded-2 px-3 py-2 h-100">
-                            <span class="d-block fs-sm text-muted">Adresse e-mail</span>
-                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-mail-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Adresse e-mail</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                            </div>
                         </div>
                     </div>
                 {% endif %}
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
                     <div class="col-12">
-                        <div class="border rounded-2 px-3 py-2 h-100">
-                            <span class="d-block fs-sm text-muted">Téléphone</span>
-                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-phone-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Téléphone</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                            </div>
                         </div>
                     </div>
                 {% elif assignment.organization %}
                     <div class="col-12">
-                        <div class="border rounded-2 px-3 py-2 h-100">
-                            <span class="d-block fs-sm text-muted">E-mail de la structure</span>
-                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-mail-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">E-mail de la structure</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                            </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="border rounded-2 px-3 py-2 h-100">
-                            <span class="d-block fs-sm text-muted">Téléphone de la structure</span>
-                            {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-phone-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Téléphone de la structure</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                            </div>
                         </div>
                     </div>
                 {% endif %}
             {% endif %}
             <div class="col-12">
-                <div class="border rounded-2 px-3 py-2 h-100">
-                    <span class="d-block fs-sm text-muted">Accompagne depuis le</span>
-                    <span class="d-block fw-bold">{{ assignment.created_at|date:"d/m/Y" }}</span>
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Accompagne depuis le</span>
+                        <span class="d-block fw-bold">{{ assignment.created_at|date:"d/m/Y" }}</span>
+                    </div>
                 </div>
             </div>
             {% if assignment.reason %}
                 <div class="col-12">
-                    <div class="border rounded-2 px-3 py-2 h-100">
-                        <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
-                        <span class="d-block">{{ assignment.reason|linebreaksbr }}</span>
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-chat-quote-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
+                            <span class="d-block">{{ assignment.reason|linebreaksbr }}</span>
+                        </div>
                     </div>
                 </div>
             {% elif can_manage %}
                 {# As on the existing advisors tab: a clear motif helps the advisors coordinate. #}
                 <div class="col-12">
                     <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-chat-quote-line" only %}
                         <span class="flex-grow-1">
                             <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
                             <i class="d-block text-disabled">Non renseigné</i>

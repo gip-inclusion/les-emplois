@@ -1,7 +1,11 @@
-{# A fact in a side drawer, framed as the advisor's: its label in small, its value in bold, a detail under it. #}
-{# Every drawer lays out its facts with it, stacked on the whole width. #}
-<div class="border rounded-2 px-3 py-2">
-    <span class="d-block fs-sm text-muted">{{ label }}</span>
-    {% if value %}<span class="d-block fw-bold text-break">{{ value }}</span>{% endif %}
-    {% if detail %}<span class="d-block fs-sm text-break">{{ detail }}</span>{% endif %}
+{% load next_steps_facts %}
+{# A fact in a side drawer, framed as the advisor's: a grey tile with the icon its label calls for, then the label #}
+{# in small, the value in bold, a detail under it. Every drawer lays out its facts with it, on the whole width. #}
+<div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+    {% include "next_steps/includes/fact_tile.html" with icon=label|fact_icon only %}
+    <div class="flex-grow-1">
+        <span class="d-block fs-sm text-muted">{{ label }}</span>
+        {% if value %}<span class="d-block fw-bold text-break">{{ value }}</span>{% endif %}
+        {% if detail %}<span class="d-block fs-sm text-break">{{ detail }}</span>{% endif %}
+    </div>
 </div>

@@ -19,6 +19,7 @@
     <div class="d-flex flex-column gap-2">
         {% for person in meeting %}
             <div class="border rounded-2 px-3 py-2 d-flex flex-column flex-sm-row align-items-sm-center gap-2">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-user-line" only %}
                 <div class="flex-grow-1">
                     <span class="d-block fs-sm text-muted">{{ person.role }}</span>
                     <span class="d-block fw-bold">{{ person.name }}</span>

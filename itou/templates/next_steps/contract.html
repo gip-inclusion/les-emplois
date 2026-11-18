@@ -43,15 +43,18 @@
             <h3 class="h5 mb-2">Déclaré à l’ASP</h3>
             <div class="d-flex flex-column gap-2">
                 {% for step in steps %}
-                    <div class="border rounded-2 px-3 py-2">
-                        <span class="d-block fs-sm text-muted">{{ step.kind|default:"Contrat" }}</span>
-                        <span class="d-block fw-bold">À partir du {{ step.start|date:"d/m/Y"|default:"—" }}</span>
-                        {% if step.end or step.left %}
-                            <span class="d-block fs-sm">
-                                {% if step.end %}Fin prévue le {{ step.end|date:"d/m/Y" }}{% endif %}
-                                {% if step.left %}· sortie définitive le {{ step.left|date:"d/m/Y" }}{% endif %}
-                            </span>
-                        {% endif %}
+                    <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-file-text-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">{{ step.kind|default:"Contrat" }}</span>
+                            <span class="d-block fw-bold">À partir du {{ step.start|date:"d/m/Y"|default:"—" }}</span>
+                            {% if step.end or step.left %}
+                                <span class="d-block fs-sm">
+                                    {% if step.end %}Fin prévue le {{ step.end|date:"d/m/Y" }}{% endif %}
+                                    {% if step.left %}· sortie définitive le {{ step.left|date:"d/m/Y" }}{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>

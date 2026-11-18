@@ -20,9 +20,12 @@
             <div class="mb-4">{% include "next_steps/journeys/components/period_bar.html" with bar=bar only %}</div>
         {% endif %}
         <div class="d-flex flex-column gap-2 mb-4">
-            <div class="border rounded-2 px-3 py-2">
-                <span class="d-block fs-sm text-muted">Période</span>
-                <span class="d-block fw-bold">Du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</span>
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Période</span>
+                    <span class="d-block fw-bold">Du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</span>
+                </div>
             </div>
             {% if approval.is_valid %}
                 {% include "next_steps/includes/fact.html" with label="Reliquat" value=approval.get_remainder_display detail="" only %}
@@ -33,22 +36,25 @@
             <h3 class="h5 mb-2" id="next-step-approval-suspensions">Suspensions</h3>
             <div class="d-flex flex-column gap-2">
                 {% for suspension in suspensions %}
-                    <div class="border rounded-2 px-3 py-2">
-                        <div class="d-flex flex-wrap align-items-center column-gap-2">
-                            <b>Du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</b>
-                            {% if suspension.is_in_progress %}
-                                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">En cours</span>
-                            {% else %}
-                                <span class="badge badge-xs rounded-pill bg-light text-muted">Passée</span>
-                            {% endif %}
+                    <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-pause-circle-line" only %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex flex-wrap align-items-center column-gap-2">
+                                <b>Du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</b>
+                                {% if suspension.is_in_progress %}
+                                    <span class="badge badge-xs rounded-pill bg-info-lighter text-info">En cours</span>
+                                {% else %}
+                                    <span class="badge badge-xs rounded-pill bg-light text-muted">Passée</span>
+                                {% endif %}
+                            </div>
+                            <span class="d-block fs-sm text-muted">
+                                {{ suspension.get_reason_display }}
+                                {% if suspension.siae %}· {{ suspension.siae.display_name }}{% endif %}
+                            </span>
                         </div>
-                        <span class="d-block fs-sm text-muted">
-                            {{ suspension.get_reason_display }}
-                            {% if suspension.siae %}· {{ suspension.siae.display_name }}{% endif %}
-                        </span>
                     </div>
                 {% empty %}
-                    <div class="border rounded-2 px-3 py-2 text-muted">Aucune suspension</div>
+                    <div class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-pause-circle-line" only %}<div class="flex-grow-1">Aucune suspension</div></div>
                 {% endfor %}
             </div>
         </section>
@@ -57,18 +63,21 @@
             <h3 class="h5 mb-2" id="next-step-approval-prolongations">Prolongations</h3>
             <div class="d-flex flex-column gap-2">
                 {% for prolongation in prolongations %}
-                    <div class="border rounded-2 px-3 py-2">
-                        <div class="d-flex flex-wrap align-items-center column-gap-2">
-                            <b>Du {{ prolongation.start_at|date:"d/m/Y" }} au {{ prolongation.end_at|date:"d/m/Y" }}</b>
-                            <span class="badge badge-xs rounded-pill {{ prolongation.badge_classes }}">{{ prolongation.status }}</span>
+                    <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-refresh-line" only %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex flex-wrap align-items-center column-gap-2">
+                                <b>Du {{ prolongation.start_at|date:"d/m/Y" }} au {{ prolongation.end_at|date:"d/m/Y" }}</b>
+                                <span class="badge badge-xs rounded-pill {{ prolongation.badge_classes }}">{{ prolongation.status }}</span>
+                            </div>
+                            <span class="d-block fs-sm text-muted">
+                                {{ prolongation.reason }}
+                                {% if prolongation.by %}· {{ prolongation.by }}{% endif %}
+                            </span>
                         </div>
-                        <span class="d-block fs-sm text-muted">
-                            {{ prolongation.reason }}
-                            {% if prolongation.by %}· {{ prolongation.by }}{% endif %}
-                        </span>
                     </div>
                 {% empty %}
-                    <div class="border rounded-2 px-3 py-2 text-muted">Aucune prolongation</div>
+                    <div class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-refresh-line" only %}<div class="flex-grow-1">Aucune prolongation</div></div>
                 {% endfor %}
             </div>
         </section>

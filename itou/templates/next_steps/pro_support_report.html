@@ -37,7 +37,7 @@
                         <span class="fw-bold">{{ label }}</span>
                     </li>
                 {% empty %}
-                    <li class="border rounded-2 px-3 py-2 text-muted">Aucun frein identifié</li>
+                    <li class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-error-warning-line" only %}<div class="flex-grow-1">Aucun frein identifié</div></li>
                 {% endfor %}
             </ul>
         </section>
@@ -45,16 +45,19 @@
         {# Autonomy on a five-step gauge, then its meaning. #}
         <section class="mb-4" aria-labelledby="next-step-report-autonomy">
             <h3 class="h5 mb-2" id="next-step-report-autonomy">Autonomie dans la recherche d’emploi</h3>
-            <div class="border rounded-2 px-3 py-2">
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <span class="next-step-gauge d-flex gap-1 flex-grow-1" aria-hidden="true">
-                        {% for filled in autonomy_steps %}
-                            <span class="flex-grow-1 rounded-pill {% if filled %}bg-tertiary{% else %}bg-light border{% endif %}"></span>
-                        {% endfor %}
-                    </span>
-                    <b class="flex-shrink-0">{{ report.autonomy }} sur 5</b>
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-compass-3-line" only %}
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <span class="next-step-gauge d-flex gap-1 flex-grow-1" aria-hidden="true">
+                            {% for filled in autonomy_steps %}
+                                <span class="flex-grow-1 rounded-pill {% if filled %}bg-tertiary{% else %}bg-light border{% endif %}"></span>
+                            {% endfor %}
+                        </span>
+                        <b class="flex-shrink-0">{{ report.autonomy }} sur 5</b>
+                    </div>
+                    <p class="fs-sm text-muted mb-0">{{ report.get_autonomy_display }}</p>
                 </div>
-                <p class="fs-sm text-muted mb-0">{{ report.get_autonomy_display }}</p>
             </div>
         </section>
 

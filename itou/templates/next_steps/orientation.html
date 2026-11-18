@@ -19,50 +19,68 @@
         {# In blocks, as the facts of the guided journeys: a long value on a whole row. #}
         <div class="row g-2">
             <div class="col-12">
-                <div class="border rounded-2 px-3 py-2 h-100">
-                    <span class="d-block fs-sm text-muted">Structure</span>
-                    <span class="d-block fw-bold text-break">{{ orientation.service.structure.name }}</span>
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-building-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Structure</span>
+                        <span class="d-block fw-bold text-break">{{ orientation.service.structure.name }}</span>
+                    </div>
                 </div>
             </div>
             <div class="col-12">
-                <div class="border rounded-2 px-3 py-2 h-100">
-                    <span class="d-block fs-sm text-muted">Envoyée le</span>
-                    <span class="d-block fw-bold">{{ orientation.created_at|date:"d/m/Y" }}</span>
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Envoyée le</span>
+                        <span class="d-block fw-bold">{{ orientation.created_at|date:"d/m/Y" }}</span>
+                    </div>
                 </div>
             </div>
             <div class="col-12">
-                <div class="border rounded-2 px-3 py-2 h-100">
-                    <span class="d-block fs-sm text-muted">Par</span>
-                    <span class="d-block fw-bold text-break">
-                        {{ orientation.sender.get_full_name }}
-                        {% if orientation.sender_organization %}
-                            <span class="d-block fw-normal fs-sm">{{ orientation.sender_organization.display_name }}</span>
-                        {% endif %}
-                    </span>
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-user-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Par</span>
+                        <span class="d-block fw-bold text-break">
+                            {{ orientation.sender.get_full_name }}
+                            {% if orientation.sender_organization %}
+                                <span class="d-block fw-normal fs-sm">{{ orientation.sender_organization.display_name }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
             </div>
             {% if orientation.processing_date %}
                 <div class="col-12">
-                    <div class="border rounded-2 px-3 py-2 h-100">
-                        <span class="d-block fs-sm text-muted">Traitée le</span>
-                        <span class="d-block fw-bold">{{ orientation.processing_date|date:"d/m/Y" }}</span>
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Traitée le</span>
+                            <span class="d-block fw-bold">{{ orientation.processing_date|date:"d/m/Y" }}</span>
+                        </div>
                     </div>
                 </div>
             {% endif %}
             {% if orientation.orientation_reasons %}
                 <div class="col-12">
-                    <div class="border rounded-2 px-3 py-2 h-100">
-                        <span class="d-block fs-sm text-muted">Motif de l’orientation</span>
-                        <span class="d-block">{{ orientation.orientation_reasons|linebreaksbr }}</span>
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-chat-quote-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motif de l’orientation</span>
+                            <span class="d-block">{{ orientation.orientation_reasons|linebreaksbr }}</span>
+                        </div>
                     </div>
                 </div>
             {% endif %}
             {% if refusal_reasons %}
                 <div class="col-12">
-                    <div class="border rounded-2 px-3 py-2 h-100">
-                        <span class="d-block fs-sm text-muted">Motifs du refus</span>
-                        <span class="d-block fw-bold">{{ refusal_reasons|join:", " }}</span>
-                        {% if orientation.refusal_details %}<span class="d-block">{{ orientation.refusal_details|linebreaksbr }}</span>{% endif %}
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-close-circle-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motifs du refus</span>
+                            <span class="d-block fw-bold">{{ refusal_reasons|join:", " }}</span>
+                            {% if orientation.refusal_details %}<span class="d-block">{{ orientation.refusal_details|linebreaksbr }}</span>{% endif %}
+                        </div>
                     </div>
                 </div>
             {% endif %}
