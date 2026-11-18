@@ -13,7 +13,8 @@
                         <i class="next-step-file__chevron ri-arrow-down-s-line fs-lg text-tertiary flex-shrink-0"
                            aria-hidden="true"></i>
                     </summary>
-                    <div class="px-3 px-md-4 pb-4">
+                    {# pt-3: room between the hovered summary line, greyed out, and the first fact. #}
+                    <div class="px-3 px-md-4 pt-3 pb-4">
                         {# itou-theme's list of data: the label, then its value on the same line when there is room. #}
                         <ul class="list-data">
                             {% for fact in part.facts %}
