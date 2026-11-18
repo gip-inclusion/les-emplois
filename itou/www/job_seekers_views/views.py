@@ -577,46 +577,63 @@ def create_or_edit_assignment(
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_request(can_fill_pro_support_report)
+@check_request(lambda request: request.from_employer)
 def create_pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report_create.html"):
-    job_seeker = get_object_or_404(
-        User.objects.at_end_of_journey(siae=request.current_organization),
-        public_id=public_id,
-        kind=UserKind.JOB_SEEKER,
+    job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    # Members of several companies may come from an email about another one of them.
+    company = next(
+        (
+            org
+            for org in sorted(request.organizations, key=lambda org: org != request.current_organization)
+            if isinstance(org, Company) and User.objects.filter(pk=job_seeker.pk).at_end_of_journey(siae=org).exists()
+        ),
+        None,
     )
-    last_contract = (
-        job_seeker.contracts.filter(company=request.current_organization).order_by("-start_date", "-pk").first()
-    )
-    if last_contract.pro_support_reports.covering_contract_end_date().exists():
+    if company is None:
         raise Http404
+    other_company = company if company != request.current_organization else None
+    last_contract = job_seeker.contracts.filter(company=company).order_by("-start_date", "-pk").first()
+    pro_support_report = None
+    if other_company is None:
+        # Several reports cover a contract whose renewal was cancelled: the latest one is shown.
+        pro_support_report = (
+            last_contract.pro_support_reports.covering_contract_end_date()
+            .select_related("author")
+            .order_by("-contract_end_date")
+            .first()
+        )
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
 
-    form = ProSupportReportForm(
-        request.path,
-        data=request.POST or None,
-        initial={"has_solution": request.GET.get("has_solution")},
-        instance=ProSupportReport(
-            job_seeker=job_seeker,
-            company=request.current_organization,
-            author=request.user,
-            contract=last_contract,
-            contract_end_date=last_contract.end_date,
-        ),
-    )
-    if request.method == "POST" and form.is_valid():
-        report = form.save()
-        report.notify_authorized_prescriber()
-
-        # Sync job seeker assignment
-        JobSeekerAssignment.objects.upsert_assignment(
-            job_seeker, request.user, request.current_organization, ActionKind.FILL_REPORT
+    form = None
+    if not other_company and not pro_support_report:
+        form = ProSupportReportForm(
+            request.path,
+            data=request.POST or None,
+            initial={"has_solution": request.GET.get("has_solution")},
+            instance=ProSupportReport(
+                job_seeker=job_seeker,
+                company=company,
+                author=request.user,
+                contract=last_contract,
+                contract_end_date=last_contract.end_date,
+            ),
         )
+        if request.method == "POST" and form.is_valid():
+            report = form.save()
+            report.notify_authorized_prescriber()
 
-        messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
-        return HttpResponseRedirect(back_url)
+            # Sync job seeker assignment
+            JobSeekerAssignment.objects.upsert_assignment(
+                job_seeker, request.user, request.current_organization, ActionKind.FILL_REPORT
+            )
+
+            messages.success(request, "Bilan d’accompagnement envoyé", extra_tags="toast")
+            return HttpResponseRedirect(back_url)
 
     context = {
         "form": form,
+        "other_company": other_company,
+        "pro_support_report": pro_support_report,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
         "back_url": back_url,
