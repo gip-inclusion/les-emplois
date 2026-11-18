@@ -1239,10 +1239,6 @@ class ContractQuerySet(models.QuerySet):
         return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
 
     def in_monthly_recap(self):
-        """The rule of User.objects.at_end_of_journey(), by calendar month.
-
-        Each contract keeps its job seeker at the end of their journey in the company of the contract,
-        so the company can fill in their pro support report."""
         from itou.users.models import User
 
         today = timezone.localdate()
