@@ -9,14 +9,12 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.job_applications.enums import JobApplicationState
-from itou.rdv_insertion.models import Participation
 from itou.www.next_steps_views.actions import Group, Kind, describe_job_seekers, elapsed_display
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.rdv_insertion.factories import ParticipationFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
 
@@ -220,41 +218,6 @@ def test_employer_prolongation_request_waiting_for_decision(employer_client, emp
     assert summary(response) == [(Group.WATCH, Kind.WAITING, prolongation_request.approval.user)]
     assertContains(response, ProlongationRequestStatus.PENDING.label)
     assertContains(response, prolongation_request.assigned_to.get_full_name())
-
-
-def test_employer_appointment_with_undetermined_status(employer_client, employer_membership):
-    company = employer_membership.company
-    now = timezone.now()
-    participation = ParticipationFactory(
-        status=Participation.Status.UNKNOWN,
-        appointment__company=company,
-        appointment__start_at=now - datetime.timedelta(days=2),
-        appointment__canceled_at=None,
-    )
-    # Upcoming, already determined, too old or from another company: nothing to do.
-    ParticipationFactory(
-        status=Participation.Status.UNKNOWN,
-        appointment__company=company,
-        appointment__start_at=now + datetime.timedelta(days=2),
-    )
-    ParticipationFactory(
-        status=Participation.Status.SEEN,
-        appointment__company=company,
-        appointment__start_at=now - datetime.timedelta(days=2),
-    )
-    ParticipationFactory(
-        status=Participation.Status.UNKNOWN,
-        appointment__company=company,
-        appointment__start_at=now - datetime.timedelta(days=60),
-    )
-    ParticipationFactory(
-        status=Participation.Status.UNKNOWN,
-        appointment__start_at=now - datetime.timedelta(days=2),
-    )
-
-    response = employer_client.get(TODO_URL)
-    assert summary(response) == [(Group.WEEK, Kind.APPOINTMENT, participation.job_seeker)]
-    assertContains(response, Participation.Status.UNKNOWN.label)
 
 
 # Prescriber actions

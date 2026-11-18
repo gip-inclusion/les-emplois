@@ -24,8 +24,6 @@ from itou.companies.models import ProSupportReport
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
-from itou.rdv_insertion.enums import ParticipationStatus
-from itou.rdv_insertion.models import Participation
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.www.job_seekers_views.views import _pro_support_request_company_email
@@ -33,8 +31,6 @@ from itou.www.job_seekers_views.views import _pro_support_request_company_email
 
 # A report stays in the queue this long: whether the prescriber read it is not recorded.
 PRO_SUPPORT_REPORT_TO_READ_DAYS = 30
-# Older appointments with an undetermined status are left out: the queue is about what can still be acted upon.
-APPOINTMENT_STATUS_TO_SPECIFY_DAYS = 30
 
 # Due dates, in days from what starts the action. Provisional, to be settled with the team, except where noted.
 # A job application gets an answer within a week. The prescriber's eligibility diagnosis is what the employer waits
@@ -50,8 +46,6 @@ APPROVAL_SUSPENSION_DAYS = 7
 # The report, from the contract's end; the prescriber's request for it has the same due date.
 PRO_SUPPORT_REPORT_FILL_DAYS = 30
 PRO_SUPPORT_REPORT_READ_DAYS = 7
-# The appointment's status, once it took place.
-APPOINTMENT_STATUS_DAYS = 7
 # Beyond this many job applications in a group, the others are folded: the rarer actions must stay in sight.
 JOB_APPLICATIONS_SHOWN = 3
 
@@ -113,7 +107,6 @@ class Kind(enum.StrEnum):
     """The kind of action, which sets its icon (Remix Icons, the set shipped with itou-theme)."""
 
     APPROVAL_SUSPENSION = "ri-pause-circle-line"
-    APPOINTMENT = "ri-calendar-check-line"
     ELIGIBILITY = "ri-shield-check-line"
     JOB_APPLICATION = "ri-file-user-line"
     PROLONGATION_REQUEST = "ri-time-line"
@@ -274,42 +267,6 @@ def _end_of_contracts(company):
             )
 
 
-def _appointments_with_undetermined_status(company):
-    now = timezone.now()
-    participations = (
-        Participation.objects.filter(
-            appointment__company=company,
-            status=ParticipationStatus.UNKNOWN,
-            appointment__canceled_at=None,
-            appointment__start_at__lt=now,
-            appointment__start_at__gte=now - datetime.timedelta(days=APPOINTMENT_STATUS_TO_SPECIFY_DAYS),
-        )
-        .select_related("job_seeker", "appointment")
-        .order_by("appointment__start_at")
-    )
-    for participation in participations:
-        appointment = participation.appointment
-        yield Action(
-            kind=Kind.APPOINTMENT,
-            job_seeker=participation.job_seeker,
-            title=f"Préciser le statut du rendez-vous du {_fr(appointment.start_at)}",
-            reason=(
-                f"{appointment.reason.rstrip('.')}. Statut : {ParticipationStatus.UNKNOWN.label}, "
-                "il se renseigne dans RDV-Insertion."
-            ),
-            since=_date(appointment.start_at),
-            due=_after(appointment.start_at, APPOINTMENT_STATUS_DAYS),
-            url=reverse(
-                "job_seekers_views:appointment_details",
-                kwargs={
-                    "public_id": participation.job_seeker.public_id,
-                    "rdv_insertion_id": appointment.rdv_insertion_id,
-                },
-            ),
-            call_to_action="Voir",
-        )
-
-
 def _prolongation_requests_sent(company):
     prolongation_requests = (
         ProlongationRequest.objects.filter(declared_by_siae=company, status=ProlongationRequestStatus.PENDING)
@@ -337,7 +294,6 @@ def _employer_actions(request):
     if request.from_iae_actor:
         yield from _end_of_contracts(company)
         yield from _prolongation_requests_sent(company)
-    yield from _appointments_with_undetermined_status(company)
 
 
 # Prescribers
@@ -562,7 +518,7 @@ def group_actions(actions):
 # ------------------------------------------------------------------------------
 # Read from what the platform already records, with its author and time: nothing is stored for the experiment.
 # Shown to the user only, never aggregated: it measures their activity (see the RGPD validation before production).
-# Not counted, as nothing records them: asking for a report by e-mail, reading a report, an appointment's status.
+# Not counted, as nothing records them: asking for a report by e-mail, reading a report.
 
 TRANSITION_LABELS = {
     "process": "candidature mise à l’étude",
