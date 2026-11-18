@@ -200,6 +200,9 @@ def test_alphabetical_ordering_and_pagination(client, snapshot):
     assert pagination.prettify() == snapshot()
     assert people_in_page(page) == ["A A", "B B", "C C", "D D", "E E", "M M", "N N", "O O", "P P", "Q Q"]
 
+    response = client.get(reverse("directory:people_results"), {"page": 2})
+    assert people_in_page(parse_response_to_soup(response)) == ["Z SECOND PAGE Z Second Page"]
+
 
 def test_people_search_includes_nearby_other_city(client):
     vannes = create_city_vannes()
