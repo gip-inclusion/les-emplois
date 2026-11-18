@@ -1591,6 +1591,18 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     def is_born_in_france(self):
         return self.birth_country_id and self.birth_country.group == Country.Group.FRANCE
 
+    def birth_insee_code(self) -> str | None:
+        if self.birth_country_id is None:
+            return None
+        if self.is_born_in_france:
+            if self.birth_country_id == Country.FRANCE_ID:
+                return self.birth_place.code
+            else:
+                # This is not documented anywhere but seems to work
+                return f"98{self.birth_country.code}"
+        else:
+            return f"99{self.birth_country.code}"
+
     @property
     def has_ass_allocation(self):
         return bool(self.ass_allocation_since)

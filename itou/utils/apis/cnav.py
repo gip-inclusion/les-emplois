@@ -17,11 +17,19 @@ class Name:
     accented: str | None
     filtered: str | None
 
+    @classmethod
+    def from_dict(cls, data):
+        return cls(accented=data.get("accented"), filtered=data.get("filtered"))
+
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class FirstNames:
     accented: list[str]
     filtered: list[str]
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(accented=data["accented"], filtered=data["filtered"])
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
@@ -39,6 +47,26 @@ class PersonalInfos:
 
     first_names: FirstNames | None
 
+    @classmethod
+    def from_dict(cls, data):
+        kwargs = {
+            key: data.get(key)
+            for key in [
+                "number",
+                "sex_code",
+                "birth_date",
+                "birth_place",
+                "death_date",
+            ]
+        }
+        kwargs["number_history"] = data.get("number_history", [])
+        kwargs["first_names"] = (
+            FirstNames.from_dict(data.get("first_names")) if data.get("first_names") is not None else None
+        )
+        for name_field in ["birth_name", "common_name", "marital_name"]:
+            kwargs[name_field] = Name.from_dict(data.get(name_field)) if data.get(name_field) is not None else None
+        return cls(**kwargs)
+
 
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class InterOpsResult:
@@ -47,6 +75,14 @@ class InterOpsResult:
     result_label: str | None
 
     infos: PersonalInfos | None = None
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            result_code=data["result_code"],
+            result_label=data["result_label"],
+            infos=PersonalInfos.from_dict(data["infos"]) if data.get("infos") else None,
+        )
 
 
 class CNAVRelayApiClient:

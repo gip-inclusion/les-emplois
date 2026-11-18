@@ -44,6 +44,7 @@ class IdentityCertificationAuthorities(models.TextChoices):
     )
     API_PARTICULIER = "api_particulier", "API Particulier"
     API_FT_RECHERCHER_USAGER = "api_rechercher_usager", "API France Travail rechercher usager"
+    API_CNAV = "api_CNAV", "API CNAV"
 
 
 class LackOfNIRReason(models.TextChoices):

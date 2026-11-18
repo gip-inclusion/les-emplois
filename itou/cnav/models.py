@@ -5,11 +5,33 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from itou.cnav.enums import CNAVRecordOrigin
-from itou.users.models import JobSeekerProfile
-from itou.utils.apis.cnav import InterOpsResult
+from itou.users.enums import IdentityCertificationAuthorities, Title
+from itou.users.models import IdentityCertification, JobSeekerProfile
+from itou.utils.apis.cnav import InterOpsResult, PersonalInfos
 
 
 logger = logging.getLogger(__name__)
+
+
+def _extract_known_case_folded_first_names(infos: PersonalInfos) -> set[str]:
+    known_first_names = set()
+    if infos.first_names:
+        for filtered_first_name in infos.first_names.filtered:
+            known_first_names.add(filtered_first_name.casefold())
+        for accented_first_name in infos.first_names.accented:
+            known_first_names.add(accented_first_name.casefold())
+    return known_first_names
+
+
+def _extract_known_case_folded_last_names(infos: PersonalInfos) -> set[str]:
+    known_last_names = set()
+    for name_field in ["birth_name", "common_name", "marital_name"]:
+        if name := getattr(infos, name_field):
+            if name.filtered:
+                known_last_names.add(name.filtered.casefold())
+            if name.accented:
+                known_last_names.add(name.accented.casefold())
+    return known_last_names
 
 
 class CNAVRecord(models.Model):
@@ -30,7 +52,7 @@ class CNAVRecord(models.Model):
         if self.profile is None:
             return
         try:
-            interops_result = InterOpsResult(**self.result)
+            interops_result = InterOpsResult.from_dict(self.result)
         except ValueError:
             logger.info("Unexpected result format for CNAVRecord pk=%s", self.pk)
             return
@@ -38,9 +60,52 @@ class CNAVRecord(models.Model):
             logger.info("Empty result for CNAVRecord pk=%s", self.pk)
             return
 
-        if self.profile.nir[13:] != interops_result.infos.number:
+        # The NIR is mandatory
+        if self.profile.nir is None or self.profile.nir[:13] != interops_result.infos.number:
+            logger.info("NIR mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
             return
-        # TODO: check last_name/first_name/birth_date/title/birth_place/birth_country
+
+        if self.profile.birthdate and self.profile.birthdate.isoformat() != interops_result.infos.birth_date:
+            logger.info("birth date mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+            return
+        if self.profile.user.title and self.profile.user.title != {1: Title.M, 2: Title.MME}.get(
+            interops_result.infos.sex_code
+        ):
+            logger.info("title/sex_code mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+            return
+        if self.profile.birth_country_id and self.profile.birth_insee_code() != interops_result.infos.birth_place:
+            logger.info("birth place mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+            return
+        if (
+            self.profile.user.first_name
+            and self.profile.user.first_name.casefold()
+            not in _extract_known_case_folded_first_names(interops_result.infos)
+        ):
+            logger.info("first name mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+            return
+        # TODO: handle birth_name (with fallback on last_name if birth_name is empty)
+        if (
+            self.profile.user.last_name
+            and self.profile.user.last_name.casefold()
+            not in _extract_known_case_folded_last_names(interops_result.infos)
+        ):
+            logger.info("last name mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+
+            return
+        # If we end up here, it means that the profile and interops information are consistent
+        # Let's certify!
+        IdentityCertification.objects.upsert_certifications(
+            [
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER,
+                    jobseeker_profile=self.profile,
+                    certified_at=self.last_attempt_at,
+                ),
+            ],
+        )
+        logger.info(
+            "Match between profile=%s and CNAVRecord pk=%s - IdentityCertification added", self.profile.pk, self.pk
+        )
 
 
 # TODO:
