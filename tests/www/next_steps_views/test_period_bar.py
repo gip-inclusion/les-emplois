@@ -9,7 +9,13 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import Suspension
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
-from itou.www.next_steps_views.period_bar import duration_display, prolongation_bar, situation_bar, suspension_bar
+from itou.www.next_steps_views.period_bar import (
+    approval_bar,
+    duration_display,
+    prolongation_bar,
+    situation_bar,
+    suspension_bar,
+)
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -67,9 +73,20 @@ def test_prolongation_bar():
     # The PASS IAE fills up to today and says what is left of it, today included: 77 days.
     assert [block.elapsed for block in bar.blocks] == ["89.5", ""]
     assert [block.remaining for block in bar.blocks] == [f"2{NBSP}mois et 16{NBSP}jours", ""]
+    # Today is near the end of the block: what is left goes under the label, not into today's line.
+    assert bar.blocks[0].remaining_side == "start"
     assert [note.text for note in bar.notes] == [
         f"Fin du contrat le 31/05/2027{NBSP}: couverte par la prolongation",
     ]
+
+
+@freeze_time("2026-11-16")
+def test_approval_bar_writes_what_is_left_after_today_early_in_the_block():
+    approval = ApprovalFactory(start_at=datetime.date(2026, 6, 1), end_at=datetime.date(2028, 5, 31))
+
+    [block] = approval_bar(approval).blocks
+
+    assert block.remaining_side == "end"
 
 
 @freeze_time("2026-11-16")

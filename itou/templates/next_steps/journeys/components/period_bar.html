@@ -12,8 +12,12 @@
                             <span class="d-flex flex-column">
                                 <span class="fs-sm fw-bold">{{ block.label }}</span>
                                 <span class="fs-xs">{{ block.duration }}</span>
+                                {% if block.remaining and block.remaining_side == "start" %}
+                                    {# Today's line leaves no room after it: what is left, under the label. #}
+                                    <span class="fs-xs fw-bold mt-1">Reste {{ block.remaining }}</span>
+                                {% endif %}
                             </span>
-                            {% if block.remaining %}
+                            {% if block.remaining and block.remaining_side == "end" %}
                                 <span class="d-flex flex-column text-end ms-auto">
                                     <span class="fs-xs">Reste</span>
                                     <span class="fs-sm fw-bold">{{ block.remaining }}</span>

@@ -84,6 +84,8 @@ class Block:
     # For a PASS IAE: how much of the block has run, in percent, and what is left once today is in it.
     elapsed: str = ""
     remaining: str = ""
+    # Where it is written: after today's line ("end"), or under the label when today leaves no room after it.
+    remaining_side: str = "end"
 
 
 @dataclasses.dataclass
@@ -125,6 +127,10 @@ def _share_columns(blocks):
     return blocks
 
 
+# Up to this share of its block, today leaves room to write what is left after it.
+REMAINING_AFTER_TODAY_UNTIL = 0.55
+
+
 def _mark_today(bar, remaining=""):
     """Place today in the block that holds it: its position in the block, and how its caption leans.
 
@@ -144,6 +150,8 @@ def _mark_today(bar, remaining=""):
             if block.kind == "pass":
                 block.elapsed = block.today
                 block.remaining = remaining
+                # Past the middle of the block, what is left would run into today's line: under the label instead.
+                block.remaining_side = "end" if share < REMAINING_AFTER_TODAY_UNTIL else "start"
         elif block.kind == "pass" and block.end < today:
             block.elapsed = "100"
         before += block.columns
