@@ -19,7 +19,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col">
-                    <div class="c-form mb-5">
+                    <div class="c-form">
                         <h2>Double authentification</h2>
                         {% component_alert title=title content=content variant="info" %}
                             {% fragment as title %}
@@ -41,21 +41,17 @@
                             {% endfragment %}
                         {% endcomponent_alert %}
 
-                        <h3 class="mt-2">Où trouver mon code ?</h3>
+                        <h3 class="mt-md-4">Où trouver mon code ?</h3>
                         <div class="row">
                             <div class="col-12 col-md-4 mb-3">
                                 <div class="c-box h-100">
-                                    <div class="d-flex flex-column align-items-center text-center row-gap-2">
-                                        <div class="d-flex align-self-stretch align-items-center">
-                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">1</span>
-                                            <span class="flex-grow-1">
-                                                <img src="{% static 'img/otp/etape-1-appareils.svg' %}"
-                                                     width="80"
-                                                     alt="Illustration : ordinateur ou smartphone."
-                                                     loading="lazy">
-                                            </span>
-                                            <span class="badge badge-xl rounded-circle invisible"
-                                                  aria-hidden="true">1</span>
+                                    <div class="d-flex align-self-stretch flex-column text-center row-gap-3">
+                                        <div class="position-relative">
+                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle position-absolute top-0 start-0">1</span>
+                                            <img src="{% static 'img/otp/etape-1-appareils.svg' %}"
+                                                 height="45"
+                                                 alt="Illustration : ordinateur ou smartphone."
+                                                 loading="lazy">
                                         </div>
                                         <p class="mb-0">
                                             Sur <strong>mon téléphone</strong> ou <strong>mon ordinateur</strong>, je lance l’<strong>application que j'ai choisie</strong> lors de l'activation de la <strong>double authentification</strong>.
@@ -70,17 +66,13 @@
                             </div>
                             <div class="col-12 col-md-4 mb-3">
                                 <div class="c-box h-100">
-                                    <div class="d-flex flex-column align-items-center text-center row-gap-2">
-                                        <div class="d-flex align-self-stretch align-items-center">
-                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">2</span>
-                                            <span class="flex-grow-1">
-                                                <img src="{% static 'img/otp/etape-2-code.svg' %}"
-                                                     width="80"
-                                                     alt="Illustration : code OTP dans l’application."
-                                                     loading="lazy">
-                                            </span>
-                                            <span class="badge badge-xl rounded-circle invisible"
-                                                  aria-hidden="true">2</span>
+                                    <div class="d-flex align-self-stretch flex-column text-center row-gap-3">
+                                        <div class="position-relative">
+                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle position-absolute top-0 start-0">2</span>
+                                            <img src="{% static 'img/otp/etape-2-code.svg' %}"
+                                                 height="45"
+                                                 alt="Illustration : code OTP dans l'application."
+                                                 loading="lazy">
                                         </div>
                                         <p class="mb-0">
                                             Dans cette application, je cherche le <strong>code</strong> associé à la <strong>Plateforme de l’inclusion</strong>.
@@ -91,17 +83,13 @@
                             </div>
                             <div class="col-12 col-md-4 mb-3">
                                 <div class="c-box h-100">
-                                    <div class="d-flex flex-column align-items-center text-center row-gap-2">
-                                        <div class="d-flex align-self-stretch align-items-center">
-                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">3</span>
-                                            <span class="flex-grow-1">
-                                                <img src="{% static 'img/otp/etape-3-saisie-validee.svg' %}"
-                                                     width="80"
-                                                     alt="Illustration : saisie du code OTP."
-                                                     loading="lazy">
-                                            </span>
-                                            <span class="badge badge-xl rounded-circle invisible"
-                                                  aria-hidden="true">3</span>
+                                    <div class="d-flex align-self-stretch flex-column text-center row-gap-3">
+                                        <div class="position-relative">
+                                            <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle position-absolute top-0 start-0">3</span>
+                                            <img src="{% static 'img/otp/etape-3-saisie-validee.svg' %}"
+                                                 height="45"
+                                                 alt="Illustration : saisie du code OTP."
+                                                 loading="lazy">
                                         </div>
                                         <p class="mb-0">
                                             Je recopie le <strong>code à 6 chiffres</strong> ci-dessous.
@@ -115,17 +103,16 @@
                             {% csrf_token %}
                             <fieldset>
                                 {% bootstrap_form_errors form type="all" %}
-                                {% bootstrap_field form.otp_token %}
+                                {% bootstrap_field form.otp_token wrapper_class="form-group form-group-input-w-lg-33" %}
                             </fieldset>
-
-                            <p class="mt-2">
-                                Vous n’avez plus accès à votre appareil ?
-                                <a href="{% url "otp_views:login_with_backup_code" %}"
-                                   class="btn-link fw-bold">Cliquez ici</a> pour utiliser votre code de récupération.
-                            </p>
-
                             {% itou_buttons_form primary_label="Valider" reset_url=None %}
                         </form>
+                    </div>
+                    <hr data-it-text="ou" class="my-5">
+                    <div class="text-center mb-3">
+                        Vous n’avez plus accès à votre appareil ?
+                        <a href="{% url "otp_views:login_with_backup_code" %}"
+                           class="btn-link">Cliquez ici pour utiliser votre code de récupération</a>.
                     </div>
                 </div>
             </div>

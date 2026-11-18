@@ -16,7 +16,11 @@ class ConfirmTOTPDeviceForm(forms.Form):
         label="Choisissez un nom pour votre appareil",
         help_text="Ce nom vous aidera à retrouver cet appareil dans vos paramètres de sécurité.",
     )
-    otp_token = forms.CharField(label="")  # customized in `__init__()`
+    otp_token = forms.CharField(
+        label="",
+        help_text="Attention, ce code change toutes les 30 secondes : "
+        "vérifiez que vous saisissez bien le code actuellement affiché.",
+    )  # label customized in `__init__()`
     key = forms.CharField(widget=forms.HiddenInput)
     device_type = forms.CharField(widget=forms.HiddenInput)
 
@@ -42,8 +46,6 @@ class ConfirmTOTPDeviceForm(forms.Form):
                 if device_type == DeviceType.SMARTPHONE
                 else "dans votre gestionnaire de mots de passe."
             )
-            + "<br>Attention, ce code change toutes les 30 secondes : "
-            "vérifiez que vous saisissez bien le code actuellement affiché."
         )
 
     def clean(self):
