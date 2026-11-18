@@ -159,6 +159,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "rdvi_participations",  # Participation.job_seeker
         "rdvi_appointments",  # Appointment.company
         "rdv_service_public_oauth_token",  # OAuthToken.user: only professionals have one
+        "rdv_service_public_proposals",  # AppointmentProposal.job_seeker: stays the person contacted by RDV-S
     }
     fields_to_transfer = {f.name for f in admin.get_fields_to_transfer_for_job_seekers()}
     # Check that all fields have been accounted for

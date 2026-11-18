@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from django.conf import settings
 from django.db import models, transaction
@@ -71,3 +72,43 @@ class OAuthToken(models.Model):
             self.refresh_token = token_data.refresh_token
             self.expires_at = timezone.now() + datetime.timedelta(seconds=token_data.expires_in)
             self.save()
+
+
+class AppointmentProposal(models.Model):
+    """A click on "Proposer un RDV": the rdv_plan created in RDV Service Public for the job seeker."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job_application = models.ForeignKey(
+        "job_applications.JobApplication",
+        verbose_name="candidature",
+        on_delete=models.CASCADE,
+        related_name="rdv_service_public_proposals",
+    )
+    # Company and job seeker at the time of the click: the job application can be transferred afterwards
+    company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise",
+        on_delete=models.CASCADE,
+        related_name="rdv_service_public_proposals",
+    )
+    job_seeker = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="demandeur d'emploi",
+        on_delete=models.CASCADE,
+        related_name="rdv_service_public_proposals",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="créée par",
+        on_delete=models.RESTRICT,
+        related_name="+",
+    )
+    created_at = models.DateTimeField(verbose_name="créée le", auto_now_add=True)
+    rdv_service_public_plan_id = models.IntegerField(verbose_name="identifiant du plan RDV-S", unique=True)
+    rdv_service_public_user_id = models.IntegerField(
+        verbose_name="identifiant de la fiche usager RDV-S", db_index=True
+    )
+
+    class Meta:
+        verbose_name = "proposition de RDV"
+        verbose_name_plural = "propositions de RDV"
