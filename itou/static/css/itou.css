@@ -422,6 +422,35 @@ table.table td > .modal .modal-content {
     height: 2rem;
 }
 
+/* The job seeker's file: folded parts whose whole summary line opens them, with a chevron instead of the marker. */
+.next-step-file summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.next-step-file summary::-webkit-details-marker {
+    display: none;
+}
+
+.next-step-file summary:hover {
+    background-color: var(--bs-light, #f8f8f8);
+}
+
+.next-step-file__chevron {
+    transition: transform .2s;
+}
+
+.next-step-file[open] .next-step-file__chevron {
+    transform: rotate(180deg);
+}
+
+/* The titles line up, so that the badges and summaries read as a column. */
+@media (min-width: 768px) {
+    .next-step-file__title {
+        min-width: 13rem;
+    }
+}
+
 /* The side drawer of guided journeys, wider than the theme's offcanvas. */
 .next-step-drawer {
     --bs-offcanvas-width: min(36rem, 100%);

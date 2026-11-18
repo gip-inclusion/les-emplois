@@ -116,71 +116,7 @@
                         {% include "next_steps/includes/barriers.html" with barriers=barriers only %}
                     {% endif %}
 
-                    {# The file, folded: each part opens on demand and leads to the existing tab #}
-                    <section aria-labelledby="next-steps-file">
-                        <h2 class="h3 mb-3" id="next-steps-file">Dossier</h2>
-                        <div class="c-box p-0">
-                            {% if request.from_iae_actor %}
-                                <details class="border-bottom px-3 py-2">
-                                    <summary class="py-1">
-                                        <strong>PASS IAE</strong>
-                                        <span class="text-muted">· {% if approval %}{{ approval.get_state_display }}{% else %}Aucun PASS IAE{% endif %}</span>
-                                    </summary>
-                                    {% if approval %}
-                                        <ul class="list-unstyled fs-sm mb-2">
-                                            <li>Numéro : {{ approval.number_with_spaces }}</li>
-                                            <li>Du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</li>
-                                            {% if approval.is_valid %}<li>Reliquat : {{ approval.get_remainder_display }}</li>{% endif %}
-                                        </ul>
-                                        <a class="fs-sm"
-                                           href="{% url "approvals:details" public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir le PASS IAE</a>
-                                    {% else %}
-                                        <p class="fs-sm mb-2">Aucun PASS IAE n’a été délivré.</p>
-                                    {% endif %}
-                                </details>
-                                <details class="border-bottom px-3 py-2">
-                                    <summary class="py-1">
-                                        <strong>Éligibilité IAE</strong>
-                                        <span class="text-muted">· {{ eligibility_summary }}</span>
-                                    </summary>
-                                    {% if iae_eligibility_diagnosis %}
-                                        <p class="fs-sm mb-2">
-                                            Diagnostic réalisé le {{ iae_eligibility_diagnosis.created_at|date:"d/m/Y" }}
-                                            {% if iae_eligibility_diagnosis.author_organization %}par {{ iae_eligibility_diagnosis.author_organization.display_name }}{% endif %}.
-                                        </p>
-                                    {% else %}
-                                        <p class="fs-sm mb-2">Il faut un diagnostic d’éligibilité valide pour être embauché en structure d’insertion.</p>
-                                    {% endif %}
-                                </details>
-                            {% endif %}
-                            {% if can_view_contracts %}
-                                <details class="border-bottom px-3 py-2">
-                                    <summary class="py-1">
-                                        <strong>Contrats</strong>
-                                        {% if contract %}
-                                            <span class="text-muted">· Dernier contrat{% if contract.company %} chez {{ contract.company.display_name }}{% endif %}</span>
-                                        {% endif %}
-                                    </summary>
-                                    <a class="fs-sm"
-                                       href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir les contrats</a>
-                                </details>
-                            {% endif %}
-                            <details class="border-bottom px-3 py-2">
-                                <summary class="py-1">
-                                    <strong>Candidatures</strong>
-                                </summary>
-                                <a class="fs-sm"
-                                   href="{% url "job_seekers_views:job_applications" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir les candidatures</a>
-                            </details>
-                            <details class="px-3 py-2">
-                                <summary class="py-1">
-                                    <strong>Informations personnelles et historique</strong>
-                                </summary>
-                                <a class="fs-sm"
-                                   href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">Voir la fiche complète</a>
-                            </details>
-                        </div>
-                    </section>
+                    {% include "next_steps/includes/file.html" with parts=file_parts request=request only %}
                 </div>
             </div>
         </div>

@@ -30,6 +30,7 @@ from itou.www.next_steps_views.actions import (
 )
 from itou.www.next_steps_views.advisors import advisor_acts, visible_orientations
 from itou.www.next_steps_views.barriers import gather_barriers
+from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
 from itou.www.next_steps_views.situation import contract_place, situation_sentences
@@ -142,14 +143,21 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         # The contracts shown on the strip need no sentence.
         "situation": situation_sentences(request, approval, contract, _can_view_contracts(request) and not contracts),
         "actions": actions,
-        "approval": approval,
-        "contract": contract,
-        "can_view_contracts": _can_view_contracts(request),
-        "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
-        "eligibility_summary": eligibility_summary,
         "situation_bar": situation_strip,
         "show_barriers": show_barriers,
         "barriers": gather_barriers(request, job_seeker, iae_eligibility_diagnosis) if show_barriers else None,
+        "file_parts": file_parts(
+            request,
+            job_seeker,
+            approval=approval,
+            iae_eligibility_diagnosis=iae_eligibility_diagnosis,
+            eligibility_summary=eligibility_summary,
+            contracts=contracts,
+            can_view_contracts=_can_view_contracts(request),
+            # Same rule as the barriers: the reports are one of their sources.
+            can_view_report=show_barriers,
+            can_view_personal_information=can_view_personal_information(request, job_seeker),
+        ),
         "matomo_custom_title": "Prochaines étapes : fiche usager",
         "journeys_media": _journeys_media(request),
     }

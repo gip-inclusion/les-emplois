@@ -82,11 +82,16 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "Suspendre le PASS IAE")
     assertContains(response, "Remplir le bilan d’accompagnement")
     assertNotContains(response, f'href="{page_url(job_seeker)}"')
-    # The folded file leads to the existing tabs.
-    # Five parts of the file.
-    assertContains(response, "<details", count=5)
+    # The folded file leads to the existing tabs: PASS IAE, diagnosis, contracts, job applications, report,
+    # personal information.
+    assertContains(response, '<details class="next-step-file', count=6)
     assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
     assertContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
+    # Each summary line says enough to skip opening it.
+    assertContains(response, f"Du {fr(approval.start_at)} au {fr(approval.end_at)}")
+    assertContains(response, "1 contrat")
+    assertContains(response, "1 candidature")
+    assertContains(response, "Aucun bilan")
 
 
 def test_suspended_approval(client):
@@ -140,9 +145,54 @@ def test_unauthorized_prescriber_sees_no_more_than_on_the_job_seeker_page(client
     assertContains(response, f"Son PASS IAE est valide jusqu’au {fr(approval.end_at)}.")
     assertNotContains(response, "Aucun contrat en structure d’insertion connu.")
     assertNotContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
-    # The name stays masked for a job seeker they did not create.
+    # The name stays masked for a job seeker they did not create, and so do their contact details.
     assertNotContains(response, job_seeker.last_name)
+    assertNotContains(response, job_seeker.email)
+    assertContains(response, "Et l’historique de la fiche")
     assertContains(response, "Aucun accompagnement en cours.")
+
+
+def test_file_parts(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    company = membership.company
+    end_date = timezone.localdate() - datetime.timedelta(days=10)
+    contract = ContractFactory(company=company, start_date=end_date - datetime.timedelta(days=200), end_date=end_date)
+    job_seeker = contract.job_seeker
+    ApprovalFactory(user=job_seeker, start_at=contract.start_date)
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker, to_company=company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
+    # Sent to another company: not in this employer's scope.
+    JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True)
+    report = ProSupportReportFactory(contract=contract, company=company)
+    client.force_login(membership.user)
+
+    response = client.get(page_url(job_seeker))
+    parts = {part.key: part for part in response.context["file_parts"]}
+    assert list(parts) == [
+        "approval",
+        "eligibility",
+        "contracts",
+        "job_applications",
+        "report",
+        "personal_information",
+    ]
+    assert (parts["approval"].badge_label, parts["approval"].badge_classes) == (
+        "Valide",
+        "bg-success-lighter text-success",
+    )
+    # A contract over, in grey, where it took place.
+    [contract_fact] = parts["contracts"].facts
+    assert (contract_fact.label, contract_fact.badge_label) == ("Chez vous", "Terminé")
+    assert contract_fact.badge_classes == "bg-light text-muted"
+    # Only this employer's job applications, with the platform's state badge.
+    assert parts["job_applications"].summary == "1 candidature"
+    assert [fact.job_application for fact in parts["job_applications"].facts] == [job_application]
+    report_url = reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id})
+    assert parts["report"].link_url == report_url
+    # The employer may see the contact details.
+    assert parts["personal_information"].summary == job_seeker.email
+    assertContains(response, "Lire le bilan")
 
 
 def test_queue_links_names_to_this_page(client):
