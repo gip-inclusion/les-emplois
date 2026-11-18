@@ -1,9 +1,15 @@
 import datetime
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from encrypted_fields import EncryptedCharField
+
+from itou.utils.apis.rdv_service_public import RdvServicePublicInvalidTokenError, get_oauth_client
+
+
+# Refresh a little before the expiry, so that the token stays valid during the calls that follow
+REFRESH_TOKEN_MARGIN = datetime.timedelta(minutes=1)
 
 
 class OAuthToken(models.Model):
@@ -37,3 +43,31 @@ class OAuthToken(models.Model):
                 "rdv_service_public_agent_id": agent_id,
             },
         )
+
+    @property
+    def needs_refresh(self):
+        return self.expires_at <= timezone.now() + REFRESH_TOKEN_MARGIN
+
+    def refresh_access_token(self):
+        """Exchange the refresh token for a new access token, unless a concurrent request already did.
+
+        Raises RdvServicePublicInvalidTokenError if RDV Service Public refuses the refresh token,
+        and RdvServicePublicApiError if it can't be reached.
+        """
+        # RDV Service Public revokes the previous refresh token as soon as the new access token is used:
+        # the new token must be committed even if the request fails afterwards.
+        # durable=True raises an error if this block is nested in a transaction, which would delay the commit.
+        with transaction.atomic(durable=True):
+            try:
+                # Wait for a concurrent refresh to end, then read its result
+                self.refresh_from_db(from_queryset=OAuthToken.objects.select_for_update())
+            except OAuthToken.DoesNotExist:
+                # Deleted by a concurrent request: like a refused token, the user must link their account again
+                raise RdvServicePublicInvalidTokenError("The token was deleted by a concurrent request")
+            if not self.needs_refresh:
+                return
+            token_data = get_oauth_client().refresh_token(self.refresh_token)
+            self.access_token = token_data.access_token
+            self.refresh_token = token_data.refresh_token
+            self.expires_at = timezone.now() + datetime.timedelta(seconds=token_data.expires_in)
+            self.save()
