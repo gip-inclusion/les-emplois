@@ -97,12 +97,18 @@
             {% elif can_manage %}
                 {# As on the existing advisors tab: a clear motif helps the advisors coordinate. #}
                 <div class="col-12">
-                    <div class="border rounded-2 px-3 py-2 h-100">
-                        <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
-                        <i class="d-block text-disabled">Non renseigné</i>
-                        <a class="fs-sm"
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        <span class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
+                            <i class="d-block text-disabled">Non renseigné</i>
+                        </span>
+                        <a class="btn btn-sm btn-outline-primary btn-ico flex-shrink-0"
                            href="{% url "job_seekers_views:edit_assignment" public_id=job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ job_seeker_url|urlencode }}"
-                           {% matomo_event "accompagnateur" "clic" "renseigner-motif-accompagnement" %}>Préciser le motif de mon accompagnement</a>
+                           aria-label="Préciser le motif de mon accompagnement"
+                           {% matomo_event "accompagnateur" "clic" "renseigner-motif-accompagnement" %}>
+                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                            <span>Préciser</span>
+                        </a>
                     </div>
                 </div>
             {% endif %}
