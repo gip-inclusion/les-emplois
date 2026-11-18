@@ -180,3 +180,78 @@ def test_job_seeker_page_opens_the_advisor_in_the_drawer(client):
     assertContains(response, f'hx-get="{advisor_url(assignment)}"')
     # Their own initials, filled.
     assertContains(response, "bg-tertiary text-white")
+
+
+# One's own assignment
+# ------------------------------------------------------------------------------
+
+
+def edit_url(assignment):
+    return reverse(
+        "job_seekers_views:edit_assignment",
+        kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+    )
+
+
+def end_url(assignment):
+    return reverse(
+        "next_steps_views:end_assignment",
+        kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+    )
+
+
+def test_own_assignment_can_be_edited_and_ended(client):
+    membership = PrescriberMembershipFactory()
+    assignment = JobSeekerAssignmentFactory(
+        professional=membership.user, prescriber_organization=membership.organization, reason=""
+    )
+    client.force_login(membership.user)
+
+    # As on the existing advisors tab: edit it, precise its motif, end it.
+    response = client.get(advisor_url(assignment), HTTP_HX_REQUEST="true")
+    assertContains(response, "Modifier mon accompagnement")
+    assertContains(response, "Préciser le motif de mon accompagnement")
+    assertContains(response, f"{edit_url(assignment)}?back_url=")
+    assertContains(response, f'hx-get="{end_url(assignment)}"')
+
+    # Ending it is confirmed in the drawer, then posted to the existing view, back to the job seeker's page.
+    response = client.get(end_url(assignment), HTTP_HX_REQUEST="true")
+    assertContains(response, "cet usager n'apparaîtra plus dans votre liste d'accompagnements")
+    archive_url = reverse(
+        "job_seekers_views:archive_assignment",
+        kwargs={"public_id": assignment.job_seeker.public_id, "assignment_pk": assignment.pk},
+    )
+    job_seeker_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": assignment.job_seeker.public_id})
+    assertContains(response, f'action="{archive_url}?back_url={job_seeker_url}"')
+    response = client.post(f"{archive_url}?back_url={job_seeker_url}")
+    assert response.url == job_seeker_url
+    assignment.refresh_from_db()
+    assert not assignment.is_active
+
+
+def test_own_assignment_from_another_organization(client):
+    membership = PrescriberMembershipFactory()
+    other = PrescriberMembershipFactory(user=membership.user)
+    assignment = JobSeekerAssignmentFactory(professional=membership.user, prescriber_organization=other.organization)
+    client.force_login(membership.user)
+    session = client.session
+    session["current_organization"] = membership.organization.organization_switch_key
+    session.save()
+
+    # Managed from its organization: switch to it first.
+    response = client.get(advisor_url(assignment), HTTP_HX_REQUEST="true")
+    assertNotContains(response, "Modifier mon accompagnement")
+    assertContains(response, f"Connectez-vous à la structure {other.organization.display_name}")
+    assertContains(response, other.organization.organization_switch_key)
+    assert client.get(end_url(assignment), HTTP_HX_REQUEST="true").status_code == 404
+
+
+def test_someone_elses_assignment_has_no_actions(client):
+    membership = PrescriberMembershipFactory()
+    assignment = JobSeekerAssignmentFactory(prescriber_organization=membership.organization)
+    client.force_login(membership.user)
+
+    response = client.get(advisor_url(assignment), HTTP_HX_REQUEST="true")
+    assertNotContains(response, "Modifier mon accompagnement")
+    assertNotContains(response, "Terminer mon accompagnement")
+    assert client.get(end_url(assignment), HTTP_HX_REQUEST="true").status_code == 404

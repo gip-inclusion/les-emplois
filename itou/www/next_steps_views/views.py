@@ -227,9 +227,16 @@ def advisor(request, public_id, assignment_pk):
         job_seeker=job_seeker,
     )
     assignment.job_seeker = job_seeker
+    # One's own assignment: the actions of the existing advisors tab, by its rule (in the organization one is
+    # logged into; else, switch to it, or one is no longer a member).
+    own = assignment.is_active and assignment.advisor == request.user
+    in_its_organization = not assignment.organization or assignment.organization == request.current_organization
     context = {
         "job_seeker": job_seeker,
         "assignment": assignment,
+        "can_manage": own and in_its_organization,
+        "must_switch": own and not in_its_organization and assignment.is_still_member,
+        "has_left": own and not in_its_organization and not assignment.is_still_member,
         "acts": advisor_acts(request, assignment),
         "can_view_name": can_view_personal_information(request, job_seeker),
         "in_drawer": bool(request.htmx),
@@ -237,6 +244,34 @@ def advisor(request, public_id, assignment_pk):
     }
     template_name = "next_steps/advisor.html" if request.htmx else "next_steps/advisor_page.html"
     return render(request, template_name, context)
+
+
+@readonly_view
+def end_assignment(request, public_id, assignment_pk):
+    """Confirm the end of one's own assignment, in the side drawer: the existing modal has no place in it.
+
+    The form posts to job_seekers_views.archive_assignment, which checks the same rule: one's own assignment, in the
+    organization one is logged into.
+    """
+    if not can_view_next_steps(request):
+        raise Http404
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=public_id)
+    assignment = get_object_or_404(
+        JobSeekerAssignment.objects.select_related("company", "prescriber_organization"),
+        pk=assignment_pk,
+        job_seeker=job_seeker,
+        professional=request.user,
+        ended_at=None,
+    )
+    if assignment.organization and assignment.organization != request.current_organization:
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "assignment": assignment,
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : terminer l’accompagnement",
+    }
+    return _drawer_or_page(request, "next_steps/end_assignment.html", "Terminer l’accompagnement", context)
 
 
 @readonly_view
