@@ -1386,7 +1386,7 @@ class ProSupportReport(models.Model):
                 condition=Q(solution="", orientation__gt="") | Q(solution__gt="", orientation=""),
                 violation_error_message="Un bilan comporte soit une solution envisagée, soit une orientation.",
             ),
-            # The ASP renewals are merged into the same contract: each new end date calls for its own report.
+            # Renewals under the same parent contract are merged into one contract: each end date has its report.
             models.UniqueConstraint(
                 fields=["contract", "contract_end_date"],
                 name="%(class)s_contract_end_date_unique",
