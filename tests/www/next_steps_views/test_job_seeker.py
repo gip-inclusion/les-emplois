@@ -405,7 +405,7 @@ def test_pro_support_report_drawer(client):
     assertContains(response, ProSupportReportBarrier.MOBILITY.label)
     assertContains(response, "ri-car-line")
     assertContains(response, f"{report.autonomy} sur 5")
-    assertContains(response, 'class="flex-grow-1 rounded-pill bg-info"', count=report.autonomy)
+    assertContains(response, 'class="flex-grow-1 rounded-pill bg-tertiary"', count=report.autonomy)
     # Without JavaScript, a page.
     assertContains(client.get(url), ProSupportReportBarrier.MOBILITY.label)
 

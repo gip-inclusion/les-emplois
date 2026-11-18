@@ -49,7 +49,7 @@
             <div class="d-flex align-items-center gap-3 mb-2">
                 <span class="next-step-gauge d-flex gap-1 flex-grow-1" aria-hidden="true">
                     {% for filled in autonomy_steps %}
-                        <span class="flex-grow-1 rounded-pill {% if filled %}bg-info{% else %}bg-light border{% endif %}"></span>
+                        <span class="flex-grow-1 rounded-pill {% if filled %}bg-tertiary{% else %}bg-light border{% endif %}"></span>
                     {% endfor %}
                 </span>
                 <b class="flex-shrink-0">{{ report.autonomy }} sur 5</b>
