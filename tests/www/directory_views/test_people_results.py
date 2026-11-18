@@ -7,6 +7,7 @@ from itou.cities.models import City, DirectoryActiveCity
 from itou.directory.models import DirectoryProfile
 from tests.cities.factories import create_city_geispolsheim, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import ProfessionalFactory
 from tests.utils.testing import parse_response_to_soup
@@ -20,6 +21,50 @@ def people_in_page(page):
     people_with_markup = page.find_all("h3")
     people = [node.string.strip() for node in people_with_markup]
     return people
+
+
+def test_people_results(client, snapshot):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        user__last_name="Employeur",
+        user__first_name="A",
+    ).user
+    CompanyMembershipFactory(company__coords=vannes.coords, user__last_name="Employeur", user__first_name="B")
+    for first_name in ["A", "B"]:
+        PrescriberMembershipFactory(
+            organization__coords=vannes.coords,
+            organization__authorized=True,
+            user__last_name="Prescripteur habilité",
+            user__first_name=first_name,
+        )
+        PrescriberMembershipFactory(
+            organization__coords=vannes.coords,
+            user__last_name="Orienteur",
+            user__first_name=first_name,
+        )
+    InstitutionMembershipFactory(
+        institution__coords=vannes.coords,
+        user__last_name="Inspecteur",
+        user__first_name="A",
+    )
+
+    client.force_login(user)
+    with assertSnapshotQueries(snapshot):
+        response = client.get(reverse("directory:people_results"))
+
+    page = parse_response_to_soup(response)
+    people = people_in_page(page)
+    assert len(people) == 6
+    assert "EMPLOYEUR A" in people
+    assert "EMPLOYEUR B" in people
+    assert "PRESCRIPTEUR HABILITÉ A" in people
+    assert "PRESCRIPTEUR HABILITÉ B" in people
+    assert "ORIENTEUR A" in people
+    assert "ORIENTEUR B" in people
+    assert "INSPECTEUR A" not in people
 
 
 def test_display_other_organization(client, snapshot):
@@ -148,8 +193,7 @@ def test_alphabetical_ordering_and_pagination(client, snapshot):
     ).user
 
     client.force_login(user)
-    with assertSnapshotQueries(snapshot):
-        response = client.get(reverse("directory:people_results"))
+    response = client.get(reverse("directory:people_results"))
 
     page = parse_response_to_soup(response)
     [pagination] = page.select("ul.pagination")

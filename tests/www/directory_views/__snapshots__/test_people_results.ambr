@@ -1,5 +1,87 @@
 # serializer version: 1
 # name: test_alphabetical_ordering_and_pagination
+  '''
+  <ul class="pagination flex-wrap justify-content-center">
+   <li class="page-item disabled">
+    <a aria-disabled="true" class="page-link" href="/directory/?page=1" tabindex="-1">
+     Premier
+    </a>
+   </li>
+   <li class="page-item active">
+    <a aria-current="page" aria-label="Page 1" class="page-link" href="/directory/?page=1">
+     1
+    </a>
+   </li>
+   <li class="page-item">
+    <a aria-label="Page 2" class="page-link" href="/directory/?page=2">
+     2
+    </a>
+   </li>
+   <li class="page-item">
+    <a class="page-link" href="/directory/?page=2">
+     Dernier
+    </a>
+   </li>
+  </ul>
+  
+  '''
+# ---
+# name: test_display_other_organization[affiche 'Les petits paniers + 1 autre structure']
+  '''
+  <div class="c-box c-box--results mb-3 mb-md-4">
+   <div class="c-box--results__header">
+    <div class="d-flex flex-column flex-md-row gap-2 gap-md-3">
+     <div class="c-box--results__summary flex-grow-1">
+      <i aria-hidden="true" class="ri-user-line">
+      </i>
+      <div>
+       <h3>
+        MARTIN Alice
+       </h3>
+       <span>
+        Employeur
+       </span>
+      </div>
+     </div>
+    </div>
+   </div>
+   <hr class="m-0"/>
+   <div class="c-box--results__body">
+    <ul class="list-data list-data__two-column-md">
+     <li>
+      <small>
+       Structure
+      </small>
+      <strong>
+       Les petits paniers
+                                      
+                                          
+                                              (+ 1 autre structure)
+      </strong>
+     </li>
+     <li>
+      <small>
+       Type
+      </small>
+      <strong>
+       Entreprise d'insertion
+      </strong>
+     </li>
+     <li>
+      <small>
+       Adresse
+      </small>
+      <address class="m-0">
+       112 rue de la Croix-Nivert, 75015 Paris
+      </address>
+     </li>
+    </ul>
+   </div>
+  </div>
+  
+  '''
+# ---
+# name: test_people_results
   dict({
     'num_queries': 16,
     'queries': list([
@@ -419,7 +501,7 @@
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC,
                    "users_user"."id" ASC
-          LIMIT 10
+          LIMIT 6
         ''',
       }),
       dict({
@@ -505,10 +587,6 @@
                                                                  %s,
                                                                  %s,
                                                                  %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
                                                                  %s))
           ORDER BY RANDOM() ASC
         ''',
@@ -571,10 +649,6 @@
                     FROM "prescribers_prescriberorganization" U0
                     WHERE ST_DWithin(U0."coords", %s, %s))
                  AND "prescribers_prescribermembership"."user_id" IN (%s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
                                                                       %s,
                                                                       %s,
                                                                       %s,
@@ -663,86 +737,4 @@
       }),
     ]),
   })
-# ---
-# name: test_alphabetical_ordering_and_pagination.1
-  '''
-  <ul class="pagination flex-wrap justify-content-center">
-   <li class="page-item disabled">
-    <a aria-disabled="true" class="page-link" href="/directory/?page=1" tabindex="-1">
-     Premier
-    </a>
-   </li>
-   <li class="page-item active">
-    <a aria-current="page" aria-label="Page 1" class="page-link" href="/directory/?page=1">
-     1
-    </a>
-   </li>
-   <li class="page-item">
-    <a aria-label="Page 2" class="page-link" href="/directory/?page=2">
-     2
-    </a>
-   </li>
-   <li class="page-item">
-    <a class="page-link" href="/directory/?page=2">
-     Dernier
-    </a>
-   </li>
-  </ul>
-  
-  '''
-# ---
-# name: test_display_other_organization[affiche 'Les petits paniers + 1 autre structure']
-  '''
-  <div class="c-box c-box--results mb-3 mb-md-4">
-   <div class="c-box--results__header">
-    <div class="d-flex flex-column flex-md-row gap-2 gap-md-3">
-     <div class="c-box--results__summary flex-grow-1">
-      <i aria-hidden="true" class="ri-user-line">
-      </i>
-      <div>
-       <h3>
-        MARTIN Alice
-       </h3>
-       <span>
-        Employeur
-       </span>
-      </div>
-     </div>
-    </div>
-   </div>
-   <hr class="m-0"/>
-   <div class="c-box--results__body">
-    <ul class="list-data list-data__two-column-md">
-     <li>
-      <small>
-       Structure
-      </small>
-      <strong>
-       Les petits paniers
-                                      
-                                          
-                                              (+ 1 autre structure)
-      </strong>
-     </li>
-     <li>
-      <small>
-       Type
-      </small>
-      <strong>
-       Entreprise d'insertion
-      </strong>
-     </li>
-     <li>
-      <small>
-       Adresse
-      </small>
-      <address class="m-0">
-       112 rue de la Croix-Nivert, 75015 Paris
-      </address>
-     </li>
-    </ul>
-   </div>
-  </div>
-  
-  '''
 # ---
