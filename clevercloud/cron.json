@@ -24,6 +24,7 @@
   "0 7-20/4 * * * $ROOT/clevercloud/run_management_command.sh delete_orientations_documents --wet-run",
   "0 7,13 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_professionals --wet-run",
 
+  "0 0 * * * $ROOT/clevercloud/run_management_command.sh check_last_name",
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "0 1 * * * $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "20 1 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
