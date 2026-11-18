@@ -82,9 +82,10 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "Suspendre le PASS IAE")
     assertContains(response, "Remplir le bilan d’accompagnement")
     assertNotContains(response, f'href="{page_url(job_seeker)}"')
-    # The folded file leads to the existing tabs: PASS IAE, diagnosis, contracts, job applications, report,
-    # personal information.
-    assertContains(response, '<details class="next-step-file', count=6)
+    # The folded file leads to the existing tabs: PASS IAE, diagnosis, contracts, job applications, personal
+    # information. Without any report, that part is a plain line, with nothing to open.
+    assertContains(response, '<details class="next-step-file', count=5)
+    assertContains(response, '<div class="d-flex align-items-center gap-3 px-3 px-md-4 py-3 border-top"', count=1)
     assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
     assertContains(response, reverse("job_seekers_views:contracts", kwargs={"public_id": job_seeker.public_id}))
     # Each summary line says enough to skip opening it.
@@ -148,7 +149,7 @@ def test_unauthorized_prescriber_sees_no_more_than_on_the_job_seeker_page(client
     # The name stays masked for a job seeker they did not create, and so do their contact details.
     assertNotContains(response, job_seeker.last_name)
     assertNotContains(response, job_seeker.email)
-    assertContains(response, "Et l’historique de la fiche")
+    assertContains(response, "Masquées pour vous")
     assertContains(response, "Aucun accompagnement en cours.")
 
 

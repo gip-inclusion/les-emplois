@@ -1,7 +1,8 @@
 """The job seeker's file, folded at the bottom of their page: one part per subject, each leading to the existing tab.
 
 Each part is built here as data, with the scope of the tab it leads to, so that the template lays them all out the
-same way: a summary line with its badge, then a few facts in blocks.
+same way: a summary line with its badge, then a few facts, a label and its value per line. A part without facts has
+nothing to open: its summary line says it all.
 """
 
 import dataclasses
@@ -55,8 +56,6 @@ class Fact:
     badge_classes: str = ""
     # Shown with the platform's own state badge.
     job_application: object = None
-    # On a whole row, for a long value.
-    wide: bool = False
 
 
 @dataclasses.dataclass
@@ -70,6 +69,10 @@ class Part:
     badge_classes: str = ""
     link_label: str = ""
     link_url: str = ""
+
+    @property
+    def can_open(self):
+        return bool(self.facts)
 
 
 def _approval_part(approval):
@@ -112,7 +115,7 @@ def _eligibility_part(diagnosis, summary):
             "Diagnostic d’éligibilité",
             "ri-shield-check-line",
             summary,
-            [Fact("Diagnostic", "Aucun", detail="Il en faut un valide pour une embauche en structure d’insertion.")],
+            [],
             badge_label="Aucun",
             badge_classes=_badge("warning"),
         )
@@ -130,7 +133,7 @@ def _eligibility_part(diagnosis, summary):
         Fact("Valide jusqu’au" if diagnosis.is_valid else "Expiré le", _fr(diagnosis.expires_at)),
     ]
     if author:
-        facts.append(Fact("Par", author, wide=True))
+        facts.append(Fact("Par", author))
     return Part(
         "eligibility",
         "Diagnostic d’éligibilité",
@@ -201,14 +204,14 @@ def _report_part(request, job_seeker):
             "Bilan d’accompagnement",
             "ri-file-edit-line",
             "Aucun bilan",
-            [Fact("Dernier bilan", "Aucun", detail="La structure employeuse le remplit à la fin d’un contrat.")],
+            [],
         )
     facts = [
         Fact("Rempli le", _fr(timezone.localdate(report.created_at))),
         Fact("Fin du contrat", _fr(report.contract_end_date)),
     ]
     if report.company:
-        facts.append(Fact("Par", report.company.display_name, wide=True))
+        facts.append(Fact("Par", report.company.display_name))
     return Part(
         "report",
         "Bilan d’accompagnement",
@@ -226,13 +229,13 @@ def _personal_information_part(job_seeker, can_view_personal_information):
         facts = [
             Fact("Téléphone", job_seeker.phone or "Non renseigné"),
             Fact("Adresse e-mail", job_seeker.email or "Non renseignée"),
-            Fact("Adresse", job_seeker.address_on_one_line or "Non renseignée", wide=True),
+            Fact("Adresse", job_seeker.address_on_one_line or "Non renseignée"),
         ]
     return Part(
         "personal_information",
         "Informations personnelles",
         "ri-user-line",
-        job_seeker.email if can_view_personal_information and job_seeker.email else "Et l’historique de la fiche",
+        job_seeker.email if can_view_personal_information and job_seeker.email else "Masquées pour vous",
         facts,
         link_label="Voir la fiche complète",
         link_url=reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}),

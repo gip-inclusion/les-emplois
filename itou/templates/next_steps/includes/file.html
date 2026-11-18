@@ -1,54 +1,48 @@
 {% load badges %}
-{# The job seeker's file (next_steps_views.file): one folded part per subject, each leading to the existing tab. #}
-{# Without JavaScript: <details>. Each summary line says enough to skip opening it. #}
+{# The job seeker's file (next_steps_views.file): one part per subject, each leading to the existing tab. #}
+{# A part with facts folds in a <details>, without JavaScript; a part without any is a plain line, nothing to open. #}
 <section aria-labelledby="next-steps-file">
     <h2 class="h3 mb-3" id="next-steps-file">Dossier</h2>
     <div class="c-box p-0 overflow-hidden">
         {% for part in parts %}
-            <details class="next-step-file{% if not forloop.first %} border-top{% endif %}"
-                     id="next-steps-file-{{ part.key }}">
-                <summary class="d-flex align-items-center gap-3 px-3 px-md-4 py-3">
-                    <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-light text-tertiary"
-                          aria-hidden="true"><i class="{{ part.icon }}"></i></span>
-                    {# Title, badge and summary wrap on narrow screens; the tile and the chevron stay on the sides. #}
-                    <span class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 flex-grow-1">
-                        <span class="next-step-file__title fw-bold">{{ part.title }}</span>
-                        {% if part.badge_label %}
-                            <span class="badge badge-sm rounded-pill {{ part.badge_classes }}">{{ part.badge_label }}</span>
-                        {% endif %}
-                        <span class="fs-sm text-muted text-break">{{ part.summary }}</span>
-                    </span>
-                    <i class="next-step-file__chevron ri-arrow-down-s-line fs-lg text-tertiary flex-shrink-0"
-                       aria-hidden="true"></i>
-                </summary>
-                <div class="px-3 px-md-4 pb-4">
-                    {# In blocks, as the advisor's details: a long value on a whole row. #}
-                    {% if part.facts %}
-                        <div class="row g-2">
+            {% if part.can_open %}
+                <details class="next-step-file{% if not forloop.first %} border-top{% endif %}"
+                         id="next-steps-file-{{ part.key }}">
+                    <summary class="d-flex align-items-center gap-3 px-3 px-md-4 py-3">
+                        {% include "next_steps/includes/file_summary.html" with part=part only %}
+                        <i class="next-step-file__chevron ri-arrow-down-s-line fs-lg text-tertiary flex-shrink-0"
+                           aria-hidden="true"></i>
+                    </summary>
+                    <div class="px-3 px-md-4 pb-4">
+                        {# itou-theme's list of data: the label, then its value on the same line when there is room. #}
+                        <ul class="list-data">
                             {% for fact in part.facts %}
-                                <div class="col-12{% if not fact.wide %} col-sm-6{% endif %}">
-                                    <div class="border rounded-2 px-3 py-2 h-100">
-                                        <span class="d-flex flex-wrap align-items-center justify-content-between column-gap-2 fs-sm text-muted">
-                                            {{ fact.label }}
-                                            {% if fact.job_application %}
-                                                {% job_application_state_badge fact.job_application extra_classes="badge-xs" %}
-                                            {% elif fact.badge_label %}
-                                                <span class="badge badge-xs rounded-pill {{ fact.badge_classes }}">{{ fact.badge_label }}</span>
-                                            {% endif %}
-                                        </span>
-                                        {% if fact.value %}<span class="d-block fw-bold text-break">{{ fact.value }}</span>{% endif %}
-                                        {% if fact.detail %}<span class="d-block fs-sm">{{ fact.detail }}</span>{% endif %}
+                                <li>
+                                    <small>{{ fact.label }}</small>
+                                    <div class="d-flex flex-wrap align-items-center column-gap-2">
+                                        {% if fact.value %}<strong class="text-break">{{ fact.value }}</strong>{% endif %}
+                                        {% if fact.job_application %}
+                                            {% job_application_state_badge fact.job_application extra_classes="badge-xs" %}
+                                        {% elif fact.badge_label %}
+                                            <span class="badge badge-xs rounded-pill {{ fact.badge_classes }}">{{ fact.badge_label }}</span>
+                                        {% endif %}
+                                        {% if fact.detail %}<span class="fs-sm text-muted">{{ fact.detail }}</span>{% endif %}
                                     </div>
-                                </div>
+                                </li>
                             {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if part.link_url %}
-                        <a class="btn btn-sm btn-outline-primary mt-3"
-                           href="{{ part.link_url }}?back_url={{ request.get_full_path|urlencode }}">{{ part.link_label }}</a>
-                    {% endif %}
+                        </ul>
+                        {% if part.link_url %}
+                            <a class="btn btn-sm btn-outline-primary mt-3"
+                               href="{{ part.link_url }}?back_url={{ request.get_full_path|urlencode }}">{{ part.link_label }}</a>
+                        {% endif %}
+                    </div>
+                </details>
+            {% else %}
+                <div class="d-flex align-items-center gap-3 px-3 px-md-4 py-3{% if not forloop.first %} border-top{% endif %}"
+                     id="next-steps-file-{{ part.key }}">
+                    {% include "next_steps/includes/file_summary.html" with part=part only %}
                 </div>
-            </details>
+            {% endif %}
         {% endfor %}
     </div>
 </section>
