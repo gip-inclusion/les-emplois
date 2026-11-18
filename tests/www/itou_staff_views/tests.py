@@ -26,6 +26,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
+from itou.rdv_service_public.models import OAuthToken
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
@@ -43,6 +44,7 @@ from tests.institutions.factories import InstitutionFactory, InstitutionMembersh
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.rdv_service_public.factories import OAuthTokenFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -817,6 +819,22 @@ class TestMergeUsers:
             f"Fusion utilisateurs {professional_1.pk} ← {professional_2.pk} — Done !",
             "HTTP 302 Found",
         ]
+
+    @pytest.mark.parametrize("kept_user_has_token", [True, False])
+    def test_merge_rdv_service_public_tokens(self, client, kept_user_has_token):
+        professional_1 = ProfessionalFactory()
+        if kept_user_has_token:
+            OAuthTokenFactory(user=professional_1)
+        professional_2 = ProfessionalFactory()
+        OAuthTokenFactory(user=professional_2)
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse(
+            "itou_staff_views:merge_users_confirm", args=(professional_1.public_id, professional_2.public_id)
+        )
+        client.post(url, data={"user_to_keep": "to_user"})
+        assert not User.objects.filter(pk=professional_2.pk).exists()
+        assert not OAuthToken.objects.exists()
 
     def test_merge_updated_by_membership(self, admin_client, caplog):
         membership_factory = random.choice(
