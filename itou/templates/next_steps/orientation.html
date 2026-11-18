@@ -24,13 +24,13 @@
                     <span class="d-block fw-bold text-break">{{ orientation.service.structure.name }}</span>
                 </div>
             </div>
-            <div class="col-12 col-sm-6">
+            <div class="col-12">
                 <div class="border rounded-2 px-3 py-2 h-100">
                     <span class="d-block fs-sm text-muted">Envoyée le</span>
                     <span class="d-block fw-bold">{{ orientation.created_at|date:"d/m/Y" }}</span>
                 </div>
             </div>
-            <div class="col-12 col-sm-6">
+            <div class="col-12">
                 <div class="border rounded-2 px-3 py-2 h-100">
                     <span class="d-block fs-sm text-muted">Par</span>
                     <span class="d-block fw-bold text-break">
@@ -42,7 +42,7 @@
                 </div>
             </div>
             {% if orientation.processing_date %}
-                <div class="col-12 col-sm-6">
+                <div class="col-12">
                     <div class="border rounded-2 px-3 py-2 h-100">
                         <span class="d-block fs-sm text-muted">Traitée le</span>
                         <span class="d-block fw-bold">{{ orientation.processing_date|date:"d/m/Y" }}</span>

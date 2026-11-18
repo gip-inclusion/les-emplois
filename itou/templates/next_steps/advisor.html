@@ -60,7 +60,7 @@
                     </div>
                 {% endif %}
                 {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12">
                         <div class="border rounded-2 px-3 py-2 h-100">
                             <span class="d-block fs-sm text-muted">Téléphone</span>
                             {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
@@ -73,7 +73,7 @@
                             {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12">
                         <div class="border rounded-2 px-3 py-2 h-100">
                             <span class="d-block fs-sm text-muted">Téléphone de la structure</span>
                             {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
@@ -81,7 +81,7 @@
                     </div>
                 {% endif %}
             {% endif %}
-            <div class="col-12 col-sm-6">
+            <div class="col-12">
                 <div class="border rounded-2 px-3 py-2 h-100">
                     <span class="d-block fs-sm text-muted">Accompagne depuis le</span>
                     <span class="d-block fw-bold">{{ assignment.created_at|date:"d/m/Y" }}</span>

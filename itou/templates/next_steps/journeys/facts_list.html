@@ -1,7 +1,8 @@
 {# The facts an action rests on, in a grid as in the prototype: itou-theme grid and utilities. #}
+{# Two by two; a last one left alone takes the whole row, so that the blocks line up. #}
 <div class="row g-2 mb-4">
     {% for label, value in facts %}
-        <div class="col-12 col-sm-6">
+        <div class="col-12{% if not forloop.last or forloop.counter|divisibleby:2 %} col-sm-6{% endif %}">
             <div class="border rounded-2 px-3 py-2 h-100">
                 <span class="d-block fs-sm text-muted">{{ label }}</span>
                 <span class="d-block fw-bold text-break">{{ value }}</span>
