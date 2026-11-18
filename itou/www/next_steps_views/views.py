@@ -9,12 +9,14 @@ from django.utils import timezone
 from itou.approvals.models import Suspension
 from itou.approvals.utils import get_contracts
 from itou.common_apps.address.forms import JobSeekerAddressForm
+from itou.companies.models import ProSupportReport
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.insertion.enums import OrientationRefusalReason
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     can_fill_pro_support_report,
+    can_view_pro_support_report,
 )
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
@@ -341,3 +343,23 @@ def eligibility(request, public_id):
         "matomo_custom_title": "Prochaines étapes : diagnostic d’éligibilité",
     }
     return _drawer_or_page(request, "next_steps/eligibility.html", "Diagnostic d’éligibilité", context)
+
+
+@readonly_view
+def pro_support_report(request, public_id, report_id):
+    """A report on the job seeker, from their file or the queue: what its own page shows, by the same rule."""
+    job_seeker = _job_seeker_or_404(request, public_id)
+    report = get_object_or_404(
+        ProSupportReport.objects.filter(job_seeker=job_seeker).select_related("company", "author"),
+        public_id=report_id,
+    )
+    if not can_view_pro_support_report(request, report):
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "report": report,
+        "contract_has_ended": report.contract_end_date < timezone.localdate(),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : bilan d’accompagnement",
+    }
+    return _drawer_or_page(request, "next_steps/pro_support_report.html", "Bilan d’accompagnement", context)

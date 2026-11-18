@@ -197,7 +197,10 @@ def test_file_parts(client):
     )
     assert [fact.url for fact in parts["job_applications"].facts] == [panel_url]
     assertContains(response, f'hx-get="{panel_url}"')
-    report_url = reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id})
+    report_url = reverse(
+        "next_steps_views:pro_support_report",
+        kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+    )
     assert parts["report"].link_url == report_url
     # The employer may see the contact details.
     assert parts["personal_information"].summary == job_seeker.email
@@ -376,3 +379,33 @@ def test_eligibility_drawer(client):
     # Without a diagnosis to show, nothing to open.
     other_url = reverse("next_steps_views:eligibility", kwargs={"public_id": JobSeekerFactory().public_id})
     assert client.get(other_url, HTTP_HX_REQUEST="true").status_code == 404
+
+
+def test_pro_support_report_drawer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    end_date = timezone.localdate() - datetime.timedelta(days=10)
+    contract = ContractFactory(
+        company=membership.company, start_date=end_date - datetime.timedelta(days=200), end_date=end_date
+    )
+    report = ProSupportReportFactory(
+        contract=contract, company=membership.company, barriers=[ProSupportReportBarrier.MOBILITY]
+    )
+    job_seeker = contract.job_seeker
+    client.force_login(membership.user)
+
+    url = reverse(
+        "next_steps_views:pro_support_report",
+        kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+    )
+    # The file's "Lire le bilan" opens it in the side drawer.
+    assertContains(client.get(page_url(job_seeker)), f'hx-get="{url}"')
+    response = client.get(url, HTTP_HX_REQUEST="true")
+    assertContains(response, f"Terminé le {fr(end_date)}")
+    assertContains(response, ProSupportReportBarrier.MOBILITY.label)
+    assertContains(response, f"{report.autonomy} sur 5")
+    # Without JavaScript, a page.
+    assertContains(client.get(url), ProSupportReportBarrier.MOBILITY.label)
+
+    # Another company's employer may not read it.
+    client.force_login(CompanyMembershipFactory(company__subject_to_iae_rules=True).user)
+    assert client.get(url, HTTP_HX_REQUEST="true").status_code == 404

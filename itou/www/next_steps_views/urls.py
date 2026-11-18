@@ -17,5 +17,10 @@ urlpatterns = [
     ),
     path("job-seekers/<uuid:public_id>/suspensions/<int:suspension_id>", views.suspension, name="suspension"),
     path("job-seekers/<uuid:public_id>/eligibility", views.eligibility, name="eligibility"),
+    path(
+        "job-seekers/<uuid:public_id>/pro-support-reports/<uuid:report_id>",
+        views.pro_support_report,
+        name="pro_support_report",
+    ),
     path("journeys/<slug:kind>/<str:pk>", views.journey, name="journey"),
 ]

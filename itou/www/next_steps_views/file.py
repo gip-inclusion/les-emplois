@@ -234,7 +234,11 @@ def _report_part(request, job_seeker):
         f"Rempli le {_fr(timezone.localdate(report.created_at))}",
         facts,
         link_label="Lire le bilan",
-        link_url=reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id}),
+        link_url=reverse(
+            "next_steps_views:pro_support_report",
+            kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+        ),
+        link_in_drawer=True,
     )
 
 
