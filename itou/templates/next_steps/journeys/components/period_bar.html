@@ -20,12 +20,6 @@
                                 </span>
                             {% endif %}
                         </div>
-                        {% for marker in block.markers %}
-                            {# A contract's start or end on the block: a green dashed line, explained by a note below. #}
-                            <span class="next-step-frise__marker next-step-frise__marker--{{ marker.kind }}"
-                                  style="left: {{ marker.position }}%"
-                                  title="{{ marker.title }}"></span>
-                        {% endfor %}
                         {% if block.today %}
                             {# The position is computed server side: a style attribute, like the employee record progress bar. #}
                             <span class="next-step-frise__today next-step-frise__today--{{ block.today_align }}"
@@ -57,34 +51,6 @@
                     </div>
                 </div>
             {% endfor %}
-        </div>
-    {% endif %}
-    {% if bar.lanes %}
-        {# Contracts under the blocks: a thin bar from their start to their end on the same grid, then their label. #}
-        {# The bars, and today on them, are positioned against this column, which spans the blocks' row; with no top, #}
-        {# each stays in its lane. #}
-        <div class="row g-1 mt-2">
-            <div class="col-12 position-relative d-flex flex-column gap-2">
-                {% for lane in bar.lanes %}
-                    <div class="next-step-frise__lane">
-                        <span class="next-step-frise__contract next-step-frise__contract--{{ lane.kind }} position-absolute{% if not lane.before %} rounded-start-pill{% endif %}{% if not lane.after %} rounded-end-pill{% endif %}"
-                              style="{{ lane.style }}"
-                              aria-hidden="true"></span>
-                        {% if bar.today_style %}
-                            <span class="next-step-frise__lane-today"
-                                  style="{{ bar.today_style }}"
-                                  aria-hidden="true"></span>
-                        {% endif %}
-                        <span class="next-step-frise__contract-label d-flex align-items-center gap-1 fs-xs lh-sm{% if lane.label_align == "end" %} justify-content-end text-end{% endif %} {% if lane.kind == "ongoing" %}text-success{% else %}text-muted{% endif %}"
-                              style="{{ lane.label_style }}">
-                            {% if lane.before %}<i class="ri-arrow-left-s-line" aria-hidden="true"></i>{% endif %}
-                            <i class="ri-file-text-line" aria-hidden="true"></i>
-                            <span>{{ lane.label }}</span>
-                            {% if lane.after %}<i class="ri-arrow-right-s-line" aria-hidden="true"></i>{% endif %}
-                        </span>
-                    </div>
-                {% endfor %}
-            </div>
         </div>
     {% endif %}
     {% if bar.notes %}

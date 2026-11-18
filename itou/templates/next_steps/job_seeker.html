@@ -88,23 +88,7 @@
                     {# Where the person stands #}
                     {% if situation %}
                         <section class="mb-5" aria-labelledby="next-steps-situation">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                                <h2 class="h3 mb-0" id="next-steps-situation">Situation</h2>
-                                {% if contract_table %}
-                                    {# Prototype: five ways to read the contracts against the PASS IAE, to compare. Links: no JavaScript. #}
-                                    <nav class="d-flex flex-wrap align-items-center gap-2"
-                                         aria-label="Affichage des contrats (prototype)">
-                                        <span class="fs-xs text-muted">Contrats (prototype)</span>
-                                        <span class="btn-group btn-group-sm">
-                                            {% for key, label in contract_layouts %}
-                                                <a class="btn btn-sm {% if key == contract_layout %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                                                   href="?contrat={{ key }}#next-steps-situation"
-                                                   {% if key == contract_layout %}aria-current="true"{% endif %}>{{ key }}. {{ label }}</a>
-                                            {% endfor %}
-                                        </span>
-                                    </nav>
-                                {% endif %}
-                            </div>
+                            <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
                             <div class="c-box">
                                 {% for sentence in situation %}<p class="mb-2">{{ sentence }}</p>{% endfor %}
                                 {% if situation_bar %}
@@ -112,8 +96,27 @@
                                         {% include "next_steps/journeys/components/period_bar.html" with bar=situation_bar only %}
                                     </div>
                                 {% endif %}
-                                {% if contract_table %}
-                                    {% include "next_steps/includes/contract_layouts.html" with layout=contract_layout relations=contract_relations table=contract_table chronology=contract_chronology cards=contract_cards only %}
+                                {% if contract_lines %}
+                                    {# Whether a contract runs and whether the PASS IAE covers it; each opens in the side drawer. #}
+                                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0 mt-3">
+                                        {% for line in contract_lines %}
+                                            <li class="d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
+                                                <a class="link-tertiary fw-bold fs-sm"
+                                                   href="{{ line.url }}"
+                                                   hx-get="{{ line.url }}"
+                                                   hx-target="#next-step-journey"
+                                                   hx-swap="outerHTML"
+                                                   hx-indicator="#next-step-journey"
+                                                   data-bs-toggle="offcanvas"
+                                                   data-bs-target="#next-step-drawer"
+                                                   aria-controls="next-step-drawer"><i class="ri-file-text-line" aria-hidden="true"></i> {{ line.label }}</a>
+                                                <span class="badge badge-sm rounded-pill {% if line.ongoing %}bg-success-lighter text-success{% else %}bg-light text-muted{% endif %}">
+                                                    {% if line.ongoing %}En cours{% else %}Terminé{% endif %}
+                                                </span>
+                                                {% include "next_steps/includes/note_badge.html" with note=line.coverage only %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 {% endif %}
                             </div>
                         </section>

@@ -167,10 +167,6 @@ def test_suspension_journey_shows_the_bars_and_matches_the_database(client, sett
     assertContains(response, announced)
 
 
-def where(contract):
-    return f"chez {contract.company.display_name}"
-
-
 @freeze_time("2026-11-16")
 def test_situation_bar():
     approval = ApprovalFactory(start_at=datetime.date(2025, 2, 1), end_at=datetime.date(2027, 3, 31))
@@ -185,10 +181,8 @@ def test_situation_bar():
         status=ProlongationRequestStatus.DENIED,
         processed=True,
     )
-    done = ContractFactory(start_date=datetime.date(2025, 2, 1), end_date=datetime.date(2025, 8, 31))
-    running = ContractFactory(start_date=datetime.date(2025, 11, 1), end_date=datetime.date(2027, 3, 31))
 
-    bar = situation_bar(approval, [done, running], where)
+    bar = situation_bar(approval)
 
     # The PASS IAE around its suspension, then the pending prolongation request only.
     assert [(block.kind, block.label, block.start, block.end) for block in bar.blocks] == [
@@ -206,26 +200,8 @@ def test_situation_bar():
     ]
     assert sum(block.columns for block in bar.blocks) == 12
     assert [block.today != "" for block in bar.blocks] == [False, False, True, False]
-    # The contracts under the blocks, at their dates, rather than as notes.
+    # The contracts are not on it: they are listed under it (coverage).
     assert bar.notes == []
-    assert [(lane.label, lane.kind, lane.before, lane.after) for lane in bar.lanes] == [
-        (f"Contrat chez {done.company.display_name} du 01/02/2025 au 31/08/2025", "ended", False, False),
-        (
-            f"Contrat chez {running.company.display_name} depuis le 01/11/2025, jusqu’au 31/03/2027",
-            "ongoing",
-            False,
-            False,
-        ),
-    ]
-    # The first starts with the PASS IAE, at the start of the first block; the second ends with it, at the end of
-    # the last PASS IAE block (the pending prolongation comes after).
-    assert bar.lanes[0].style.startswith("left: calc(0.000% + 0.125rem);")
-    first = bar.blocks[0].columns / 12 * 100
-    assert bar.lanes[0].style.endswith(f"right: calc({100 - first:.3f}% + 0.125rem)")
-    passes = sum(block.columns for block in bar.blocks[:3]) / 12 * 100
-    assert bar.lanes[1].style.endswith(f"right: calc({100 - passes:.3f}% + 0.125rem)")
-    # Today runs through them.
-    assert bar.today_style.startswith("left: calc(")
 
 
 @freeze_time("2026-11-16")
@@ -235,7 +211,7 @@ def test_situation_bar_clips_a_suspension_outside_the_approval():
     SuspensionFactory(approval=approval, start_at=datetime.date(2024, 1, 1), end_at=datetime.date(2025, 9, 1))
     approval.refresh_from_db()
 
-    bar = situation_bar(approval, [], where)
+    bar = situation_bar(approval)
 
     # Only the part within the PASS IAE is on the strip: the blocks follow each other, the PASS IAE's start first.
     assert [(block.kind, block.start, block.end) for block in bar.blocks] == [
@@ -257,7 +233,7 @@ def test_situation_bar_clips_a_suspension_outside_the_approval():
 def test_situation_bar_expired_or_empty():
     approval = ApprovalFactory(start_at=datetime.date(2023, 2, 1), end_at=datetime.date(2025, 1, 31))
 
-    bar = situation_bar(approval, [], where)
+    bar = situation_bar(approval)
 
     # The PASS IAE greyed out, then a block without PASS IAE up to today, which is always on the strip.
     assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
@@ -268,14 +244,14 @@ def test_situation_bar_expired_or_empty():
     assert [block.today != "" for block in bar.blocks] == [False, True]
     assert bar.blocks[1].today_align == "end"
     assert bar.today_display == "16/11/2026"
-    assert situation_bar(None, [], where) is None
+    assert situation_bar(None) is None
 
 
 @freeze_time("2026-11-16")
 def test_situation_bar_before_the_approval():
     approval = ApprovalFactory(start_at=datetime.date(2027, 2, 1), end_at=datetime.date(2029, 1, 31))
 
-    bar = situation_bar(approval, [], where)
+    bar = situation_bar(approval)
 
     # A block without PASS IAE from today, which is always on the strip, then the PASS IAE.
     assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [

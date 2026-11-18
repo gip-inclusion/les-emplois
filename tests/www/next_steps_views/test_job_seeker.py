@@ -29,6 +29,10 @@ def page_url(job_seeker):
     return reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
 
 
+def fr_iso(date):
+    return f"{date:%Y-%m-%d}"
+
+
 def fr(date):
     return f"{date:%d/%m/%Y}"
 
@@ -457,29 +461,45 @@ def test_approval_drawer(client):
     assert client.get(url, HTTP_HX_REQUEST="true").status_code == 404
 
 
-@pytest.mark.parametrize(
-    "layout,expected",
-    [
-        ("1", "consommés depuis, sans contrat"),
-        ("2", '<th scope="col">Début</th>'),
-        ("3", '<ul class="list-step'),
-        ("4", "next-step-frise__marker--start"),
-        ("5", 'class="progress-bar'),
-        # Unknown: the first.
-        ("9", "consommés depuis, sans contrat"),
-    ],
-)
-def test_contract_layouts_to_compare(client, layout, expected):
+def test_contract_line_opens_in_the_drawer(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     contract = ContractFactory(
         company=membership.company,
         start_date=timezone.localdate() - datetime.timedelta(days=200),
         end_date=timezone.localdate() - datetime.timedelta(days=10),
+        details=[
+            {
+                "Type Contrat": "initial",
+                "Contrat Date Embauche": fr_iso(timezone.localdate() - datetime.timedelta(days=200)),
+                "Contrat Date Fin Contrat": fr_iso(timezone.localdate() - datetime.timedelta(days=10)),
+                "Contrat Date Sortie Definitive": None,
+            }
+        ],
     )
-    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    job_seeker = contract.job_seeker
+    ApprovalFactory(user=job_seeker, start_at=contract.start_date)
     client.force_login(membership.user)
 
-    response = client.get(page_url(contract.job_seeker), {"contrat": layout})
-    assertContains(response, expected)
-    # The switch, to go from one to the other.
-    assertContains(response, "?contrat=5#next-steps-situation")
+    url = reverse("next_steps_views:contract", kwargs={"public_id": job_seeker.public_id, "contract_id": contract.pk})
+    # Under the strip: the contract, ended, and how the PASS IAE covers it; a click opens it in the side drawer.
+    response = client.get(page_url(job_seeker))
+    [line] = response.context["contract_lines"]
+    assert (line.label, line.ongoing, line.coverage.variant) == ("Contrat chez vous", False, "warn")
+    assertContains(response, f'hx-get="{url}"')
+
+    response = client.get(url, HTTP_HX_REQUEST="true")
+    assertContains(response, membership.company.display_name)
+    assertContains(response, f"Du {fr(contract.start_date)} au {fr(contract.end_date)}")
+    assertContains(response, f"PASS{NBSP}IAE consommés depuis, sans contrat")
+    # Its records in the ASP data.
+    assertContains(response, "Déclaré à l’ASP")
+    assertContains(response, "Initial")
+    assertContains(response, f"Fin prévue le {fr(contract.end_date)}")
+    # Without JavaScript, a page.
+    assertContains(client.get(url), "Déclaré à l’ASP")
+
+    # Another job seeker's contract is not found from this page.
+    other = reverse(
+        "next_steps_views:contract", kwargs={"public_id": JobSeekerFactory().public_id, "contract_id": contract.pk}
+    )
+    assert client.get(other, HTTP_HX_REQUEST="true").status_code == 404

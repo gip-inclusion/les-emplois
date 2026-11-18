@@ -25,7 +25,7 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.process_views import job_application_sender_left_org
-from itou.www.next_steps_views import contract_layouts, engine
+from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import (
     Group,
@@ -42,6 +42,7 @@ from itou.www.next_steps_views.advisors import (
     visible_orientations,
 )
 from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER, gather_barriers
+from itou.www.next_steps_views.coverage import contract_lines, contract_steps, coverage, period
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
@@ -140,14 +141,7 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
     if _can_view_contracts(request):
         contract = job_seeker.contracts.select_related("company").order_by("-start_date", "-pk").first()
         contracts = _contracts_for_situation(job_seeker, approval)
-    situation_strip = None
-    where = functools.partial(contract_place, request)
-    # Prototype: five ways to read the contracts against the PASS IAE, to compare (contract_layouts).
-    layout = contract_layouts.layout_of(request)
-    if request.from_iae_actor:
-        situation_strip = situation_bar(
-            approval, contracts, where, contracts_mode="markers" if layout == "4" else "none"
-        )
+    situation_strip = situation_bar(approval) if request.from_iae_actor else None
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
     show_barriers = request.from_authorized_prescriber or can_fill_pro_support_report(request)
@@ -161,15 +155,10 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "situation": situation_sentences(request, approval, contract, _can_view_contracts(request) and not contracts),
         "actions": actions,
         "situation_bar": situation_strip,
-        "contract_layout": layout,
-        "contract_layouts": contract_layouts.LAYOUTS,
-        "contract_relations": [
-            (contract_layouts.contract_label(contract, where), contract_layouts.relation(approval, contract))
-            for contract in contracts
-        ],
-        "contract_table": contract_layouts.table(approval, contracts, where) if contracts else [],
-        "contract_chronology": contract_layouts.chronology(approval, contracts, where) if contracts else [],
-        "contract_cards": contract_layouts.cards(approval, contracts, where) if contracts else [],
+        # Under the strip: whether a contract runs, and whether the PASS IAE covers it.
+        "contract_lines": contract_lines(job_seeker, approval, contracts, functools.partial(contract_place, request))
+        if request.from_iae_actor
+        else [],
         "show_barriers": show_barriers,
         "barriers": gather_barriers(request, job_seeker, iae_eligibility_diagnosis) if show_barriers else None,
         "file_parts": file_parts(
@@ -432,10 +421,38 @@ def approval(request, public_id):
         "job_seeker": job_seeker,
         "approval": approval,
         # The PASS IAE alone: the contracts are in the file.
-        "bar": situation_bar(approval, [], functools.partial(contract_place, request)),
+        "bar": situation_bar(approval),
         "suspensions": sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at, reverse=True),
         "prolongations": sorted(prolongations, key=lambda prolongation: prolongation["start_at"], reverse=True),
         "can_view_name": can_view_personal_information(request, job_seeker),
         "matomo_custom_title": "Prochaines étapes : PASS IAE",
     }
     return _drawer_or_page(request, "next_steps/approval.html", "PASS IAE", context)
+
+
+@readonly_view
+def contract(request, public_id, contract_id):
+    """A contract of the job seeker, from the situation: where, when, how the PASS IAE covers it, its ASP records.
+
+    Only one of the contracts the situation shows, by the rule of the existing contracts tab.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    if not (request.from_iae_actor and _can_view_contracts(request)):
+        raise Http404
+    approval = job_seeker.approvals.prefetch_related("suspension_set").order_by("-start_at").first()
+    contract = next(
+        (contract for contract in _contracts_for_situation(job_seeker, approval) if contract.pk == contract_id), None
+    )
+    if contract is None:
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "contract": contract,
+        "place": contract_place(request, contract),
+        "period": period(contract),
+        "coverage": coverage(approval, contract),
+        "steps": contract_steps(contract),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : contrat",
+    }
+    return _drawer_or_page(request, "next_steps/contract.html", "Contrat", context)
