@@ -26,7 +26,6 @@ class Command(BaseCommand):
             .select_related("company", "job_seeker")
             .order_by("end_date", "pk")
         )
-        # Computed on the same contracts: a contract imported meanwhile would have no contacts.
         contacts = Contract.objects.filter(pk__in=[contract.pk for contract in contracts]).get_company_contacts()
 
         recaps = defaultdict(list)

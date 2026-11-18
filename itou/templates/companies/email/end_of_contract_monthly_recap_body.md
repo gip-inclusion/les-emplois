@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.md" %}
 {% load str_filters %}
 {% block body %}
-Bonjour {{ user.first_name|title }},
+Bonjour {{ user.get_full_name }},
 
 {{ contracts|length|pluralizefr:"Voici le salarié,Voici les salariés" }} que vous accompagnez chez {{ structure.display_name }} dont le contrat se termine ce mois-ci ou s’est terminé le mois dernier sans suite connue.
 
