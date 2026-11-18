@@ -141,10 +141,7 @@ class UserQuerySet(models.QuerySet):
         return self.annotate(contract_ending_soon=self.contract_ending_soon_lookup(siae))
 
     def last_contract_pk_lookup(self, siae=None):
-        contracts = Contract.objects.filter(job_seeker=OuterRef(OuterRef("pk")))
-        if siae:
-            contracts = contracts.filter(company=siae)
-        return Subquery(contracts.order_by("-start_date", "-pk").values("pk")[:1])
+        return Contract.objects.last_pk_lookup(OuterRef(OuterRef("pk")), company=siae)
 
     def last_contract_ended_with_valid_approval_lookup(self, siae=None):
         from itou.approvals.models import Approval
