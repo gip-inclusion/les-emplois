@@ -4,7 +4,6 @@ import logging
 from allauth.account.internal.flows.email_verification import send_verification_email_to_address
 from allauth.account.models import EmailAddress
 from allauth.account.views import PasswordChangeView
-from allauth.core.internal.httpkit import get_client_ip
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -44,7 +43,7 @@ from itou.users.notifications import (
     NewAPITokenNotification,
 )
 from itou.utils import constants as global_constants
-from itou.utils.auth import check_request
+from itou.utils.auth import check_request, get_client_ip
 from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
