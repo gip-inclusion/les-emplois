@@ -88,13 +88,32 @@
                     {# Where the person stands #}
                     {% if situation %}
                         <section class="mb-5" aria-labelledby="next-steps-situation">
-                            <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                                <h2 class="h3 mb-0" id="next-steps-situation">Situation</h2>
+                                {% if contract_table %}
+                                    {# Prototype: five ways to read the contracts against the PASS IAE, to compare. Links: no JavaScript. #}
+                                    <nav class="d-flex flex-wrap align-items-center gap-2"
+                                         aria-label="Affichage des contrats (prototype)">
+                                        <span class="fs-xs text-muted">Contrats (prototype)</span>
+                                        <span class="btn-group btn-group-sm">
+                                            {% for key, label in contract_layouts %}
+                                                <a class="btn btn-sm {% if key == contract_layout %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                                   href="?contrat={{ key }}#next-steps-situation"
+                                                   {% if key == contract_layout %}aria-current="true"{% endif %}>{{ key }}. {{ label }}</a>
+                                            {% endfor %}
+                                        </span>
+                                    </nav>
+                                {% endif %}
+                            </div>
                             <div class="c-box">
                                 {% for sentence in situation %}<p class="mb-2">{{ sentence }}</p>{% endfor %}
                                 {% if situation_bar %}
                                     <div class="mt-3">
                                         {% include "next_steps/journeys/components/period_bar.html" with bar=situation_bar only %}
                                     </div>
+                                {% endif %}
+                                {% if contract_table %}
+                                    {% include "next_steps/includes/contract_layouts.html" with layout=contract_layout relations=contract_relations table=contract_table chronology=contract_chronology cards=contract_cards only %}
                                 {% endif %}
                             </div>
                         </section>

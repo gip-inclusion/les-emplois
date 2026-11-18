@@ -84,6 +84,18 @@ class Block:
     # For a PASS IAE: how much of the block has run, in percent, and what is left once today is in it.
     elapsed: str = ""
     remaining: str = ""
+    # Contracts' starts and ends that fall in the block, as lines on it (situation_bar's "markers").
+    markers: list = dataclasses.field(default_factory=list)
+
+
+@dataclasses.dataclass
+class Marker:
+    """A contract's start or end on a block: where, in percent of the block, and what it is."""
+
+    position: str
+    title: str
+    # start, end (CSS modifiers)
+    kind: str
 
 
 @dataclasses.dataclass
@@ -382,11 +394,27 @@ def _contract_note(contract, where):
     return Note(f"Contrat {where(contract)} {dates}", variant="ok", icon="ri-file-text-line")
 
 
-def situation_bar(approval, contracts, where):
+def _add_markers(bar, contract, where):
+    """The contract's start and end as lines on the blocks they fall in, and a note saying what they are."""
+    points = [(contract.start_date, False, "start", "Début")]
+    if contract.end_date:
+        points.append((contract.end_date, True, "end", "Fin"))
+    for day, at_end, kind, word in points:
+        for block in bar.blocks:
+            if block.start <= day <= block.end:
+                days = (day - block.start).days + (1 if at_end else 0)
+                share = days / ((block.end - block.start).days + 1)
+                block.markers.append(Marker(f"{share * 100:.1f}", f"{word} du contrat {where(contract)}", kind))
+    note = _contract_note(contract, where)
+    bar.notes.append(Note(f"{note.text}{NBSP}: ses dates en vert sur la frise", note.variant, "ri-flag-line"))
+
+
+def situation_bar(approval, contracts, where, contracts_mode="lanes"):
     """The job seeker's PASS IAE with its suspensions and a pending prolongation, then their contracts as notes.
 
     approval may be None and contracts empty; where(contract) says where the contract is, "chez vous" for instance.
-    Returns None when there is nothing to show.
+    contracts_mode says how the contracts the strip covers are drawn: "lanes" under the blocks, "markers" on them, or
+    "none" when they are shown elsewhere. Returns None when there is nothing to show.
     """
     blocks = []
     # Suspensions shown only in part, said in a note so that the strip does not hide a date the database holds.
@@ -464,16 +492,20 @@ def situation_bar(approval, contracts, where):
         )
         for suspension, where_ in clipped
     ]
-    if not blocks and not notes and not contracts:
+    if not blocks and not notes and (not contracts or contracts_mode == "none"):
         return None
     bar = PeriodBar(blocks=_share_columns(blocks) if blocks else [], notes=notes)
     _mark_today(bar, _remaining(approval) if approval else "")
     # The contracts the strip covers, under its blocks at their dates; the others as notes.
     for contract in contracts:
-        if bar.blocks and _on_the_strip(bar, contract):
-            bar.lanes.append(_contract_lane(bar, contract, where))
-        else:
+        if contracts_mode == "none":
+            continue
+        if not (bar.blocks and _on_the_strip(bar, contract)):
             bar.notes.append(_contract_note(contract, where))
+        elif contracts_mode == "markers":
+            _add_markers(bar, contract, where)
+        else:
+            bar.lanes.append(_contract_lane(bar, contract, where))
     if bar.lanes:
         bar.today_style = _today_style(bar)
     return bar

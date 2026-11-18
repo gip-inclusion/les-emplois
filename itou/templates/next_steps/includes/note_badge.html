@@ -1,0 +1,5 @@
+{# A note of the situation (next_steps_views.period_bar.Note), as a pill coloured by its variant: ok, warn, info. #}
+<span class="badge rounded-pill fs-sm fw-normal text-wrap text-start d-inline-flex align-items-center gap-1 {% if note.variant == "ok" %}bg-success-lighter text-success{% elif note.variant == "warn" %}bg-warning-lighter text-warning{% else %}bg-info-lighter text-info{% endif %}">
+    <i class="{{ note.icon }}" aria-hidden="true"></i>
+    {{ note.text }}
+</span>

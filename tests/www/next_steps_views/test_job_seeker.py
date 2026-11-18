@@ -22,6 +22,9 @@ def experiment_for_everyone(settings):
     settings.NEXT_STEPS_FOR_EVERYONE = True
 
 
+NBSP = " "
+
+
 def page_url(job_seeker):
     return reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
 
@@ -69,8 +72,10 @@ def test_employer_after_the_end_of_the_contract(client):
     assertContains(response, "· vous", count=1)
     assertContains(response, advisor.get_full_name())
     # Where the person stands.
-    # The contract is on the strip, with the PASS IAE and today: no sentence repeats it.
-    assertContains(response, f"Contrat chez vous du {fr(contract.start_date)} au {fr(end_date)}")
+    # The contract against the PASS IAE, said (the first of the layouts to compare): no sentence repeats it.
+    assertContains(
+        response, f"Terminé le {fr(end_date)}{NBSP}: 10{NBSP}jours de PASS{NBSP}IAE consommés depuis, sans contrat"
+    )
     assertNotContains(response, "Son contrat chez vous")
     assertContains(response, "next-step-frise__block--pass")
     assertContains(response, f"<b>Aujourd’hui</b> · {fr(timezone.localdate())}")
@@ -263,7 +268,7 @@ def test_strip_and_barriers_for_employer(client):
 
     response = client.get(page_url(contract.job_seeker))
     assertContains(response, "next-step-frise__block--pass")
-    assertContains(response, f"Contrat chez vous du {fr(contract.start_date)} au {fr(contract.end_date)}")
+    assertContains(response, "Contrat chez vous")
     assertContains(response, "Freins à lever")
     assertContains(
         response,
@@ -450,3 +455,31 @@ def test_approval_drawer(client):
     # An employer who never received an application from them may not see it.
     client.force_login(CompanyMembershipFactory(company__subject_to_iae_rules=True).user)
     assert client.get(url, HTTP_HX_REQUEST="true").status_code == 404
+
+
+@pytest.mark.parametrize(
+    "layout,expected",
+    [
+        ("1", "consommés depuis, sans contrat"),
+        ("2", '<th scope="col">Début</th>'),
+        ("3", '<ul class="list-step'),
+        ("4", "next-step-frise__marker--start"),
+        ("5", 'class="progress-bar'),
+        # Unknown: the first.
+        ("9", "consommés depuis, sans contrat"),
+    ],
+)
+def test_contract_layouts_to_compare(client, layout, expected):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    contract = ContractFactory(
+        company=membership.company,
+        start_date=timezone.localdate() - datetime.timedelta(days=200),
+        end_date=timezone.localdate() - datetime.timedelta(days=10),
+    )
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    client.force_login(membership.user)
+
+    response = client.get(page_url(contract.job_seeker), {"contrat": layout})
+    assertContains(response, expected)
+    # The switch, to go from one to the other.
+    assertContains(response, "?contrat=5#next-steps-situation")

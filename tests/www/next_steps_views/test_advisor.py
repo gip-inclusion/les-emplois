@@ -92,7 +92,10 @@ def test_a_colleague_acts_for_the_job_seeker(client):
 
 def test_an_employer_sees_no_more_than_on_the_job_seeker_page(client):
     company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
-    elsewhere = JobApplicationFactory(sent_by_authorized_prescriber=True, created_at=days_ago(3))
+    # A name of its own: a random one may match another name on the page.
+    elsewhere = JobApplicationFactory(
+        sent_by_authorized_prescriber=True, created_at=days_ago(3), to_company__name="Structure hors périmètre"
+    )
     advisor = elsewhere.sender
     organization = elsewhere.sender_prescriber_organization
     job_seeker = elsewhere.job_seeker

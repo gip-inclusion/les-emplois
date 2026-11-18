@@ -25,7 +25,7 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.process_views import job_application_sender_left_org
-from itou.www.next_steps_views import engine
+from itou.www.next_steps_views import contract_layouts, engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import (
     Group,
@@ -141,8 +141,13 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         contract = job_seeker.contracts.select_related("company").order_by("-start_date", "-pk").first()
         contracts = _contracts_for_situation(job_seeker, approval)
     situation_strip = None
+    where = functools.partial(contract_place, request)
+    # Prototype: five ways to read the contracts against the PASS IAE, to compare (contract_layouts).
+    layout = contract_layouts.layout_of(request)
     if request.from_iae_actor:
-        situation_strip = situation_bar(approval, contracts, functools.partial(contract_place, request))
+        situation_strip = situation_bar(
+            approval, contracts, where, contracts_mode="markers" if layout == "4" else "none"
+        )
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
     show_barriers = request.from_authorized_prescriber or can_fill_pro_support_report(request)
@@ -156,6 +161,15 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "situation": situation_sentences(request, approval, contract, _can_view_contracts(request) and not contracts),
         "actions": actions,
         "situation_bar": situation_strip,
+        "contract_layout": layout,
+        "contract_layouts": contract_layouts.LAYOUTS,
+        "contract_relations": [
+            (contract_layouts.contract_label(contract, where), contract_layouts.relation(approval, contract))
+            for contract in contracts
+        ],
+        "contract_table": contract_layouts.table(approval, contracts, where) if contracts else [],
+        "contract_chronology": contract_layouts.chronology(approval, contracts, where) if contracts else [],
+        "contract_cards": contract_layouts.cards(approval, contracts, where) if contracts else [],
         "show_barriers": show_barriers,
         "barriers": gather_barriers(request, job_seeker, iae_eligibility_diagnosis) if show_barriers else None,
         "file_parts": file_parts(

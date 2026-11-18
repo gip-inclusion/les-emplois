@@ -566,6 +566,26 @@ table.table td > .modal .modal-content {
     white-space: nowrap;
 }
 
+/* A contract's start or end on a block (prototype): a green dashed line through it, a dot at its top. */
+.next-step-frise__marker {
+    position: absolute;
+    top: -.25rem;
+    bottom: -.25rem;
+    margin-left: -1px;
+    border-left: 2px dashed var(--bs-success, #18753c);
+}
+
+.next-step-frise__marker::before {
+    content: "";
+    position: absolute;
+    top: -.25rem;
+    left: -5px;
+    width: .5rem;
+    height: .5rem;
+    border-radius: 50%;
+    background-color: var(--bs-success, #18753c);
+}
+
 /* Contracts under the blocks: a thin bar at their dates, then their label under it. The bar is placed by left and
    right against the column that spans the blocks' row; with no top, it stays at the top of its lane. */
 .next-step-frise__contract {

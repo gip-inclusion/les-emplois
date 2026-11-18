@@ -20,6 +20,12 @@
                                 </span>
                             {% endif %}
                         </div>
+                        {% for marker in block.markers %}
+                            {# A contract's start or end on the block: a green dashed line, explained by a note below. #}
+                            <span class="next-step-frise__marker next-step-frise__marker--{{ marker.kind }}"
+                                  style="left: {{ marker.position }}%"
+                                  title="{{ marker.title }}"></span>
+                        {% endfor %}
                         {% if block.today %}
                             {# The position is computed server side: a style attribute, like the employee record progress bar. #}
                             <span class="next-step-frise__today next-step-frise__today--{{ block.today_align }}"
