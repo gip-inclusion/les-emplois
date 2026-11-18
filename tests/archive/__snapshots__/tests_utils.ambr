@@ -348,6 +348,11 @@
     dict({
       'field': 'user',
       'hidden': False,
+      'model': 'rdv_service_public.OAuthToken',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
       'model': 'search.SavedSearch',
     }),
     dict({

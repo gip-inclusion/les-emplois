@@ -133,6 +133,7 @@ INSTALLED_APPS = [
     "itou.analytics",
     "itou.communications",
     "itou.rdv_insertion",
+    "itou.rdv_service_public",
     "itou.archive",
     "itou.nexus",
     "itou.insertion",
