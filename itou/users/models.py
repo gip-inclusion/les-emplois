@@ -1669,6 +1669,19 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                     # Block edition of the pole emploi id if not empty
                     if self.pole_emploi_id:
                         blocked_fields.add("pole_emploi_id")
+                case IdentityCertificationAuthorities.API_CNAV:
+                    blocked_fields.update(
+                        {
+                            "nir",
+                            "last_name",
+                            "first_name",
+                            "birthdate",
+                            "birth_country",
+                            "birth_place",
+                            "title",
+                        }
+                    )
+
         return blocked_fields
 
 
