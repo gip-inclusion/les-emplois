@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource, ContractType, ProSupportReportSolution
-from itou.companies.models import Company, Contract, JobDescription, SiaeACIConvergencePHC
+from itou.companies.models import Company, Contract, JobDescription, ProSupportReport, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
@@ -741,31 +741,6 @@ class TestContractQuerySet:
             ordered=False,
         )
 
-    @pytest.mark.parametrize(
-        "days_after_contract_end_date,expected",
-        [(0, True), (10, True), (-10, False)],
-        ids=["same_end_date", "contract_end_date_brought_forward", "contract_renewed"],
-    )
-    def test_with_has_covering_pro_support_report(self, days_after_contract_end_date, expected):
-        contract = ContractFactory(end_date=timezone.localdate())
-        ProSupportReportFactory(
-            contract=contract, contract_end_date=contract.end_date + timedelta(days=days_after_contract_end_date)
-        )
-        assert (
-            Contract.objects.with_has_covering_pro_support_report().get(pk=contract.pk).has_covering_pro_support_report
-            is expected
-        )
-
-    def test_with_has_covering_pro_support_report_ignores_other_contracts(self):
-        report = ProSupportReportFactory()
-        contract = ContractFactory(
-            job_seeker=report.job_seeker, company=report.company, end_date=report.contract_end_date
-        )
-        assert (
-            Contract.objects.with_has_covering_pro_support_report().get(pk=contract.pk).has_covering_pro_support_report
-            is False
-        )
-
 
 class TestContractModel:
     def test_has_ended(self):
@@ -790,6 +765,20 @@ class TestContractModel:
         assert contract_no_enddate_inactive_siae.has_ended
         assert contract_no_enddate_deleted_siae.has_ended
         assert contract_enddate_in_past.has_ended
+
+
+class TestProSupportReportQuerySet:
+    @pytest.mark.parametrize(
+        "days_after_contract_end_date,expected",
+        [(0, True), (10, True), (-10, False)],
+        ids=["same_end_date", "contract_end_date_brought_forward", "contract_renewed"],
+    )
+    def test_covering_contract_end_date(self, days_after_contract_end_date, expected):
+        contract = ContractFactory(end_date=timezone.localdate())
+        report = ProSupportReportFactory(
+            contract=contract, contract_end_date=contract.end_date + timedelta(days=days_after_contract_end_date)
+        )
+        assert ProSupportReport.objects.covering_contract_end_date().filter(pk=report.pk).exists() is expected
 
 
 class TestProSupportReport:

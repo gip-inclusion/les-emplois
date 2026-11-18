@@ -1230,14 +1230,6 @@ class ContractQuerySet(models.QuerySet):
             Exists(Company.objects.active().filter(pk=OuterRef("company_id"))),
         )
 
-    def covering_pro_support_reports_lookup(self):
-        # A renewal postpones the end date of the contract and calls for a new report.
-        # An end date brought forward does not: the existing report still covers the contract.
-        return ProSupportReport.objects.filter(contract=OuterRef("pk"), contract_end_date__gte=OuterRef("end_date"))
-
-    def with_has_covering_pro_support_report(self):
-        return self.annotate(has_covering_pro_support_report=Exists(self.covering_pro_support_reports_lookup()))
-
 
 class Contract(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)
@@ -1302,6 +1294,13 @@ class SiaeACIConvergencePHC(models.Model):
 
     def __str__(self):
         return self.siret
+
+
+class ProSupportReportQuerySet(models.QuerySet):
+    def covering_contract_end_date(self):
+        # Renewals under the same parent contract are merged into one contract with a later end date,
+        # which calls for a new report. An end date brought forward does not: the report still covers the contract.
+        return self.filter(contract_end_date__gte=F("contract__end_date"))
 
 
 class ProSupportReport(models.Model):
@@ -1370,6 +1369,8 @@ class ProSupportReport(models.Model):
         blank=True,
         default="",
     )
+
+    objects = ProSupportReportQuerySet.as_manager()
 
     class Meta:
         verbose_name = "bilan d’accompagnement"
