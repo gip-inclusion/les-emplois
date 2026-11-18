@@ -1,9 +1,11 @@
+import datetime
 import logging
 import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
+from itou.asp.models import Commune, Country
 from itou.cnav.enums import CNAVRecordOrigin
 from itou.users.enums import IdentityCertificationAuthorities, Title
 from itou.users.models import IdentityCertification, JobSeekerProfile
@@ -94,6 +96,30 @@ class CNAVRecord(models.Model):
             return
         # If we end up here, it means that the profile and interops information are consistent
         # Let's certify!
+        # First fill missing fields:
+        update_fields = set()
+        if not self.profile.birthdate:
+            self.profile.birthdate = datetime.date.fromisoformat(interops_result.infos.birth_date)
+            update_fields.add("birthdate")
+        if not self.profile.birth_country_id:
+            insee_code = interops_result.infos.birth_place
+            if insee_code.startswith("99"):
+                self.profile.birth_country = Country.objects.get(code=insee_code[2:])
+                update_fields.add("birth_country")
+            else:
+                commune = Commune.objects.filter(code=insee_code).first()
+                if commune:
+                    self.profile.birth_place = commune
+                    self.profile.birth_country_id = Country.FRANCE_ID
+                    update_fields.add("birth_country", "birth_place")
+                else:
+                    self.profile.birth_country = Country.objects.get(code=insee_code[2:], group=Country.Group.FRANCE)
+                    update_fields.add("birth_country")
+        if update_fields:
+            self.profile.save(update_fields=update_fields)
+
+        # TODO: handle title/first_name/last_name/birth_name
+
         IdentityCertification.objects.upsert_certifications(
             [
                 IdentityCertification(
