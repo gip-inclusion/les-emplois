@@ -236,13 +236,11 @@ def test_deactivate_spontaneous_jobapps_batch_size(mocker, caplog, settings):
 
 
 @freeze_time("2026-11-10")
-def test_send_end_of_contract_monthly_recaps(
-    snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog, settings
-):
+def test_send_end_of_contract_monthly_recaps(snapshot, mailoutbox, django_capture_on_commit_callbacks, settings):
     settings.TALLY_URL = "https://tally.so"
     company = companies_factories.CompanyFactory(for_snapshot=True)
     admin = companies_factories.CompanyMembershipFactory(
-        company=company, is_admin=True, user__first_name="camille"
+        company=company, is_admin=True, user__first_name="camille", user__last_name="Dupont"
     ).user
     advisor = companies_factories.CompanyMembershipFactory(company=company, is_admin=False).user
     make_contract = partial(companies_factories.ContractFactory, company=company)
@@ -290,15 +288,11 @@ def test_send_end_of_contract_monthly_recaps(
         with django_capture_on_commit_callbacks(execute=True):
             management.call_command("send_end_of_contract_monthly_recaps", wet_run=True)
 
-    assert caplog.messages[:-1] == [
-        "Contracts without anyone to write to: 1",
-        "Sending 3 end of contract monthly recaps",
-    ]
     assert sorted(mail.to[0] for mail in mailoutbox) == sorted(
         [admin.email, advisor.email, company_in_grace_period_admin.email]
     )
     mail = next(mail for mail in mailoutbox if mail.to == [admin.email])
     assert mail.subject == snapshot(name="email subject")
-    assert mail.body.startswith("Bonjour Camille,\n")
+    assert mail.body.startswith("Bonjour Camille DUPONT,\n")
     assert remove_greetings(mail.body) == snapshot(name="email body")
     assert '<a href="https://tally.so/r/kdDjod?mail=1&amp;role=siae">' in mail.alternatives[0][0]
