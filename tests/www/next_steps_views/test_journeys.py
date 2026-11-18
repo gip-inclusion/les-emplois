@@ -315,6 +315,31 @@ def test_meet_the_job_seeker_or_the_prescriber_before_answering(client):
     assertNotContains(response, f'hx-post="{invite_url}"')
 
 
+def test_meet_the_employer_who_sent_the_application(client):
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True, rdv_solidarites_id=None)
+    job_application = JobApplicationFactory(
+        to_company=company, state=JobApplicationState.NEW, sent_by_another_employer=True
+    )
+    client.force_login(company.members.first())
+
+    # Another employer sent it: they are offered a meeting too, as a prescriber would.
+    response = client.get(journey_url("candidature", job_application.pk), **HTMX)
+    assertContains(response, "L’employeur émetteur")
+    assertContains(response, job_application.sender_company.display_name)
+    assertContains(response, f'href="mailto:{job_application.sender.email}?subject=')
+
+    # Sent by the company itself: no one else to meet.
+    own = JobApplicationFactory(
+        to_company=company,
+        state=JobApplicationState.NEW,
+        sent_by_employer=True,
+        sender=company.members.first(),
+        sender_company=company,
+    )
+    response = client.get(journey_url("candidature", own.pk), **HTMX)
+    assertNotContains(response, "L’employeur émetteur")
+
+
 def test_job_application_to_processing_then_postponed(client):
     membership = CompanyMembershipFactory()
     job_application = JobApplicationFactory(

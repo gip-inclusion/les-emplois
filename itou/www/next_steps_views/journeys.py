@@ -854,11 +854,12 @@ class JobApplicationJourney(Journey):
         return lines
 
     def _meeting(self):
-        """Whom to meet before answering: the job seeker, and the prescriber who sent the application.
+        """Whom to meet before answering: the job seeker, and the professional who sent the application.
 
         The job seeker gets an invitation through RDV-Insertion when the company uses it, the same as from the
-        existing application page, and picks a slot online. Otherwise, and for the prescriber, the platform has no
-        appointment tool: an e-mail with a proposal to complete, and the phone number.
+        existing application page, and picks a slot online. Otherwise, and for the professional who sent it (a
+        prescriber, or another employer), the platform has no appointment tool: an e-mail with a proposal to
+        complete, and the phone number. An application the company sent itself has no one else to meet.
         """
         job_application, job_seeker, company = self.job_application, self.job_seeker, self.company
         employer = self.request.user
@@ -898,11 +899,15 @@ class JobApplicationJourney(Journey):
                 }
             )
         sender = job_application.sender
-        if job_application.sender_kind == SenderKind.PRESCRIBER and sender:
-            organization = job_application.sender_prescriber_organization
+        role = organization = None
+        if job_application.sender_kind == SenderKind.PRESCRIBER:
+            role, organization = "Le prescripteur", job_application.sender_prescriber_organization
+        elif job_application.sender_kind == SenderKind.EMPLOYER and job_application.sender_company_id != company.pk:
+            role, organization = "L’employeur émetteur", job_application.sender_company
+        if role and sender:
             people.append(
                 {
-                    "role": "Le prescripteur",
+                    "role": role,
                     "name": sender.get_full_name() + (f", {organization.display_name}" if organization else ""),
                     "phone": sender.phone,
                     "mailto": mailto(sender.email, sender.first_name) if sender.email else "",
