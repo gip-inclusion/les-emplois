@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.models import Suspension
 from itou.companies.enums import ProSupportReportBarrier
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyMembershipFactory, ContractFactory, ProSupportReportFactory
@@ -189,10 +190,13 @@ def test_file_parts(client):
     # Only this employer's job applications, with the platform's state badge.
     assert parts["job_applications"].summary == "1 candidature"
     assert [fact.job_application for fact in parts["job_applications"].facts] == [job_application]
-    # Each leads to its own page.
-    job_application_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    assert [fact.url for fact in parts["job_applications"].facts] == [job_application_url]
-    assertContains(response, f'href="{job_application_url}?back_url=')
+    # Each opens in the side drawer.
+    panel_url = reverse(
+        "next_steps_views:job_application",
+        kwargs={"public_id": job_seeker.public_id, "job_application_id": job_application.pk},
+    )
+    assert [fact.url for fact in parts["job_applications"].facts] == [panel_url]
+    assertContains(response, f'hx-get="{panel_url}"')
     report_url = reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id})
     assert parts["report"].link_url == report_url
     # The employer may see the contact details.
@@ -283,3 +287,92 @@ def test_no_barriers_section_for_those_who_cannot_read_reports(client):
     membership = PrescriberMembershipFactory(organization__authorized=False)
     client.force_login(membership.user)
     assertNotContains(client.get(page_url(JobSeekerFactory())), "Freins à lever")
+
+
+# Side drawers of the file
+# ------------------------------------------------------------------------------
+
+
+def test_job_application_drawer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    job_application = JobApplicationFactory(
+        to_company=membership.company,
+        state=JobApplicationState.NEW,
+        sent_by_authorized_prescriber=True,
+        message="Motivé et disponible.",
+    )
+    job_seeker = job_application.job_seeker
+    # Sent to another company: not in this employer's scope.
+    elsewhere = JobApplicationFactory(
+        job_seeker=job_seeker, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
+    client.force_login(membership.user)
+
+    def url(job_application):
+        return reverse(
+            "next_steps_views:job_application",
+            kwargs={"public_id": job_seeker.public_id, "job_application_id": job_application.pk},
+        )
+
+    response = client.get(url(job_application), HTTP_HX_REQUEST="true")
+    # What the "Candidature" section of its own page shows: the sender, the message, the jobs.
+    assertContains(response, job_application.sender.get_full_name().split()[-1].upper())
+    assertContains(response, job_application.sender_prescriber_organization.display_name)
+    assertContains(response, "Motivé et disponible.")
+    assertContains(response, "Candidature spontanée")
+    full_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    assertContains(response, f"{full_url}?back_url=")
+    assertContains(response, '<button type="button" class="btn-close" data-bs-dismiss="offcanvas"')
+    # Without JavaScript, a page, with nothing to close.
+    response = client.get(url(job_application))
+    assertContains(response, "Motivé et disponible.")
+    assertNotContains(response, '<button type="button" class="btn-close" data-bs-dismiss="offcanvas"')
+    assert client.get(url(elsewhere), HTTP_HX_REQUEST="true").status_code == 404
+
+
+def test_suspension_drawer(client):
+    membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+    approval = ApprovalFactory(start_at=timezone.localdate() - datetime.timedelta(days=100))
+    suspension = SuspensionFactory(
+        approval=approval,
+        start_at=timezone.localdate() - datetime.timedelta(days=5),
+        end_at=timezone.localdate() + datetime.timedelta(days=30),
+        reason=Suspension.Reason.FINISHED_CONTRACT,
+        siae=membership.company,
+    )
+    job_seeker = approval.user
+    client.force_login(membership.user)
+
+    url = reverse(
+        "next_steps_views:suspension", kwargs={"public_id": job_seeker.public_id, "suspension_id": suspension.pk}
+    )
+    # The ongoing suspension of the file opens in the side drawer.
+    assertContains(client.get(page_url(job_seeker)), f'hx-get="{url}"')
+    response = client.get(url, HTTP_HX_REQUEST="true")
+    assertContains(response, f"Du {fr(suspension.start_at)} au {fr(suspension.end_at)}")
+    assertContains(response, Suspension.Reason.FINISHED_CONTRACT.label)
+    assertContains(response, membership.company.display_name)
+    # Another job seeker's suspension is not found from this page.
+    other = JobSeekerFactory()
+    other_url = reverse(
+        "next_steps_views:suspension", kwargs={"public_id": other.public_id, "suspension_id": suspension.pk}
+    )
+    assert client.get(other_url, HTTP_HX_REQUEST="true").status_code == 404
+
+
+def test_eligibility_drawer(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+    job_seeker = diagnosis.job_seeker
+    client.force_login(membership.user)
+
+    url = reverse("next_steps_views:eligibility", kwargs={"public_id": job_seeker.public_id})
+    assertContains(client.get(page_url(job_seeker)), f'hx-get="{url}"')
+    response = client.get(url, HTTP_HX_REQUEST="true")
+    assertContains(response, "Valide jusqu’au")
+    assertContains(response, fr(diagnosis.expires_at))
+    assertContains(response, "Bénéficiaire du RSA")
+
+    # Without a diagnosis to show, nothing to open.
+    other_url = reverse("next_steps_views:eligibility", kwargs={"public_id": JobSeekerFactory().public_id})
+    assert client.get(other_url, HTTP_HX_REQUEST="true").status_code == 404

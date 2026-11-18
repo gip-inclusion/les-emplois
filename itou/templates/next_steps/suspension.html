@@ -1,0 +1,54 @@
+{% load str_filters %}
+{# A suspension of the job seeker's PASS IAE, in the side drawer or inside a page. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">PASS&nbsp;IAE de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">Suspension</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        <ul class="list-data mb-0">
+            <li>
+                <small>Période</small>
+                <strong>Du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</strong>
+            </li>
+            <li>
+                <small>Motif</small>
+                <strong>{{ suspension.get_reason_display }}</strong>
+            </li>
+            {% if suspension.reason_explanation %}
+                <li>
+                    <small>Explications</small>
+                    <strong>{{ suspension.reason_explanation|linebreaksbr }}</strong>
+                </li>
+            {% endif %}
+            {% if suspension.siae %}
+                <li>
+                    <small>Déclarée par</small>
+                    <strong>{{ suspension.siae.display_name }}</strong>
+                </li>
+            {% endif %}
+            <li>
+                <small>Le</small>
+                <strong>{{ suspension.created_at|date:"d/m/Y" }}</strong>
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+        <a class="btn btn-outline-primary btn-ico"
+           href="{% url "approvals:details" public_id=suspension.approval.public_id %}?back_url={{ job_seeker_url|urlencode }}">
+            <i class="ri-pass-valid-line fw-medium" aria-hidden="true"></i>
+            <span>Voir le PASS&nbsp;IAE</span>
+        </a>
+    </div>
+</div>

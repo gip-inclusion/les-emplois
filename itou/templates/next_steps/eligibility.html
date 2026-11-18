@@ -1,0 +1,52 @@
+{% load str_filters %}
+{# The eligibility diagnosis of the job seeker's file, in the side drawer or inside a page: who, when, which criteria. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">Diagnostic d’éligibilité</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        <ul class="list-data mb-4">
+            <li>
+                <small>Réalisé le</small>
+                <strong>{{ diagnosis.created_at|date:"d/m/Y" }}</strong>
+            </li>
+            {% if diagnosis.author %}
+                <li>
+                    <small>Par</small>
+                    <strong>
+                        {{ diagnosis.author.get_full_name }}
+                        {% if diagnosis.author_organization %}· {{ diagnosis.author_organization.display_name }}{% endif %}
+                    </strong>
+                </li>
+            {% endif %}
+            <li>
+                <small>{% if diagnosis.is_valid %}Valide jusqu’au{% else %}Expiré le{% endif %}</small>
+                <strong>{{ diagnosis.expires_at|date:"d/m/Y" }}</strong>
+            </li>
+        </ul>
+        <h3 class="h4 mb-2">Critères administratifs</h3>
+        {% if criteria %}
+            <ul class="mb-0">
+                {% for selected in criteria %}
+                    <li>
+                        {{ selected.administrative_criteria.name }}
+                        {% if selected.certified_at %}
+                            <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted mb-0">Aucun critère renseigné.</p>
+        {% endif %}
+    </div>
+</div>

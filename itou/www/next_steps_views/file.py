@@ -13,7 +13,7 @@ from django.utils import timezone
 from itou.approvals.enums import ApprovalStatus
 from itou.companies.models import ProSupportReport
 from itou.users.perms import can_view_pro_support_report
-from itou.www.next_steps_views.advisors import _job_application_url, _job_applications
+from itou.www.next_steps_views.advisors import _job_applications
 from itou.www.next_steps_views.situation import contract_place
 
 
@@ -56,7 +56,7 @@ class Fact:
     badge_classes: str = ""
     # Shown with the platform's own state badge.
     job_application: object = None
-    # The page with its details, if any: the label leads there.
+    # Its details in the side drawer, if any: the label opens them.
     url: str = ""
 
 
@@ -71,13 +71,15 @@ class Part:
     badge_classes: str = ""
     link_label: str = ""
     link_url: str = ""
+    # The link opens the side drawer rather than the existing page.
+    link_in_drawer: bool = False
 
     @property
     def can_open(self):
         return bool(self.facts)
 
 
-def _approval_part(approval):
+def _approval_part(approval, job_seeker):
     if approval is None:
         return Part("approval", f"PASS{NBSP}IAE", "ri-pass-valid-line", f"Aucun PASS{NBSP}IAE délivré")
     badge_label, badge_tone = APPROVAL_BADGES[approval.state]
@@ -95,6 +97,10 @@ def _approval_part(approval):
                     "Suspension en cours",
                     _period(suspension.start_at, suspension.end_at),
                     detail=suspension.get_reason_display(),
+                    url=reverse(
+                        "next_steps_views:suspension",
+                        kwargs={"public_id": job_seeker.public_id, "suspension_id": suspension.pk},
+                    ),
                 )
             )
     return Part(
@@ -110,7 +116,7 @@ def _approval_part(approval):
     )
 
 
-def _eligibility_part(diagnosis, summary):
+def _eligibility_part(diagnosis, summary, job_seeker):
     if diagnosis is None:
         return Part(
             "eligibility",
@@ -145,6 +151,9 @@ def _eligibility_part(diagnosis, summary):
         # Valid either way; the summary says when it is through the PASS IAE.
         badge_label="Valide",
         badge_classes=_badge("success"),
+        link_label="Voir le diagnostic",
+        link_url=reverse("next_steps_views:eligibility", kwargs={"public_id": job_seeker.public_id}),
+        link_in_drawer=True,
     )
 
 
@@ -183,7 +192,10 @@ def _job_applications_part(request, job_seeker):
             job_application.to_company.display_name,
             detail=f"Envoyée le {_fr(timezone.localdate(job_application.created_at))}",
             job_application=job_application,
-            url=_job_application_url(request, job_application),
+            url=reverse(
+                "next_steps_views:job_application",
+                kwargs={"public_id": job_seeker.public_id, "job_application_id": job_application.pk},
+            ),
         )
         for job_application in job_applications[:JOB_APPLICATIONS_SHOWN]
     ]
@@ -260,7 +272,10 @@ def file_parts(
     """The parts of the file the user may see, each with the scope of the tab it leads to."""
     parts = []
     if request.from_iae_actor:
-        parts += [_approval_part(approval), _eligibility_part(iae_eligibility_diagnosis, eligibility_summary)]
+        parts += [
+            _approval_part(approval, job_seeker),
+            _eligibility_part(iae_eligibility_diagnosis, eligibility_summary, job_seeker),
+        ]
     if can_view_contracts:
         parts.append(_contracts_part(request, job_seeker, contracts))
     parts.append(_job_applications_part(request, job_seeker))

@@ -6,6 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+from itou.approvals.models import Suspension
 from itou.approvals.utils import get_contracts
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -18,6 +19,7 @@ from itou.users.perms import (
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
+from itou.www.apply.views.process_views import job_application_sender_left_org
 from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import (
@@ -28,7 +30,12 @@ from itou.www.next_steps_views.actions import (
     group_actions,
     next_action,
 )
-from itou.www.next_steps_views.advisors import advisor_acts, visible_orientations
+from itou.www.next_steps_views.advisors import (
+    _job_application_url,
+    _job_applications,
+    advisor_acts,
+    visible_orientations,
+)
 from itou.www.next_steps_views.barriers import gather_barriers
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
@@ -252,3 +259,85 @@ def orientation(request, public_id, orientation_id):
     }
     template_name = "next_steps/orientation.html" if request.htmx else "next_steps/orientation_page.html"
     return render(request, template_name, context)
+
+
+def _drawer_or_page(request, drawer_template, title, context):
+    """In the side drawer when loaded by htmx, an ordinary page otherwise, as when JavaScript does not run."""
+    context |= {"in_drawer": bool(request.htmx), "drawer_template": drawer_template, "page_title": title}
+    return render(request, drawer_template if request.htmx else "next_steps/drawer_page.html", context)
+
+
+def _job_seeker_or_404(request, public_id):
+    if not can_view_next_steps(request):
+        raise Http404
+    return get_object_or_404(
+        User.objects.select_related("jobseeker_profile"), kind=UserKind.JOB_SEEKER, public_id=public_id
+    )
+
+
+@readonly_view
+def job_application(request, public_id, job_application_id):
+    """A job application from the job seeker's file: what its "Candidature" section shows on its own page.
+
+    Only a job application whose details the user may read on the job applications tab.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    job_application = get_object_or_404(
+        _job_applications(request, job_seeker)
+        .filter(user_can_see_details=True)
+        .select_related("sender", "sender_company", "sender_prescriber_organization", "to_company")
+        .prefetch_related("selected_jobs__appellation", "selected_jobs__company", "prior_actions"),
+        pk=job_application_id,
+    )
+    context = {
+        "job_seeker": job_seeker,
+        "job_application": job_application,
+        "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "full_url": _job_application_url(request, job_application),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : candidature",
+    }
+    return _drawer_or_page(
+        request, "next_steps/job_application.html", job_application.to_company.display_name, context
+    )
+
+
+@readonly_view
+def suspension(request, public_id, suspension_id):
+    """A suspension of the job seeker's PASS IAE, for those who see the PASS IAE in the file."""
+    job_seeker = _job_seeker_or_404(request, public_id)
+    if not request.from_iae_actor:
+        raise Http404
+    suspension = get_object_or_404(
+        Suspension.objects.filter(approval__user=job_seeker).select_related("approval", "siae"), pk=suspension_id
+    )
+    context = {
+        "job_seeker": job_seeker,
+        "suspension": suspension,
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : suspension",
+    }
+    return _drawer_or_page(request, "next_steps/suspension.html", "Suspension du PASS IAE", context)
+
+
+@readonly_view
+def eligibility(request, public_id):
+    """The eligibility diagnosis shown in the job seeker's file: the same one, by the same rule."""
+    job_seeker = _job_seeker_or_404(request, public_id)
+    if not request.from_iae_actor:
+        raise Http404
+    diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+        job_seeker, for_siae=request.current_organization if request.from_employer else None
+    )
+    if diagnosis is None:
+        raise Http404
+    context = {
+        "job_seeker": job_seeker,
+        "diagnosis": diagnosis,
+        "criteria": diagnosis.selected_administrative_criteria.select_related("administrative_criteria").order_by(
+            "administrative_criteria__level", "administrative_criteria__ui_rank"
+        ),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : diagnostic d’éligibilité",
+    }
+    return _drawer_or_page(request, "next_steps/eligibility.html", "Diagnostic d’éligibilité", context)

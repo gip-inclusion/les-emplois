@@ -1,5 +1,4 @@
 {% load badges %}
-{% load url_add_query %}
 {# The job seeker's file (next_steps_views.file): one part per subject, each leading to the existing tab. #}
 {# A part with facts folds in a <details>, without JavaScript; a part without any is a plain line, nothing to open. #}
 <section aria-labelledby="next-steps-file">
@@ -21,10 +20,17 @@
                             {% for fact in part.facts %}
                                 <li>
                                     {% if fact.url %}
-                                        {# Leads to its own page, as in the job applications tab. #}
+                                        {# Opens its details in the side drawer; without JavaScript, as a page. #}
                                         <small>
                                             <a class="link-tertiary fw-bold"
-                                               href="{% url_add_query fact.url back_url=request.get_full_path %}">{{ fact.label }}</a>
+                                               href="{{ fact.url }}"
+                                               hx-get="{{ fact.url }}"
+                                               hx-target="#next-step-journey"
+                                               hx-swap="outerHTML"
+                                               hx-indicator="#next-step-journey"
+                                               data-bs-toggle="offcanvas"
+                                               data-bs-target="#next-step-drawer"
+                                               aria-controls="next-step-drawer">{{ fact.label }}</a>
                                         </small>
                                     {% else %}
                                         <small>{{ fact.label }}</small>
@@ -41,7 +47,17 @@
                                 </li>
                             {% endfor %}
                         </ul>
-                        {% if part.link_url %}
+                        {% if part.link_url and part.link_in_drawer %}
+                            <a class="btn btn-sm btn-outline-primary mt-3"
+                               href="{{ part.link_url }}"
+                               hx-get="{{ part.link_url }}"
+                               hx-target="#next-step-journey"
+                               hx-swap="outerHTML"
+                               hx-indicator="#next-step-journey"
+                               data-bs-toggle="offcanvas"
+                               data-bs-target="#next-step-drawer"
+                               aria-controls="next-step-drawer">{{ part.link_label }}</a>
+                        {% elif part.link_url %}
                             <a class="btn btn-sm btn-outline-primary mt-3"
                                href="{{ part.link_url }}?back_url={{ request.get_full_path|urlencode }}">{{ part.link_label }}</a>
                         {% endif %}
