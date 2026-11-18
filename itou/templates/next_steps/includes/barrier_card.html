@@ -33,6 +33,22 @@
                 {{ clue.text }}
                 {% if clue.certified %}<span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>{% endif %}
             </p>
+            {% if clue.reports %}
+                {# The reports it comes from, in the side drawer; without JavaScript, as pages. #}
+                <p class="d-flex flex-wrap column-gap-3 fs-xs mb-0">
+                    {% for label, url in clue.reports %}
+                        <a class="link-tertiary"
+                           href="{{ url }}"
+                           hx-get="{{ url }}"
+                           hx-target="#next-step-journey"
+                           hx-swap="outerHTML"
+                           hx-indicator="#next-step-journey"
+                           data-bs-toggle="offcanvas"
+                           data-bs-target="#next-step-drawer"
+                           aria-controls="next-step-drawer"><i class="ri-file-edit-line" aria-hidden="true"></i> {{ label }}</a>
+                    {% endfor %}
+                </p>
+            {% endif %}
         {% endif %}
     {% endfor %}
     {% if card.search_url %}

@@ -44,13 +44,13 @@ def employer():
 def test_three_sources_in_three_columns(client, employer):
     company = employer.company_set.first()
     job_seeker = JobSeekerFactory()
-    ProSupportReportFactory(
+    older = ProSupportReportFactory(
         contract__company=company,
         contract__job_seeker=job_seeker,
         barriers=[Barrier.MOBILITY, Barrier.DIGITAL],
         created_at=days_ago(400),
     )
-    ProSupportReportFactory(
+    latest = ProSupportReportFactory(
         contract__company=company,
         contract__job_seeker=job_seeker,
         barriers=[Barrier.MOBILITY, Barrier.HEALTH],
@@ -85,8 +85,19 @@ def test_three_sources_in_three_columns(client, employer):
     assert [card.to_confirm for card in barriers.to_work] == [False, True, True]
     # An ongoing orientation towards a mobility service.
     assert keys(barriers.in_progress) == [Barrier.MOBILITY]
-    # In the report before, no longer in the latest one.
+    # In the report before, no longer in the latest one: both open in the side drawer.
     assert keys(barriers.lifted) == [Barrier.DIGITAL]
+
+    def report_url(report):
+        return reverse(
+            "next_steps_views:pro_support_report",
+            kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+        )
+
+    assert [url for _, url in barriers.lifted[0].clues[0].reports] == [report_url(older), report_url(latest)]
+    assertContains(response, f'hx-get="{report_url(older)}"')
+    # A barrier named in the latest report leads to it too.
+    assert barriers.to_work[0].clues[0].reports == [("Voir le bilan", report_url(latest))]
     assertContains(response, f"orientation vers « {orientation.service.name} »")
     assertContains(response, "Repéré par le diagnostic d’éligibilité IAE", count=2)
 

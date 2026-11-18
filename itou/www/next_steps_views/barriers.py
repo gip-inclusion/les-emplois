@@ -98,6 +98,8 @@ class Clue:
     text: str
     certified: bool = False
     url: str = ""
+    # The reports it comes from, opened in the side drawer: (label, url).
+    reports: list = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass
@@ -156,6 +158,16 @@ def _statement_text(statement):
     return f"Confirmé le {_fr(statement.created_at)} à la validation de l’éligibilité" + (f", par {by}" if by else "")
 
 
+def _report_link(job_seeker, report, label):
+    return (
+        label,
+        reverse(
+            "next_steps_views:pro_support_report",
+            kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+        ),
+    )
+
+
 def _search_url(request, job_seeker, key):
     query = {"back_url": reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})}
     if job_seeker.city_slug:
@@ -192,10 +204,16 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
     latest = reports[0] if reports else None
     lifted = []
     if latest:
+        latest_link = [_report_link(job_seeker, latest, "Voir le bilan")]
         for key in latest.barriers:
-            card(key).clues.append(Clue("report", _report_text(latest)))
+            card(key).clues.append(Clue("report", _report_text(latest), reports=latest_link))
         if latest.other_barrier:
-            cards[OTHER] = Card(OTHER, latest.other_barrier, "Autre frein", [Clue("report", _report_text(latest))])
+            cards[OTHER] = Card(
+                OTHER,
+                latest.other_barrier,
+                "Autre frein",
+                [Clue("report", _report_text(latest), reports=latest_link)],
+            )
         if len(reports) > 1:
             previous = reports[1]
             for key in previous.barriers:
@@ -209,6 +227,10 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                                     "lifted",
                                     f"Noté dans le bilan du {_fr(previous.created_at)}, "
                                     f"plus dans celui du {_fr(latest.created_at)}",
+                                    reports=[
+                                        _report_link(job_seeker, previous, f"Bilan du {_fr(previous.created_at)}"),
+                                        _report_link(job_seeker, latest, f"Bilan du {_fr(latest.created_at)}"),
+                                    ],
                                 )
                             ],
                         )
