@@ -873,6 +873,10 @@ RDV_INSERTION_WEBHOOK_SECRET = os.getenv("RDV_INSERTION_WEBHOOK_SECRET")
 # rdv-insertion API dedicated to les emplois, distinct from the generic API above
 RDV_INSERTION_PLATEFORME_INCLUSION_API_BASE_URL = os.getenv("RDV_INSERTION_PLATEFORME_INCLUSION_API_BASE_URL")
 RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN = os.getenv("RDV_INSERTION_PLATEFORME_INCLUSION_API_TOKEN")
+# RDV Service Public: employers propose appointments with their own RDV-S account, linked with OAuth
+RDV_SERVICE_PUBLIC_BASE_URL = os.getenv("RDV_SERVICE_PUBLIC_BASE_URL")
+RDV_SERVICE_PUBLIC_CLIENT_ID = os.getenv("RDV_SERVICE_PUBLIC_CLIENT_ID")
+RDV_SERVICE_PUBLIC_CLIENT_SECRET = os.getenv("RDV_SERVICE_PUBLIC_CLIENT_SECRET")
 
 # API Particuliers
 # ------------------------------------------------------------------------------
