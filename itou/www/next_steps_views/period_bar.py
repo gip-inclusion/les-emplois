@@ -95,11 +95,31 @@ class Note:
 
 
 @dataclasses.dataclass
+class Lane:
+    """A contract under the blocks, from its start to its end on their grid."""
+
+    label: str
+    # ongoing, ended (CSS modifiers)
+    kind: str
+    # Its bar's left and right, as CSS.
+    style: str
+    # Its label, under the bar, from the bar's start, or up to its end when it starts late in the strip.
+    label_style: str
+    label_align: str
+    # It starts before the strip, or goes on after it: its bar is cut there.
+    before: bool = False
+    after: bool = False
+
+
+@dataclasses.dataclass
 class PeriodBar:
     blocks: list
     notes: list = dataclasses.field(default_factory=list)
     # Set when today falls in one of the blocks.
     today_display: str = ""
+    # Contracts drawn under the blocks, and where today runs through them, as CSS.
+    lanes: list = dataclasses.field(default_factory=list)
+    today_style: str = ""
 
 
 def _share_columns(blocks):
@@ -148,6 +168,80 @@ def _mark_today(bar, remaining=""):
             block.elapsed = "100"
         before += block.columns
     return bar
+
+
+# The blocks' row has the gutter `g-1`: each column keeps .125rem on either side of its block.
+HALF_GUTTER_REM = 0.125
+
+
+def _grid_point(bar, index, share):
+    """Where a point `share` (0 to 1) of the way through block `index` falls: a percentage and a correction in rem.
+
+    Positioned against the row's box, which the columns tile: the block runs from the start of its column plus half
+    a gutter to its end minus half a gutter.
+    """
+    start = sum(block.columns for block in bar.blocks[:index]) / COLUMNS * 100
+    width = bar.blocks[index].columns / COLUMNS * 100
+    return start + share * width, HALF_GUTTER_REM - 2 * HALF_GUTTER_REM * share
+
+
+def _date_point(bar, day, *, at_end=False):
+    """The grid point at the start of `day`, or at its end, and whether `day` falls before or after the strip.
+
+    A start and an end on the same boundary between two blocks fall in their own block: a contract ending on the
+    day before a suspension ends at the end of the PASS IAE block, not at the start of the suspension block.
+    """
+    first, last = bar.blocks[0], bar.blocks[-1]
+    if day < first.start or (day == first.start and not at_end):
+        return _grid_point(bar, 0, 0), day < first.start, False
+    if day > last.end:
+        return _grid_point(bar, len(bar.blocks) - 1, 1), False, True
+    for index, block in enumerate(bar.blocks):
+        if block.start <= day <= block.end:
+            days = (day - block.start).days + (1 if at_end else 0)
+            return _grid_point(bar, index, days / ((block.end - block.start).days + 1)), False, False
+    # Between two blocks that do not follow each other: at the end of the previous one.
+    index = max(i for i, block in enumerate(bar.blocks) if block.end < day)
+    return _grid_point(bar, index, 1), False, False
+
+
+def _calc(percent, rem):
+    sign = "+" if rem >= 0 else "-"
+    return f"calc({percent:.3f}% {sign} {abs(rem):.3f}rem)"
+
+
+def _contract_lane(bar, contract, where):
+    (start, start_rem), before, _ = _date_point(bar, contract.start_date)
+    # Without an end, it goes on after the strip.
+    if contract.end_date is None:
+        (end, end_rem), after = _grid_point(bar, len(bar.blocks) - 1, 1), True
+    else:
+        (end, end_rem), _, after = _date_point(bar, contract.end_date, at_end=True)
+    note = _contract_note(contract, where)
+    left, right = _calc(start, start_rem), _calc(100 - end, -end_rem)
+    from_start = start < 50
+    return Lane(
+        label=note.text,
+        kind="ended" if contract.has_ended else "ongoing",
+        style=f"left: {left}; right: {right}",
+        label_style=f"padding-left: {left}" if from_start else f"padding-right: {right}",
+        label_align="start" if from_start else "end",
+        before=before,
+        after=after,
+    )
+
+
+def _on_the_strip(bar, contract):
+    first, last = bar.blocks[0], bar.blocks[-1]
+    return contract.start_date <= last.end and (contract.end_date is None or contract.end_date >= first.start)
+
+
+def _today_style(bar):
+    for index, block in enumerate(bar.blocks):
+        if block.today:
+            percent, rem = _grid_point(bar, index, float(block.today) / 100)
+            return f"left: {_calc(percent, rem)}"
+    return ""
 
 
 def _remaining(approval):
@@ -370,9 +464,16 @@ def situation_bar(approval, contracts, where):
         )
         for suspension, where_ in clipped
     ]
-    notes += [_contract_note(contract, where) for contract in contracts]
-    if not blocks and not notes:
+    if not blocks and not notes and not contracts:
         return None
-    if blocks:
-        _share_columns(blocks)
-    return _mark_today(PeriodBar(blocks=blocks, notes=notes), _remaining(approval) if approval else "")
+    bar = PeriodBar(blocks=_share_columns(blocks) if blocks else [], notes=notes)
+    _mark_today(bar, _remaining(approval) if approval else "")
+    # The contracts the strip covers, under its blocks at their dates; the others as notes.
+    for contract in contracts:
+        if bar.blocks and _on_the_strip(bar, contract):
+            bar.lanes.append(_contract_lane(bar, contract, where))
+        else:
+            bar.notes.append(_contract_note(contract, where))
+    if bar.lanes:
+        bar.today_style = _today_style(bar)
+    return bar

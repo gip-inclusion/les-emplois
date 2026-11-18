@@ -206,10 +206,26 @@ def test_situation_bar():
     ]
     assert sum(block.columns for block in bar.blocks) == 12
     assert [block.today != "" for block in bar.blocks] == [False, False, True, False]
-    assert [(note.text, note.variant) for note in bar.notes] == [
-        (f"Contrat chez {done.company.display_name} du 01/02/2025 au 31/08/2025", "info"),
-        (f"Contrat chez {running.company.display_name} depuis le 01/11/2025, jusqu’au 31/03/2027", "ok"),
+    # The contracts under the blocks, at their dates, rather than as notes.
+    assert bar.notes == []
+    assert [(lane.label, lane.kind, lane.before, lane.after) for lane in bar.lanes] == [
+        (f"Contrat chez {done.company.display_name} du 01/02/2025 au 31/08/2025", "ended", False, False),
+        (
+            f"Contrat chez {running.company.display_name} depuis le 01/11/2025, jusqu’au 31/03/2027",
+            "ongoing",
+            False,
+            False,
+        ),
     ]
+    # The first starts with the PASS IAE, at the start of the first block; the second ends with it, at the end of
+    # the last PASS IAE block (the pending prolongation comes after).
+    assert bar.lanes[0].style.startswith("left: calc(0.000% + 0.125rem);")
+    first = bar.blocks[0].columns / 12 * 100
+    assert bar.lanes[0].style.endswith(f"right: calc({100 - first:.3f}% + 0.125rem)")
+    passes = sum(block.columns for block in bar.blocks[:3]) / 12 * 100
+    assert bar.lanes[1].style.endswith(f"right: calc({100 - passes:.3f}% + 0.125rem)")
+    # Today runs through them.
+    assert bar.today_style.startswith("left: calc(")
 
 
 @freeze_time("2026-11-16")
