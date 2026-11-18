@@ -3,12 +3,9 @@
 {% if form and form.is_bound %}
     {% bootstrap_form_errors form type="non_fields" %}
 {% endif %}
-{# itou-theme's list of data: the label in small, the answer below. #}
-<ul class="list-data mb-0">
+{# Each answer framed, as the other facts of the drawers. #}
+<div class="d-flex flex-column gap-2">
     {% for label, value in recap %}
-        <li>
-            <small>{{ label }}</small>
-            <strong>{{ value }}</strong>
-        </li>
+        {% include "next_steps/includes/fact.html" with label=label value=value detail="" only %}
     {% endfor %}
-</ul>
+</div>

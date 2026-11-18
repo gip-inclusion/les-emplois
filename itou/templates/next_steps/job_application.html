@@ -1,7 +1,11 @@
 {% load badges %}
+{% load format_filters %}
+{% load matomo %}
 {% load str_filters %}
 {% load url_add_query %}
-{# A job application from the job seeker's file, in the side drawer or inside a page: its "Candidature" section. #}
+{# A job application from the job seeker's file, in the side drawer or inside a page: what the "Candidature" #}
+{# section of its own page shows (apply/includes/job_application_sender_info.html, job_application_info.html), #}
+{# framed as the other drawers' facts. Keep them in step. #}
 <div id="next-step-journey" class="d-flex flex-column h-100">
     <div class="px-4 pt-4 pb-3 border-bottom">
         <div class="d-flex align-items-start gap-3">
@@ -17,16 +21,101 @@
     </div>
 
     <div class="flex-grow-1 overflow-auto p-4">
-        {# The same as the "Candidature" section of the job application's own page, from its own templates. #}
-        {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
-        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
-        {% if job_application.can_have_prior_action and job_application.prior_actions.all %}
-            <hr class="my-4">
-            <h3>Action préalable à l'embauche</h3>
-            {% for prior_action in job_application.prior_actions.all %}
-                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last with_oob_state_update=False %}
-            {% endfor %}
+        {% if job_application_sender_left_org %}
+            <div class="bg-warning-lighter rounded-2 p-3 mb-3">
+                <p class="fs-sm mb-0">L’émetteur de cette candidature ne fait plus partie de l’organisation émettrice.</p>
+            </div>
         {% endif %}
+        <div class="d-flex flex-column gap-2">
+            <div class="border rounded-2 px-3 py-2">
+                <span class="d-block fs-sm text-muted">Émetteur</span>
+                <span class="d-block fw-bold">{{ job_application.sender.first_name|title }} {{ job_application.sender.last_name|upper }}</span>
+                <span class="d-block fs-sm">{{ job_application.get_sender_kind_display }}</span>
+            </div>
+            {% if job_application.sender_prescriber_organization or job_application.sender_company %}
+                <div class="border rounded-2 px-3 py-2">
+                    <span class="d-block fs-sm text-muted">Organisation</span>
+                    <span class="d-flex flex-wrap align-items-center column-gap-2">
+                        <span class="fw-bold">
+                            {% if job_application.sender_prescriber_organization %}
+                                {{ job_application.sender_prescriber_organization.display_name }}
+                            {% else %}
+                                {{ job_application.sender_company.display_name }}
+                            {% endif %}
+                        </span>
+                        {% if job_application.is_sent_by_authorized_prescriber %}
+                            <span class="badge badge-xs rounded-pill bg-warning">Prescripteur habilité</span>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+            <div class="border rounded-2 px-3 py-2">
+                <span class="d-block fs-sm text-muted">Adresse e-mail</span>
+                {% if job_application_sender_left_org %}
+                    <span class="d-block fs-sm text-warning fst-italic">Les réponses seront transmises aux administrateurs de l’organisation</span>
+                {% else %}
+                    <span class="d-flex align-items-center column-gap-1">
+                        <span class="fw-bold text-break">{{ job_application.sender.email }}</span>
+                        {% matomo_event "candidature" "clic" "copied_sender_email" as matomo_event_attrs %}
+                        {% include "includes/copy_to_clipboard.html" with content=job_application.sender.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                    </span>
+                {% endif %}
+            </div>
+            {% if job_application.sender.phone %}
+                <div class="border rounded-2 px-3 py-2">
+                    <span class="d-block fs-sm text-muted">Téléphone</span>
+                    <span class="d-flex align-items-center column-gap-1">
+                        <span class="fw-bold">{{ job_application.sender.phone|format_phone }}</span>
+                        {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
+                        {% include "includes/copy_to_clipboard.html" with content=job_application.sender.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                    </span>
+                </div>
+            {% endif %}
+            {% include "next_steps/includes/fact.html" with label="Date" value=job_application.created_at|date:"d/m/Y" detail="" only %}
+            {% if job_application.message %}
+                <div class="border rounded-2 px-3 py-2">
+                    <span class="d-block fs-sm text-muted mb-1">Message de candidature</span>
+                    <div class="fs-sm">{{ job_application.message|linebreaks }}</div>
+                </div>
+            {% endif %}
+            {% if job_application.to_company != request.current_organization %}
+                <div class="border rounded-2 px-3 py-2">
+                    <span class="d-block fs-sm text-muted">Employeur destinataire</span>
+                    <a class="fw-bold link-tertiary"
+                       href="{% url "companies_views:card" company_pk=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}">{{ job_application.to_company.display_name }}</a>
+                </div>
+            {% endif %}
+            {% with jobs=job_application.selected_jobs.all %}
+                <div class="border rounded-2 px-3 py-2">
+                    <span class="d-block fs-sm text-muted">{{ jobs|pluralizefr:"Poste recherché,Postes recherchés" }}</span>
+                    {% for job in jobs %}
+                        <a class="d-block fw-bold link-tertiary"
+                           href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{{ job.display_name }} ({{ job.appellation.rome_id }})</a>
+                        <span class="d-block fs-sm{% if not forloop.last %} mb-1{% endif %}">
+                            <i class="ri-map-pin-2-line" aria-hidden="true"></i>
+                            {% if job.location %}
+                                {{ job.location }}
+                            {% else %}
+                                {{ job.company.city|title }} ({{ job.company.department }})
+                            {% endif %}
+                        </span>
+                    {% empty %}
+                        <span class="d-block fw-bold">Candidature spontanée</span>
+                    {% endfor %}
+                </div>
+            {% endwith %}
+            {% if job_application.can_have_prior_action %}
+                {% for prior_action in job_application.prior_actions.all %}
+                    <div class="border rounded-2 px-3 py-2">
+                        <span class="d-block fs-sm text-muted">Action préalable à l’embauche · {{ prior_action.action_kind }}</span>
+                        <span class="d-block fw-bold">{{ prior_action.get_action_display }}</span>
+                        <span class="d-block fs-sm">
+                            Du {{ prior_action.dates.lower|date:"d/m/Y" }} au {{ prior_action.dates.upper|date:"d/m/Y" }}
+                        </span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 
     <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">

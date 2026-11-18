@@ -1,0 +1,7 @@
+{# A fact in a side drawer, framed as the advisor's: its label in small, its value in bold, a detail under it. #}
+{# Every drawer lays out its facts with it, stacked on the whole width. #}
+<div class="border rounded-2 px-3 py-2">
+    <span class="d-block fs-sm text-muted">{{ label }}</span>
+    {% if value %}<span class="d-block fw-bold text-break">{{ value }}</span>{% endif %}
+    {% if detail %}<span class="d-block fs-sm text-break">{{ detail }}</span>{% endif %}
+</div>
