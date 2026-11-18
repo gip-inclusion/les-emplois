@@ -13,7 +13,7 @@ from django.utils import timezone
 from itou.approvals.enums import ApprovalStatus
 from itou.companies.models import ProSupportReport
 from itou.users.perms import can_view_pro_support_report
-from itou.www.next_steps_views.advisors import _job_applications
+from itou.www.next_steps_views.advisors import _job_application_url, _job_applications
 from itou.www.next_steps_views.situation import contract_place
 
 
@@ -56,6 +56,8 @@ class Fact:
     badge_classes: str = ""
     # Shown with the platform's own state badge.
     job_application: object = None
+    # The page with its details, if any: the label leads there.
+    url: str = ""
 
 
 @dataclasses.dataclass
@@ -181,6 +183,7 @@ def _job_applications_part(request, job_seeker):
             job_application.to_company.display_name,
             detail=f"Envoyée le {_fr(timezone.localdate(job_application.created_at))}",
             job_application=job_application,
+            url=_job_application_url(request, job_application),
         )
         for job_application in job_applications[:JOB_APPLICATIONS_SHOWN]
     ]

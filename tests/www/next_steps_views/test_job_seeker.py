@@ -189,6 +189,10 @@ def test_file_parts(client):
     # Only this employer's job applications, with the platform's state badge.
     assert parts["job_applications"].summary == "1 candidature"
     assert [fact.job_application for fact in parts["job_applications"].facts] == [job_application]
+    # Each leads to its own page.
+    job_application_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    assert [fact.url for fact in parts["job_applications"].facts] == [job_application_url]
+    assertContains(response, f'href="{job_application_url}?back_url=')
     report_url = reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id})
     assert parts["report"].link_url == report_url
     # The employer may see the contact details.
