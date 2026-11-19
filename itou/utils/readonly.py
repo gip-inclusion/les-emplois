@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 
 def only_readonly_allowed(execute, sql, params, many, context):
-    if not sql.upper().startswith(("SELECT", "SAVEPOINT ", "RELEASE SAVEPOINT ")):
+    if not sql.upper().startswith(("(SELECT", "SELECT", "SAVEPOINT ", "RELEASE SAVEPOINT ")):
         raise RuntimeError("Only SAVEPOINT/SELECT/RELEASE SAVEPOINT statements allowed in readonly views")
     return execute(sql, params, many, context)
 
