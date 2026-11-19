@@ -4,8 +4,9 @@ import xworkflows
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from django.utils.timezone import localtime
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.otp.enums import RESET_REQUEST_TRANSITION_NAMES, ResetRequestTransition
@@ -64,11 +65,29 @@ class ResetRequestAdmin(ItouModelAdmin):
     save_on_top = False
     change_form_template = "admin/otp/resetrequest/change_form.html"
     list_display = ("user", "state", "created_at", "updated_at")
-    fields = ("user", "structure", "audit_trail", "state", "created_at", "updated_at")
+    fields = ("user", "devices", "structure", "audit_trail", "state", "created_at", "updated_at")
     readonly_fields = fields
     inlines = (PkSupportRemarkInline, ResetRequestTransitionsInline)
     list_filter = ["state", "created_at"]
     search_fields = ["user__email", "user__full_name_search_vector"]
+
+    def devices(self, obj):
+        return format_html(
+            "<table><tr><th>Nom</th><th>Création</th><th>Dernière utilisation</th></tr>{}</table>",
+            format_html_join(
+                "\n",
+                '<tr><td><a href="{}">{}</a></td><td>{}</td><td>{}</td></tr>',
+                (
+                    (
+                        reverse("admin:otp_itoutotpdevice_change", args=(device.pk,)),
+                        device.name,
+                        f"{localtime(device.created_at):%Y-%m-%d %H:%M:%S}",
+                        f"{localtime(device.last_used_at):%Y-%m-%d %H:%M:%S}",
+                    )
+                    for device in obj.user.itou_totp_devices.filter(disabled_at=None, confirmed=True)
+                ),
+            ),
+        )
 
     def audit_trail(self, obj):
         return mark_safe("<br>".join(obj.credibility_explanation()))
