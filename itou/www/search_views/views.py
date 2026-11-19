@@ -438,6 +438,7 @@ def search_services_results(request, template_name="search/services/results.html
             thematics=thematics,
             reception=reception,
             service_types=form.cleaned_data["services"],
+            keyword=None,
         ).select_related("structure", "source")
 
         # We only make available (for the user to choose from) the funding

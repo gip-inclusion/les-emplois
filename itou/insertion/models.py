@@ -56,6 +56,7 @@ logger = logging.getLogger(__name__)
 SOURCE_DORA_VALUE = "dora"
 
 SERVICE_SEARCH_RADIUS_KM = 50
+REMOTE_SERVICES_SCORE_DISTANCE = 0.5
 
 
 class GeolocatedAddressMixin(models.Model):
@@ -200,7 +201,37 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
 
 class ServiceQuerySet(models.QuerySet):
-    def search(self, *, city, thematics, reception, service_types):
+    def _get_annotations(self, city, reception):
+        annotations = {}
+
+        annotations["distance"] = Distance("coordinates", city.coords) / 1000
+        annotations["distance_score"] = models.ExpressionWrapper(
+            1 - models.F("distance") / SERVICE_SEARCH_RADIUS_KM, output_field=models.FloatField()
+        )
+
+        if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value:
+            annotations["is_in_person"] = models.Value(True, output_field=models.BooleanField())
+            annotations["is_remote"] = models.Value(False, output_field=models.BooleanField())
+        elif reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
+            annotations["is_in_person"] = models.Value(False, output_field=models.BooleanField())
+            annotations["is_remote"] = models.Value(True, output_field=models.BooleanField())
+        else:
+            annotations["is_in_person"] = models.Exists(
+                self.model.receptions.through.objects.filter(
+                    service=models.OuterRef("pk"),
+                    genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
+                )
+            )
+            annotations["is_remote"] = models.Exists(
+                self.model.receptions.through.objects.filter(
+                    service=models.OuterRef("pk"),
+                    genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
+                )
+            )
+
+        return annotations
+
+    def filter_search(self, *, city, thematics, reception, service_types):
         # NOTE(vperron): always search with ids directly instead of letting Django create JOINs with .through
         # as it might become horrribly slow on those tables
         thematic_ids = list(GenericReferenceItem.objects.filter(value__in=thematics).values_list("id", flat=True))
@@ -232,46 +263,24 @@ class ServiceQuerySet(models.QuerySet):
                     coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)),
                 )
                 .filter(eligibility_filter)
-                .annotate(
-                    is_in_person=models.Value(True, output_field=models.BooleanField()),
-                    is_remote=models.Value(False, output_field=models.BooleanField()),
-                )
-                .order_by("distance", "pk")
+                .annotate(**self._get_annotations(city, reception))
             )
 
         if reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
             return (
                 queryset.filter(receptions__id__in=GenericReferenceItem.remote_reception_ids())
                 .filter(eligibility_filter)
-                .annotate(
-                    is_in_person=models.Value(False, output_field=models.BooleanField()),
-                    is_remote=models.Value(True, output_field=models.BooleanField()),
-                )
-                .order_by("distance", "pk")
+                .annotate(**self._get_annotations(city, reception))
             )
 
         return (
-            queryset.annotate(
-                is_in_person=models.Exists(
-                    self.model.receptions.through.objects.filter(
-                        service=models.OuterRef("pk"),
-                        genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
-                    )
-                ),
-                is_remote=models.Exists(
-                    self.model.receptions.through.objects.filter(
-                        service=models.OuterRef("pk"),
-                        genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
-                    )
-                ),
-            )
+            queryset.annotate(**self._get_annotations(city, reception))
             .filter(
                 models.Q(is_in_person=True)
                 & models.Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
                 | models.Q(is_remote=True)
             )
             .filter(eligibility_filter)
-            .order_by("-is_in_person", "distance", "pk")
         )
 
     def keyword_search(self, q):
@@ -321,6 +330,28 @@ class ServiceQuerySet(models.QuerySet):
             .annotate(search_score=Round(rank, 2))
             .order_by(Round(models.F("search_score") * 10).desc(), models.F("score_qualite").desc(), "pk")
         )
+
+    def search(self, *, city, thematics, reception, service_types, keyword):
+        """
+        Combines filter_search and keyword_search. The orders are computed as in data·inclusion:
+        - filter_search with city only: distance
+        - filter_search with city and keyword_search: 0.5×distance + 0.5×keyword_search_score
+        """
+        queryset = self.filter_search(
+            city=city, thematics=thematics, reception=reception, service_types=service_types
+        ).order_by("-distance_score", "pk")
+
+        if reception not in [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL, data_inclusion_v1.ModeAccueil.A_DISTANCE]:
+            queryset = queryset.order_by("-is_in_person", "-distance_score", "pk")
+
+        if keyword:
+            queryset = (
+                queryset.keyword_search(keyword)
+                .annotate(total_score=models.F("distance_score") * 0.5 + models.F("search_score") * 0.5)
+                .order_by("-total_score", "pk")
+            )
+
+        return queryset
 
     @transaction.atomic
     def update_search_index(self):
