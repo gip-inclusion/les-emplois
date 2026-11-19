@@ -8,4 +8,5 @@ app_name = "professionals_views"
 
 urlpatterns = [
     path("authorizations/list", views.AuthorizationListView.as_view(), name="authorizations_list"),
+    path("authorizations/details/<uuid:uid>", views.AuthorizationDetailsView.as_view(), name="authorizations_details"),
 ]

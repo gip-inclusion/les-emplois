@@ -15,6 +15,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    ProfessionalFactory,
 )
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -163,19 +164,234 @@ class TestAuthorizationListView(AuthorizationsTestMixin):
             membership__organization__kind=PrescriberOrganizationKind.DEPT,
             membership__organization__department="01",
         )
-        self.get_dept_fixtures()
+        displayed, _not_displayed = self.get_dept_fixtures()
         client.force_login(user)
 
         response = client.get(reverse("professionals_views:authorizations_list"))
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    "#main",
+                    replace_in_attr=[("href", str(org.uid), "[ORG_UID]") for org in displayed],
+                )
+            )
+            == snapshot
+        )
 
     def test_DDETS_IAE(self, client, snapshot):
         user = LaborInspectorFactory(
             membership__institution__kind=InstitutionKind.DDETS_IAE,
             membership__institution__department="01",
         )
-        self.get_ddets_iae_fixtures()
+        displayed, _not_displayed = self.get_ddets_iae_fixtures()
         client.force_login(user)
 
         response = client.get(reverse("professionals_views:authorizations_list"))
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    "#main",
+                    replace_in_attr=[("href", str(org.uid), "[ORG_UID]") for org in displayed],
+                )
+            )
+            == snapshot
+        )
+
+
+class TestAuthorizationDetailsView(AuthorizationsTestMixin):
+    @pytest.mark.parametrize(
+        "factory,has_access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__kind=PrescriberOrganizationKind.DEPT), True),
+            (
+                partial(PrescriberFactory, membership__organization__kind=random.choice(DENIED_PRESCRIBER_KINDS)),
+                False,
+            ),
+            (EmployerFactory, False),
+            [partial(LaborInspectorFactory, membership__institution__kind=InstitutionKind.DDETS_IAE), True],
+            [
+                partial(LaborInspectorFactory, membership__institution__kind=random.choice(DENIED_INSTITUTION_KINDS)),
+                False,
+            ],
+        ],
+        ids=[
+            "job_seeker",
+            "prescriber_DEPT",
+            "prescriber_other_kind",
+            "employer",
+            "labor_inspector_DDETS_IAE",
+            "labor_inspector_other_kind",
+        ],
+    )
+    def test_permissions(self, client, factory, has_access):
+        user = factory()
+        client.force_login(user)
+        url = reverse(
+            "professionals_views:authorizations_details", kwargs={"uid": "c29b353c-75fa-4452-ba57-315480d25f34"}
+        )
+        response = client.get(url)
+        if has_access:
+            # user is allowed but the org doesn't exist. The test with a valid org will made in the following tests
+            assert response.status_code == 404
+        else:
+            assert response.status_code == 403  # Don't even try to find the org
+
+    def test_DEPT_access(self, client, subtests):
+        user = PrescriberFactory(
+            membership__organization__kind=PrescriberOrganizationKind.DEPT,
+            membership__organization__department="01",
+        )
+        displayed, not_displayed = self.get_dept_fixtures()
+        client.force_login(user)
+
+        for org in displayed:
+            with subtests.test(
+                odc=org.kind == PrescriberOrganizationKind.ODC,
+                brsa=org.is_brsa,
+                same_dept=org.department == "01",
+            ):
+                response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+                assert response.status_code == 200
+        for org in not_displayed:
+            with subtests.test(
+                odc=org.kind == PrescriberOrganizationKind.ODC,
+                brsa=org.is_brsa,
+                same_dept=org.department == "01",
+            ):
+                response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+                assert response.status_code == 404
+
+    def test_DEPT_pending_authorization(self, client, snapshot):
+        user = PrescriberFactory(
+            membership__organization__kind=PrescriberOrganizationKind.DEPT,
+            membership__organization__department="01",
+        )
+        # Maybe find a way to re-use the same from self.get_dept_fixtures() without calling the 4 other factories ?
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.ODC,
+            department="01",
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
+            created_by=PrescriberFactory(for_snapshot=True),
+            for_snapshot=True,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_DEPT_accepted_authorization(self, client, snapshot):
+        user = PrescriberFactory(
+            membership__organization__kind=PrescriberOrganizationKind.DEPT,
+            membership__organization__department="01",
+        )
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.ODC,
+            department="01",
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            authorization_updated_at=datetime.datetime(2026, 11, 20, 12, 33, tzinfo=datetime.UTC),
+            created_by=PrescriberFactory(for_snapshot=True),
+            for_snapshot=True,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_DDETS_IAE_access(self, client, subtests):
+        user = LaborInspectorFactory(
+            membership__institution__kind=InstitutionKind.DDETS_IAE,
+            membership__institution__department="01",
+        )
+        displayed, not_displayed = self.get_ddets_iae_fixtures()
+        client.force_login(user)
+
+        for org in displayed:
+            with subtests.test(ohpd=org.kind == PrescriberOrganizationKind.OHPD, same_dept=org.department == "01"):
+                response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+                assert response.status_code == 200
+        for org in not_displayed:
+            with subtests.test(ohpd=org.kind == PrescriberOrganizationKind.OHPD, same_dept=org.department == "01"):
+                response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+                assert response.status_code == 404
+
+    def test_DDETS_IAE_pending_authorization(self, client, snapshot):
+        user = LaborInspectorFactory(
+            membership__institution__kind=InstitutionKind.DDETS_IAE,
+            membership__institution__department="01",
+        )
+        # Maybe find a way to re-use the same from self.get_ddets_iae_fixtures() without calling the other factories ?
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.OHPD,
+            department="01",
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
+            created_by=PrescriberFactory(for_snapshot=True),
+            for_snapshot=True,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_DDETS_IAE_accepted_authorization(self, client, snapshot):
+        user = LaborInspectorFactory(
+            membership__institution__kind=InstitutionKind.DDETS_IAE,
+            membership__institution__department="01",
+        )
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.OHPD,
+            department="01",
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            authorization_updated_at=datetime.datetime(2026, 11, 20, 12, 33, tzinfo=datetime.UTC),
+            created_by=PrescriberFactory(for_snapshot=True),
+            for_snapshot=True,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_created_by_staff_or_null(self, client, snapshot):
+        # Use a dept for this test, but it could be any other kind, we just look at the the created by box
+        user = PrescriberFactory(
+            membership__organization__kind=PrescriberOrganizationKind.DEPT,
+            membership__organization__department="01",
+        )
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.ODC,
+            department="01",
+            created_by=ItouStaffFactory(),  # created by La plateforme
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#creator-box")) == snapshot
+
+        org.created_by = None
+        org.save()
+
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#creator-box")) == snapshot
+
+    @pytest.mark.parametrize("user_factory", [ItouStaffFactory, ProfessionalFactory, None])
+    def test_authorization_validated_by(self, client, snapshot, user_factory):
+        user = PrescriberFactory(
+            membership__organization__kind=PrescriberOrganizationKind.DEPT,
+            membership__organization__department="01",
+        )
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.ODC,
+            department="01",
+            created_by=ItouStaffFactory(),  # created by La plateforme
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            authorization_updated_at=datetime.datetime(2026, 11, 20, 12, 33, tzinfo=datetime.UTC),
+            authorization_updated_by=user_factory(for_snapshot=True) if user_factory else None,
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
+        assert pretty_indented(parse_response_to_soup(response, "#authorization-box")) == snapshot
+
+    # test members pagination on 21+
