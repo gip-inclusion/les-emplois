@@ -986,7 +986,7 @@ NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 
 # Experiment: France Travail agents of these departments can view job applications sent to SIAE of their department,
 # until the end date (inclusive).
-XP_REF_IAE_DEPARTMENTS = ["06", "30", "76", "83", "974"]
+XP_REF_IAE_DEPARTMENTS = ["06", "30", "67", "83", "974"]
 XP_REF_IAE_END_DATE = datetime.date(2026, 12, 31)
 
 # This API seems to be rarely used (which is understandable) and will soon have to be dropped
