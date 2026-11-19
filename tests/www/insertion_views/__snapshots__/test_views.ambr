@@ -3451,8 +3451,8 @@
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
-                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Contacter le service par email
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                                      Envoyer un email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3615,8 +3615,8 @@
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
-                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Contacter le service par email
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                                      Envoyer un email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3784,8 +3784,8 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Contacter le service par email
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                  Envoyer un email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -3849,8 +3849,13 @@
                                   </a>
                               </div>
                               <div class="form-group col-12 col-lg-auto">
-                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                                      Contacter le service par téléphone ou email
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-phone-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_tel" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="appeler-contact" type="button">
+                                      Appeler
+                                  </button>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                                      Envoyer un email
                                   </button>
                               </div>
                               <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -4144,8 +4149,8 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Contacter le service par email
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                  Envoyer un email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -4185,8 +4190,8 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-contact-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="voir-coordonnees-contact" type="button">
-                  Contacter le service par email
+              <button class="btn btn-lg btn-outline-white btn-block justify-content-center" data-bs-target="#service-send-email-modal" data-bs-toggle="modal" data-emplois-mobilization-kind="service_contact_email" data-matomo-action="clic" data-matomo-category="fiche-service" data-matomo-event="true" data-matomo-option="envoyer-email-contact" type="button">
+                  Envoyer un email
               </button>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
@@ -4249,7 +4254,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4295,7 +4300,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4339,7 +4344,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4385,7 +4390,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4431,7 +4436,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4475,7 +4480,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4521,7 +4526,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4567,7 +4572,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4611,7 +4616,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4657,7 +4662,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4703,7 +4708,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4747,7 +4752,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4791,7 +4796,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4835,7 +4840,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4879,7 +4884,7 @@
                   Annuler
               </button>
               <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                  Envoyer
+                  Envoyer et enregistrer dans mon tableau de suivi
               </button>
           </div>
       </div>
@@ -4925,7 +4930,7 @@
                           Annuler
                       </button>
                       <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                          Envoyer
+                          Envoyer et enregistrer dans mon tableau de suivi
                       </button>
                   </div>
               </div>
@@ -4973,7 +4978,7 @@
                           Annuler
                       </button>
                       <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
-                          Envoyer
+                          Envoyer et enregistrer dans mon tableau de suivi
                       </button>
                   </div>
               </div>

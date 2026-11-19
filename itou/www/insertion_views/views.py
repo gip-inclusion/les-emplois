@@ -141,15 +141,6 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
             for category_label in sorted(categories.keys())
         ]
 
-    def get_contact_button_label(self) -> str:
-        if self.object.contact_phone and self.object.contact_email:
-            return "Contacter le service par téléphone ou email"
-        if self.object.contact_phone:
-            return "Contacter le service par téléphone"
-        if self.object.contact_email:
-            return "Contacter le service par email"
-        return "Contacter le service"
-
     def get_send_email_form(self, request, job_seeker):
         if not can_orient_towards_insertion_service(request):
             return
@@ -172,9 +163,10 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         has_contact_to_display = bool(
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
         )
-        can_view_contact_modal = has_contact_to_display and bool(
+        contact_requires_login = not (
             self.request.user.is_authenticated or (self.object.extra or {}).get("is_contact_public")
         )
+        can_view_contact_modal = has_contact_to_display and not contact_requires_login
 
         orient_for_job_seeker_context = get_orient_for_job_seeker_context(self.request)
         send_email_form = self.get_send_email_form(self.request, orient_for_job_seeker_context.get("job_seeker"))
@@ -188,9 +180,9 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
                 "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "formatted_categories": self.format_categories(),
-                "contact_button_label": self.get_contact_button_label(),
                 "has_contact_to_display": has_contact_to_display,
                 "can_view_contact_modal": can_view_contact_modal,
+                "contact_requires_login": contact_requires_login,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
                 "send_email_form": send_email_form,
             }

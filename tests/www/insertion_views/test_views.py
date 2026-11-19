@@ -46,7 +46,7 @@ from itou.insertion.models import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import Title
+from itou.users.enums import IdentityProvider, Title
 from itou.utils import triggers
 from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 from itou.utils.brand import product_name
@@ -312,20 +312,52 @@ class TestStructures:
 
 
 class TestServices:
-    LOGIN_URL = reverse("login:existing_user")
+    LOGIN_URL = reverse("account_login")
     ORIENT_BTN_LABEL = "Orienter votre usager en ligne"
-    DISPLAY_SERVICE_CONTACT_BTN = """
+    PHONE_CONTACT_BTN = """
     <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
-            data-bs-target="#service-contact-modal" data-emplois-mobilization-kind="service_contact"
+            data-bs-target="#service-contact-phone-modal" data-emplois-mobilization-kind="service_contact_tel"
             data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
-            data-matomo-option="voir-coordonnees-contact">
-        Contacter le service par email
+            data-matomo-option="appeler-contact">
+        Appeler
     </button>"""
-    DISPLAY_SERVICE_CONTACT_LINK = """
-    <a class="btn btn-lg btn-outline-white btn-block justify-content-center" href="%s"
+    EMAIL_CONTACT_BTN = """
+    <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
+            data-bs-target="#service-send-email-modal" data-emplois-mobilization-kind="service_contact_email"
+            data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+            data-matomo-option="envoyer-email-contact">
+        Envoyer un email
+    </button>"""
+    # Displayed to users who cannot orient (labor inspectors, itou staff) instead of the modal button.
+    EMAIL_CONTACT_MAILTO_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block justify-content-center" href="mailto:%s"
+       data-emplois-mobilization-kind="service_contact_email"
        data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
-       data-matomo-option="voir-coordonnees-contact">
-        Contacter le service par email
+       data-matomo-option="envoyer-email-contact">
+        Envoyer un email
+    </a>"""
+    # Displayed when contact details are private and the user is not authenticated: the padlock
+    # links to the login page and no iMER is registered.
+    LOCKED_PHONE_CONTACT_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="appeler-contact">
+        <i class="ri-phone-lock-line" aria-hidden="true"></i>
+        <span>Appeler</span>
+    </a>"""
+    LOCKED_EMAIL_CONTACT_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="envoyer-email-contact">
+        <i class="ri-mail-lock-line" aria-hidden="true"></i>
+        <span>Envoyer un email</span>
+    </a>"""
+    LOCKED_ORIENT_BTN_LINK = """
+    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="orienter-un-bénéficiaire">
+        <i class="ri-file-lock-line" aria-hidden="true"></i>
+        <span>Orienter votre usager en ligne</span>
     </a>"""
     MISSING_CONTACT_LABEL = "Informations de contact non renseignées"
     DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
@@ -842,7 +874,8 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.PHONE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertNotContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, self.MISSING_CONTACT_LABEL)
 
@@ -857,34 +890,40 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
     @pytest.mark.parametrize(
-        "contact_email,contact_phone,expected_label",
+        "contact_email,contact_phone,expected_buttons",
         [
-            pytest.param("", "01 23 45 67 89", "Contacter le service par téléphone", id="phone"),
-            pytest.param("contact@example.com", "", "Contacter le service par email", id="email"),
+            pytest.param("", "01 23 45 67 89", ["Appeler"], id="phone"),
+            pytest.param("contact@example.com", "", ["Envoyer un email"], id="email"),
             pytest.param(
                 "contact@example.com",
                 "01 23 45 67 89",
-                "Contacter le service par téléphone ou email",
+                ["Appeler", "Envoyer un email"],
                 id="phone_and_email",
             ),
+            pytest.param("", "", [], id="no_contact"),
         ],
     )
-    def test_detail_contact_button_label(self, client, contact_email, contact_phone, expected_label):
+    def test_detail_contact_buttons(self, client, contact_email, contact_phone, expected_buttons):
         user = PrescriberFactory()
         service = ServiceFactory(contact_email=contact_email, contact_phone=contact_phone)
         client.force_login(user)
 
         response = client.get(self.get_service_url(service))
 
-        contact_button = parse_response_to_soup(response, ".c-box--action").find(
-            "button", {"data-bs-target": "#service-contact-modal"}
-        )
-        assert contact_button.get_text(strip=True) == expected_label
+        action_box = parse_response_to_soup(response, ".c-box--action")
+        contact_buttons = [
+            button.get_text(strip=True)
+            for button in action_box.find_all(
+                "button",
+                {"data-bs-target": ["#service-contact-phone-modal", "#service-send-email-modal"]},
+            )
+        ]
+        assert contact_buttons == expected_buttons
 
     @pytest.mark.parametrize(
         "extra,is_authenticated_user",
@@ -898,6 +937,7 @@ class TestServices:
             uid="test-contact-public-uid",
             updated_on="2025-01-15",
             contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
             extra=extra,
@@ -907,7 +947,12 @@ class TestServices:
             client.force_login(PrescriberFactory())
 
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.PHONE_CONTACT_BTN, html=True)
+        if is_authenticated_user:
+            assertContains(response, self.EMAIL_CONTACT_BTN, html=True)
+        else:
+            # An anonymous user cannot orient: they only get a mailto link.
+            assertContains(response, self.EMAIL_CONTACT_MAILTO_LINK % service.contact_email, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
@@ -930,6 +975,7 @@ class TestServices:
             updated_on="2025-01-15",
             contact_full_name="Joe Blow",
             contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
             extra=extra,
@@ -937,15 +983,63 @@ class TestServices:
 
         service_url = self.get_service_url(service)
         response = client.get(service_url)
+        login_url = f"{self.LOGIN_URL}?next={urlencode(service_url)}"
 
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.PHONE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertNotContains(response, "Joe Blow")
         assertNotContains(response, "contact@example.com")
+        assertNotContains(response, "01 23 45 67 89")
+        assertContains(response, self.LOCKED_PHONE_CONTACT_LINK % login_url, html=True)
+        assertContains(response, self.LOCKED_EMAIL_CONTACT_LINK % login_url, html=True)
+        # The padlock only leads to the login page: no iMER is registered yet.
+        assertNotContains(response, "service_contact_tel")
+        assertNotContains(response, "service_contact_email")
+
+    def test_locked_contact_button_login_keeps_the_next_url(self, client):
+        # The padlock must link to the first step of the login funnel: "login:existing_user" only
+        # works once the email was submitted, and would drop the next param.
+        service = ServiceFactory(
+            contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
+            extra={"is_contact_public": False},
+        )
+        service_url = self.get_service_url(service)
+        user = PrescriberFactory(email="sender@example.com", identity_provider=IdentityProvider.DJANGO)
+
+        response = client.get(service_url)
+        login_url = f"{self.LOGIN_URL}?next={urlencode(service_url)}"
+        assertContains(response, self.LOCKED_PHONE_CONTACT_LINK % login_url, html=True)
+
+        # Following the padlock displays the login form, which carries the next url over.
+        response = client.get(login_url)
+        assertContains(response, f'value="{service_url}"')
+
+        response = client.post(login_url, data={"email": user.email})
+        assertRedirects(
+            response,
+            reverse(
+                "login:existing_user",
+                query={"back_url": f"/accounts/login/?next={urlencode(service_url)}", "next": service_url},
+            ),
+        )
+
+    def test_detail_orient_button_has_padlock_for_unauthenticated_user(self, client):
+        service = ServiceFactory(contact_email="contact@example.com")
+        service_url = self.get_service_url(service)
+
+        response = client.get(service_url)
+
         assertContains(
             response,
-            self.DISPLAY_SERVICE_CONTACT_LINK % f"{self.LOGIN_URL}?next={urlencode(service_url)}",
+            self.LOCKED_ORIENT_BTN_LINK % f"{self.LOGIN_URL}?next={urlencode(service_url)}",
             html=True,
         )
+
+        client.force_login(PrescriberFactory())
+        response = client.get(service_url)
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(response, "lock-line")
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory()
@@ -1140,14 +1234,15 @@ class TestServices:
             (EmployerFactory, assertNotContains, assertContains),
         ],
     )
-    def test_render_contact_modal(self, client, user_factory, assertion_mailto, assertion_button):
+    def test_render_email_contact_button(self, client, user_factory, assertion_mailto, assertion_button):
         service = ServiceFactory(contact_email="contact@example.com", extra={"is_contact_public": True})
         if user_factory:
             client.force_login(user_factory())
         response = client.get(self.get_service_url(service))
 
+        # Users who cannot orient only get a mailto link, the others open the send email modal.
         assertion_mailto(response, f"mailto:{service.contact_email}")
-        assertion_button(response, f"Écrire un email à {service.contact_email}")
+        assertion_button(response, self.EMAIL_CONTACT_BTN, html=True)
 
     @pytest.mark.parametrize(
         "user_factory,do_snapshot",
@@ -1226,9 +1321,11 @@ class TestServices:
 
         client.force_login(membership_factory().user)
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, selector="#service-send-email-content")) == snapshot(
-            name="send-email-content"
-        )
+        # The htmx POST target keeps the job seeker public id of the current page.
+        replace_in_attr = [("hx-post", str(job_seeker.public_id), "[PUBLIC ID of JobSeeker]")] if job_seeker else None
+        assert pretty_indented(
+            parse_response_to_soup(response, selector="#service-send-email-content", replace_in_attr=replace_in_attr)
+        ) == snapshot(name="send-email-content")
 
     @pytest.mark.parametrize(
         "user_factory,is_htmx,expected_status_code",
