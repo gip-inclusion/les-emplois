@@ -69,7 +69,7 @@ def test_import_contacts_request_error(mocker, caplog, brevo_client):
     assert error_record.message == "Brevo API: Request failed: Connection timed out"
 
 
-def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
+def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client, console_log):
     email = "somebody@mail.com"
     mocker.patch("itou.utils.brevo.httpx.Client.delete", side_effect=httpx.RequestError("Connection timed out"))
 
@@ -80,10 +80,11 @@ def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-request-error-connection-timed-out")
-    assert email not in caplog.text
+    assert "Brevo API: Request failed" in console_log.getvalue()  # guard against a false negative
+    assert email not in console_log.getvalue()
 
 
-def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo_client):
+def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo_client, console_log):
     email = "somebody@mail.com"
     respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
         return_value=httpx.Response(status_code=500)
@@ -96,7 +97,8 @@ def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-http-error-500")
-    assert email not in caplog.text
+    assert "/contacts/_REDACTED_" in console_log.getvalue()  # guard against a false negative
+    assert email not in console_log.getvalue()
 
 
 def test_delete_contact_on_400(respx_mock, caplog, brevo_client):
