@@ -1325,7 +1325,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong organization
         MobilizationEventFactory(
@@ -1333,7 +1333,7 @@ class TestServices:
             prescriber_organization=PrescriberOrganizationFactory(),
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong service
         MobilizationEventFactory(
@@ -1341,7 +1341,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=ServiceFactory(),
             structure=StructureFactory(),
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong kind
         MobilizationEventFactory(
@@ -1350,6 +1350,14 @@ class TestServices:
             service=service,
             structure=StructureFactory(),
             kind=MobilizationEventKind.SERVICE_ORIENTATION,
+        )
+        # Wrong kind: the deprecated kind is not picked up anymore
+        MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
         )
         data = {"body": "Bonjour, je souhaiterais orienter un usager."}
         client.post(self.get_service_url(service), headers=headers, data=data)
@@ -1366,7 +1374,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         client.post(self.get_service_url(service), headers=headers, data=data)
         mobilization_email = MobilizationEmail.objects.filter(
@@ -1382,7 +1390,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         client.post(self.get_service_url(service), headers=headers, data=data)
         mobilization_email = MobilizationEmail.objects.filter(
@@ -2785,6 +2793,8 @@ class TestRegisterMobilizationEvent:
         [
             (MobilizationEventKind.STRUCTURE_CONTACT, False, ""),
             (MobilizationEventKind.SERVICE_CONTACT, True, ""),
+            (MobilizationEventKind.SERVICE_CONTACT_EMAIL, True, ""),
+            (MobilizationEventKind.SERVICE_CONTACT_TEL, True, ""),
             (MobilizationEventKind.SERVICE_EXT_LINK, True, "https://site.fake"),
         ],
     )

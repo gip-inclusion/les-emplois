@@ -214,7 +214,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                     prescriber_organization=prescriber_organization,
                     company=company,
                     service=self.object,
-                    kind=MobilizationEventKind.SERVICE_CONTACT,
+                    kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
                     created_at__gte=timezone.now() - datetime.timedelta(hours=6),
                 )
                 .order_by("-created_at")

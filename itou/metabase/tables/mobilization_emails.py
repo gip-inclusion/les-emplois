@@ -37,7 +37,7 @@ TABLE.add_columns(
         get_column_from_field(
             get_model_field(MobilizationEmail, "mobilization_event"),
             name="imer_id",
-            comment="ID de l’iMER enregistrée au clic sur 'Voir les coordonnées'",
+            comment="ID de l’iMER enregistrée au clic sur « Envoyer un email »",
         ),
         {
             "name": "service_id",

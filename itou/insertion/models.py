@@ -757,6 +757,8 @@ class MobilizationEvent(models.Model):
                     kind__in=[
                         MobilizationEventKind.SERVICE_ORIENTATION,
                         MobilizationEventKind.SERVICE_CONTACT,
+                        MobilizationEventKind.SERVICE_CONTACT_EMAIL,
+                        MobilizationEventKind.SERVICE_CONTACT_TEL,
                         MobilizationEventKind.SERVICE_EXT_LINK,
                     ],
                     service__isnull=False,
