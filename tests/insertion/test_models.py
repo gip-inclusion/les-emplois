@@ -283,7 +283,11 @@ class TestIsActiveManager:
         ServiceFactory(coordinates=vannes.coords, city="Vannes", is_active=False)
 
         results = Service.objects.search(
-            city=vannes, thematics=[THEMATIC_VALUE], reception=IN_PERSON_RECEPTION_VALUE, service_types=[]
+            city=vannes,
+            thematics=[THEMATIC_VALUE],
+            reception=IN_PERSON_RECEPTION_VALUE,
+            service_types=[],
+            keyword=None,
         )
         assert list(results) == [active]
 
