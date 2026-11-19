@@ -703,7 +703,7 @@ class TestServices:
         assert "Utiliser le lien de mobilisation" in mobilization_modes.get_text()
         assert mobilization_modes.find("a", href=external_link)
 
-    def test_detail_contact_modal_has_phone_copy_button(self, client):
+    def test_detail_phone_modal_title(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-contact-phone-copy-uid",
@@ -713,8 +713,23 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        modal = parse_response_to_soup(response, "#service-contact-modal")
-        assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        assert "Contacter le service par téléphone au 01 23 45 67 89" in modal.find("h3").get_text(strip=True)
+        assert modal.find(attrs={"data-it-clipboard-button": "copy"}) is None
+
+    def test_detail_phone_modal_with_copy_button(self, client):
+        service = ServiceFactory(
+            uid="test-contact-phone-copy-public-uid",
+            updated_on="2025-01-15",
+            contact_phone="01 23 45 67 89",
+            extra={"is_contact_public": True},
+            structure__updated_on="2025-01-15",
+        )
+        response = client.get(self.get_service_url(service))
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        copy_button = modal.find(attrs={"data-it-clipboard-button": "copy"})
+        assert copy_button is not None
+        assert copy_button["data-it-copy-to-clipboard"] == "01 23 45 67 89"
 
     def test_detail_with_external_orientation_link_for_non_orientable_service(self, client):
         user = PrescriberFactory()
@@ -1228,7 +1243,7 @@ class TestServices:
         [
             (None, assertContains, assertNotContains),
             (ItouStaffFactory, assertContains, assertNotContains),
-            (JobSeekerFactory, assertContains, assertNotContains),
+            (JobSeekerFactory, assertNotContains, assertNotContains),  # the action bar is hidden to job seekers
             (LaborInspectorFactory, assertContains, assertNotContains),
             (PrescriberFactory, assertNotContains, assertContains),
             (EmployerFactory, assertNotContains, assertContains),
@@ -1243,6 +1258,35 @@ class TestServices:
         # Users who cannot orient only get a mailto link, the others open the send email modal.
         assertion_mailto(response, f"mailto:{service.contact_email}")
         assertion_button(response, self.EMAIL_CONTACT_BTN, html=True)
+
+    @pytest.mark.parametrize(
+        "user_factory,assertion",
+        [
+            (None, assertContains),
+            (ItouStaffFactory, assertContains),
+            (JobSeekerFactory, assertNotContains),  # the action bar is hidden to job seekers
+            (LaborInspectorFactory, assertContains),
+            (PrescriberFactory, assertContains),
+            (EmployerFactory, assertContains),
+        ],
+    )
+    def test_render_phone_modal(self, client, user_factory, assertion):
+        service = ServiceFactory(contact_phone="01 23 45 67 89", extra={"is_contact_public": True})
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_service_url(service))
+
+        assertion(response, self.PHONE_CONTACT_BTN, html=True)
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        save_button = modal.find("button", string="Enregistrer dans le tableau de suivi")
+        if user_factory in (PrescriberFactory, EmployerFactory):
+            # The tracking table save procedure is not implemented yet.
+            assert save_button.has_attr("disabled")
+            assert modal.find("textarea", {"name": "notes"})
+        else:
+            # Users who cannot orient only see the contact details.
+            assert save_button is None
+            assert modal.find("textarea", {"name": "notes"}) is None
 
     @pytest.mark.parametrize(
         "user_factory,do_snapshot",

@@ -1,0 +1,45 @@
+{% load format_filters %}
+<div class="modal fade"
+     id="service-contact-phone-modal"
+     tabindex="-1"
+     aria-labelledby="service-contact-phone-modal-label"
+     aria-modal="true"
+     role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="service-contact-phone-modal-label">
+                    Contacter {% if service.contact_full_name %}{{ service.contact_full_name }}{% else %}le service{% endif %} par téléphone au {{ service.contact_phone|format_phone }}
+                    {% if show_phone_number_copy_button %}
+                        {% include "includes/copy_to_clipboard.html" with content=service.contact_phone css_classes="mx-sm-2" only_icon=True in_modal=True %}
+                    {% endif %}
+                </h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                {% if can_orient_towards_insertion_service %}
+                    <div class="form-group">
+                        <label class="form-label" for="service-contact-phone-notes">Notes privées</label>
+                        <textarea class="form-control"
+                                  id="service-contact-phone-notes"
+                                  name="notes"
+                                  rows="4"
+                                  placeholder="Ces notes ne sont visibles que par vous et votre organisation."></textarea>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-primary btn-sm"
+                        data-bs-dismiss="modal"
+                        aria-label="Fermer"
+                        type="button">Fermer</button>
+                {% if can_orient_towards_insertion_service %}
+                    {# FIXME: enabled by the "Prise de contact" PR, which adds the tracking table save procedure. #}
+                    <button class="btn btn-primary btn-sm"
+                            type="button"
+                            disabled>Enregistrer dans le tableau de suivi</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
