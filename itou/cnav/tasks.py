@@ -71,20 +71,31 @@ def retrieve_cnav_infos(record_pk):
 
     with get_client() as client:
         cnav_record.last_attempt_at = timezone.now()
+        update_fields = {"last_attempt_at"}
         try:
             interops_result = client.identity(**payload)
         except httpx.HTTPStatusError as exc:
-            if exc.response:
-                print(exc.response)
-            cnav_record.save(update_fields={"last_attempt_at"})
-            logger.warning("Error while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
+            if exc.response.status_code == 429:
+                logger.warning("Hit rate limit while trying to retrieve data for CNAVRecord pk=%s", record_pk)
+                try:
+                    retry_after = int(exc.response.headers.get("Retry-After", "3600"))
+                except ValueError, TypeError:
+                    retry_after = 3600
+                cnav_record.next_attempt_at = timezone.now() + datetime.timedelta(seconds=retry_after)
+                update_fields.add("next_attempt_at")
+            else:
+                logger.warning(
+                    "HTTPStatusError while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc
+                )
+        except httpx.HTTPError as exc:
+            logger.warning("HTTPError while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
         except Exception as exc:
-            # TODO: handle 429 error
-            cnav_record.save(update_fields={"last_attempt_at"})
-            logger.warning("Error while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
+            logger.error("Error while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
         else:
             cnav_record.result = dataclasses.asdict(interops_result)
-            cnav_record.save(update_fields={"result", "last_attempt_at"})
+            update_fields.add("result")
+        finally:
+            cnav_record.save(update_fields=update_fields)
 
 
 @on_commit_task()

@@ -134,7 +134,7 @@ class CNAVRelayApiClient:
             .raise_for_status()
             .json()
         )
-        return InterOpsResult(**data)
+        return InterOpsResult.from_dict(data)
 
 
 def get_client(*, read_timeout=None):
