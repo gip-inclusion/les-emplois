@@ -58,6 +58,7 @@
             {% else %}
                 {% url 'job_seekers_views:list' as url_list %}
             {% endif %}
+            {% include "job_seekers_views/includes/end_of_contracts_banner.html" with show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active contracts_ending_soon_count=contracts_ending_soon_count last_contract_ended_count=last_contract_ended_count end_of_journey_count=end_of_journey_count request=request only %}
             <form hx-get="{{ url_list }}"
                   hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s{% if list_organization %}, change from:#id_organization_members delay:.5s{% endif %}"
                   hx-indicator="#job-seekers-section"
@@ -69,7 +70,6 @@
                 <input id="id_order" type="hidden" name="order" value="{{ order }}">
                 {% if filters_form.end_of_journey %}{{ filters_form.end_of_journey }}{% endif %}
             </form>
-            {% include "job_seekers_views/includes/end_of_contracts_banner.html" with show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active contracts_ending_soon_count=contracts_ending_soon_count last_contract_ended_count=last_contract_ended_count end_of_journey_count=end_of_journey_count request=request only %}
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
