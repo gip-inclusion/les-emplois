@@ -29,7 +29,7 @@ from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
 from itou.cnav.enums import CNAVRecordOrigin
-from itou.cnav.models import CNAVRecord
+from itou.cnav.models import CNAVRecord, match
 from itou.cnav.tasks import plan_retrieve_cnav_infos
 from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -47,6 +47,7 @@ from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.users.perms import (
     can_fill_pro_support_report,
     can_orient_towards_insertion_service,
+    can_see_cnav_certification_infos,
     can_view_pro_support_report,
 )
 from itou.utils.apis import rdv_insertion
@@ -1628,6 +1629,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         )
 
     def post(self, request, *args, **kwargs):
+        cnav_record = None
         try:
             with transaction.atomic():
                 user = User.create_job_seeker_by_proxy(
@@ -1673,6 +1675,15 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 pass
             else:
                 user.save()
+
+            if (
+                can_see_cnav_certification_infos(self.request)
+                and cnav_record
+                and cnav_record.result
+                and not match(profile=self.profile, cnav_record=cnav_record)
+            ):
+                # TODO: redirect to new matching step
+                pass
 
             url = self.get_exit_url(self.profile.user, created=True)
             self.job_seeker_session.delete()
