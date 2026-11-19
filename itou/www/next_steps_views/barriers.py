@@ -20,7 +20,7 @@ from itou.companies.enums import ProSupportReportBarrier
 from itou.eligibility.enums import AdministrativeCriteriaKind as Kind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.insertion.enums import OrientationStatus
-from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier, LiftCause
 from itou.users.perms import can_orient_towards_insertion_service, can_view_pro_support_report
 from itou.www.next_steps_views.advisors import visible_orientations
 
@@ -112,6 +112,9 @@ class Card:
     in_progress: bool = False
     # « Trouver une solution »: the services search for the barrier, around the job seeker.
     search_url: str = ""
+    # « Marquer comme levé » on a barrier to work on or in progress, « Le frein est revenu » on a lifted one.
+    lift_url: str = ""
+    back_url: str = ""
 
     @property
     def icon(self):
@@ -152,10 +155,29 @@ def _report_text(report):
 
 def _statement_text(statement):
     by = statement.author.get_full_name() if statement.author else ""
-    if statement.author_prescriber_organization:
-        organization = statement.author_prescriber_organization.display_name
+    if statement.author_organization:
+        organization = statement.author_organization.display_name
         by = f"{by} ({organization})" if by else organization
-    return f"Confirmé le {_fr(statement.created_at)} à la validation de l’éligibilité" + (f", par {by}" if by else "")
+    by = f", par {by}" if by else ""
+    if statement.status == BarrierStatus.LIFTED:
+        if statement.lift_cause == LiftCause.ORIENTATION and statement.orientation:
+            cause = f" · grâce à l’orientation vers «{NBSP}{statement.orientation.service.name}{NBSP}»"
+        elif statement.lift_cause in (LiftCause.ORIENTATION, LiftCause.SELF):
+            cause = f" · grâce à {statement.get_lift_cause_display()}"
+        else:
+            cause = ""
+        return f"Levé le {_fr(statement.created_at)}{by}{cause}"
+    if statement.eligibility_diagnosis_id:
+        return f"Confirmé le {_fr(statement.created_at)} à la validation de l’éligibilité{by}"
+    return f"Revenu le {_fr(statement.created_at)}{by}"
+
+
+def statement_url(job_seeker, key, action):
+    """The side drawer that states a barrier lifted ("leve") or back ("revenu")."""
+    return reverse(
+        "next_steps_views:barrier_statement",
+        kwargs={"public_id": job_seeker.public_id, "barrier": key.lower(), "action": action},
+    )
 
 
 def _report_link(job_seeker, report, label):
@@ -166,6 +188,24 @@ def _report_link(job_seeker, report, label):
             kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
         ),
     )
+
+
+def ongoing_orientations(request, job_seeker):
+    """The ongoing orientations the user may see, each with the barriers its service works on."""
+    orientations = (
+        visible_orientations(request, job_seeker)
+        .filter(status__in=ONGOING_ORIENTATIONS)
+        .select_related("service", "sender")
+        .prefetch_related("service__thematics")
+        .order_by("-created_at")
+    )
+    for orientation in orientations:
+        keys = {
+            THEMATIC_BARRIERS[prefix]
+            for thematic in orientation.service.thematics.all()
+            if (prefix := thematic.value.split("--")[0]) in THEMATIC_BARRIERS
+        }
+        yield orientation, keys
 
 
 def _search_url(request, job_seeker, key):
@@ -253,38 +293,7 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                     )
                 )
 
-    # What the professionals stated when validating the eligibility: it prevails over the criteria, and over the
-    # latest report when more recent.
-    statements = (
-        JobSeekerBarrier.objects.filter(job_seeker=job_seeker)
-        .select_related("author", "author_prescriber_organization")
-        .latest_by_barrier()
-    )
-    for key, statement in statements.items():
-        if latest and latest.created_at > statement.created_at:
-            continue
-        if key in cards:
-            cards[key].clues = [clue for clue in cards[key].clues if clue.kind not in ("criterion", "report")]
-        if statement.status == BarrierStatus.CONFIRMED:
-            card(key).clues.insert(0, Clue("confirmed", _statement_text(statement)))
-            lifted = [lifted_card for lifted_card in lifted if lifted_card.key != key]
-            lifted_keys.discard(key)
-        elif key in cards and not cards[key].clues:
-            del cards[key]
-
-    orientations = (
-        visible_orientations(request, job_seeker)
-        .filter(status__in=ONGOING_ORIENTATIONS)
-        .select_related("service", "sender")
-        .prefetch_related("service__thematics")
-        .order_by("-created_at")
-    )
-    for orientation in orientations:
-        keys = {
-            THEMATIC_BARRIERS[prefix]
-            for thematic in orientation.service.thematics.all()
-            if (prefix := thematic.value.split("--")[0]) in THEMATIC_BARRIERS
-        }
+    for orientation, keys in ongoing_orientations(request, job_seeker):
         url = ""
         if orientation.user_can_see_details:
             # Opens in the side drawer of the job seeker page.
@@ -304,6 +313,32 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
                 )
             )
 
+    # What the professionals stated, when validating the eligibility or on the cards: it prevails over the criteria
+    # and the orientations, and over the latest report when more recent.
+    statements = (
+        JobSeekerBarrier.objects.filter(job_seeker=job_seeker)
+        .select_related("author", "author_prescriber_organization", "author_company", "orientation__service")
+        .latest_by_barrier()
+    )
+    for key, statement in statements.items():
+        if latest and latest.created_at > statement.created_at:
+            continue
+        if key in cards:
+            cards[key].clues = [clue for clue in cards[key].clues if clue.kind not in ("criterion", "report")]
+        lifted = [lifted_card for lifted_card in lifted if lifted_card.key != key]
+        lifted_keys.discard(key)
+        if statement.status == BarrierStatus.CONFIRMED:
+            card(key).clues.insert(0, Clue("confirmed", _statement_text(statement)))
+        elif statement.status == BarrierStatus.LIFTED:
+            # Lifted: in its column, with the mention of an orientation still under way.
+            lifted_card = cards.pop(key, None) or Card(key, Barrier(key).label)
+            lifted_card.in_progress = False
+            lifted_card.clues.insert(0, Clue("lifted", _statement_text(statement)))
+            lifted.append(lifted_card)
+            lifted_keys.add(key)
+        elif key in cards and not any(clue.kind == "orientation" for clue in cards[key].clues):
+            del cards[key]
+
     for each in cards.values():
         if any(clue.kind == "report" for clue in each.clues):
             # Named in the latest report: the criteria hinting at it need no confirmation.
@@ -312,11 +347,21 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
     order = [*Barrier.values, OTHER]
     ordered = sorted(cards.values(), key=lambda card: order.index(card.key))
     to_work = [card for card in ordered if not card.in_progress and card.key not in lifted_keys]
+    in_progress = [card for card in ordered if card.in_progress]
+    lifted = [card for card in lifted if card.key not in {c.key for c in in_progress}]
     for card_to_work in to_work:
         card_to_work.search_url = _search_url(request, job_seeker, card_to_work.key)
+    # Only the report's barriers can be stated: « Autre frein » is free text.
+    for each in to_work + in_progress:
+        if each.key in Barrier.values:
+            each.lift_url = statement_url(job_seeker, each.key, "leve")
+    for each in lifted:
+        if each.key in Barrier.values:
+            each.back_url = statement_url(job_seeker, each.key, "revenu")
+    order = [*Barrier.values, OTHER]
     return Barriers(
         to_work=to_work,
-        in_progress=[card for card in ordered if card.in_progress],
-        lifted=[card for card in lifted if card.key not in {c.key for c in ordered if c.in_progress}],
+        in_progress=in_progress,
+        lifted=sorted(lifted, key=lambda card: order.index(card.key)),
         report=latest,
     )

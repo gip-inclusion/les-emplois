@@ -51,7 +51,34 @@
             {% endif %}
         {% endif %}
     {% endfor %}
-    {% if card.search_url %}
-        <a class="btn btn-sm btn-primary align-self-start" href="{{ card.search_url }}">Trouver une solution</a>
+    {% if card.search_url or card.lift_url or card.back_url %}
+        <div class="d-flex flex-wrap gap-2">
+            {% if card.search_url %}
+                <a class="btn btn-sm btn-primary" href="{{ card.search_url }}">Trouver une solution</a>
+            {% endif %}
+            {# Stating it lifted or back: a confirmation in the side drawer; without JavaScript, as a page. #}
+            {% if card.lift_url %}
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ card.lift_url }}"
+                   hx-get="{{ card.lift_url }}"
+                   hx-target="#next-step-journey"
+                   hx-swap="outerHTML"
+                   hx-indicator="#next-step-journey"
+                   data-bs-toggle="offcanvas"
+                   data-bs-target="#next-step-drawer"
+                   aria-controls="next-step-drawer">Marquer comme levé</a>
+            {% endif %}
+            {% if card.back_url %}
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ card.back_url }}"
+                   hx-get="{{ card.back_url }}"
+                   hx-target="#next-step-journey"
+                   hx-swap="outerHTML"
+                   hx-indicator="#next-step-journey"
+                   data-bs-toggle="offcanvas"
+                   data-bs-target="#next-step-drawer"
+                   aria-controls="next-step-drawer">Le frein est revenu</a>
+            {% endif %}
+        </div>
     {% endif %}
 </article>

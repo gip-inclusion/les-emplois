@@ -137,6 +137,8 @@ class TestOrganizationTransfer:
                 (Appellation, "company"),  # handled through `JobDescription`
                 (job_applications_models.JobApplicationComment, "company"),
                 (job_applications_models.JobApplicationTransitionLog, "target_company"),
+                # Where its author worked when they stated it: not moved by a transfer.
+                (next_steps_models.JobSeekerBarrier, "author_company"),
                 (rdv_insertion_models.Appointment, "company"),
                 (rdv_insertion_models.InvitationRequest, "company"),
                 (users_models.User, "created_company_set"),

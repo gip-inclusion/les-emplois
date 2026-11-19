@@ -1280,7 +1280,7 @@ class EligibilityJourney(Journey):
         if not hasattr(self, "_latest_statements"):
             self._latest_statements = (
                 JobSeekerBarrier.objects.filter(job_seeker=self.job_seeker)
-                .select_related("author", "author_prescriber_organization")
+                .select_related("author", "author_prescriber_organization", "author_company")
                 .latest_by_barrier()
             )
         return self._latest_statements
@@ -1299,19 +1299,17 @@ class EligibilityJourney(Journey):
         suggested = set(hints)
         for key, statement in self._statements().items():
             by = statement.author.get_full_name() if statement.author else ""
-            if statement.author_prescriber_organization:
-                by = (
-                    f"{by} ({statement.author_prescriber_organization.display_name})"
-                    if by
-                    else (statement.author_prescriber_organization.display_name)
-                )
+            if statement.author_organization:
+                organization = statement.author_organization.display_name
+                by = f"{by} ({organization})" if by else organization
             when = f"le {_fr(statement.created_at)}" + (f" par {by}" if by else "")
             if statement.status == BarrierStatus.CONFIRMED:
                 suggested.add(key)
                 hints[key] = f"Confirmé {when}"
             else:
+                # Dismissed or lifted: left unchecked, saying so.
                 suggested.discard(key)
-                hints[key] = f"Écarté {when}"
+                hints[key] = f"{'Levé' if statement.status == BarrierStatus.LIFTED else 'Écarté'} {when}"
         return sorted(suggested, key=list(ProSupportReportBarrier.values).index), hints
 
     def steps(self, data):

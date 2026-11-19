@@ -3,15 +3,17 @@ import datetime
 import pytest
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import ProSupportReportBarrier as Barrier
 from itou.eligibility.enums import AdministrativeCriteriaKind as Kind
 from itou.insertion.enums import GenericReferenceItemKind, OrientationStatus
 from itou.job_applications.enums import SenderKind
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier, LiftCause
 from tests.companies.factories import CompanyMembershipFactory, ProSupportReportFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.insertion.factories import GenericReferenceItemFactory, OrientationFactory, ServiceFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -192,3 +194,125 @@ def test_an_ongoing_orientation_opens_in_the_drawer(client, employer):
         "next_steps_views:orientation", kwargs={"public_id": job_seeker.public_id, "orientation_id": elsewhere.pk}
     )
     assert client.get(elsewhere_url, HTTP_HX_REQUEST="true").status_code == 404
+
+
+def statement_url(job_seeker, barrier, action):
+    return reverse(
+        "next_steps_views:barrier_statement",
+        kwargs={"public_id": job_seeker.public_id, "barrier": barrier.lower(), "action": action},
+    )
+
+
+def test_lift_a_barrier_from_its_card(client, employer):
+    company = employer.company_set.first()
+    job_seeker = JobSeekerFactory()
+    ProSupportReportFactory(
+        contract__company=company,
+        contract__job_seeker=job_seeker,
+        barriers=[Barrier.MOBILITY, Barrier.DIGITAL],
+        created_at=days_ago(10),
+    )
+    orientation = OrientationFactory(
+        beneficiary=job_seeker,
+        sender=employer,
+        sender_kind=SenderKind.EMPLOYER,
+        sender_company=company,
+        sender_prescriber_organization=None,
+        service=ServiceFactory(thematics=[thematic("mobilite--preparer-un-permis")]),
+        status=OrientationStatus.ACCEPTED,
+    )
+    client.force_login(employer)
+
+    barriers = page(client, job_seeker).context["barriers"]
+    assert keys(barriers.in_progress) == [Barrier.MOBILITY]
+    lift_url = statement_url(job_seeker, Barrier.MOBILITY, "leve")
+    assert barriers.in_progress[0].lift_url == lift_url
+    assert barriers.to_work[0].lift_url == statement_url(job_seeker, Barrier.DIGITAL, "leve")
+
+    # A confirmation in the side drawer, offering the ongoing orientation on that barrier as the cause.
+    response = client.get(lift_url, HTTP_HX_REQUEST="true")
+    assertContains(response, "Marquer le frein comme levé")
+    assertContains(response, f'value="orientation-{orientation.pk}"')
+    assertContains(response, "La personne a trouvé une solution elle-même")
+    # Without JavaScript, a page.
+    assert client.get(lift_url).status_code == 200
+
+    response = client.post(lift_url, {"cause": f"orientation-{orientation.pk}"})
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    assertRedirects(response, page_url, fetch_redirect_response=False)
+
+    response = page(client, job_seeker)
+    barriers = response.context["barriers"]
+    assert keys(barriers.in_progress) == []
+    assert keys(barriers.to_work) == [Barrier.DIGITAL]
+    [lifted] = barriers.lifted
+    assert lifted.key == Barrier.MOBILITY
+    assert lifted.back_url == statement_url(job_seeker, Barrier.MOBILITY, "revenu")
+    assert lifted.lift_url == ""
+    assert lifted.clues[0].text == (
+        f"Levé le {timezone.localdate():%d/%m/%Y}, par {employer.get_full_name()} ({company.display_name})"
+        f" · grâce à l’orientation vers « {orientation.service.name} »"
+    )
+    statement = JobSeekerBarrier.objects.get()
+    assert statement.author_company == company
+    assert statement.author_prescriber_organization is None
+    assert statement.lift_cause == LiftCause.ORIENTATION
+
+    # Among what was done today.
+    response = client.get(reverse("next_steps_views:todo"))
+    assertContains(response, f"frein levé : {Barrier.MOBILITY.label}")
+
+
+def test_a_lifted_barrier_comes_back(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory()
+    IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker, criteria_kinds=[Kind.PM])
+    client.force_login(membership.user)
+
+    response = client.post(statement_url(job_seeker, Barrier.MOBILITY, "leve"), {"cause": LiftCause.SELF})
+    assert response.status_code == 302
+    barriers = page(client, job_seeker).context["barriers"]
+    assert keys(barriers.to_work) == []
+    assert barriers.lifted[0].clues[0].text.endswith("· grâce à la personne a trouvé une solution elle-même")
+    assert JobSeekerBarrier.objects.get().author_prescriber_organization == membership.organization
+
+    back_url = statement_url(job_seeker, Barrier.MOBILITY, "revenu")
+    response = client.get(back_url, HTTP_HX_REQUEST="true")
+    assertContains(response, "Le frein est revenu")
+    assertContains(response, "Le frein repassera dans «&nbsp;À travailler&nbsp;»")
+    client.post(back_url)
+    barriers = page(client, job_seeker).context["barriers"]
+    assert keys(barriers.to_work) == [Barrier.MOBILITY]
+    assert keys(barriers.lifted) == []
+    assert barriers.to_work[0].clues[0].text.startswith(f"Revenu le {timezone.localdate():%d/%m/%Y}")
+
+
+def test_a_later_report_prevails_over_a_lifted_barrier(client, employer):
+    company = employer.company_set.first()
+    job_seeker = JobSeekerFactory()
+    JobSeekerBarrier.objects.create(
+        job_seeker=job_seeker, barrier=Barrier.MOBILITY, status=BarrierStatus.LIFTED, created_at=days_ago(20)
+    )
+    ProSupportReportFactory(
+        contract__company=company,
+        contract__job_seeker=job_seeker,
+        barriers=[Barrier.MOBILITY],
+        created_at=days_ago(5),
+    )
+    client.force_login(employer)
+
+    barriers = page(client, job_seeker).context["barriers"]
+    assert keys(barriers.to_work) == [Barrier.MOBILITY]
+    assert keys(barriers.lifted) == []
+
+
+def test_who_can_state_a_barrier(client, employer):
+    job_seeker = JobSeekerFactory()
+    client.force_login(employer)
+    # Only the report's barriers and the two actions.
+    assert client.get(statement_url(job_seeker, "AUTRE", "leve")).status_code == 404
+    assert client.get(statement_url(job_seeker, Barrier.MOBILITY, "supprime")).status_code == 404
+    # Not for a prescriber without the authorization.
+    client.force_login(PrescriberMembershipFactory(organization__authorized=False).user)
+    assert client.post(statement_url(job_seeker, Barrier.MOBILITY, "leve")).status_code == 404
+    assert not JobSeekerBarrier.objects.exists()
