@@ -426,3 +426,26 @@ def test_no_job_descriptions_reminder_on_the_experiment_pages(client, settings):
     assertNotContains(client.get(TODO_URL), "deactivation-job-banner")
     # Elsewhere, the reminder stays.
     assertContains(client.get(reverse("dashboard:index")), "deactivation-job-banner")
+
+
+# Menu
+# ------------------------------------------------------------------------------
+
+
+def test_menu_counts_the_urgent_actions(employer_client, employer_membership):
+    company = employer_membership.company
+    # No urgent action yet: no badge, and the experiment no longer says « Beta ».
+    response = employer_client.get(reverse("dashboard:index"))
+    assertNotContains(response, "urgente")
+    assertNotContains(response, "Beta")
+
+    # Late, then due this week: only the first is urgent.
+    JobApplicationFactory(
+        to_company=company,
+        state=JobApplicationState.NEW,
+        sent_by_authorized_prescriber=True,
+        created_at=timezone.now() - datetime.timedelta(days=20),
+    )
+    JobApplicationFactory(to_company=company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True)
+    response = employer_client.get(reverse("dashboard:index"))
+    assertContains(response, '<span class="visually-hidden">action urgente</span>', count=1)

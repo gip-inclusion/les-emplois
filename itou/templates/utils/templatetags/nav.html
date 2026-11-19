@@ -1,4 +1,5 @@
 {% load matomo %}
+{% load str_filters %}
 {% load theme_inclusion %}
 
 <ul class="nav nav-tabs flex-column mb-3">
@@ -55,6 +56,12 @@
                     {% endif %}
                     {% if menu_group_or_item.is_beta %}
                         {% beta_badge %}
+                    {% endif %}
+                    {% if menu_group_or_item.counter %}
+                        <span class="badge badge-sm rounded-pill bg-danger text-white ms-2">
+                            {{ menu_group_or_item.counter }}
+                            <span class="visually-hidden">action{{ menu_group_or_item.counter|pluralizefr }} urgente{{ menu_group_or_item.counter|pluralizefr }}</span>
+                        </span>
                     {% endif %}
                 </a>
             </li>
