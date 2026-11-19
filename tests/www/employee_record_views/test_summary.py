@@ -40,6 +40,7 @@ class TestSummaryEmployeeRecords:
             sent_by_prescriber_alone=True,
             for_employee_record=True,
             to_company=self.company,
+            job_seeker__public_id="111111111111-1111-1111-1111-11111111",
             job_seeker__first_name="Lauren",
             job_seeker__last_name="Mata",
         )
