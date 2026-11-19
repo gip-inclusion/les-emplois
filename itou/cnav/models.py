@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import logging
 import uuid
@@ -36,90 +37,143 @@ def _extract_known_case_folded_last_names(infos: PersonalInfos) -> set[str]:
     return known_last_names
 
 
+def _matching_infos_for_profile(profile: JobSeekerProfile):
+    return {
+        "nir": profile.nir,
+        "last_name": profile.user.last_name.casefold(),
+        "first_name": profile.user.first_name.casefold(),
+        "birthdate": profile.birthdate,
+        "title": profile.user.title,
+        "birth_insee_code": profile.birth_insee_code(),
+    }
+
+
+def _matching_infos_for_record(cnav_record: CNAVRecord):
+    personal_infos = cnav_record.get_personal_infos()
+    if personal_infos is None:
+        return {}
+    birthdate = None
+    if personal_infos.birth_date is not None:
+        with contextlib.suppress(ValueError):
+            birthdate = datetime.date.fromisoformat(personal_infos.birth_date)
+    return {
+        "nir": {personal_infos.number} | set(personal_infos.number_history),
+        "last_name": _extract_known_case_folded_last_names(personal_infos),
+        "first_name": _extract_known_case_folded_first_names(personal_infos),
+        "birthdate": birthdate,
+        "birth_insee_code": personal_infos.birth_place,
+    }
+
+
+def match(*, profile: JobSeekerProfile, cnav_record: CNAVRecord):
+    profile_matching_infos = _matching_infos_for_profile(profile)
+    record_matching_infos = _matching_infos_for_record(cnav_record)
+    if not profile_matching_infos or not record_matching_infos:
+        return False
+    mismatched_fields = []
+    for field in ["nir", "last_name", "first_name", "birth_date", "birth_insee_code"]:
+        profile_value = profile_matching_infos.get(field)
+        record_value = record_matching_infos.get(field)
+        if not profile_matching_infos or not record_value:
+            # Ignoring empty fields
+            continue
+        if isinstance(record_value, set):
+            if profile_value not in record_value:
+                mismatched_fields.append(field)
+        else:
+            if profile_value != record_value:
+                mismatched_fields.append(field)
+    if mismatched_fields:
+        logger.info(
+            "Mismatch between JobSeekerProfile=%s and CNAVRecord=%s on fields: %s",
+            profile.pk,
+            cnav_record.pk,
+            mismatched_fields,
+        )
+        return False
+    return True
+
+
+def record_to_profile_values(cnav_record: CNAVRecord):
+    values = {}
+
+    personal_infos = cnav_record.get_personal_infos()
+    if personal_infos is None:
+        return values
+
+    values["nir"] = personal_infos.number
+
+    if personal_infos.sex_code:
+        values["title"] = {1: Title.M, 2: Title.MME}.get(personal_infos.sex_code)
+
+    if personal_infos.birth_date:
+        with contextlib.suppress(ValueError):
+            values["birthdate"] = datetime.date.fromisoformat(personal_infos.birth_date)
+
+    if insee_code := personal_infos.birth_place:
+        if insee_code.startswith("99"):
+            values["birth_country"] = Country.objects.get(code=insee_code[2:])
+            values["birth_place"] = None
+        else:
+            commune = Commune.objects.filter(code=insee_code).first()
+            if commune:
+                values["birth_place"] = commune
+                values["birth_country_id"] = Country.FRANCE_ID
+            else:
+                values["birth_country"] = Country.objects.get(code=insee_code[2:], group=Country.Group.FRANCE)
+                values["birth_place"] = None
+
+    # last_name/first_name are ignored for now: if a match was found it means that the data are okayish
+    return values
+
+
+def update_profile_from_record(*, profile, cnav_record):
+    record_infos = record_to_profile_values(cnav_record)
+
+    if (record_title := record_infos.pop("title", None)) is not None and profile.user.title != record_title:
+        profile.user.title = record_title
+        profile.user.save(update_fields={"title"})
+
+    update_fields = set()
+    for field, value in record_infos.items():
+        if value != getattr(profile, field):
+            setattr(profile, field, value)
+            update_fields.add(field)
+    if update_fields:
+        profile.save(update_fields=update_fields)
+
+
 class CNAVRecord(models.Model):
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     origin = models.CharField(choices=CNAVRecordOrigin.choices)
 
-    # Input infos
     profile = models.ForeignKey(JobSeekerProfile, null=True, on_delete=models.SET_NULL, related_name="cnav_records")
-
     input_data = models.JSONField(encoder=DjangoJSONEncoder)
     result = models.JSONField(encoder=DjangoJSONEncoder, null=True)
 
     last_attempt_at = models.DateTimeField(null=True)
     next_attempt_at = models.DateTimeField(null=True)
 
-    def try_to_certify_profile(self):
-        if self.profile is None:
-            return
+    def get_personal_infos(self) -> PersonalInfos | None:
         try:
             interops_result = InterOpsResult.from_dict(self.result)
         except ValueError:
             logger.info("Unexpected result format for CNAVRecord pk=%s", self.pk)
             return
-        if not interops_result.infos:
-            logger.info("Empty result for CNAVRecord pk=%s", self.pk)
+        return interops_result.infos
+
+    def try_to_certify_profile(self):
+        if self.profile is None:
             return
 
-        # The NIR is mandatory
-        if self.profile.nir is None or self.profile.nir[:13] != interops_result.infos.number:
-            logger.info("NIR mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+        personal_infos = self.get_personal_infos()
+        if personal_infos is None:
             return
 
-        if self.profile.birthdate and self.profile.birthdate.isoformat() != interops_result.infos.birth_date:
-            logger.info("birth date mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
+        if not match(profile=self.profile, cnav_record=self):
             return
-        if self.profile.user.title and self.profile.user.title != {1: Title.M, 2: Title.MME}.get(
-            interops_result.infos.sex_code
-        ):
-            logger.info("title/sex_code mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
-            return
-        if self.profile.birth_country_id and self.profile.birth_insee_code() != interops_result.infos.birth_place:
-            logger.info("birth place mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
-            return
-        if (
-            self.profile.user.first_name
-            and self.profile.user.first_name.casefold()
-            not in _extract_known_case_folded_first_names(interops_result.infos)
-        ):
-            logger.info("first name mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
-            return
-        # TODO: handle birth_name (with fallback on last_name if birth_name is empty)
-        if (
-            self.profile.user.last_name
-            and self.profile.user.last_name.casefold()
-            not in _extract_known_case_folded_last_names(interops_result.infos)
-        ):
-            logger.info("last name mismatch between profile=%s and CNAVRecord pk=%s", self.profile.pk, self.pk)
-
-            return
-        # If we end up here, it means that the profile and interops information are consistent
-        # Let's certify!
-        # First fill missing fields:
-        update_fields = set()
-        if not self.profile.birthdate:
-            self.profile.birthdate = datetime.date.fromisoformat(interops_result.infos.birth_date)
-            update_fields.add("birthdate")
-        if not self.profile.birth_country_id:
-            insee_code = interops_result.infos.birth_place
-            if insee_code.startswith("99"):
-                self.profile.birth_country = Country.objects.get(code=insee_code[2:])
-                update_fields.add("birth_country")
-            else:
-                commune = Commune.objects.filter(code=insee_code).first()
-                if commune:
-                    self.profile.birth_place = commune
-                    self.profile.birth_country_id = Country.FRANCE_ID
-                    update_fields.add("birth_country", "birth_place")
-                else:
-                    self.profile.birth_country = Country.objects.get(code=insee_code[2:], group=Country.Group.FRANCE)
-                    update_fields.add("birth_country")
-        if update_fields:
-            self.profile.save(update_fields=update_fields)
-
-        # TODO: handle title/first_name/last_name/birth_name
-
+        update_profile_from_record(profile=self.profile, cnav_record=self)
         IdentityCertification.objects.upsert_certifications(
             [
                 IdentityCertification(
@@ -130,7 +184,9 @@ class CNAVRecord(models.Model):
             ],
         )
         logger.info(
-            "Match between profile=%s and CNAVRecord pk=%s - IdentityCertification added", self.profile.pk, self.pk
+            "Match between JobSeekerProfile=%s and CNAVRecord=%s - IdentityCertification added",
+            self.profile.pk,
+            self.pk,
         )
 
 
@@ -138,7 +194,6 @@ class CNAVRecord(models.Model):
 # * Ajout d'une tache planifiée qui supprime les vieux CNAVRecord non liés à un profile
 # * Ajout d'une tache planifiée qui tente de traiter les vieux CNAVRecord (a priori sans tache huey)
 # * Modification de la fusion de deux comptes candidats pour garder ces objets
-# * Affichage du badge de certification CNAV
 #
 # Lors de la validation de la création de l'usager, on vérifie le CNAVRecord lié et si:
 #   - le pro a le droit de voir les infos de la CNAV
