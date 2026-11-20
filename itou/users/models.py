@@ -305,11 +305,27 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
 
 class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
-    """
-    Custom user model.
+    """Custom user model.
 
     Default fields are listed here:
     https://github.com/django/django/blob/f3901b5899d746dc5b754115d94ce9a045b4db0a/django/contrib/auth/models.py#L321
+
+    Notes about last name and birth name:
+
+    - For job seekers: ``User.last name`` is the "nom d'usage";
+      ``JobSeekerProfile.birth_name`` is the "nom de naissance.  The
+      ``last_name`` is never empty: it's either the same as
+      ``birth_name``, or a different name (for example after a
+      marriage).
+
+      The ``birth_name`` field having been added recently, some users
+      have their name in ``last_name`` and an empty ``birth_name``.
+      We progressively populate it (and possibly change ``last_name``)
+      when they log in and go to their dashboard, when someone apply
+      for them, etc.
+
+    - For users who are _not_ job seekers, ``last_name`` is also the
+      "nom d'usage", we do not know about their "nom de naissance".
 
     Auth is managed with django-allauth.
 
@@ -916,20 +932,24 @@ class JobSeekerProfileManager(models.Manager.from_queryset(JobSeekerProfileQuery
 
 
 class JobSeekerProfile(AbstractFieldsHistoryModel):
-    """
-    Specific information about the job seeker
+    """Specific information about the job seeker
 
     Instead of augmenting the 'User' model, additional data is collected in a "profile" object.
 
     This user profile has 2 main parts:
 
-    1 - Job seeker "administrative" situation
+    1 - Job seeker birth name
+
+    See "Notes about last name and birth name" in the docstring of the
+    ``User`` model above.
+
+    2 - Job seeker "administrative" situation
 
     These fields are part of the mandatory fields for EmployeeRecord processing:
     - education level
     - various social allowances flags and durations
 
-    2 - Job seeker address in HEXA address format:
+    3 - Job seeker address in HEXA address format:
 
     The SNA (Service National de l'Adresse) has several certification / validation
     norms to verify french addresses:
@@ -959,6 +979,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
     FIELDS_HISTORY_TRIGGER_FIELDS = [
         "asp_uid",
         "birth_country",
+        "birth_name",
         "birth_place",
         "birthdate",
         "is_not_stalled_anymore",
@@ -997,6 +1018,14 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         related_name="jobseeker_profile",
     )
 
+    birth_name = models.CharField(
+        max_length=150,  # same as `AbstractUser.last_name`
+        verbose_name="nom de naissance",
+        blank=True,
+        null=False,
+        default="",
+        db_default="",
+    )
     birthdate = models.DateField(
         verbose_name="date de naissance",
         null=True,
@@ -1448,7 +1477,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
+        if self.has_data_changed(["birth_name", "birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
@@ -1682,6 +1711,12 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
                 case IdentityCertificationAuthorities.API_PARTICULIER:
                     blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
                     blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
+                    if self.birth_name:
+                        # If birth name is known, then that's what we used for
+                        # certification. Thus we cannot change it, but we are
+                        # allowed to update the last name.
+                        blocked_fields.add("birth_name")
+                        blocked_fields.remove("last_name")
 
                     # These fields can be empty even after the certification, generating an error
                     # when the form is validated. Hence we allow the edition of this field.

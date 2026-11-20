@@ -15,6 +15,7 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.models import User
+from itou.users.utils import GuessLastNameMode, guess_last_name
 from itou.utils.brand import product_name
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 
@@ -176,7 +177,7 @@ class OIDConnectUserData:
         """
         sso_data_dict = {k: v for k, v in dataclasses.asdict(self).items() if v}
         is_jobseeker = sso_data_dict["kind"] == UserKind.JOB_SEEKER
-        jobseeker_fields = {"birthdate"}
+        jobseeker_fields = {"birth_name", "birthdate"}
         jobseeker_data_dict = {}
         user_data_dict = {}
         for field, value in sso_data_dict.items():
@@ -184,6 +185,13 @@ class OIDConnectUserData:
                 jobseeker_data_dict[field] = value
             else:
                 user_data_dict[field] = value
+
+        if is_jobseeker and "birth_name" in jobseeker_data_dict:
+            user_data_dict["last_name"] = guess_last_name(
+                user_data_dict["last_name"],
+                jobseeker_data_dict["birth_name"],
+                GuessLastNameMode.BEFORE_SAVE,
+            )
 
         created = False
         try:

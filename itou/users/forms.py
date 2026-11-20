@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
+from itou.users.utils import GuessLastNameMode, guess_last_name
 from itou.utils import constants as global_constants
 
 
@@ -32,6 +33,30 @@ class JobSeekerProfileFieldsMixin:
         for field in self.PROFILE_FIELDS:
             if field not in self.fields:
                 self.fields[field] = JobSeekerProfile._meta.get_field(field).formfield()
+
+        if "last_name" in self.initial:
+            self.initial["last_name"] = guess_last_name(
+                self.initial["last_name"],
+                self.initial["birth_name"],
+                GuessLastNameMode.BEFORE_DISPLAY,
+            )
+
+    def clean(self):
+        super().clean()
+        self.auto_populate_last_name_from_birth_name_before_save()
+
+    def auto_populate_last_name_from_birth_name_before_save(self):
+        """If last name field is empty, automatically populate it from
+        the birth name.
+
+        This is to ensure that `User.last_name` is always updated.
+        """
+        if set(self.cleaned_data).issuperset({"last_name", "birth_name"}):
+            self.cleaned_data["last_name"] = guess_last_name(
+                self.cleaned_data["last_name"],
+                self.cleaned_data["birth_name"],
+                GuessLastNameMode.BEFORE_SAVE,
+            )
 
     def save(self, commit=True):
         user = super().save(commit=commit)
@@ -97,8 +122,8 @@ class PoleEmploiFieldsMixin:
 
 
 class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
-    PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
-    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
+    PROFILE_FIELDS = ["birth_name", "birthdate", "birth_place", "birth_country"]
+    REQUIRED_FIELDS = ["title", "first_name", "birth_name", "birthdate"]
 
     class Meta:
         model = User
@@ -112,6 +137,8 @@ class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMix
                 self.fields[fieldname].required = True
             except KeyError:
                 pass
+
+        self.fields["last_name"].label = "Nom d’usage"
 
         for fieldname, field in self.fields.items():
             if fieldname in self.readonly_pii_fields:
