@@ -51,7 +51,7 @@
                             <span class="d-block fw-bold">{{ service.name }}</span>
                             <span class="d-block fs-sm">
                                 {% if service.is_local %}
-                                    {% if service.distance is not None %}À {{ service.distance|floatformat:"-1" }}&nbsp;km · {% endif %}
+                                    {% if service.home_distance is not None %}À {{ service.home_distance|floatformat:"-1" }}&nbsp;km {{ distance_from }} · {% endif %}
                                     {{ service.post_code }} {{ service.city }}
                                     {% if service.is_remote %}· également à distance{% endif %}
                                 {% elif service.is_remote %}

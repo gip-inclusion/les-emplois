@@ -432,6 +432,21 @@ table.table td > .modal .modal-content {
     margin-bottom: 0;
 }
 
+/* A box of a drawer that unfolds on request, as the contact of a service: a summary without its marker, a chevron
+   that turns once open. */
+.next-step-unfold > summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.next-step-unfold > summary::-webkit-details-marker {
+    display: none;
+}
+
+.next-step-unfold[open] .next-step-unfold__chevron {
+    transform: rotate(180deg);
+}
+
 /* A score on a gauge of steps, as the autonomy in a report. */
 .next-step-gauge > span {
     height: .5rem;

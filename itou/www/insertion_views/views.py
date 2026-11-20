@@ -110,6 +110,46 @@ class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
         }
 
 
+def service_email_prefilled_body(request, service, job_seeker):
+    """The message prefilled to write to a service: who orients whom. Shared with the next steps' side drawer."""
+    email_context = {
+        "service": service,
+        "job_seeker": job_seeker,
+        "sender": request.user,
+        "can_view_personal_information": (can_view_personal_information(request, job_seeker) if job_seeker else False),
+    }
+    return mark_safe(get_template("insertion/send_email_service_prefilled_body.txt").render(email_context).strip())
+
+
+def send_email_to_service(request, service, body):
+    """Send a professional's message to a service, linked to their latest view of its contact details.
+
+    Shared with the next steps' side drawer.
+    """
+    prescriber_organization = request.current_organization if request.from_prescriber else None
+    company = request.current_organization if request.from_employer else None
+    mobilization_event = (
+        insertion_models.MobilizationEvent.objects.filter(
+            user=request.user,
+            prescriber_organization=prescriber_organization,
+            company=company,
+            service=service,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+            created_at__gte=timezone.now() - datetime.timedelta(hours=6),
+        )
+        .order_by("-created_at")
+        .first()
+    )
+    mobilization_email = insertion_models.MobilizationEmail.objects.create(
+        service=service,
+        mobilization_event=mobilization_event,
+        sender=request.user,
+        sender_prescriber_organization=prescriber_organization,
+        sender_company=company,
+    )
+    mobilization_email.free_form_email_to_service(body_message=body).send()
+
+
 class ServiceDetailView(LoginNotRequiredMixin, DetailView):
     model = insertion_models.Service
     queryset = insertion_models.Service.objects.select_related(
@@ -154,17 +194,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         if not can_orient_towards_insertion_service(request):
             return
 
-        email_context = {
-            "service": self.object,
-            "job_seeker": job_seeker,
-            "sender": request.user,
-            "can_view_personal_information": (
-                can_view_personal_information(request, job_seeker) if job_seeker else False
-            ),
-        }
-        prefilled_body = mark_safe(
-            get_template("insertion/send_email_service_prefilled_body.txt").render(email_context).strip()
-        )
+        prefilled_body = service_email_prefilled_body(request, self.object, job_seeker)
         form = SendEmailForm(initial={"body": prefilled_body}, data=request.POST or None)
         return form
 
@@ -206,28 +236,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         send_email_form = self.get_send_email_form(request, orient_for_job_seeker_context.get("job_seeker"))
         partial_name = "#service-send-email-content"
         if send_email_form.is_valid():
-            prescriber_organization = request.current_organization if request.from_prescriber else None
-            company = request.current_organization if request.from_employer else None
-            mobilization_event = (
-                insertion_models.MobilizationEvent.objects.filter(
-                    user=request.user,
-                    prescriber_organization=prescriber_organization,
-                    company=company,
-                    service=self.object,
-                    kind=MobilizationEventKind.SERVICE_CONTACT,
-                    created_at__gte=timezone.now() - datetime.timedelta(hours=6),
-                )
-                .order_by("-created_at")
-                .first()
-            )
-            mobilization_email = insertion_models.MobilizationEmail.objects.create(
-                service=self.object,
-                mobilization_event=mobilization_event,
-                sender=request.user,
-                sender_prescriber_organization=prescriber_organization,
-                sender_company=company,
-            )
-            mobilization_email.free_form_email_to_service(body_message=send_email_form.cleaned_data["body"]).send()
+            send_email_to_service(request, self.object, send_email_form.cleaned_data["body"])
             partial_name = "#email-sent"
 
         context = {"send_email_form": send_email_form, "service": self.object}

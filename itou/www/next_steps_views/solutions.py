@@ -6,12 +6,15 @@ same rules (Service.objects.search); a service opens in the drawer too, and so d
 """
 
 from data_inclusion.schema import v1 as data_inclusion_v1
+from django.contrib.gis.db.models.functions import Distance
 from django.urls import reverse
 
 from itou.cities.models import City
 from itou.insertion.models import Service
 from itou.www.next_steps_views.barriers import SEARCH_CATEGORIES
 
+
+RECEPTION_IN_PERSON = data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value
 
 # How the services receive people: the search's own values, with the drawer's labels.
 RECEPTIONS = {
@@ -26,6 +29,22 @@ def job_seeker_city(job_seeker):
     if not job_seeker.city_slug:
         return None
     return City.objects.filter(slug=job_seeker.city_slug).first()
+
+
+def distance_origin(job_seeker, city):
+    """Where distances start from, and how to say it: the job seeker's home when geocoded, else their town."""
+    if job_seeker.coords:
+        return job_seeker.coords, "du domicile de l’usager"
+    if city:
+        return city.coords, f"du centre de {city.name}"
+    return None, ""
+
+
+def with_home_distance(services, origin):
+    """Each service's distance from the origin, in km, as the search's own distance from the town."""
+    if origin is None:
+        return services
+    return services.annotate(home_distance=Distance("coordinates", origin) / 1000)
 
 
 def search_services(city, key, reception=""):
