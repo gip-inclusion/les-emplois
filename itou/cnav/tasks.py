@@ -14,35 +14,18 @@ from itou.utils.apis.cnav import get_client
 
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS = [
-    "birthdate",
-    "last_name",
-    "nir",
-]
 
-ALLOWED_FIELDS = [
-    # User model
-    "first_name",
-    "last_name",
-    "title",
-    # JobSeekerProfile model
-    "birthdate",
-    "nir",
-]
-
-assert set(MANDATORY_FIELDS) <= set(ALLOWED_FIELDS)
-
-
-def _input_to_payload(input_data):
+def _record_to_payload(cnav_record: CNAVRecord):
     payload = {
-        "number": input_data["nir"][:13],
-        "name": input_data["last_name"],  # Update to birth_name if available
-        "birth_date": datetime.date.fromisoformat(input_data["birthdate"]),
+        "number": cnav_record.input_nir[:13],
+        "name": cnav_record.input_last_name,  # Update to birth_name if available
     }
-    if "title" in input_data:
-        payload["sex_code"] = {Title.M: 1, Title.MME: 2}[input_data["title"]]
-    if "first_name" in input_data:
-        payload["first_names"] = input_data["first_name"]
+    if cnav_record.input_first_name:
+        payload["first_names"] = cnav_record.input_first_name
+    if cnav_record.input_title:
+        payload["sex_code"] = {Title.M: 1, Title.MME: 2}[cnav_record.input_title]
+    if cnav_record.input_birthdate:
+        payload["birth_date"] = cnav_record.input_birthdate
     return payload
 
 
@@ -59,15 +42,8 @@ def retrieve_cnav_infos(record_pk):
     if cnav_record.result is not None:
         logger.info("CNAVRecord pk=%s has already been processed - ignoring task", record_pk)
         return
-    if not cnav_record.input_data or not isinstance(cnav_record.input_data, dict):
-        logger.error("Invalid input_data for CNAVRecord pk=%s", record_pk)
-        return
 
-    retrieval_fields = set(cnav_record.input_data)
-    if not set(MANDATORY_FIELDS) <= retrieval_fields <= set(ALLOWED_FIELDS):
-        logger.error("Invalid fields in input_data of CNAVRecord pk=%s : %s", record_pk, retrieval_fields)
-        return
-    payload = _input_to_payload(cnav_record.input_data)
+    payload = _record_to_payload(cnav_record)
 
     with get_client() as client:
         cnav_record.last_attempt_at = timezone.now()
@@ -87,6 +63,7 @@ def retrieve_cnav_infos(record_pk):
                 logger.warning(
                     "HTTPStatusError while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc
                 )
+                print(exc.response.json())
         except httpx.HTTPError as exc:
             logger.warning("HTTPError while trying to retrieve data for CNAVRecord pk=%s : %s", record_pk, exc)
         except Exception as exc:

@@ -119,6 +119,7 @@ class CNAVRelayApiClient:
             "name": name,
             "birth_date": birth_date.isoformat(),
         }
+        print(payload)
         if sex_code is not None:
             payload["sex_code"] = sex_code
         if first_names is not None:

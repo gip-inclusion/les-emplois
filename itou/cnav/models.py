@@ -39,7 +39,7 @@ def _extract_known_case_folded_last_names(infos: PersonalInfos) -> set[str]:
 
 def _matching_infos_for_profile(profile: JobSeekerProfile):
     return {
-        "nir": profile.nir,
+        "nir": profile.nir[:13],
         "last_name": profile.user.last_name.casefold(),
         "first_name": profile.user.first_name.casefold(),
         "birthdate": profile.birthdate,
@@ -66,6 +66,7 @@ def _matching_infos_for_record(cnav_record: CNAVRecord):
 
 
 def match(*, profile: JobSeekerProfile, cnav_record: CNAVRecord):
+    # XXX: should we recheck the input data ?
     profile_matching_infos = _matching_infos_for_profile(profile)
     record_matching_infos = _matching_infos_for_record(cnav_record)
     if not profile_matching_infos or not record_matching_infos:
@@ -149,7 +150,14 @@ class CNAVRecord(models.Model):
     origin = models.CharField(choices=CNAVRecordOrigin.choices)
 
     profile = models.ForeignKey(JobSeekerProfile, null=True, on_delete=models.SET_NULL, related_name="cnav_records")
-    input_data = models.JSONField(encoder=DjangoJSONEncoder)
+
+    # Input data
+    input_nir = models.CharField(verbose_name="NIR recherché", max_length=15)
+    input_title = models.CharField()
+    input_last_name = models.CharField()
+    input_first_name = models.CharField()
+    input_birthdate = models.DateField()
+
     result = models.JSONField(encoder=DjangoJSONEncoder, null=True)
 
     last_attempt_at = models.DateTimeField(null=True)

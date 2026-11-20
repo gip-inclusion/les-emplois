@@ -1483,13 +1483,11 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 if session_nir := self.job_seeker_session.get("profile", {}).get("nir"):
                     cnav_record = CNAVRecord.objects.create(
                         origin=CNAVRecordOrigin.USER_CREATION,
-                        input_data={
-                            "nir": session_nir,
-                            "last_name": self.form.cleaned_data["last_name"],
-                            "title": self.form.cleaned_data["title"],
-                            "first_name": self.form.cleaned_data["first_name"],
-                            "birthdate": self.form.cleaned_data["birthdate"],
-                        },
+                        input_nir=session_nir,
+                        input_last_name=self.form.cleaned_data["last_name"],
+                        input_first_name=self.form.cleaned_data["first_name"],
+                        input_title=self.form.cleaned_data["title"],
+                        input_birthdate=self.form.cleaned_data["birthdate"],
                     )
                     logger.info("CNAVRecord pk=%s created", cnav_record.pk)
                     plan_retrieve_cnav_infos(record_pk=cnav_record.pk)
