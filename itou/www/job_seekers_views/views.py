@@ -895,7 +895,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
 
     request_from_siae = request.from_iae_actor and request.from_employer
     # Authorized prescribers get the same banners, pointing to the support request instead of the pro support report.
-    show_end_of_contracts_banner = request_from_siae or request.from_authorized_prescriber
+    # Not within the "Prochaines étapes" experiment, whose queue brings the ends of contracts up.
+    show_end_of_contracts_banner = (
+        request_from_siae or request.from_authorized_prescriber
+    ) and not next_steps_prescriber
 
     # Discovery banner: count over the assigned job seekers (unfiltered), only shown when the
     # end-of-journey filter is not active. A SIAE counts its own contracts, a prescriber those of

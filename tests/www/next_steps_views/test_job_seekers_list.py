@@ -124,3 +124,20 @@ def test_not_for_unauthorized_prescribers(client, settings):
     response = client.get(LIST_URL)
     assert response.status_code == 200
     assertNotContains(response, BADGE)
+
+
+def test_titled_as_its_menu_entry_without_banner(client, settings, membership):
+    client.force_login(membership.user)
+
+    # Without the experiment: « Accompagnements », a section title, the end of contracts banner.
+    response = client.get(LIST_URL)
+    assertContains(response, "<h1>Accompagnements</h1>", html=True)
+    assertContains(response, '<h2 class="mb-3 mb-md-4">Usagers accompagnés</h2>', html=True)
+    assert response.context["show_end_of_contracts_banner"] is True
+
+    experiment_on(settings, membership)
+    response = client.get(LIST_URL)
+    assertContains(response, "<title>Usagers accompagnés - La plateforme de l’inclusion</title>", html=True)
+    assertContains(response, "<h1>Usagers accompagnés</h1>", html=True)
+    assertNotContains(response, "<h2")
+    assert response.context["show_end_of_contracts_banner"] is False
