@@ -493,11 +493,19 @@ class TestSendProSupportReportIntroduction:
         client.force_login(prescriber)
 
         response = client.get(report_url(report))
-        assertNotContains(response, "a quitté la structure")
-        assertContains(response, f"Échanger avec {report.author.get_full_name()}")
-        assertContains(response, f"Mise en relation avec {report.author.get_full_name()}")
+        assertContains(response, "Auteur du bilan")
+        assertNotContains(response, "A quitté")
+        assertContains(response, f"<span>Contacter {report.author.get_full_name()}</span>", html=True)
+        assertContains(
+            response,
+            f"Votre demande de contact sera envoyée par e-mail à {report.author.get_full_name()}, avec vous en copie.",
+        )
+        # The phone is saved in the profile unless the prescriber unchecks the box.
+        assert response.context["introduction_form"]["save_phone"].value() is True
 
-        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        response = client.post(
+            introduction_url(report), {"phone": "06 12 34 56 78", "save_phone": "on"}, headers={"HX-Request": "true"}
+        )
         assert response.headers["HX-Refresh"] == "true"
         prescriber.refresh_from_db()
         assert prescriber.phone == "06 12 34 56 78"
@@ -509,32 +517,48 @@ class TestSendProSupportReportIntroduction:
         assert email.cc == [prescriber.email]
 
         response = client.get(report_url(report))
-        assertContains(response, "E-mail de mise en relation envoyé")
-        assertContains(response, f"vous pouvez contacter {report.author.get_full_name()} dès maintenant")
-        assertContains(response, f"Échanger de vive voix avec {report.author.get_full_name()}")
-        assertNotContains(response, f"Échanger avec {report.author.get_full_name()}")
+        assertContains(response, f"N’hésitez pas à prendre contact rapidement avec {report.author.get_full_name()}.")
+        assertContains(response, "Demande de contact envoyée le 15/01/2026")
+        assertNotContains(response, f"<span>Contacter {report.author.get_full_name()}</span>", html=True)
 
         # Any authorized prescriber who reads the report sees the contact details.
         client.force_login(PrescriberMembershipFactory(organization=organization).user)
         response = client.get(report_url(report))
-        assertContains(response, f"Échanger de vive voix avec {report.author.get_full_name()}")
-        assertNotContains(response, f"Échanger avec {report.author.get_full_name()}")
+        assertContains(response, "Demande de contact envoyée le 15/01/2026")
+        assertContains(response, report.author.email)
 
         # The SIAE does not see the contact details given to the prescriber.
         client.force_login(CompanyMembershipFactory(company=report.company, is_admin=False).user)
         response = client.get(report_url(report))
-        assertNotContains(response, "Échanger de vive voix")
-        assertNotContains(response, "Échanger avec")
+        assertNotContains(response, "Auteur du bilan")
+        assertNotContains(response, "Demande de contact envoyée")
 
-    def test_missing_phone(self, client, mailoutbox):
+    def test_phone_not_saved(self, client, mailoutbox):
         report = ProSupportReportFactory()
-        client.force_login(PrescriberMembershipFactory(organization=advisor_organization(report), user__phone="").user)
+        prescriber = PrescriberMembershipFactory(
+            organization=advisor_organization(report), user__phone="04 94 00 00 00"
+        ).user
+        client.force_login(prescriber)
 
-        response = client.post(introduction_url(report), {"phone": ""}, headers={"HX-Request": "true"})
-        assertContains(response, "Renseignez votre téléphone professionnel.")
-        assert mailoutbox == []
-        report.refresh_from_db()
-        assert report.introduction_email_sent_at is None
+        # The box to save the phone is unchecked.
+        client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "04 94 00 00 00"
+        [email] = mailoutbox
+        assert f"Téléphone\xa0: 06 12 34 56 78\nAdresse e-mail\xa0: {prescriber.email}" in email.body
+
+    def test_without_phone(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        prescriber = PrescriberMembershipFactory(organization=organization, user__phone="04 94 00 00 00").user
+        client.force_login(prescriber)
+
+        # The prescriber empties the field: the email gives no phone, the profile keeps it.
+        client.post(introduction_url(report), {"phone": "", "save_phone": "on"}, headers={"HX-Request": "true"})
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "04 94 00 00 00"
+        [email] = mailoutbox
+        assert f"{organization.display_name}\nAdresse e-mail\xa0: {prescriber.email}" in email.body
 
     def test_already_sent(self, client, mailoutbox):
         report = ProSupportReportFactory(introduction_email_sent_at=timezone.now())
@@ -552,29 +576,31 @@ class TestSendProSupportReportIntroduction:
         response = client.get(report_url(report))
         # The admin is unknown to the prescriber: the author's departure explains why they get the email.
         assertContains(response, f"par {report.author.get_full_name()} (a quitté la structure)")
-        assertContains(response, "<span>Échanger avec l’employeur</span>", html=True)
-        assertNotContains(response, f"Échanger avec {admin.get_full_name()}")
-        assertContains(response, f"Mise en relation avec {report.company.display_name}")
+        assertContains(response, f"A quitté {report.company.display_name}")
+        assertContains(response, "<span>Contacter l’employeur</span>", html=True)
+        assertNotContains(response, f"<span>Contacter {admin.get_full_name()}</span>", html=True)
+        assertContains(response, f"Contacter {report.company.display_name}")
         assertContains(
-            response, f"L’e-mail de mise en relation sera envoyé à {admin.get_full_name()}, qui administre le compte"
+            response,
+            f"Votre demande de contact sera envoyée par e-mail à {admin.get_full_name()}, qui administre le compte",
         )
 
-        client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        client.post(
+            introduction_url(report), {"phone": "06 12 34 56 78", "save_phone": "on"}, headers={"HX-Request": "true"}
+        )
         [email] = mailoutbox
         assert email.to == [admin.email]
         report.refresh_from_db()
         assert report.introduction_email_recipient == admin
 
         response = client.get(report_url(report))
-        assertContains(
-            response, f"contacter {admin.get_full_name()}, qui administre le compte de la structure, dès maintenant"
-        )
-        assertContains(response, f"Échanger de vive voix avec {admin.get_full_name()}")
+        assertContains(response, f"N’hésitez pas à prendre contact rapidement avec {admin.get_full_name()}.")
+        assertContains(response, admin.email)
 
         # The contact details stay those of the admin who received the email.
         other_admin = CompanyMembershipFactory(company=report.company, user__last_login=timezone.now()).user
         response = client.get(report_url(report))
-        assertContains(response, f"Échanger de vive voix avec {admin.get_full_name()}")
+        assertContains(response, admin.email)
         assertNotContains(response, other_admin.get_full_name())
 
     @pytest.mark.parametrize(
@@ -591,8 +617,8 @@ class TestSendProSupportReportIntroduction:
         client.force_login(advisor_organization(report).members.get())
 
         response = client.get(report_url(report))
-        assertContains(response, '<h2 class="h3 mb-0">Contenu du bilan</h2>', html=True)
-        assertNotContains(response, "Échanger avec")
+        assertContains(response, '<h2 class="h3">Contenu du bilan</h2>', html=True)
+        assertNotContains(response, "Auteur du bilan")
 
         response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
         assert response.status_code == 404

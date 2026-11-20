@@ -5,41 +5,57 @@
      aria-labelledby="pro-support-report-introduction-modal-label"
      aria-modal="true"
      role="dialog">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         {% partialdef pro-support-report-introduction-form inline %}
             <form id="pro-support-report-introduction-form"
                   class="modal-content js-prevent-multiple-submit"
                   hx-post="{% url "job_seekers_views:send_pro_support_report_introduction" public_id=report.public_id %}"
                   hx-target="#pro-support-report-introduction-form"
                   hx-swap="outerHTML">
-                <div class="modal-header">
+                <div class="modal-header flex-wrap">
                     <h3 class="modal-title" id="pro-support-report-introduction-modal-label">
                         {% if report.author_has_left %}
-                            Mise en relation avec {{ report.company.display_name }}
+                            Contacter {{ report.company.display_name }}
                         {% else %}
-                            Mise en relation avec {{ contact.get_full_name }}
+                            Contacter {{ contact.get_full_name }}
                         {% endif %}
                     </h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    <p class="w-100 mb-0 mt-2">
+                        <span class="badge badge-sm rounded-pill bg-emploi-lightest text-primary fw-normal text-wrap text-start">
+                            {# A single child: the badge is a flex container, which would lay out each text part as a column. #}
+                            <span>À propos du bilan d’accompagnement de <strong>{{ report.job_seeker.get_full_name }}</strong> · rempli le {{ report.created_at|date:"d/m/Y" }}</span>
+                        </span>
+                    </p>
                 </div>
                 <div class="modal-body">
                     {% csrf_token %}
                     {% if report.author_has_left %}
                         <p>{{ report.author.get_full_name }}, qui a rempli ce bilan, a quitté la structure.</p>
                         <p>
-                            L’e-mail de mise en relation sera envoyé à {{ contact.get_full_name }}, qui administre le compte de la structure, avec vous en copie.
-                            Il contiendra vos adresses e-mail et téléphones respectifs, et pourra être transféré à la personne qui suit désormais {{ report.job_seeker.get_full_name }}.
+                            Votre demande de contact sera envoyée par e-mail à {{ contact.get_full_name }}, qui administre le compte de la structure, avec vous en copie.
+                            Elle pourra être transférée à la personne qui suit désormais {{ report.job_seeker.get_full_name }}.
                         </p>
                     {% else %}
-                        <p>{{ contact.get_full_name }} et vous recevrez un e-mail de mise en relation avec vos adresses e-mail et téléphones respectifs.</p>
+                        <p>Votre demande de contact sera envoyée par e-mail à {{ contact.get_full_name }}, avec vous en copie.</p>
                     {% endif %}
-                    {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33 mb-0" %}
+                    <h4 class="mt-4">Coordonnées transmises à {{ contact.get_full_name }}</h4>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <p class="form-label mb-2">E-mail</p>
+                                <p class="mb-0 text-break">{{ form.instance.email }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            {% bootstrap_field form.phone wrapper_class="form-group mb-2" %}
+                            {% bootstrap_field form.save_phone wrapper_class="form-group mb-0" %}
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-sm btn-outline-primary"
-                            data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-sm btn-primary">Envoyer l’e-mail de mise en relation</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Envoyer la demande de contact</button>
                 </div>
             </form>
         {% endpartialdef %}
