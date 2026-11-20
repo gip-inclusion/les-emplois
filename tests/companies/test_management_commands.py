@@ -6,8 +6,9 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.companies.constants import CONTRACT_EXIT_DETECTION_DAYS
 from itou.companies.enums import CompanyKind, JobSource
-from itou.companies.models import Company, JobDescription
+from itou.companies.models import Company, Contract, ContractExit, JobDescription
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.job_applications.factories import JobApplicationFactory
@@ -230,3 +231,79 @@ def test_deactivate_spontaneous_jobapps_batch_size(mocker, caplog, settings):
     management.call_command("deactivate_spontaneous_jobapps")
     assert Company.objects.filter(spontaneous_applications_open_since__isnull=False).count() == 1
     assert [record.message for record in caplog.records if record.levelname == "ERROR"] == []
+
+
+@freeze_time("2026-01-10")
+def test_detect_contract_exits(caplog, snapshot):
+    today = timezone.localdate()
+    yesterday = today - datetime.timedelta(days=1)
+    tomorrow = today + datetime.timedelta(days=1)
+    oldest_to_alert = today - datetime.timedelta(days=CONTRACT_EXIT_DETECTION_DAYS)
+    too_old_to_alert = oldest_to_alert - datetime.timedelta(days=1)
+
+    contract_exited_today = companies_factories.ContractFactory(end_date=today, exit_reason="Au chômage")
+    oldest_exited_contract = companies_factories.ContractFactory(end_date=oldest_to_alert, exit_reason="Inactif")
+    already_detected_exit = companies_factories.ContractExitFactory(
+        contract__end_date=yesterday, contract__exit_reason="Sans nouvelle"
+    )
+    # The exit date changed (corrected by the ASP, or a renewal followed by a new exit): a new exit is recorded
+    contract_with_moved_exit = companies_factories.ContractFactory(
+        end_date=yesterday, exit_reason="Démission du bénéficiaire"
+    )
+    companies_factories.ContractExitFactory(contract=contract_with_moved_exit, exit_date=today)
+    # Ignored
+    companies_factories.ContractFactory(end_date=yesterday, exit_reason="Sortie automatique")
+    companies_factories.ContractFactory(end_date=too_old_to_alert, exit_reason="Inactif")
+    companies_factories.ContractFactory(end_date=tomorrow, exit_reason="Inactif")
+    companies_factories.ContractFactory(end_date=yesterday)
+    contract_without_exit_reason_yet = companies_factories.ContractFactory(
+        end_date=yesterday,
+        details=[{"Contrat Date Sortie Definitive": yesterday.isoformat(), "Motif Sortie": None}],
+    )
+    for _ in range(2):
+        companies_factories.ContractFactory(end_date=yesterday, exit_reason="Nouveau motif")
+
+    management.call_command("detect_contract_exits", wet_run=False)
+    assert ContractExit.objects.count() == 2
+
+    caplog.clear()
+    with assertSnapshotQueries(snapshot(name="SQL")):
+        management.call_command("detect_contract_exits", wet_run=True)
+    assert caplog.messages[:-1] == [
+        "Unknown contract exit reason: Nouveau motif",
+        "Detected 3 new contract exits.",
+    ]
+    assertQuerySetEqual(
+        ContractExit.objects.values_list("contract", "exit_date"),
+        [
+            (already_detected_exit.contract_id, yesterday),
+            (contract_with_moved_exit.pk, today),
+            (contract_exited_today.pk, today),
+            (oldest_exited_contract.pk, oldest_to_alert),
+            (contract_with_moved_exit.pk, yesterday),
+        ],
+        ordered=False,
+    )
+
+    # The reason arrives the next night
+    contract_without_exit_reason_yet.details[0]["Motif Sortie"] = "Au chômage"
+    contract_without_exit_reason_yet.save()
+    caplog.clear()
+    management.call_command("detect_contract_exits", wet_run=True)
+    assert "Detected 1 new contract exit." in caplog.messages
+    assert ContractExit.objects.filter(contract=contract_without_exit_reason_yet, exit_date=yesterday).exists()
+
+
+@freeze_time("2026-01-10")
+def test_detect_contract_exits_after_contract_recreation(caplog):
+    today = timezone.localdate()
+    contract_exit = companies_factories.ContractExitFactory(
+        contract__end_date=today, contract__exit_reason="Au chômage"
+    )
+    # Like fetch_riae_contracts when a contract is missing from one night's ASP data and comes back the next
+    Contract.objects.filter(pk=contract_exit.contract_id).delete()
+    companies_factories.ContractFactory(pk=contract_exit.contract_id, end_date=today, exit_reason="Au chômage")
+
+    management.call_command("detect_contract_exits", wet_run=True)
+    assert "Detected 0 new contract exits." in caplog.messages
+    assertQuerySetEqual(ContractExit.objects.all(), [contract_exit])
