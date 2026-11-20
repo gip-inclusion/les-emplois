@@ -17,6 +17,7 @@ from itou.common_apps.organizations.models import (
     OrganizationQuerySet,
 )
 from itou.emails.utils import get_email_message
+from itou.institutions.models import Institution
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -138,6 +139,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         default=False,
         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
+    # XXX surveiller le champ
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="e-mail", blank=True)
     website = models.URLField(verbose_name="site web", blank=True)
@@ -183,6 +185,22 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         null=True,
         blank=True,
         on_delete=models.RESTRICT,  # Only staff can update it, and we shouldn't delete one of those accounts
+    )
+    authorization_updated_by_prescriber_organization = models.ForeignKey(
+        "PrescriberOrganization",
+        verbose_name="organization prescriptrice à l'origine de la dernière MAJ de l'habilitation",
+        related_name="authorization_status_set",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+    )
+    authorization_updated_by_institution = models.ForeignKey(
+        Institution,
+        verbose_name="institution à l'origine de la dernière MAJ de l'habilitation",
+        related_name="authorization_status_set",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
     )
 
     # Use the generic relation to let NotificationSettings being collected on deletion
@@ -246,6 +264,11 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             models.CheckConstraint(
                 condition=models.Q(siret__regex=r"\A[0-9]{14}\Z"),
                 name="prescriber_organization_siret_regex",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(authorization_updated_by_prescriber_organization__isnull=True)
+                | models.Q(authorization_updated_by_institution__isnull=True),
+                name="field_a_and_field_b_not_both_set",
             ),
         ]
 
@@ -327,6 +350,10 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         An unknown organization claiming to be authorized must provide a written proof.
         """
         return self.kind == PrescriberOrganizationKind.OTHER and self.has_pending_authorization()
+
+    @property
+    def authorization_updated_by_org(self):
+        return self.authorization_updated_by_prescriber_organization or self.authorization_updated_by_institution
 
     def validated_prescriber_organization_email(self):
         """

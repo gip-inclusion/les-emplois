@@ -7,7 +7,11 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
+from itou.utils.perms import institution
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -353,7 +357,8 @@ class TestAuthorizationDetailsView(AuthorizationsTestMixin):
         response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
-    def test_created_by_staff_or_null(self, client, snapshot):
+    @pytest.mark.parametrize("user_factory", [ItouStaffFactory, ProfessionalFactory, None])
+    def test_created_by(self, client, snapshot, user_factory):
         # Use a dept for this test, but it could be any other kind, we just look at the the created by box
         user = PrescriberFactory(
             membership__organization__kind=PrescriberOrganizationKind.DEPT,
@@ -362,32 +367,36 @@ class TestAuthorizationDetailsView(AuthorizationsTestMixin):
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.ODC,
             department="01",
-            created_by=ItouStaffFactory(),  # created by La plateforme
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            created_by=user_factory(for_snapshot=True) if user_factory else None,
         )
         client.force_login(user)
 
         response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
         assert pretty_indented(parse_response_to_soup(response, "#creator-box")) == snapshot
 
-        org.created_by = None
-        org.save()
-
-        response = client.get(reverse("professionals_views:authorizations_details", kwargs={"uid": org.uid}))
-        assert pretty_indented(parse_response_to_soup(response, "#creator-box")) == snapshot
-
-    @pytest.mark.parametrize("user_factory", [ItouStaffFactory, ProfessionalFactory, None])
+    @pytest.mark.parametrize("user_factory", [ItouStaffFactory, PrescriberFactory, LaborInspectorFactory, None])
     def test_authorization_validated_by(self, client, snapshot, user_factory):
+        validator = user_factory(for_snapshot=True) if user_factory else None
+        validation_org = {}
+        if validator and validator.kind == UserKind.PROFESSIONAL:
+            PrescriberOrganization.objects.update(name="Une orga prescriptrice")
+            validation_org["authorization_updated_by_prescriber_organization"] = PrescriberOrganization.objects.last()
+            Institution.objects.update(name="Une institution")
+            validation_org["authorization_updated_by_institution"] = Institution.objects.last()
         user = PrescriberFactory(
             membership__organization__kind=PrescriberOrganizationKind.DEPT,
             membership__organization__department="01",
         )
+
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.ODC,
             department="01",
             created_by=ItouStaffFactory(),  # created by La plateforme
             authorization_status=PrescriberAuthorizationStatus.VALIDATED,
             authorization_updated_at=datetime.datetime(2026, 11, 20, 12, 33, tzinfo=datetime.UTC),
-            authorization_updated_by=user_factory(for_snapshot=True) if user_factory else None,
+            authorization_updated_by=validator,
+            **validation_org,
         )
         client.force_login(user)
 

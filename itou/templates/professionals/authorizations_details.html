@@ -45,24 +45,21 @@
             <div class="form-row align-items-center gx-3">
                 <div class="form-group col-12 col-lg-auto">
                     {# FIXME: Add action #}
-                    <form method="post">
-                        {% csrf_token %}
-                        <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                                action=""
-                                type="submit">
-                            <i class="ri-check-line fw-medium" aria-hidden="true"></i>
-                            <span>Valider</span>
-                        </button>
-                    </form>
+                    <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
+                            action=""
+                            type="button">
+                        <i class="ri-check-line fw-medium" aria-hidden="true"></i>
+                        <span>Valider</span>
+                    </button>
                 </div>
                 <div class="form-group col-12 col-lg-auto">
                     {# FIXME: Add action #}
-                    <a href=""
-                       class="btn btn-lg btn-outline-white btn-block btn-ico"
-                       {% matomo_event "orientation" "clic" "décliner" %}>
+                    <button class="btn btn-lg btn-outline-white btn-block btn-ico"
+                            type="button"
+                            {% matomo_event "orientation" "clic" "décliner" %}>
                         <i class="ri-close-line fw-medium" aria-hidden="true"></i>
                         <span>Refuser</span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -88,7 +85,16 @@
                                 </div>
 
                                 <ul class="list-data mb-3">
-                                    {% if not organization.created_by or organization.created_by.is_staff %}
+                                    {% if not organization.created_by %}
+                                        <li>
+                                            <small>Prénom et Nom</small>
+                                            <i class="text-disabled">Non disponible</i>
+                                        </li>
+                                        <li>
+                                            <small>Adresse e-mail</small>
+                                            <i class="text-disabled">Non disponible</i>
+                                        </li>
+                                    {% elif organization.created_by.is_staff %}
                                         <li>
                                             <small>Prénom et Nom</small>
                                             <strong>Plateforme de l'inclusion</strong>

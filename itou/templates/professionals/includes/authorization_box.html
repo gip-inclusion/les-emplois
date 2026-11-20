@@ -25,8 +25,8 @@
                 {% elif organization.authorization_updated_by.is_staff %}
                     <strong>La plateforme de l’inclusion</strong>
                 {% else %}
-                    {# FIXME Add authorization_updated_by_organization and authorization_updated_by_institution #}
                     <strong>{{ organization.authorization_updated_by.get_full_name }}</strong>
+                    ({{ organization.authorization_updated_by_org.name }})
                 {% endif %}
             </li>
         {% endif %}
