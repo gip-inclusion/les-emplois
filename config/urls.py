@@ -135,6 +135,7 @@ urlpatterns = [
     ),
     path("", include("itou.www.security.urls")),
     path("rdvi/", include("itou.www.rdv_insertion.urls")),
+    path("rdv-service-public/", include("itou.www.rdv_service_public.urls")),
     path("staff/", include("itou.www.itou_staff_views.urls")),
     path("otp/", include("itou.www.otp_views.urls")),
 ]
