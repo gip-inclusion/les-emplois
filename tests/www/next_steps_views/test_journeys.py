@@ -755,3 +755,30 @@ def test_done_today_for_a_prescriber(client):
         "prolongation acceptée",
         "éligibilité IAE validée",
     ]
+
+
+def test_validate_eligibility_recalls_who_the_person_is(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(city="Tarascon")
+    JobSeekerAssignmentFactory(
+        professional=membership.user, prescriber_organization=membership.organization, job_seeker=job_seeker
+    )
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
+    client.force_login(membership.user)
+
+    response = client.get(journey_url("eligibilite", job_seeker.public_id), **HTMX)
+    profile = job_seeker.jobseeker_profile
+    # Under the name, on every step.
+    department = f" ({job_seeker.department})" if job_seeker.department else ""
+    assertContains(response, f"{profile.age}{NBSP}ans · Tarascon{department}")
+    if profile.pole_emploi_id:
+        assertContains(response, f"ID France Travail {profile.pole_emploi_id}")
+    # Why the professional is asked, and what links them to the person.
+    created = timezone.localdate(job_application.created_at)
+    assertContains(response, f"Candidature du {created:%d/%m/%Y} · {job_application.to_company.display_name}")
+    assertContains(response, "Vous l’accompagnez depuis le")
+    assertContains(response, f"Jamais de PASS{NBSP}IAE")
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    assertContains(response, f'href="{page_url}"\n               target="_blank"')

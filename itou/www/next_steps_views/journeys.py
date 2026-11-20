@@ -43,7 +43,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_
 from itou.insertion.models import Service
 from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.rdv_insertion.models import InvitationRequest
@@ -162,6 +162,19 @@ class Step:
 
 
 @dataclasses.dataclass
+class Summary:
+    """Who the person is, for a professional who follows hundreds: why they are asked, and what links them to them.
+
+    Shown at the top of the first step, in a box, with a link to the job seeker's page in a new tab: the drawer often
+    opens from « À faire », without the page behind it.
+    """
+
+    title: str
+    lines: list
+    url: str = ""
+
+
+@dataclasses.dataclass
 class Result:
     title: str
     lines: list
@@ -185,6 +198,14 @@ class Journey:
 
     def facts(self):
         return []
+
+    def identity(self):
+        """A line under the person's name in the drawer's header, on every step, to recognize them: "" for none."""
+        return ""
+
+    def summary(self):
+        """A Summary at the top of the first step, or None."""
+        return None
 
     def build_forms(self, data=None, initial=None):
         """Forms by key: bound to data to validate, or unbound with initial values to display."""
@@ -1256,11 +1277,92 @@ class EligibilityJourney(Journey):
         self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, None)
         self.criteria_filled_from_job_seeker = None
 
-    def facts(self):
-        job_application = self.job_seeker.job_applications.select_related("to_company").order_by("-created_at").first()
-        if job_application is None:
-            return []
-        return [("Candidature du", _fr(job_application.created_at)), ("Chez", job_application.to_company.display_name)]
+    def identity(self):
+        # Under the name, and masked with it.
+        if not can_view_personal_information(self.request, self.job_seeker):
+            return ""
+        profile = self.job_seeker.jobseeker_profile
+        parts = []
+        if profile.age is not None:
+            parts.append(f"{profile.age}{NBSP}ans")
+        if self.job_seeker.city:
+            department = f" ({self.job_seeker.department})" if self.job_seeker.department else ""
+            parts.append(f"{self.job_seeker.city}{department}")
+        if profile.pole_emploi_id:
+            parts.append(f"ID France Travail {profile.pole_emploi_id}")
+        return " · ".join(parts)
+
+    def _job_application(self):
+        """The job application the action comes from (actions._eligibility_to_validate): the oldest pending one to
+        an SIAE; else the latest."""
+        job_applications = self.job_seeker.job_applications.select_related(
+            "to_company", "sender", "sender_company", "sender_prescriber_organization"
+        )
+        pending = job_applications.filter(
+            state__in=JobApplicationWorkflow.PENDING_STATES, to_company__kind__in=CompanyKind.siae_kinds()
+        ).order_by("created_at")
+        return pending.first() or job_applications.order_by("-created_at").first()
+
+    def _relationship(self):
+        """What links the professional, or their organization, to the person."""
+        request = self.request
+        assignments = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker=self.job_seeker, prescriber_organization=request.current_organization, ended_at=None
+            )
+            .select_related("professional")
+            .order_by("created_at")
+        )
+        own = next((each for each in assignments if each.professional_id == request.user.pk), None)
+        assignment = own or assignments.first()
+        if assignment is None:
+            return "Pas encore accompagnée par votre structure"
+        if own:
+            text = f"Vous l’accompagnez depuis le {_fr(own.created_at)}"
+        else:
+            text = f"Accompagnée par {assignment.professional.get_full_name()} depuis le {_fr(assignment.created_at)}"
+        # The last action, when it is not the one that started the assignment.
+        if assignment.last_action_kind and _fr(assignment.last_action_at) != _fr(assignment.created_at):
+            action = assignment.get_last_action_kind_display()
+            text += f", dernière action le {_fr(assignment.last_action_at)}{NBSP}: {action}"
+        return text
+
+    def _iae_history(self):
+        """The person's IAE path in a few words: there is no valid PASS IAE here (see load)."""
+        approval = self.job_seeker.approvals.order_by("-end_at").first()
+        if approval:
+            return f"{PASS_IAE} expiré le {_fr(approval.end_at)}"
+        diagnosis = EligibilityDiagnosis.objects.filter(job_seeker=self.job_seeker).order_by("-expires_at").first()
+        if diagnosis and diagnosis != self.eligibility_diagnosis:
+            return f"Diagnostic d’éligibilité précédent expiré le {_fr(diagnosis.expires_at)}"
+        return f"Jamais de {PASS_IAE}"
+
+    def summary(self):
+        job_application = self._job_application()
+        lines = []
+        if job_application:
+            title = f"Candidature du {_fr(job_application.created_at)} · {job_application.to_company.display_name}"
+            job = job_application.selected_jobs.first()
+            if job_application.sender_id == self.request.user.pk:
+                sender = "envoyée par vous"
+            elif job_application.sender:
+                sender = f"envoyée par {job_application.sender.get_full_name()}"
+                organization = job_application.sender_company or job_application.sender_prescriber_organization
+                if organization:
+                    sender += f" ({organization.display_name})"
+            else:
+                sender = ""
+            job_name = job.display_name if job else "Candidature spontanée"
+            lines.append(" · ".join(part for part in (job_name, sender) if part))
+            lines.append(f"{self._relationship()} · {self._iae_history()}")
+        else:
+            title = self._relationship()
+            lines.append(self._iae_history())
+        return Summary(
+            title,
+            lines,
+            url=reverse("next_steps_views:job_seeker", kwargs={"public_id": self.job_seeker.public_id}),
+        )
 
     def build_forms(self, data=None, initial=None):
         # The barriers' default depends on the criteria chosen first: only computed for a display (see engine).

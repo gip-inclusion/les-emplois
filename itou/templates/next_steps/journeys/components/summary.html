@@ -1,0 +1,15 @@
+{# Who the person is, at the top of a journey's first step (journeys.Summary): why the professional is asked, what #}
+{# links them to the person, and their page in a new tab, so as not to lose the answers given in the drawer. #}
+<div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3 mb-4">
+    {% include "next_steps/includes/fact_tile.html" with icon="ri-file-user-line" only %}
+    <div class="flex-grow-1 d-flex flex-column gap-1">
+        <span class="fw-bold">{{ summary.title }}</span>
+        {% for line in summary.lines %}<span class="fs-sm">{{ line }}</span>{% endfor %}
+        {% if summary.url %}
+            <a class="fs-sm link-tertiary align-self-start"
+               href="{{ summary.url }}"
+               target="_blank"
+               rel="noopener">Voir la fiche <i class="ri-external-link-line" aria-hidden="true"></i><span class="visually-hidden">(nouvel onglet)</span></a>
+        {% endif %}
+    </div>
+</div>

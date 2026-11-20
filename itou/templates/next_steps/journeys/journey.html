@@ -4,7 +4,13 @@
     <div class="px-4 pt-4 pb-3 border-bottom">
         <div class="d-flex align-items-start gap-3">
             <div class="flex-grow-1">
-                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <span class="d-block fs-sm text-muted">
+                    {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}
+                    {# To recognize the person among hundreds, on every step (see journeys.Journey.identity). #}
+                    {% with identity=journey.identity %}
+                        {% if identity %}· {{ identity }}{% endif %}
+                    {% endwith %}
+                </span>
                 <h2 class="h3 mb-0" id="next-step-journey-title">{{ journey.title }}</h2>
             </div>
             {% if in_drawer %}
@@ -93,6 +99,13 @@
             {% for name, value in carried %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
             <div class="flex-grow-1 overflow-auto p-4">
                 {# As in the prototype: the facts first, then the question the step asks, then its fields. #}
+                {% if is_first_step %}
+                    {% with summary=journey.summary %}
+                        {% if summary %}
+                            {% include "next_steps/journeys/components/summary.html" with summary=summary only %}
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
                 {% if is_first_step and facts and not step.facts_in_template %}
                     {% include "next_steps/journeys/facts_list.html" with facts=facts only %}
                 {% endif %}
