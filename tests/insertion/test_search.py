@@ -16,22 +16,21 @@ from tests.insertion.factories import (
 )
 
 
-def _search(vannes, *, reception, thematics=None):
-    return Service.objects.search(
-        city=vannes,
-        thematics=thematics or [THEMATIC_VALUE],
-        reception=reception,
-        service_types=[],
-    )
+class TestServiceFilterSearch:
+    def _search(self, *, city, reception, thematics=None):
+        return Service.objects.filter_search(
+            city=city,
+            thematics=thematics or [THEMATIC_VALUE],
+            reception=reception,
+            service_types=[],
+        )
 
-
-class TestServiceSearch:
     def test_in_person_within_radius(self):
         vannes = create_city_vannes()
         near = ServiceFactory(coordinates=vannes.coords, city="Vannes")
         ServiceFactory(coordinates=create_city_geispolsheim().coords, city="Geispolsheim")
 
-        results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert list(results) == [near]
 
     def test_in_person_excludes_neighbour_commune_not_covering_city(self):
@@ -40,7 +39,7 @@ class TestServiceSearch:
         covering = ServiceFactory(coordinates=Point(-2.75, 47.70), city="Theix", eligibility_zones=["56"])
         ServiceFactory(coordinates=Point(-2.75, 47.70), city="Theix", eligibility_zones=["56251"])
 
-        results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert set(results) == {unspecified, covering}
 
     def test_remote_matched_on_eligibility_zones(self):
@@ -57,7 +56,7 @@ class TestServiceSearch:
         excluded = ServiceFactory(coordinates=vannes.coords, city="Vannes", eligibility_zones=["67"])
         excluded.receptions.set([RemoteReceptionFactory()])
 
-        results = _search(vannes, reception=REMOTE_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=REMOTE_RECEPTION_VALUE)
         assert set(results) == {nationwide, department, commune, unspecified}
 
     def test_remote_matched_on_epci(self):
@@ -68,7 +67,7 @@ class TestServiceSearch:
         other = ServiceFactory(coordinates=vannes.coords, city="Vannes", eligibility_zones=["200000999"])
         other.receptions.set([RemoteReceptionFactory()])
 
-        results = _search(vannes, reception=REMOTE_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=REMOTE_RECEPTION_VALUE)
         assert set(results) == {epci}
 
     @pytest.mark.parametrize(
@@ -89,7 +88,7 @@ class TestServiceSearch:
         mixte = ServiceFactory(uid="mixte", coordinates=vannes.coords, city="Vannes", eligibility_zones=["56"])
         mixte.receptions.set([InPersonReceptionFactory(), RemoteReceptionFactory()])
 
-        results = _search(vannes, reception=reception)
+        results = self._search(city=vannes, reception=reception)
         assert {service.uid for service in results} == expected
 
     def test_filter_on_thematic(self):
@@ -98,7 +97,7 @@ class TestServiceSearch:
         other = ServiceFactory(coordinates=vannes.coords, city="Vannes")
         other.thematics.set([OtherThematicFactory()])
 
-        results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert list(results) == [match]
 
     def test_filter_on_service_type(self):
@@ -115,6 +114,7 @@ class TestServiceSearch:
             thematics=[THEMATIC_VALUE],
             reception=IN_PERSON_RECEPTION_VALUE,
             service_types=["accompagnement"],
+            keyword=None,
         )
         assert list(results) == [match]
 
@@ -124,24 +124,14 @@ class TestServiceSearch:
         ServiceFactory(coordinates=None, city="Vannes")
         ServiceFactory(coordinates=vannes.coords, city="")
 
-        results = _search(vannes, reception=IN_PERSON_RECEPTION_VALUE)
+        results = self._search(city=vannes, reception=IN_PERSON_RECEPTION_VALUE)
         assert list(results) == [located]
-
-    def test_orders_in_person_first_then_by_distance(self):
-        vannes = create_city_vannes()
-        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", eligibility_zones=["france"])
-        remote.receptions.set([RemoteReceptionFactory()])
-        mid = ServiceFactory(coordinates=Point(-2.75, 47.70), city="Vannes")
-        close = ServiceFactory(coordinates=vannes.coords, city="Vannes")
-
-        results = _search(vannes, reception="")
-        assert list(results) == [close, mid, remote]
 
     def test_search_does_not_join_genericreferenceitem(self):
         vannes = create_city_vannes()
         ServiceFactory(coordinates=vannes.coords, city="Vannes")
 
-        sql = str(_search(vannes, reception=IN_PERSON_RECEPTION_VALUE).query)
+        sql = str(self._search(city=vannes, reception=IN_PERSON_RECEPTION_VALUE).query)
         assert 'INNER JOIN "insertion_genericreferenceitem"' not in sql
         assert "genericreferenceitem_id" in sql
 
@@ -266,29 +256,6 @@ class TestServiceKeywordSearch:
         assert not Service.objects.keyword_search(q).exists()
 
     @pytest.mark.parametrize(
-        "best_field,other_field",
-        [
-            ("name", "structure__name"),
-            ("structure__name", "publics_details"),
-        ],
-    )
-    def test_keyword_search_ranks_by_field_weight(self, best_field, other_field):
-        other = ServiceFactory(**{other_field: "Agefiph"})
-        best = ServiceFactory(**{best_field: "Agefiph"})
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("agefiph")) == [best, other]
-
-    def test_keyword_search_ranks_thematics_first(self):
-        in_structure_name = ServiceFactory(structure__name="Soutien aux aidants")
-        in_thematics = ServiceFactory(
-            thematics=[GenericReferenceItemFactory(kind="THEMATIC", label="Soutien aux aidants")],
-        )
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("soutien aux aidants")) == [in_thematics, in_structure_name]
-
-    @pytest.mark.parametrize(
         "q,expected",
         [
             ("naturalisation", True),
@@ -310,21 +277,6 @@ class TestServiceKeywordSearch:
         Service.include_inactive.update_search_index()
 
         assert Service.objects.keyword_search(q).exists() is expected
-
-    def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
-        in_publics_details = ServiceFactory(publics_details="Titre de séjour")
-        in_thematic_aliases = ServiceFactory(
-            thematics=[
-                GenericReferenceItemFactory(
-                    kind="THEMATIC",
-                    value="difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
-                    label="Citoyenneté",
-                )
-            ],
-        )
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("titre de séjour")) == [in_thematic_aliases, in_publics_details]
 
     @pytest.mark.parametrize(
         "name,q",
@@ -352,14 +304,184 @@ class TestServiceKeywordSearch:
 
         assert not Service.objects.keyword_search("garage tracteur").exists()
 
+
+class TestMixedSearchAndOrder:
+    def _search(self, *, city=None, keyword=None, thematics=[THEMATIC_VALUE], reception=""):
+        return Service.objects.search(
+            city=city, thematics=thematics, reception=reception, service_types=[], keyword=keyword
+        )
+
+    def test_filter_search_orders_in_person_first_then_by_distance(self):
+        vannes = create_city_vannes()
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", eligibility_zones=["france"])
+        remote.receptions.set([RemoteReceptionFactory()])
+        mid = ServiceFactory(coordinates=Point(-2.75, 47.70), city="Vannes")
+        close = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+
+        results = self._search(city=vannes, reception="")
+        assert list(results) == [close, mid, remote]
+
+    @pytest.mark.parametrize(
+        "best_field,other_field",
+        [
+            ("name", "structure__name"),
+            ("structure__name", "publics_details"),
+        ],
+    )
+    def test_keyword_search_ranks_by_field_weight(self, best_field, other_field):
+        other = ServiceFactory(**{other_field: "Agefiph"})
+        best = ServiceFactory(**{best_field: "Agefiph"})
+        Service.include_inactive.update_search_index()
+
+        assert list(self._search(keyword="agefiph")) == [best, other]
+
+    def test_keyword_search_ranks_thematics_first(self):
+        second_thematic_value = "famille--soutien-aidants"
+        in_structure_name = ServiceFactory(structure__name="Soutien aux aidants")
+        in_thematics = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", label="Soutien aux aidants", value=second_thematic_value)
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert list(
+            self._search(keyword="soutien aux aidants", thematics=[THEMATIC_VALUE, second_thematic_value])
+        ) == [in_thematics, in_structure_name]
+
+    def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
+        second_thematic_value = (
+            "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete"
+        )
+        in_publics_details = ServiceFactory(publics_details="Titre de séjour")
+        in_thematic_aliases = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(
+                    kind="THEMATIC",
+                    value=second_thematic_value,
+                    label="Citoyenneté",
+                )
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert list(self._search(keyword="titre de séjour", thematics=[THEMATIC_VALUE, second_thematic_value])) == [
+            in_thematic_aliases,
+            in_publics_details,
+        ]
+
     def test_keyword_search_also_ranks_by_quality(self):
         slightly_more_relevant = ServiceFactory(name="Garage solidaire", description="Garage", score_qualite=0.2)
         better_quality = ServiceFactory(name="Garage solidaire", score_qualite=0.9)
         far_less_relevant = ServiceFactory(publics_details="Garage solidaire", score_qualite=1)
         Service.include_inactive.update_search_index()
 
-        assert list(Service.objects.keyword_search("garage solidaire")) == [
+        assert list(self._search(keyword="garage solidaire")) == [
             better_quality,
             slightly_more_relevant,
             far_less_relevant,
         ]
+
+    def test_mixed_search_orders_distance_and_match(self):
+        thematic = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC, value="famille--soutien-aidants", label="Soutien aux aidants"
+        )
+        vannes = create_city_vannes()
+
+        third_match = ServiceFactory(
+            thematics=[thematic],
+            description="Super-aidants",
+            coordinates=vannes.coords,
+            city="Vannes",
+        )
+        second_match = ServiceFactory(
+            thematics=[thematic],
+            name="Super-aidants",
+            coordinates=Point(-2.75, 47.70),  # within SERVICE_SEARCH_RADIUS_KM
+            city="Theix",
+            eligibility_zones=["56"],
+        )
+        first_match_remote = ServiceFactory(
+            thematics=[thematic],
+            name="Super-aidants",
+            coordinates=vannes.coords,
+            city="Vannes",
+        )
+        first_match_remote.receptions.set([RemoteReceptionFactory()])
+        # no match
+        ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(
+                    kind=GenericReferenceItemKind.THEMATIC,
+                    value="choisir-un-metier--confirmer-son-choix-de-metier",
+                    label="Confirmer son choix de métier",
+                )
+            ],
+            name="Super-aidants",
+            coordinates=vannes.coords,
+            city="Vannes",
+        )
+        ServiceFactory(
+            thematics=[thematic],
+            name="Super-aidants",
+            coordinates=create_city_geispolsheim().coords,
+            city="Geispolsheim",
+        )
+        Service.include_inactive.update_search_index()
+
+        # No keyword search -- order: distance then pk, remote at the end
+        assert list(
+            self._search(
+                city=vannes,
+                thematics=[thematic.value],
+                reception="",
+                keyword=None,
+            )
+        ) == [third_match, second_match, first_match_remote]
+
+        # Keyword search -- order: distance + text search score (more weight on name than description) then pk
+        assert list(
+            self._search(
+                city=vannes,
+                thematics=[thematic.value],
+                reception="",
+                keyword="Super-aidants",
+            )
+        ) == [first_match_remote, second_match, third_match]
+
+    def test_mixed_search_city_only_returns_all_services(self):
+        vannes = create_city_vannes()
+
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote.receptions.set([RemoteReceptionFactory()])
+
+        # Won’t be in the results
+        ServiceFactory(coordinates=vannes.coords, city="Vannes", is_active=False)
+        ServiceFactory(coordinates=create_city_geispolsheim().coords, city="Geispolsheim")
+        ServiceFactory(coordinates=vannes.coords, city="")
+
+        assert list(self._search(city=vannes)) == [in_person, remote]
+
+    def test_mixed_search_keyword_only_returns_all_services(self):
+        vannes = create_city_vannes()
+
+        service_vannes = ServiceFactory(coordinates=vannes.coords, city="Vannes", name="véhicule")
+        service_geispolsheim = ServiceFactory(
+            coordinates=create_city_geispolsheim().coords, city="Geispolsheim", structure__name="véhicule"
+        )
+        service_remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", name="véhicule")
+        service_remote.receptions.set([RemoteReceptionFactory()])
+        service_no_coords = ServiceFactory()  # thematic value contains 'véhicule'
+
+        # Won’t be in the results
+        ServiceFactory(name="véhicule", is_active=False)
+
+        Service.include_inactive.update_search_index()
+
+        assert set(self._search(keyword="véhicule")) == {
+            service_vannes,
+            service_geispolsheim,
+            service_remote,
+            service_no_coords,
+        }

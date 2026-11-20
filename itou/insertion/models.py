@@ -56,6 +56,7 @@ logger = logging.getLogger(__name__)
 SOURCE_DORA_VALUE = "dora"
 
 SERVICE_SEARCH_RADIUS_KM = 50
+REMOTE_SERVICES_SCORE_DISTANCE = 0.5
 
 
 class GeolocatedAddressMixin(models.Model):
@@ -200,79 +201,106 @@ class Structure(GeolocatedAddressMixin, models.Model):
 
 
 class ServiceQuerySet(models.QuerySet):
-    def search(self, *, city, thematics, reception, service_types):
+    def _get_annotations(self, city, reception):
+        annotations = {}
+
+        if city:
+            annotations["distance"] = Distance("coordinates", city.coords) / 1000
+            annotations["distance_score"] = models.ExpressionWrapper(
+                1 - models.F("distance") / SERVICE_SEARCH_RADIUS_KM, output_field=models.FloatField()
+            )
+
+        if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value:
+            annotations["is_in_person"] = models.Value(True, output_field=models.BooleanField())
+            annotations["is_remote"] = models.Value(False, output_field=models.BooleanField())
+        elif reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
+            annotations["is_in_person"] = models.Value(False, output_field=models.BooleanField())
+            annotations["is_remote"] = models.Value(True, output_field=models.BooleanField())
+        else:
+            annotations["is_in_person"] = models.Exists(
+                self.model.receptions.through.objects.filter(
+                    service=models.OuterRef("pk"),
+                    genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
+                )
+            )
+            annotations["is_remote"] = models.Exists(
+                self.model.receptions.through.objects.filter(
+                    service=models.OuterRef("pk"),
+                    genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
+                )
+            )
+            if city:
+                # Out-of-range yet eligible remote services may be relevant, so we give them a distance_score of .5
+                # (as data·inclusion)
+                annotations["distance_score"] = models.Case(
+                    models.When(
+                        distance__lte=SERVICE_SEARCH_RADIUS_KM,
+                        then=1 - models.F("distance") / SERVICE_SEARCH_RADIUS_KM,
+                    ),
+                    models.When(distance__gt=SERVICE_SEARCH_RADIUS_KM, then=REMOTE_SERVICES_SCORE_DISTANCE),
+                )
+
+        return annotations
+
+    def _get_filters(self, city, reception):
+        filters = []
+        if city:
+            null_coordinates_filter = models.Q(coordinates__isnull=False)
+            filters.append(null_coordinates_filter)
+
+            eligibility_codes = [
+                code for code in [city.code_insee, city.department, city.siren_epci, "france"] if code
+            ]
+            # An empty eligibility zone means national availability (aligned on data·inclusion).
+            eligibility_filter = models.Q(eligibility_zones__overlap=eligibility_codes) | models.Q(
+                eligibility_zones=[]
+            )
+            filters.append(eligibility_filter)
+
+        if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value:
+            in_person_filter = models.Q(receptions__id__in=GenericReferenceItem.in_person_reception_ids())
+            filters.append(in_person_filter)
+            if city:
+                overlap_in_person_filter = models.Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
+                filters.append(overlap_in_person_filter)
+        elif reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
+            remote_filter = models.Q(receptions__id__in=GenericReferenceItem.remote_reception_ids())
+            filters.append(remote_filter)
+        else:
+            if city:
+                all_receptions_filter = models.Q(is_in_person=True) & models.Q(
+                    coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM))
+                ) | models.Q(is_remote=True)
+                filters.append(all_receptions_filter)
+
+        return filters
+
+    def _get_excludes(self, city):
+        return {"city": ""} if city else {}
+
+    def filter_search(self, *, city, thematics, reception, service_types):
         # NOTE(vperron): always search with ids directly instead of letting Django create JOINs with .through
         # as it might become horrribly slow on those tables
         thematic_ids = list(GenericReferenceItem.objects.filter(value__in=thematics).values_list("id", flat=True))
-        eligibility_codes = [code for code in [city.code_insee, city.department, city.siren_epci, "france"] if code]
-        # An empty eligibility zone means national availability (aligned on data·inclusion).
-        eligibility_filter = models.Q(eligibility_zones__overlap=eligibility_codes) | models.Q(eligibility_zones=[])
         queryset = (
             self.annotate(
-                distance=Distance("coordinates", city.coords) / 1000,
                 has_thematic=models.Exists(
                     self.model.thematics.through.objects.filter(
                         service=models.OuterRef("pk"),
                         genericreferenceitem_id__in=thematic_ids,
                     )
                 ),
+                **self._get_annotations(city, reception),
             )
             .filter(
                 has_thematic=True,
-                coordinates__isnull=False,
+                *self._get_filters(city, reception),
                 **({"kind__value__in": service_types} if service_types else {}),
             )
-            .exclude(city="")
+            .exclude(**self._get_excludes(city))
         )
 
-        if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value:
-            return (
-                queryset.filter(
-                    receptions__id__in=GenericReferenceItem.in_person_reception_ids(),
-                    coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)),
-                )
-                .filter(eligibility_filter)
-                .annotate(
-                    is_in_person=models.Value(True, output_field=models.BooleanField()),
-                    is_remote=models.Value(False, output_field=models.BooleanField()),
-                )
-                .order_by("distance", "pk")
-            )
-
-        if reception == data_inclusion_v1.ModeAccueil.A_DISTANCE.value:
-            return (
-                queryset.filter(receptions__id__in=GenericReferenceItem.remote_reception_ids())
-                .filter(eligibility_filter)
-                .annotate(
-                    is_in_person=models.Value(False, output_field=models.BooleanField()),
-                    is_remote=models.Value(True, output_field=models.BooleanField()),
-                )
-                .order_by("distance", "pk")
-            )
-
-        return (
-            queryset.annotate(
-                is_in_person=models.Exists(
-                    self.model.receptions.through.objects.filter(
-                        service=models.OuterRef("pk"),
-                        genericreferenceitem_id__in=GenericReferenceItem.in_person_reception_ids(),
-                    )
-                ),
-                is_remote=models.Exists(
-                    self.model.receptions.through.objects.filter(
-                        service=models.OuterRef("pk"),
-                        genericreferenceitem_id__in=GenericReferenceItem.remote_reception_ids(),
-                    )
-                ),
-            )
-            .filter(
-                models.Q(is_in_person=True)
-                & models.Q(coordinates__dwithin=(city.coords, D(km=SERVICE_SEARCH_RADIUS_KM)))
-                | models.Q(is_remote=True)
-            )
-            .filter(eligibility_filter)
-            .order_by("-is_in_person", "distance", "pk")
-        )
+        return queryset
 
     def keyword_search(self, q):
         """Ranked like data·inclusion's search."""
@@ -316,11 +344,39 @@ class ServiceQuerySet(models.QuerySet):
                 ),
             )
             query |= multi_word_query
-        return (
-            self.filter(search_vector=query)
-            .annotate(search_score=Round(rank, 2))
-            .order_by(Round(models.F("search_score") * 10).desc(), models.F("score_qualite").desc(), "pk")
-        )
+        return self.filter(search_vector=query).annotate(search_score=Round(rank, 2))
+
+    def search(self, *, city, thematics, reception, service_types, keyword):
+        """
+        Combines filter_search and keyword_search. The orders are computed as in data·inclusion:
+        - filter_search with city only: distance
+        - filter_search with city and keyword_search: 0.5×distance + 0.5×keyword_search_score
+        - filter_search without city and keyword_search: keyword_search_score, then the service’s score_qualite
+        """
+        queryset = self.filter_search(city=city, thematics=thematics, reception=reception, service_types=service_types)
+
+        if city:
+            queryset = queryset.order_by("-distance_score", "pk")
+
+            if reception not in [
+                data_inclusion_v1.ModeAccueil.EN_PRESENTIEL,
+                data_inclusion_v1.ModeAccueil.A_DISTANCE,
+            ]:
+                queryset = queryset.order_by("-is_in_person", "-distance_score", "pk")
+
+        if keyword:
+            queryset = queryset.keyword_search(keyword)
+
+            if city:
+                queryset = queryset.annotate(
+                    total_score=models.F("distance_score") * 0.5 + models.F("search_score") * 0.5
+                ).order_by("-total_score", "pk")
+            else:
+                queryset = queryset.order_by(
+                    Round(models.F("search_score") * 10).desc(), models.F("score_qualite").desc(), "pk"
+                )
+
+        return queryset
 
     @transaction.atomic
     def update_search_index(self):
@@ -610,7 +666,12 @@ class Service(GeolocatedAddressMixin, models.Model):
 
     @property
     def is_local(self):
-        return self.is_in_person and self.distance is not None and self.distance <= SERVICE_SEARCH_RADIUS_KM
+        return (
+            hasattr(self, "distance")
+            and self.is_in_person
+            and self.distance is not None
+            and self.distance <= SERVICE_SEARCH_RADIUS_KM
+        )
 
 
 class WordFrequency(models.Model):

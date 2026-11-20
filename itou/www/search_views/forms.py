@@ -230,21 +230,18 @@ class ServiceSearchForm(forms.Form):
                 "data-service-search-city": "true",
             }
         ),
-    )
-    category = forms.TypedChoiceField(
-        coerce=data_inclusion_v1.Categorie,
-        empty_value="",
-        choices=[("", "Sélectionnez une thématique")] + [(c.value, c.label) for c in data_inclusion_v1.Categorie],
-        label="Sélectionnez une thématique",
-        widget=Select2Widget(
-            attrs={"data-service-search-category": "true", "data-placeholder": "Thématique"},
-        ),
-    )
-    thematics = forms.MultipleChoiceField(
-        choices=[(t.value, t.label) for t in data_inclusion_v1.Thematique],
-        label="Besoin",
         required=False,
+    )
+    keyword = forms.CharField(
+        label="Entrez un mot-clé",
+        widget=forms.TextInput(attrs={"placeholder": "Mot-clé, nom de structure, thématique"}),
+        required=False,
+    )
+    categories = forms.MultipleChoiceField(
+        choices=[(c.value, c.label) for c in data_inclusion_v1.Categorie],
+        label="Thématique",
         widget=forms.CheckboxSelectMultiple,
+        required=False,
     )
     reception = forms.ChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil] + [(RECEPTION_ALL_VALUE, "Tous")],
@@ -271,10 +268,11 @@ class ServiceSearchForm(forms.Form):
             data.setdefault("reception", self.base_fields["reception"].initial)
 
         super().__init__(data, *args, **kwargs)
-        if not_cleaned_category := self.data.get("category"):
-            self.fields["thematics"].choices = [
-                (t.value, t.label) for t in data_inclusion_v1.Thematique if t.value.startswith(not_cleaned_category)
-            ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("city") and not cleaned_data.get("keyword"):
+            raise forms.ValidationError("Veuillez renseigner une ville et/ou un mot-clé.")
 
 
 class NewSavedSearchForm(forms.ModelForm):

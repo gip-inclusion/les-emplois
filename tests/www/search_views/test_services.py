@@ -5,13 +5,16 @@ from data_inclusion.schema import v1 as data_inclusion_v1
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
+from itou.insertion.enums import GenericReferenceItemKind
+from itou.insertion.models import Service
 from itou.www.search_views.forms import ServiceSearchForm
 from tests.cities.factories import create_city_vannes
 from tests.insertion.factories import (
     IN_PERSON_RECEPTION_VALUE,
     REMOTE_RECEPTION_VALUE,
+    GenericReferenceItemFactory,
     InPersonReceptionFactory,
     RemoteReceptionFactory,
     ServiceFactory,
@@ -21,7 +24,7 @@ from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
 
-CATEGORY = data_inclusion_v1.Categorie.MOBILITE
+KEYWORD = "véhicule"
 
 FUNDING_LABELS_FILTER_LABEL = "Financé par"
 
@@ -53,7 +56,7 @@ class TestSearchServices:
             client.get(reverse("search:services_home"))
 
     def test_invalid_query_parameters(self, client):
-        response = client.get(self.URL, {"city": "foo-44", "category": "foobar"})
+        response = client.get(self.URL, {"city": "foo-44", "categories": ["foobar"]})
         assertContains(response, "Rechercher un service d'insertion")
         assertContains(response, "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.")
 
@@ -81,20 +84,22 @@ class TestSearchServices:
             eligibility_zones=["france"],
         )
         remote_only.receptions.set([RemoteReceptionFactory()])
+        Service.include_inactive.update_search_index()
 
         response = client.get(
-            self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE}
+            self.URL, {"city": vannes.slug, "keyword": KEYWORD, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE}
         )
         assertContains(response, "2 résultats")
-        expected_title = f"Services d'insertion « {CATEGORY.label} » autour de {vannes} - La plateforme de l’inclusion"
+        expected_title = f"Services d'insertion « {KEYWORD} » autour de {vannes} - La plateforme de l’inclusion"
         assertContains(response, f"<title>{expected_title}</title>", html=True, count=1)
         assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot()
 
     def test_link_to_local_detail_page(self, client):
         vannes = create_city_vannes()
         service = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        Service.include_inactive.update_search_index()
 
-        response = client.get(self.URL, {"city": vannes.slug, "category": CATEGORY})
+        response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
         href = parse_response_to_soup(response, selector=self.FIRST_RESULT_LINK)["href"]
         assert href.startswith(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
         assert "back_url=" in href
@@ -103,42 +108,30 @@ class TestSearchServices:
     def test_link_carries_job_seeker_for_authorized_prescriber(self, client):
         vannes = create_city_vannes()
         ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        Service.include_inactive.update_search_index()
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
 
         response = client.get(
-            self.URL, {"city": vannes.slug, "category": CATEGORY, "job_seeker_public_id": job_seeker.public_id}
+            self.URL, {"city": vannes.slug, "keyword": KEYWORD, "job_seeker_public_id": job_seeker.public_id}
         )
         href = parse_response_to_soup(response, selector=self.FIRST_RESULT_LINK)["href"]
         assert f"job_seeker_public_id={job_seeker.public_id}" in href
         assertContains(response, "Vous orientez actuellement")
         assertContains(response, "vers un service")
 
-    def test_category_error_suppression(self, client):
-        vannes = create_city_vannes()
-
-        # Choosing to "orienter" a job seeker from the job seekers list
-        # pre-fills the form with a job seeker city, but the category field
-        # isn’t yet populated.
-        response = client.get(self.URL, {"city": vannes.slug})
-        error_message = "Votre formulaire contient une erreur"
-        assertContains(response, "Veuillez sélectionner une thématique pour voir les résultats.")
-        assertNotContains(response, error_message)
-
-        response = client.get(self.URL, {"city": vannes.slug, "category": "invalid"})
-        assertContains(response, error_message)
-
     def test_no_results(self, client):
         vannes = create_city_vannes()
-        response = client.get(self.URL, {"city": vannes.slug, "category": CATEGORY})
+        response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
         assertContains(response, "Aucun résultat avec les filtres actuels.")
 
     @override_settings(PAGE_SIZE_SMALL=1)
     def test_pagination(self, client):
         vannes = create_city_vannes()
         ServiceFactory.create_batch(2, coordinates=vannes.coords, city="Vannes")
+        Service.include_inactive.update_search_index()
 
-        url = reverse("search:services_results", query={"city": vannes.slug, "category": CATEGORY})
+        url = reverse("search:services_results", query={"city": vannes.slug, "keyword": KEYWORD})
         assertContains(client.get(url), PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_htmx_reload_for_filters(self, client, htmx_client):
@@ -146,10 +139,15 @@ class TestSearchServices:
         ServiceFactory(coordinates=vannes.coords, city="Vannes")
         remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", eligibility_zones=["france"])
         remote.receptions.set([RemoteReceptionFactory()])
+        Service.include_inactive.update_search_index()
 
         simulated_page = parse_response_to_soup(
-            client.get(self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": IN_PERSON_RECEPTION_VALUE})
+            client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD, "reception": IN_PERSON_RECEPTION_VALUE})
         )
+        [checkbox] = simulated_page.find_all(
+            "input", attrs={"type": "checkbox", "name": "categories", "value": data_inclusion_v1.Categorie.MOBILITE}
+        )
+        checkbox["checked"] = ""
         [radio_input] = simulated_page.find_all(
             "input", attrs={"type": "radio", "name": "reception", "value": REMOTE_RECEPTION_VALUE}
         )
@@ -162,12 +160,26 @@ class TestSearchServices:
             simulated_page,
             f"form[hx-get='{self.URL}']",
             htmx_client.get(
-                self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": REMOTE_RECEPTION_VALUE}
+                self.URL,
+                {
+                    "city": vannes.slug,
+                    "keyword": KEYWORD,
+                    "categories": [data_inclusion_v1.Categorie.MOBILITE],
+                    "reception": REMOTE_RECEPTION_VALUE,
+                },
             ),
         )
 
         fresh_page = parse_response_to_soup(
-            client.get(self.URL, {"city": vannes.slug, "category": CATEGORY, "reception": REMOTE_RECEPTION_VALUE})
+            client.get(
+                self.URL,
+                {
+                    "city": vannes.slug,
+                    "keyword": KEYWORD,
+                    "categories": [data_inclusion_v1.Categorie.MOBILITE],
+                    "reception": REMOTE_RECEPTION_VALUE,
+                },
+            )
         )
         assertSoupEqual(simulated_page, fresh_page)
 
@@ -176,16 +188,53 @@ class TestSearchServices:
         service = ServiceFactory(
             coordinates=vannes.coords, city="Vannes", uid="fredo--97416_13643-activités / ateliers"
         )  # real case
+        Service.include_inactive.update_search_index()
 
-        response = client.get(self.URL, {"city": vannes.slug, "category": CATEGORY})
+        response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
         assertContains(response, reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
+
+    def test_categories_filter(self, client):
+        vannes = create_city_vannes()
+        thematic_metier = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="choisir-un-metier--confirmer-son-choix-de-metier",
+            label="Confirmer son choix de métier",
+        )
+        service_mobilite = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        service_metier = ServiceFactory(
+            coordinates=vannes.coords,
+            city="Vannes",
+            name="Explorer les métiers autour du " + KEYWORD,
+            thematics=[thematic_metier],
+        )
+        Service.include_inactive.update_search_index()
+
+        response = client.get(
+            self.URL, {"city": vannes.slug, "keyword": KEYWORD, "categories": [data_inclusion_v1.Categorie.MOBILITE]}
+        )
+        assertQuerySetEqual(response.context["results"], [service_mobilite])
+
+        response = client.get(
+            self.URL,
+            {
+                "city": vannes.slug,
+                "keyword": KEYWORD,
+                "categories": [data_inclusion_v1.Categorie.MOBILITE, data_inclusion_v1.Categorie.CHOISIR_UN_METIER],
+            },
+        )
+        assertQuerySetEqual(response.context["results"], [service_mobilite, service_metier])
+
+        # No category means all categories
+        response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
+        assertQuerySetEqual(response.context["results"], [service_mobilite, service_metier], ordered=False)
 
     def test_funding_labels_filter(self, client, snapshot):
         FUNDING_LABEL_FILTER = "#services-funding-labels-filter"
         vannes = create_city_vannes()
 
         unfunded = ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": None})
-        params = {"city": vannes.slug, "category": CATEGORY}
+        Service.include_inactive.update_search_index()
+        params = {"city": vannes.slug, "keyword": KEYWORD}
         response = client.get(self.URL, params)
         assertContains(response, "1 résultat")
         assertNotContains(response, FUNDING_LABELS_FILTER_LABEL)
@@ -206,6 +255,7 @@ class TestSearchServices:
             extra={"funding_labels": [FUNDING_LABEL_VIENNE]},
         )
         remote.receptions.set([RemoteReceptionFactory()])
+        Service.include_inactive.update_search_index()
 
         def available_choices(response):
             soup = parse_response_to_soup(response, selector=FUNDING_LABEL_FILTER)
@@ -258,8 +308,9 @@ class TestSearchServices:
             extra={"funding_labels": [FUNDING_LABEL_VIENNE]},
         )
         remote.receptions.set([RemoteReceptionFactory()])
+        Service.include_inactive.update_search_index()
 
-        params = {"city": vannes.slug, "category": CATEGORY}
+        params = {"city": vannes.slug, "keyword": KEYWORD}
         simulated_page = parse_response_to_soup(
             client.get(self.URL, params | {"reception": IN_PERSON_RECEPTION_VALUE})
         )
@@ -292,7 +343,8 @@ class TestSearchServices:
             extra={"funding_labels": [FUNDING_LABEL_VIENNE]},
         )
         remote.receptions.set([RemoteReceptionFactory()])
-        params = {"city": vannes.slug, "category": CATEGORY, "reception": IN_PERSON_RECEPTION_VALUE}
+        Service.include_inactive.update_search_index()
+        params = {"city": vannes.slug, "keyword": KEYWORD, "reception": IN_PERSON_RECEPTION_VALUE}
 
         # The remote service is not part of (in person) results so the funding
         # label selected beforehand must not hide all the results.
@@ -305,6 +357,7 @@ class TestSearchServices:
         savoie_service = ServiceFactory(
             coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [FUNDING_LABEL_SAVOIE]}
         )
+        Service.include_inactive.update_search_index()
         response = client.get(self.URL, params | {"funding_labels": [FUNDING_LABEL_SAVOIE, FUNDING_LABEL_VIENNE]})
         assertContains(response, "1 résultat")
         assertContains(response, FUNDING_LABELS_FILTER_LABEL)
@@ -319,7 +372,8 @@ class TestSearchServices:
         FUNDING_LABEL_FILTER = "#services-funding-labels-filter"
         vannes = create_city_vannes()
         ServiceFactory(coordinates=vannes.coords, city="Vannes", extra={"funding_labels": [FUNDING_LABEL_VIENNE]})
-        params = {"city": vannes.slug, "category": CATEGORY, "reception": IN_PERSON_RECEPTION_VALUE}
+        Service.include_inactive.update_search_index()
+        params = {"city": vannes.slug, "keyword": KEYWORD, "reception": IN_PERSON_RECEPTION_VALUE}
 
         def get(current_params, params):
             current_url = f"http://testserver{self.URL}?{urlencode(current_params, doseq=True)}"
@@ -338,3 +392,44 @@ class TestSearchServices:
         assertContains(response, FUNDING_LABEL_FILTER[1:])
         response = htmx_client.get(self.URL, params)  # No HX-Current-URL header.
         assertContains(response, FUNDING_LABEL_FILTER[1:])
+
+    def test_search_city_only(self, client):
+        vannes = create_city_vannes()
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote.receptions.set([RemoteReceptionFactory()])
+        ServiceFactory()
+        Service.include_inactive.update_search_index()
+
+        params = {"city": vannes.slug}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person])
+
+        # Other filters work
+        params = {"city": vannes.slug, "reception": "tous"}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, remote])
+
+    def test_search_keyword_only(self, client):
+        vannes = create_city_vannes()
+        thematic_metier = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="choisir-un-metier--confirmer-son-choix-de-metier",
+            label="Confirmer son choix de métier",
+        )
+
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes", name=KEYWORD)
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", structure__name=KEYWORD)
+        remote.receptions.set([RemoteReceptionFactory()])
+        no_coords = ServiceFactory(city="", coordinates=None)  # thematic value contains KEYWORD
+        ServiceFactory(thematics=[thematic_metier])
+        Service.include_inactive.update_search_index()
+
+        params = {"keyword": KEYWORD}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, no_coords])
+
+        # Other filters work
+        params = {"keyword": KEYWORD, "reception": "tous"}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, remote, no_coords])
