@@ -20,6 +20,7 @@ from itou.companies.enums import (
     ProSupportReportAutonomy,
     ProSupportReportBarrier,
     ProSupportReportOrientation,
+    ProSupportReportRecipientSource,
     ProSupportReportSolution,
 )
 from itou.companies.models import JobDescription, SiaeACIConvergencePHC
@@ -1179,6 +1180,7 @@ def test_populate_pro_support_reports(snapshot):
         contract__pk=2**31,  # ASP contract IDs are big integers
         notified_prescriber=PrescriberFactory(),
         notified_prescriber_organization=PrescriberOrganizationFactory(),
+        notified_prescriber_source=ProSupportReportRecipientSource.CHOSEN,
         barriers=[ProSupportReportBarrier.HEALTH, ProSupportReportBarrier.LEGAL],
         other_barrier=other_barrier,
         autonomy=ProSupportReportAutonomy.AUTONOMOUS,
@@ -1208,6 +1210,7 @@ def test_populate_pro_support_reports(snapshot):
             "id_auteur": report_with_solution.author_id,
             "id_prescripteur_prévenu": report_with_solution.notified_prescriber_id,
             "id_organisation_prévenue": report_with_solution.notified_prescriber_organization_id,
+            "origine_destinataire": ProSupportReportRecipientSource.CHOSEN.label,
             "id_contrat_asp": report_with_solution.contract_id,
             "date_fin_contrat": report_with_solution.contract_end_date,
             "frein_santé": True,
@@ -1232,6 +1235,7 @@ def test_populate_pro_support_reports(snapshot):
             "id_auteur": report_with_orientation.author_id,
             "id_prescripteur_prévenu": None,
             "id_organisation_prévenue": None,
+            "origine_destinataire": None,
             "id_contrat_asp": report_with_orientation.contract_id,
             "date_fin_contrat": report_with_orientation.contract_end_date,
             "frein_santé": False,
