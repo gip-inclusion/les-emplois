@@ -62,6 +62,19 @@ TABLE.add_columns(
             ),
         ),
         get_column_from_field(
+            get_model_field(ProSupportReport, "first_read_at"),
+            name="date_première_lecture",
+            comment="Date à laquelle le prescripteur prévenu a ouvert le bilan pour la première fois, vide sinon",
+        ),
+        get_column_from_field(
+            get_model_field(ProSupportReport, "introduction_email_sent_at"),
+            name="date_mise_en_relation",
+            comment=(
+                "Date à laquelle un prescripteur a envoyé l’e-mail de mise en relation avec la structure, "
+                "vide si aucun e-mail n’a été envoyé"
+            ),
+        ),
+        get_column_from_field(
             get_model_field(ProSupportReport, "contract"),
             name="id_contrat_asp",
             comment=(

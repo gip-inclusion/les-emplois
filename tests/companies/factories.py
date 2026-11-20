@@ -262,7 +262,7 @@ class ProSupportReportFactory(factory.django.DjangoModelFactory):
     contract = factory.SubFactory(ContractFactory)
     job_seeker = factory.SelfAttribute("contract.job_seeker")
     company = factory.SelfAttribute("contract.company")
-    author = factory.SubFactory(EmployerFactory)
+    author = factory.SubFactory(EmployerFactory, membership__company=factory.SelfAttribute("...contract.company"))
     contract_end_date = factory.SelfAttribute("contract.end_date")
     barriers = factory.List([ProSupportReportBarrier.MOBILITY])
     autonomy = ProSupportReportAutonomy.OCCASIONAL_SUPPORT
