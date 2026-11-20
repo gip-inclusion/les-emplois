@@ -1,0 +1,1531 @@
+# serializer version: 1
+# name: TestAuthorizationDetailsView.test_DDETS_IAE_accepted_authorization
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Pres. Org.
+                                  <span class="badge rounded-pill badge-sm bg-success">
+                                      Validée
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <button aria-label="Imprimer l’habilitation de Pres. Org." class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                                  <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                  </i>
+                              </button>
+                              <button class="btn btn-danger btn-lg btn-ico" data-bs-target="#cancel_hire_modal" data-bs-toggle="modal" type="button">
+                                  <i aria-hidden="true" class="ri-arrow-go-back-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Annuler l’habilitation
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="row">
+                          <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                              <h2 class="mb-3 mb-md-4">
+                                  Informations générales
+                              </h2>
+                          </div>
+                          <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                              <div class="c-box mb-3 mb-md-4" id="creator-box">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de l’emetteur
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Prénom et Nom
+                                          </small>
+                                          <strong>
+                                              Pierre DUPONT
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              pierre.dupont@test.local
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de la structure
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Organisation
+                                          </small>
+                                          <strong>
+                                              Pres. Org.
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Type
+                                          </small>
+                                          <strong>
+                                              Organisme habilité par le préfet de département
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              SIRET
+                                          </small>
+                                          <strong>
+                                              012 345 678 91010
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse
+                                          </small>
+                                          <strong>
+                                              39 rue d'Artois, 75008 Paris
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              contact@Presorg.fr
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+                                  <div class="mb-3 mb-md-4">
+                                      <span class="badge rounded-pill bg-success">
+                                          <i class="ri-checkbox-circle-line 1">
+                                          </i>
+                                          Habilitation validée
+                                      </span>
+                                  </div>
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>
+                                              Date d’inscription
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Validée le
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Validée par
+                                          </small>
+                                          <i class="text-disabled">
+                                              Non disponible
+                                          </i>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Members actifs de la structure
+                                  </h3>
+                                  <div class="table-responsive mt-3 mt-md-4">
+                                      <table class="table table-hover">
+                                          <caption class="visually-hidden">
+                                              Liste des collaborateurs
+                                          </caption>
+                                          <thead>
+                                              <tr>
+                                                  <th scope="col">
+                                                      Nom Prénom
+                                                  </th>
+                                                  <th scope="col">
+                                                      Email
+                                                  </th>
+                                                  <th scope="col">
+                                                      Date d'inscription
+                                                  </th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_DDETS_IAE_pending_authorization
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Pres. Org.
+                                  <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
+                                      En attente
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <button aria-label="Imprimer l’habilitation de Pres. Org." class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                                  <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                  </i>
+                              </button>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button action="" class="btn btn-lg btn-white btn-block btn-ico justify-content-center" type="button">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Valider
+                                      </span>
+                                  </button>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" type="button">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Refuser
+                                      </span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="row">
+                          <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                              <h2 class="mb-3 mb-md-4">
+                                  Informations générales
+                              </h2>
+                          </div>
+                          <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                              <div class="c-box mb-3 mb-md-4" id="creator-box">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de l’emetteur
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Prénom et Nom
+                                          </small>
+                                          <strong>
+                                              Pierre DUPONT
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              pierre.dupont@test.local
+                                          </strong>
+                                      </li>
+                                  </ul>
+                                  <div class="alert alert-warning mb-0" role="status">
+                                      <div class="row">
+                                          <div class="col-auto pe-0">
+                                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                                              </i>
+                                          </div>
+                                          <div class="col">
+                                              <p class="mb-2">
+                                                  <strong>
+                                                      Avant de valider une habilitation
+                                                  </strong>
+                                              </p>
+                                              <p class="mb-0">
+                                                  Vérifiez l’identité du professionnel ainsi que son appartenance à la structure. Soyez particulièrement vigilant quant à l’adresse e-mail utilisée afin de prévenir toute tentative d’accès frauduleux.
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de la structure
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Organisation
+                                          </small>
+                                          <strong>
+                                              Pres. Org.
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Type
+                                          </small>
+                                          <strong>
+                                              Organisme habilité par le préfet de département
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              SIRET
+                                          </small>
+                                          <strong>
+                                              012 345 678 91010
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse
+                                          </small>
+                                          <strong>
+                                              39 rue d'Artois, 75008 Paris
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              contact@Presorg.fr
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--pass bg-warning-lightest border-warning mb-3 mb-md-4" id="authorization-box">
+                                  <div class="mb-3 mb-md-4">
+                                      <span class="badge rounded-pill bg-accent-03 text-primary">
+                                          <i class="ri-pause-circle-line">
+                                          </i>
+                                          Habilitation en attente
+                                      </span>
+                                  </div>
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>
+                                              Date d’inscription
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                  </ul>
+                                  <p class="mt-3 mb-0">
+                                      <i>
+                                          En attente d'habilitation, la structure peut orienter des bénéficiaires mais n'a pas encore le statut de prescripteur habilité.
+                                      </i>
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Members actifs de la structure
+                                  </h3>
+                                  <div class="table-responsive mt-3 mt-md-4">
+                                      <table class="table table-hover">
+                                          <caption class="visually-hidden">
+                                              Liste des collaborateurs
+                                          </caption>
+                                          <thead>
+                                              <tr>
+                                                  <th scope="col">
+                                                      Nom Prénom
+                                                  </th>
+                                                  <th scope="col">
+                                                      Email
+                                                  </th>
+                                                  <th scope="col">
+                                                      Date d'inscription
+                                                  </th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_DEPT_accepted_authorization
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Pres. Org.
+                                  <span class="badge rounded-pill badge-sm bg-success">
+                                      Validée
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <button aria-label="Imprimer l’habilitation de Pres. Org." class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                                  <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                  </i>
+                              </button>
+                              <button class="btn btn-danger btn-lg btn-ico" data-bs-target="#cancel_hire_modal" data-bs-toggle="modal" type="button">
+                                  <i aria-hidden="true" class="ri-arrow-go-back-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Annuler l’habilitation
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="row">
+                          <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                              <h2 class="mb-3 mb-md-4">
+                                  Informations générales
+                              </h2>
+                          </div>
+                          <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                              <div class="c-box mb-3 mb-md-4" id="creator-box">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de l’emetteur
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Prénom et Nom
+                                          </small>
+                                          <strong>
+                                              Pierre DUPONT
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              pierre.dupont@test.local
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de la structure
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Organisation
+                                          </small>
+                                          <strong>
+                                              Pres. Org.
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Type
+                                          </small>
+                                          <strong>
+                                              Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              SIRET
+                                          </small>
+                                          <strong>
+                                              012 345 678 91010
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse
+                                          </small>
+                                          <strong>
+                                              39 rue d'Artois, 75008 Paris
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              contact@Presorg.fr
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+                                  <div class="mb-3 mb-md-4">
+                                      <span class="badge rounded-pill bg-success">
+                                          <i class="ri-checkbox-circle-line 1">
+                                          </i>
+                                          Habilitation validée
+                                      </span>
+                                  </div>
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>
+                                              Date d’inscription
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Validée le
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Validée par
+                                          </small>
+                                          <i class="text-disabled">
+                                              Non disponible
+                                          </i>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Members actifs de la structure
+                                  </h3>
+                                  <div class="table-responsive mt-3 mt-md-4">
+                                      <table class="table table-hover">
+                                          <caption class="visually-hidden">
+                                              Liste des collaborateurs
+                                          </caption>
+                                          <thead>
+                                              <tr>
+                                                  <th scope="col">
+                                                      Nom Prénom
+                                                  </th>
+                                                  <th scope="col">
+                                                      Email
+                                                  </th>
+                                                  <th scope="col">
+                                                      Date d'inscription
+                                                  </th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_DEPT_pending_authorization
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Pres. Org.
+                                  <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
+                                      En attente
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <button aria-label="Imprimer l’habilitation de Pres. Org." class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                                  <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                  </i>
+                              </button>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button action="" class="btn btn-lg btn-white btn-block btn-ico justify-content-center" type="button">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Valider
+                                      </span>
+                                  </button>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <button class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="orientation" data-matomo-event="true" data-matomo-option="décliner" type="button">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Refuser
+                                      </span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="row">
+                          <div class="col-12 col-xxl-12 order-1 order-xxl-1">
+                              <h2 class="mb-3 mb-md-4">
+                                  Informations générales
+                              </h2>
+                          </div>
+                          <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                              <div class="c-box mb-3 mb-md-4" id="creator-box">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de l’emetteur
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Prénom et Nom
+                                          </small>
+                                          <strong>
+                                              Pierre DUPONT
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              pierre.dupont@test.local
+                                          </strong>
+                                      </li>
+                                  </ul>
+                                  <div class="alert alert-warning mb-0" role="status">
+                                      <div class="row">
+                                          <div class="col-auto pe-0">
+                                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                                              </i>
+                                          </div>
+                                          <div class="col">
+                                              <p class="mb-2">
+                                                  <strong>
+                                                      Avant de valider une habilitation
+                                                  </strong>
+                                              </p>
+                                              <p class="mb-0">
+                                                  Vérifiez l’identité du professionnel ainsi que son appartenance à la structure. Soyez particulièrement vigilant quant à l’adresse e-mail utilisée afin de prévenir toute tentative d’accès frauduleux.
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations de la structure
+                                          </h3>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Organisation
+                                          </small>
+                                          <strong>
+                                              Pres. Org.
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Type
+                                          </small>
+                                          <strong>
+                                              Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              SIRET
+                                          </small>
+                                          <strong>
+                                              012 345 678 91010
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse
+                                          </small>
+                                          <strong>
+                                              39 rue d'Artois, 75008 Paris
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              contact@Presorg.fr
+                                          </strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
+                              <div class="c-box c-box--pass bg-warning-lightest border-warning mb-3 mb-md-4" id="authorization-box">
+                                  <div class="mb-3 mb-md-4">
+                                      <span class="badge rounded-pill bg-accent-03 text-primary">
+                                          <i class="ri-pause-circle-line">
+                                          </i>
+                                          Habilitation en attente
+                                      </span>
+                                  </div>
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>
+                                              Date d’inscription
+                                          </small>
+                                          <strong>
+                                              20/11/2026
+                                          </strong>
+                                      </li>
+                                  </ul>
+                                  <p class="mt-3 mb-0">
+                                      <i>
+                                          En attente d'habilitation, la structure peut orienter des bénéficiaires mais n'a pas encore le statut de prescripteur habilité.
+                                      </i>
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="s-section__col col-12">
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Members actifs de la structure
+                                  </h3>
+                                  <div class="table-responsive mt-3 mt-md-4">
+                                      <table class="table table-hover">
+                                          <caption class="visually-hidden">
+                                              Liste des collaborateurs
+                                          </caption>
+                                          <thead>
+                                              <tr>
+                                                  <th scope="col">
+                                                      Nom Prénom
+                                                  </th>
+                                                  <th scope="col">
+                                                      Email
+                                                  </th>
+                                                  <th scope="col">
+                                                      Date d'inscription
+                                                  </th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_authorization_validated_by[ItouStaffFactory]
+  '''
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+      <div class="mb-3 mb-md-4">
+          <span class="badge rounded-pill bg-success">
+              <i class="ri-checkbox-circle-line 1">
+              </i>
+              Habilitation validée
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>
+                  Date d’inscription
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée le
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée par
+              </small>
+              <strong>
+                  La plateforme de l’inclusion
+              </strong>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_authorization_validated_by[LaborInspectorFactory]
+  '''
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+      <div class="mb-3 mb-md-4">
+          <span class="badge rounded-pill bg-success">
+              <i class="ri-checkbox-circle-line 1">
+              </i>
+              Habilitation validée
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>
+                  Date d’inscription
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée le
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée par
+              </small>
+              <strong>
+                  Jeanne D'ORLÉANS
+              </strong>
+              (Une institution)
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_authorization_validated_by[None]
+  '''
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+      <div class="mb-3 mb-md-4">
+          <span class="badge rounded-pill bg-success">
+              <i class="ri-checkbox-circle-line 1">
+              </i>
+              Habilitation validée
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>
+                  Date d’inscription
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée le
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée par
+              </small>
+              <i class="text-disabled">
+                  Non disponible
+              </i>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_authorization_validated_by[PrescriberFactory]
+  '''
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4" id="authorization-box">
+      <div class="mb-3 mb-md-4">
+          <span class="badge rounded-pill bg-success">
+              <i class="ri-checkbox-circle-line 1">
+              </i>
+              Habilitation validée
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>
+                  Date d’inscription
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée le
+              </small>
+              <strong>
+                  20/11/2026
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Validée par
+              </small>
+              <strong>
+                  Pierre DUPONT
+              </strong>
+              (Une orga prescriptrice)
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_created_by[ItouStaffFactory]
+  '''
+  <div class="c-box mb-3 mb-md-4" id="creator-box">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Informations de l’emetteur
+              </h3>
+          </div>
+      </div>
+      <ul class="list-data mb-3">
+          <li>
+              <small>
+                  Prénom et Nom
+              </small>
+              <strong>
+                  Plateforme de l'inclusion
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Adresse e-mail
+              </small>
+              <i class="text-disabled">
+                  Non disponible
+              </i>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_created_by[None]
+  '''
+  <div class="c-box mb-3 mb-md-4" id="creator-box">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Informations de l’emetteur
+              </h3>
+          </div>
+      </div>
+      <ul class="list-data mb-3">
+          <li>
+              <small>
+                  Prénom et Nom
+              </small>
+              <i class="text-disabled">
+                  Non disponible
+              </i>
+          </li>
+          <li>
+              <small>
+                  Adresse e-mail
+              </small>
+              <i class="text-disabled">
+                  Non disponible
+              </i>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationDetailsView.test_created_by[ProfessionalFactory]
+  '''
+  <div class="c-box mb-3 mb-md-4" id="creator-box">
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Informations de l’emetteur
+              </h3>
+          </div>
+      </div>
+      <ul class="list-data mb-3">
+          <li>
+              <small>
+                  Prénom et Nom
+              </small>
+              <strong>
+                  James BOND
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Adresse e-mail
+              </small>
+              <strong>
+                  james.bond@test.local
+              </strong>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestAuthorizationListView.test_DDETS_IAE
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Territoire
+                              </h1>
+                              <p>
+                                  Habilitez les OHPD (Organisations habilitées par le préfet du département) de votre département.
+                              </p>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" href="/professionals/authorizations/list">
+                                  Gestion des habilitations
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/institutions/organizations-list">
+                                  Liste des organisations
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="tab-content">
+                          <h2 class="mb-3 mb-md-4">
+                              Gestion des habilitations
+                          </h2>
+                          <p>
+                              Cet espace vous permet de suivre les OHPD (Organisations habilitées par le préfet du département) déjà habilitées, ainsi que de traiter les nouvelles demandes.
+                          </p>
+                          <p class="mb-0">
+                              3 résultats
+                          </p>
+                          <div id="authorizations-list">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <caption class="visually-hidden">
+                                          Liste des habilitations
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th class="text-nowrap" scope="col">
+                                                  Structure
+                                              </th>
+                                              <th scope="col">
+                                                  Ville
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Date de validation
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      OHPD 2
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Valserhône (01)
+                                              </td>
+                                              <td>
+                                                  Pierre DUPONT
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
+                                                      En attente
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  -
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure OHPD 2" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure OHPD 2" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      OHPD 1
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Oyonnax (01)
+                                              </td>
+                                              <td>
+                                                  Plateforme de l'inclusion
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-success">
+                                                      Validée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  20/11/2026
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure OHPD 1" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure OHPD 1" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      OHPD 3
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Ambérieu-En-Bugey (01)
+                                              </td>
+                                              <td>
+                                                  <i class="text-disabled">
+                                                      Non disponible
+                                                  </i>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-success">
+                                                      Validée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  02/10/0202
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure OHPD 3" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure OHPD 3" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestAuthorizationListView.test_DEPT
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Territoire
+                              </h1>
+                              <p>
+                                  Gérez le conventionnement des organisations et accédez aux principaux indicateurs de leur activité.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="tab-content">
+                          <h2 class="mb-3 mb-md-4">
+                              Gestion des habilitations
+                          </h2>
+                          <p>
+                              Cet espace vous permet de consulter les organisations délégataires déjà habilitées et de traiter les nouvelles demandes. Cette page est accessible uniquement aux administrateurs de votre structure.
+                          </p>
+                          <p class="mb-0">
+                              3 résultats
+                          </p>
+                          <div id="authorizations-list">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover table-sortable">
+                                      <caption class="visually-hidden">
+                                          Liste des habilitations
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th class="text-nowrap" scope="col">
+                                                  Structure
+                                              </th>
+                                              <th scope="col">
+                                                  Ville
+                                              </th>
+                                              <th scope="col">
+                                                  Émetteur
+                                              </th>
+                                              <th scope="col">
+                                                  Statut
+                                              </th>
+                                              <th scope="col">
+                                                  Date de validation
+                                              </th>
+                                              <th class="text-end w-50px" scope="col">
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      PLIE du 01
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Valserhône (01)
+                                              </td>
+                                              <td>
+                                                  Pierre DUPONT
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-accent-03 text-primary">
+                                                      En attente
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  -
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure PLIE du 01" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure PLIE du 01" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      autre ODC du 01
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Ambérieu-En-Bugey (01)
+                                              </td>
+                                              <td>
+                                                  <i class="text-disabled">
+                                                      Non disponible
+                                                  </i>
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-success">
+                                                      Validée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  02/10/0202
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure autre ODC du 01" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure autre ODC du 01" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      ODC du 01
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  Oyonnax (01)
+                                              </td>
+                                              <td>
+                                                  Plateforme de l'inclusion
+                                              </td>
+                                              <td>
+                                                  <span class="badge rounded-pill badge-sm bg-success">
+                                                      Validée
+                                                  </span>
+                                              </td>
+                                              <td>
+                                                  20/11/2026
+                                              </td>
+                                              <td class="text-end w-50px align-middle">
+                                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir la structure ODC du 01" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="habilitations" data-matomo-event="true" data-matomo-option="détail-organisation" href="/professionals/authorizations/details/[ORG_UID]?back_url=/professionals/authorizations/list">
+                                                      <i aria-label="Voir la structure ODC du 01" class="ri-arrow-drop-right-line fs-lg">
+                                                      </i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---

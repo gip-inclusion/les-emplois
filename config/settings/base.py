@@ -119,6 +119,7 @@ INSTALLED_APPS = [
     "itou.www.geiq_assessments_views",
     "itou.www.home",
     "itou.www.prescribers_views",
+    "itou.www.professionals_views",
     "itou.www.search_views",
     "itou.www.companies_views",
     "itou.www.signup",
