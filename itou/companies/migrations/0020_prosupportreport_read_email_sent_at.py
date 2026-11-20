@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("companies", "0018_prosupportreport_first_read_at"),
+        ("companies", "0019_prosupportreport_first_read_at"),
     ]
 
     operations = [
