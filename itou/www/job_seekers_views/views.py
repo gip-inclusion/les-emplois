@@ -715,13 +715,17 @@ def send_pro_support_report_introduction(
 
     form = ProSupportReportIntroductionForm(instance=request.user, data=request.POST)
     if form.is_valid():
-        form.save()
+        prescriber = form.save(commit=False)
+        if form.cleaned_data["save_phone"] and prescriber.phone:
+            prescriber.save()
         report.introduction_email_sent_at = timezone.now()
         report.introduction_email_recipient = contact
         report.save(update_fields=["introduction_email_sent_at", "introduction_email_recipient"])
-        report.introduction_email(contact, request.user, request.current_organization).send()
+        report.introduction_email(contact, prescriber, request.current_organization).send()
         messages.success(
-            request, "E-mail de mise en relation envoyé", extra_tags="modal pro_support_report_introduction"
+            request,
+            "Demande de contact envoyée. Vous venez de recevoir un e-mail de mise en relation. "
+            f"N’hésitez pas à prendre contact rapidement avec {contact.get_full_name()}.",
         )
         # Reloads the page with its back_url.
         return HttpResponseClientRefresh()

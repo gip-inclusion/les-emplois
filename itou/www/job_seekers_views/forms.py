@@ -739,15 +739,10 @@ class ProSupportReportForm(forms.ModelForm):
 
 
 class ProSupportReportIntroductionForm(forms.ModelForm):
+    save_phone = forms.BooleanField(label="Enregistrer ce numéro dans mon profil", required=False, initial=True)
+
     class Meta:
         model = User
         fields = ["phone"]
-        labels = {"phone": "Votre téléphone professionnel"}
-        help_texts = {"phone": "Ce numéro sera enregistré dans votre profil, modifiable à tout moment."}
+        labels = {"phone": "Téléphone professionnel"}
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
-        error_messages = {"phone": {"required": "Renseignez votre téléphone professionnel."}}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Both phone numbers are given in the introduction email.
-        self.fields["phone"].required = True

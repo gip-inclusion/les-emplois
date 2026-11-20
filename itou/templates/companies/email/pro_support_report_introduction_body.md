@@ -14,8 +14,8 @@ Voici vos coordonnées respectives :
 {% endif %}Adresse e-mail : {{ contact.email }}
 
 **{{ prescriber.get_full_name }}**, {{ prescriber_organization.display_name }}
-Téléphone : {{ prescriber.phone }}
-Adresse e-mail : {{ prescriber.email }}
+{% if prescriber.phone %}Téléphone : {{ prescriber.phone }}
+{% endif %}Adresse e-mail : {{ prescriber.email }}
 
 N’hésitez pas à vous appeler ou à vous écrire : utilisez « Répondre à tous ».
 

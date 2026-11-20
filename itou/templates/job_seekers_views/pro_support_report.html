@@ -27,23 +27,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-box mb-3 mb-md-4">
-                        <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
-                            <h2 class="h3 mb-0">Contenu du bilan</h2>
-                            {% if introduction_form %}
-                                <button type="button"
-                                        class="btn btn-outline-primary btn-ico"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#pro-support-report-introduction-modal"
-                                        {% matomo_event "candidat" "clic" "ouvrir-mise-en-relation-bilan" %}>
-                                    <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
-                                    {% if report.author_has_left %}
-                                        <span>Échanger avec l’employeur</span>
-                                    {% else %}
-                                        <span>Échanger avec {{ introduction_contact.get_full_name }}</span>
-                                    {% endif %}
-                                </button>
-                            {% endif %}
-                        </div>
+                        <h2 class="h3">Contenu du bilan</h2>
                         <ul class="list-data mb-0">
                             <li>
                                 <small>Situation du contrat</small>
@@ -90,13 +74,76 @@
                                 </li>
                             {% endif %}
                         </ul>
+                        {% if introduction_contact %}
+                            <hr class="my-4">
+                            <h3 class="h4">Auteur du bilan</h3>
+                            <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between">
+                                <div class="c-box--accompagnateur__summary">
+                                    <i class="{{ report.company.icon }}" aria-hidden="true"></i>
+                                    <div>
+                                        <span class="d-block h5 mb-1">{{ report.author.get_full_name }}</span>
+                                        <span class="d-block">{% if report.author_has_left %}A quitté {% endif %}{{ report.company.display_name }}</span>
+                                    </div>
+                                </div>
+                                {% if introduction_form %}
+                                    <button type="button"
+                                            class="btn btn-outline-primary btn-ico flex-shrink-0"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#pro-support-report-introduction-modal"
+                                            {% matomo_event "candidat" "clic" "ouvrir-mise-en-relation-bilan" %}>
+                                        <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                        {% if report.author_has_left %}
+                                            <span>Contacter l’employeur</span>
+                                        {% else %}
+                                            <span>Contacter {{ introduction_contact.get_full_name }}</span>
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                            {% if report.introduction_email_sent_at %}
+                                <p class="mt-3">
+                                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success text-wrap text-start">
+                                        <i class="ri-check-line" aria-hidden="true"></i>
+                                        Demande de contact envoyée le {{ report.introduction_email_sent_at|date:"d/m/Y" }}
+                                    </span>
+                                </p>
+                                <ul class="list-data mb-0">
+                                    <li>
+                                        <small>Structure</small>
+                                        <strong>{{ report.company.display_name }}</strong>
+                                    </li>
+                                    {% if report.company.address_on_one_line %}
+                                        <li>
+                                            <small>Adresse</small>
+                                            <strong>{{ report.company.address_on_one_line }}</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if introduction_contact.phone %}
+                                        <li>
+                                            <small>Téléphone</small>
+                                            <strong>{{ introduction_contact.phone }}</strong>
+                                            {% include "includes/copy_to_clipboard.html" with content=introduction_contact.phone css_classes="btn-link" only_icon=True only %}
+                                        </li>
+                                    {% elif report.company.phone %}
+                                        <li>
+                                            <small>Téléphone de la structure</small>
+                                            <strong>{{ report.company.phone }}</strong>
+                                            {% include "includes/copy_to_clipboard.html" with content=report.company.phone css_classes="btn-link" only_icon=True only %}
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <small>Adresse e-mail</small>
+                                        <strong class="text-break">{{ introduction_contact.email }}</strong>
+                                        {% include "includes/copy_to_clipboard.html" with content=introduction_contact.email css_classes="btn-link" only_icon=True only %}
+                                    </li>
+                                </ul>
+                            {% else %}
+                                <p class="fs-sm text-muted mt-3 mb-0">
+                                    Pour toute question sur ce bilan ou la suite du parcours de {{ report.job_seeker.get_full_name }}{% if report.author_has_left %}, contactez la structure{% endif %}.
+                                </p>
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    {% if introduction_contact and report.introduction_email_sent_at %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2 class="h3">Échanger de vive voix avec {{ introduction_contact.get_full_name }}</h2>
-                            {% include "job_seekers_views/includes/pro_support_report_introduction_contact.html" with contact=introduction_contact company=report.company in_modal=False only %}
-                        </div>
-                    {% endif %}
                     <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"
                        class="btn btn-outline-primary">Voir la fiche du salarié</a>
                     {% if record_first_read %}
