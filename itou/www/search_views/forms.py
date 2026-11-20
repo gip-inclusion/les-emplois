@@ -230,10 +230,12 @@ class ServiceSearchForm(forms.Form):
                 "data-service-search-city": "true",
             }
         ),
+        required=False,
     )
     keyword = forms.CharField(
         label="Entrez un mot-clé",
         widget=forms.TextInput(attrs={"placeholder": "Mot-clé, nom de structure, thématique"}),
+        required=False,
     )
     categories = forms.MultipleChoiceField(
         choices=[(c.value, c.label) for c in data_inclusion_v1.Categorie],
@@ -266,6 +268,11 @@ class ServiceSearchForm(forms.Form):
             data.setdefault("reception", self.base_fields["reception"].initial)
 
         super().__init__(data, *args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("city") and not cleaned_data.get("keyword"):
+            raise forms.ValidationError("Veuillez renseigner une ville et/ou un mot-clé.")
 
 
 class NewSavedSearchForm(forms.ModelForm):

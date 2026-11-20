@@ -256,29 +256,6 @@ class TestServiceKeywordSearch:
         assert not Service.objects.keyword_search(q).exists()
 
     @pytest.mark.parametrize(
-        "best_field,other_field",
-        [
-            ("name", "structure__name"),
-            ("structure__name", "publics_details"),
-        ],
-    )
-    def test_keyword_search_ranks_by_field_weight(self, best_field, other_field):
-        other = ServiceFactory(**{other_field: "Agefiph"})
-        best = ServiceFactory(**{best_field: "Agefiph"})
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("agefiph")) == [best, other]
-
-    def test_keyword_search_ranks_thematics_first(self):
-        in_structure_name = ServiceFactory(structure__name="Soutien aux aidants")
-        in_thematics = ServiceFactory(
-            thematics=[GenericReferenceItemFactory(kind="THEMATIC", label="Soutien aux aidants")],
-        )
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("soutien aux aidants")) == [in_thematics, in_structure_name]
-
-    @pytest.mark.parametrize(
         "q,expected",
         [
             ("naturalisation", True),
@@ -300,21 +277,6 @@ class TestServiceKeywordSearch:
         Service.include_inactive.update_search_index()
 
         assert Service.objects.keyword_search(q).exists() is expected
-
-    def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
-        in_publics_details = ServiceFactory(publics_details="Titre de séjour")
-        in_thematic_aliases = ServiceFactory(
-            thematics=[
-                GenericReferenceItemFactory(
-                    kind="THEMATIC",
-                    value="difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete",
-                    label="Citoyenneté",
-                )
-            ],
-        )
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("titre de séjour")) == [in_thematic_aliases, in_publics_details]
 
     @pytest.mark.parametrize(
         "name,q",
@@ -342,18 +304,6 @@ class TestServiceKeywordSearch:
 
         assert not Service.objects.keyword_search("garage tracteur").exists()
 
-    def test_keyword_search_also_ranks_by_quality(self):
-        slightly_more_relevant = ServiceFactory(name="Garage solidaire", description="Garage", score_qualite=0.2)
-        better_quality = ServiceFactory(name="Garage solidaire", score_qualite=0.9)
-        far_less_relevant = ServiceFactory(publics_details="Garage solidaire", score_qualite=1)
-        Service.include_inactive.update_search_index()
-
-        assert list(Service.objects.keyword_search("garage solidaire")) == [
-            better_quality,
-            slightly_more_relevant,
-            far_less_relevant,
-        ]
-
 
 class TestMixedSearchAndOrder:
     def _search(self, *, city=None, keyword=None, thematics=[THEMATIC_VALUE], reception=""):
@@ -370,6 +320,67 @@ class TestMixedSearchAndOrder:
 
         results = self._search(city=vannes, reception="")
         assert list(results) == [close, mid, remote]
+
+    @pytest.mark.parametrize(
+        "best_field,other_field",
+        [
+            ("name", "structure__name"),
+            ("structure__name", "publics_details"),
+        ],
+    )
+    def test_keyword_search_ranks_by_field_weight(self, best_field, other_field):
+        other = ServiceFactory(**{other_field: "Agefiph"})
+        best = ServiceFactory(**{best_field: "Agefiph"})
+        Service.include_inactive.update_search_index()
+
+        assert list(self._search(keyword="agefiph")) == [best, other]
+
+    def test_keyword_search_ranks_thematics_first(self):
+        second_thematic_value = "famille--soutien-aidants"
+        in_structure_name = ServiceFactory(structure__name="Soutien aux aidants")
+        in_thematics = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", label="Soutien aux aidants", value=second_thematic_value)
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert list(
+            self._search(keyword="soutien aux aidants", thematics=[THEMATIC_VALUE, second_thematic_value])
+        ) == [in_thematics, in_structure_name]
+
+    def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
+        second_thematic_value = (
+            "difficultes-administratives-ou-juridiques--accompagnement-pour-lacces-a-la-citoyennete"
+        )
+        in_publics_details = ServiceFactory(publics_details="Titre de séjour")
+        in_thematic_aliases = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(
+                    kind="THEMATIC",
+                    value=second_thematic_value,
+                    label="Citoyenneté",
+                )
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert list(self._search(keyword="titre de séjour", thematics=[THEMATIC_VALUE, second_thematic_value])) == [
+            in_thematic_aliases,
+            in_publics_details,
+        ]
+
+    def test_keyword_search_also_ranks_by_quality(self):
+        slightly_more_relevant = ServiceFactory(name="Garage solidaire", description="Garage", score_qualite=0.2)
+        better_quality = ServiceFactory(name="Garage solidaire", score_qualite=0.9)
+        far_less_relevant = ServiceFactory(publics_details="Garage solidaire", score_qualite=1)
+        Service.include_inactive.update_search_index()
+
+        assert list(self._search(keyword="garage solidaire")) == [
+            better_quality,
+            slightly_more_relevant,
+            far_less_relevant,
+        ]
 
     def test_mixed_search_orders_distance_and_match(self):
         thematic = GenericReferenceItemFactory(
@@ -437,3 +448,40 @@ class TestMixedSearchAndOrder:
                 keyword="Super-aidants",
             )
         ) == [first_match_remote, second_match, third_match]
+
+    def test_mixed_search_city_only_returns_all_services(self):
+        vannes = create_city_vannes()
+
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote.receptions.set([RemoteReceptionFactory()])
+
+        # Won’t be in the results
+        ServiceFactory(coordinates=vannes.coords, city="Vannes", is_active=False)
+        ServiceFactory(coordinates=create_city_geispolsheim().coords, city="Geispolsheim")
+        ServiceFactory(coordinates=vannes.coords, city="")
+
+        assert list(self._search(city=vannes)) == [in_person, remote]
+
+    def test_mixed_search_keyword_only_returns_all_services(self):
+        vannes = create_city_vannes()
+
+        service_vannes = ServiceFactory(coordinates=vannes.coords, city="Vannes", name="véhicule")
+        service_geispolsheim = ServiceFactory(
+            coordinates=create_city_geispolsheim().coords, city="Geispolsheim", structure__name="véhicule"
+        )
+        service_remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", name="véhicule")
+        service_remote.receptions.set([RemoteReceptionFactory()])
+        service_no_coords = ServiceFactory()  # thematic value contains 'véhicule'
+
+        # Won’t be in the results
+        ServiceFactory(name="véhicule", is_active=False)
+
+        Service.include_inactive.update_search_index()
+
+        assert set(self._search(keyword="véhicule")) == {
+            service_vannes,
+            service_geispolsheim,
+            service_remote,
+            service_no_coords,
+        }
