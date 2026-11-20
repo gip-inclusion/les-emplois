@@ -30,10 +30,12 @@
                             <li>
                                 <small>Situation du contrat</small>
                                 <strong>
-                                    {% if contract_has_ended %}
-                                        Terminé le {{ report.contract_end_date|date:"d/m/Y" }}
-                                    {% else %}
+                                    {% if not contract_has_ended %}
                                         En cours, fin le {{ report.contract_end_date|date:"d/m/Y" }}
+                                    {% elif report.renewal_end_date %}
+                                        Initialement terminé le {{ report.contract_end_date|date:"d/m/Y" }}, renouvelé jusqu’au {{ report.renewal_end_date|date:"d/m/Y" }}
+                                    {% else %}
+                                        Terminé le {{ report.contract_end_date|date:"d/m/Y" }}
                                     {% endif %}
                                 </strong>
                             </li>
