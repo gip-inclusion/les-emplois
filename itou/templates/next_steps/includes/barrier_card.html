@@ -51,9 +51,20 @@
             {% endif %}
         {% endif %}
     {% endfor %}
-    {% if card.search_url or card.lift_url or card.back_url %}
+    {% if card.solutions_url or card.search_url or card.lift_url or card.back_url %}
         <div class="d-flex flex-wrap gap-2">
-            {% if card.search_url %}
+            {% if card.solutions_url %}
+                {# The services around the job seeker, in the side drawer; without JavaScript, as a page. #}
+                <a class="btn btn-sm btn-primary"
+                   href="{{ card.solutions_url }}"
+                   hx-get="{{ card.solutions_url }}"
+                   hx-target="#next-step-journey"
+                   hx-swap="outerHTML"
+                   hx-indicator="#next-step-journey"
+                   data-bs-toggle="offcanvas"
+                   data-bs-target="#next-step-drawer"
+                   aria-controls="next-step-drawer">Trouver une solution</a>
+            {% elif card.search_url %}
                 <a class="btn btn-sm btn-primary" href="{{ card.search_url }}">Trouver une solution</a>
             {% endif %}
             {# Stating it lifted or back: a confirmation in the side drawer; without JavaScript, as a page. #}

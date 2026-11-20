@@ -376,6 +376,83 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
         }
 
 
+def create_orientation(request, *, service, job_seeker, referent_data, documents_data):
+    """Create an orientation from the orientation forms' data, with its documents, and send its notifications.
+
+    Shared by the orientation wizard and the next steps experiment's side drawer.
+    """
+
+    if request.from_employer:
+        sender_kind = SenderKind.EMPLOYER
+        sender_prescriber_organization = None
+        sender_company = request.current_organization
+    else:
+        sender_kind = SenderKind.PRESCRIBER
+        sender_prescriber_organization = request.current_organization
+        sender_company = None
+
+    orientation = insertion_models.Orientation.objects.create(
+        service=service,
+        beneficiary=job_seeker,
+        sender=request.user,
+        sender_kind=sender_kind,
+        sender_prescriber_organization=sender_prescriber_organization,
+        sender_company=sender_company,
+        referent_last_name=referent_data["referent_last_name"],
+        referent_first_name=referent_data["referent_first_name"],
+        referent_phone=referent_data["referent_phone"],
+        referent_email=referent_data["referent_email"],
+        orientation_reasons=referent_data.get("orientation_reason", ""),
+        data_protection_commitment=documents_data["gdpr_consent"],
+    )
+
+    logger.info(
+        "orientation wizard created orientation=%s for user=%s service_uid=%s job_seeker=%s",
+        orientation.pk,
+        request.user.pk,
+        service.uid,
+        job_seeker.public_id,
+    )
+
+    documents = []
+    for field in ("credentials_documents_files", "credentials_proof_files"):
+        for uploaded_file in documents_data.get(field) or []:
+            file = save_file(folder="orientations/", file=uploaded_file, anonymize_filename=False)
+            documents.append(file)
+    orientation.documents.set(documents)
+
+    # Send notifications
+    process_link = insertion_models.OrientationProcessLink.objects.create(orientation=orientation)
+    process_link.email_new_orientation_for_structure.send()
+    if not orientation.sender_is_referent:
+        orientation.email_new_orientation_for_referent.send()
+    orientation.notification_new_for_beneficiary.send()
+    orientation.notification_new_for_sender.send()
+
+    # Link the originating iMER to the created Orientation.
+    hashed_session_key = hashlib.sha256(request.session.session_key.encode()).hexdigest()
+    event = (
+        insertion_models.MobilizationEvent.objects.filter(
+            kind=MobilizationEventKind.SERVICE_ORIENTATION,
+            hashed_session_key=hashed_session_key,
+            service=service,
+            user=request.user,
+            orientation__isnull=True,
+        )
+        .order_by("-created_at")
+        .first()
+    )
+    if event is not None:
+        event.orientation = orientation
+        event.save(update_fields=["orientation"])
+
+    # Sync job seeker assignment
+    JobSeekerAssignment.objects.upsert_assignment(
+        job_seeker, request.user, request.current_organization, ActionKind.ORIENT
+    )
+    return orientation
+
+
 class OrientationWizardView(WizardView):
     url_name = "insertion_views:orientation_steps"
     expected_session_kind = "orientation"
@@ -446,76 +523,12 @@ class OrientationWizardView(WizardView):
             if not self.form.is_valid():
                 return self.render_to_response(self.get_context_data(**kwargs))
 
-            cleaned = self.form.cleaned_data
-            referent_data = self.wizard_session.get(OrientationStep.REFERENT)
-
-            if request.from_employer:
-                sender_kind = SenderKind.EMPLOYER
-                sender_prescriber_organization = None
-                sender_company = request.current_organization
-            else:
-                sender_kind = SenderKind.PRESCRIBER
-                sender_prescriber_organization = request.current_organization
-                sender_company = None
-
-            orientation = insertion_models.Orientation.objects.create(
+            orientation = create_orientation(
+                request,
                 service=self.service,
-                beneficiary=self.job_seeker,
-                sender=request.user,
-                sender_kind=sender_kind,
-                sender_prescriber_organization=sender_prescriber_organization,
-                sender_company=sender_company,
-                referent_last_name=referent_data["referent_last_name"],
-                referent_first_name=referent_data["referent_first_name"],
-                referent_phone=referent_data["referent_phone"],
-                referent_email=referent_data["referent_email"],
-                orientation_reasons=referent_data.get("orientation_reason", ""),
-                data_protection_commitment=cleaned["gdpr_consent"],
-            )
-
-            logger.info(
-                "orientation wizard created orientation=%s for user=%s service_uid=%s job_seeker=%s",
-                orientation.pk,
-                request.user.pk,
-                self.service.uid,
-                self.job_seeker.public_id,
-            )
-
-            documents = []
-            for field in ("credentials_documents_files", "credentials_proof_files"):
-                for uploaded_file in cleaned.get(field) or []:
-                    file = save_file(folder="orientations/", file=uploaded_file, anonymize_filename=False)
-                    documents.append(file)
-            orientation.documents.set(documents)
-
-            # Send notifications
-            process_link = insertion_models.OrientationProcessLink.objects.create(orientation=orientation)
-            process_link.email_new_orientation_for_structure.send()
-            if not orientation.sender_is_referent:
-                orientation.email_new_orientation_for_referent.send()
-            orientation.notification_new_for_beneficiary.send()
-            orientation.notification_new_for_sender.send()
-
-            # Link the originating iMER to the created Orientation.
-            hashed_session_key = hashlib.sha256(request.session.session_key.encode()).hexdigest()
-            event = (
-                insertion_models.MobilizationEvent.objects.filter(
-                    kind=MobilizationEventKind.SERVICE_ORIENTATION,
-                    hashed_session_key=hashed_session_key,
-                    service=self.service,
-                    user=request.user,
-                    orientation__isnull=True,
-                )
-                .order_by("-created_at")
-                .first()
-            )
-            if event is not None:
-                event.orientation = orientation
-                event.save(update_fields=["orientation"])
-
-            # Sync job seeker assignment
-            JobSeekerAssignment.objects.upsert_assignment(
-                self.job_seeker, request.user, request.current_organization, ActionKind.ORIENT
+                job_seeker=self.job_seeker,
+                referent_data=self.wizard_session.get(OrientationStep.REFERENT),
+                documents_data=self.form.cleaned_data,
             )
 
             # A non-authorized prescriber may orient a job seeker whose account they did not create

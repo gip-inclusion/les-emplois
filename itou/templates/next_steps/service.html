@@ -1,0 +1,95 @@
+{% load markdownify %}
+{% load str_filters %}
+{# An insertion service, in the side drawer or inside a page (next_steps_views.service): what helps choose it, and #}
+{# orienting the job seeker towards it, in the drawer too. The full service card stays one link away. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">{{ service.name }}</h2>
+                <span class="d-block fs-sm">{{ service.structure.name }}</span>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4 d-flex flex-column gap-2">
+        {% if service.address_on_one_line %}
+            {% include "next_steps/includes/fact.html" with label="Adresse" value=service.address_on_one_line detail="" only %}
+        {% endif %}
+        {% if receptions %}
+            {% include "next_steps/includes/fact.html" with label="Accueil" value=receptions|join:", " detail="" only %}
+        {% endif %}
+        {% include "next_steps/includes/service_conditions.html" with service=service only %}
+        {% if service.contact_full_name or service.contact_phone or service.contact_email %}
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-contacts-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Contact</span>
+                    {% if service.contact_full_name %}<span class="d-block fw-bold">{{ service.contact_full_name }}</span>{% endif %}
+                    <span class="d-flex flex-wrap column-gap-3 fs-sm">
+                        {% if service.contact_phone %}
+                            <a class="link-tertiary"
+                               href="tel:{{ service.contact_phone }}">{{ service.contact_phone }}</a>
+                        {% endif %}
+                        {% if service.contact_email %}
+                            <a class="link-tertiary text-break"
+                               href="mailto:{{ service.contact_email }}">{{ service.contact_email }}</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        {% endif %}
+        {% if opening_hours %}
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-time-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Horaires d’accueil{% if opening_hours.has_ph_off %}, hors jours fériés{% endif %}</span>
+                    <ul class="list-unstyled fs-sm mb-0">
+                        {% for entry in opening_hours.entries %}
+                            <li>
+                                <b>{{ entry.label }}&nbsp;:</b> {{ entry.hours }}
+                                {% if entry.comment %}({{ entry.comment|lower }}){% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+        {% if service.description %}
+            <details class="border rounded-2 px-3 py-2">
+                <summary class="fw-bold">Description du service</summary>
+                <div class="next-step-markdown fs-sm text-break mt-2">{{ service.description|markdownify }}</div>
+            </details>
+        {% endif %}
+        <a class="fs-sm align-self-start mt-2" href="{{ full_url }}">Voir la fiche complète du service</a>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% if back_url %}
+            <a class="btn btn-outline-primary"
+               href="{{ back_url }}"
+               {% if in_drawer %}hx-get="{{ back_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>Autres solutions</a>
+        {% elif in_drawer %}
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Fermer</button>
+        {% else %}
+            <a class="btn btn-outline-primary"
+               href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Retour</a>
+        {% endif %}
+        {% if orient_url %}
+            <a class="btn btn-primary"
+               href="{{ orient_url }}"
+               {% if in_drawer %}hx-get="{{ orient_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>Orienter vers ce service</a>
+        {% elif external_url %}
+            {# The service takes its orientations on its own website, as the full service card says. #}
+            <a class="btn btn-primary has-external-link"
+               href="{{ external_url }}"
+               target="_blank"
+               rel="noopener">Orienter sur son site</a>
+        {% endif %}
+    </div>
+</div>

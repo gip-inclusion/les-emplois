@@ -427,6 +427,11 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-light, #f8f8f8);
 }
 
+/* Text written in Markdown by a service (data·inclusion), in a drawer's box: no margin under its last block. */
+.next-step-markdown > :last-child {
+    margin-bottom: 0;
+}
+
 /* A score on a gauge of steps, as the autonomy in a report. */
 .next-step-gauge > span {
     height: .5rem;

@@ -8,6 +8,10 @@ register = template.Library()
 # Remix icons, by the first keyword found in the label (lowercased, after a space: " le" is a word): the more
 # specific first.
 FACT_ICONS = [
+    ("publics", "ri-group-line"),
+    ("frais", "ri-money-euro-circle-line"),
+    ("adresse", "ri-map-pin-line"),
+    ("accueil", "ri-door-open-line"),
     ("employeur", "ri-building-line"),
     ("prescripteur", "ri-user-line"),
     ("usager", "ri-user-line"),
@@ -28,6 +32,7 @@ FACT_ICONS = [
     ("autonomie", "ri-compass-3-line"),
     ("solution", "ri-flag-line"),
     ("orientation", "ri-signpost-line"),
+    ("service", "ri-community-line"),
     ("action préalable", "ri-task-line"),
     ("suspension", "ri-pause-circle-line"),
     ("prolongation", "ri-refresh-line"),

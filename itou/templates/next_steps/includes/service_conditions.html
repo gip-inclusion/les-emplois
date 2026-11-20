@@ -1,0 +1,19 @@
+{# What a service asks of the people it receives: publics, fees, access conditions. In its drawer, and on the first #}
+{# step of the orientation towards it. #}
+{% if service.publics.all %}
+    {% with publics=service.publics.all|join:", " %}
+        {% include "next_steps/includes/fact.html" with label="Publics concernés" value=publics detail=service.publics_details only %}
+    {% endwith %}
+{% endif %}
+{% if service.fee %}
+    {% include "next_steps/includes/fact.html" with label="Frais" value=service.fee.label detail=service.fee_details only %}
+{% endif %}
+{% if service.has_prerequisites %}
+    <div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+        {% include "next_steps/includes/fact_tile.html" with icon="ri-list-check-2" only %}
+        <div class="flex-grow-1 fs-sm text-break">
+            <span class="d-block text-muted">Conditions d’accès</span>
+            {% include "insertion/includes/access_conditions_di.html" with service=service extra_classes="next-step-markdown" only %}
+        </div>
+    </div>
+{% endif %}

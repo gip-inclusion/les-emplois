@@ -2,6 +2,7 @@ import functools
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -17,13 +18,17 @@ from itou.companies.enums import ProSupportReportBarrier
 from itou.companies.models import ProSupportReport
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.insertion.enums import OrientationRefusalReason
+from itou.insertion.models import Service
+from itou.insertion.opening_hours import format_osm_hours
 from itou.next_steps.models import BarrierStatus, JobSeekerBarrier, LiftCause
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     can_fill_pro_support_report,
+    can_orient_towards_insertion_service,
     can_view_pro_support_report,
 )
+from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
@@ -44,12 +49,26 @@ from itou.www.next_steps_views.advisors import (
     advisor_acts,
     visible_orientations,
 )
-from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER, gather_barriers, ongoing_orientations
+from itou.www.next_steps_views.barriers import (
+    BARRIER_ICONS,
+    OTHER,
+    SEARCH_CATEGORIES,
+    gather_barriers,
+    ongoing_orientations,
+    search_url,
+)
 from itou.www.next_steps_views.coverage import contract_lines, contract_steps, coverage, period
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
 from itou.www.next_steps_views.situation import contract_place, situation_sentences
+from itou.www.next_steps_views.solutions import (
+    RECEPTIONS,
+    job_seeker_city,
+    search_services,
+    service_url,
+    solutions_url,
+)
 
 
 def _journeys_media(request):
@@ -574,3 +593,82 @@ def barrier_statement(request, public_id, barrier, action):
     }
     title = "Frein levé" if status == BarrierStatus.LIFTED else "Frein revenu"
     return _drawer_or_page(request, "next_steps/barrier_statement.html", title, context)
+
+
+@readonly_view
+def solutions(request, public_id, barrier):
+    """« Trouver une solution »: the insertion services for a barrier, around the job seeker, in the side drawer.
+
+    What the services search finds for the barrier's category and the job seeker's city (see solutions.py); the full
+    search, with its other filters, one link away.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    key = barrier.upper()
+    if key not in SEARCH_CATEGORIES:
+        raise Http404
+    reception = request.GET.get("accueil", "")
+    if reception not in RECEPTIONS:
+        reception = ""
+    city = job_seeker_city(job_seeker)
+    services = pager(
+        search_services(city, key, reception) if city else Service.objects.none(),
+        request.GET.get("page"),
+        items_per_page=settings.PAGE_SIZE_SMALL,
+    )
+    for each in services:
+        each.drawer_url = service_url(job_seeker, each, key)
+    context = {
+        "job_seeker": job_seeker,
+        "label": ProSupportReportBarrier(key).label,
+        "icon": BARRIER_ICONS[key],
+        "city": city,
+        "services": services,
+        "receptions": [
+            (label, solutions_url(job_seeker, key, accueil=value), value == reception)
+            for value, label in RECEPTIONS.items()
+        ],
+        "more_url": solutions_url(job_seeker, key, accueil=reception, page=services.next_page_number())
+        if services.has_next()
+        else "",
+        "search_url": search_url(request, job_seeker, key),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : trouver une solution",
+    }
+    return _drawer_or_page(request, "next_steps/solutions.html", "Trouver une solution", context)
+
+
+@readonly_view
+def service(request, public_id, service_id):
+    """An insertion service in the side drawer: what helps choose it, then orient the job seeker towards it.
+
+    Orienting runs in the drawer (journeys.OrientationJourney), as the orientation wizard does; a service that
+    mobilizes on its own website links to it. The full service card stays one link away.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    service = get_object_or_404(
+        Service.objects.select_related("source", "fee", "structure").prefetch_related("publics", "receptions"),
+        pk=service_id,
+    )
+    key = request.GET.get("frein", "").upper()
+    can_orient = can_orient_towards_insertion_service(request)
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    full_query = {"back_url": page_url}
+    if can_orient:
+        full_query["job_seeker_public_id"] = job_seeker.public_id
+    context = {
+        "job_seeker": job_seeker,
+        "service": service,
+        "receptions": [reception.label for reception in service.receptions.all()],
+        "opening_hours": format_osm_hours(service.opening_hours),
+        "back_url": solutions_url(job_seeker, key) if key in SEARCH_CATEGORIES else "",
+        "orient_url": reverse(
+            "next_steps_views:journey", kwargs={"kind": "orientation", "pk": f"{job_seeker.public_id}.{service.pk}"}
+        )
+        if can_orient and service.is_orientable_via_internal_form
+        else "",
+        "external_url": service.lien_mobilisation if can_orient else "",
+        "full_url": reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}, query=full_query),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : service d’insertion",
+    }
+    return _drawer_or_page(request, "next_steps/service.html", service.name, context)
