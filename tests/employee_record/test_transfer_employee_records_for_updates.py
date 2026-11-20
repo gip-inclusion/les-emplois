@@ -10,7 +10,7 @@ from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecordBatch
+from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordTransition
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordFactory
 
@@ -260,3 +260,31 @@ def test_parse_file(snapshot, sftp_directory, caplog):
         re.sub(r"employee_record=\d+", "employee_record=[EMPLOYEE RECORD PK]", msg)
         for msg in process_output(caplog.messages)
     ] == snapshot(name="logs")
+
+
+@pytest.mark.usefixtures("mocked_sftp")
+def test_recreate_on_3446(sftp_directory, caplog):
+    employee_record = EmployeeRecordFactory(ready_for_transfer=True, status=Status.MODIFICATION_PENDING)
+
+    call_command("transfer_employee_records_for_updates", upload=True, download=False, preflight=False, wet_run=True)
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.MODIFICATION_SENT
+    assert employee_record.asp_batch_line_number == 1
+    assert employee_record.asp_batch_file is not None
+
+    process_incoming_file(sftp_directory, "3446", "Le PASS IAE n'est pas connu")
+
+    caplog.clear()
+    call_command("transfer_employee_records_for_updates", upload=False, download=True, preflight=False, wet_run=True)
+    employee_record.refresh_from_db()
+    assert employee_record.status == Status.READY
+    assert employee_record.asp_processing_code == "3446"
+    assert employee_record.archived_json.get("libelleTraitement") == "Le PASS IAE n'est pas connu"
+    expected_transitions = [
+        EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+        EmployeeRecordTransition.REJECT_MODIFICATION,
+        EmployeeRecordTransition.RECREATE,
+    ]
+    assert (
+        list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True)) == expected_transitions
+    )
