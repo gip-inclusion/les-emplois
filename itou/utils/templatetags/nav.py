@@ -126,6 +126,21 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidats-utilisateur",
     ),
+    # The experiment's prescriber menu: the people followed, without a sub-section. The PASS IAE extensions stay
+    # reachable from the list's tabs, for authorized prescribers.
+    "next-steps-prescriber-jobseekers": NavItem(
+        label="Usagers accompagnés",
+        icon="ri-team-line",
+        target=reverse_lazy("job_seekers_views:list"),
+        active_view_names=[
+            "job_seekers_views:list",
+            "job_seekers_views:list_organization",
+            "approvals:prolongation_requests_list",
+        ],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="candidats-utilisateur",
+    ),
     "prescriber-approval-prolongations": NavItem(
         label="Prolongations de PASS\xa0IAE",
         target=reverse_lazy("approvals:prolongation_requests_list", query={"only_pending": "on"}),
@@ -331,7 +346,8 @@ def _next_steps_entry(request):
 def nav(request):
     menu_items: list[NavItem | NavGroup] = [NAV_ENTRIES["home"]]
     try:
-        if can_view_next_steps(request):
+        next_steps = can_view_next_steps(request)
+        if next_steps:
             menu_items.append(_next_steps_entry(request))
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
@@ -346,12 +362,15 @@ def nav(request):
                     ],
                 )
             )
-            jobseekers_items = [
-                NAV_ENTRIES["prescriber-jobseekers-user"],
-            ]
-            if request.from_authorized_prescriber:
-                jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
-            menu_items.append(NavGroup(label="Accompagnements", icon="ri-team-line", items=jobseekers_items))
+            if next_steps:
+                menu_items.append(NAV_ENTRIES["next-steps-prescriber-jobseekers"])
+            else:
+                jobseekers_items = [
+                    NAV_ENTRIES["prescriber-jobseekers-user"],
+                ]
+                if request.from_authorized_prescriber:
+                    jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
+                menu_items.append(NavGroup(label="Accompagnements", icon="ri-team-line", items=jobseekers_items))
             organization_items = [
                 (
                     NAV_ENTRIES["prescriber-overview"]

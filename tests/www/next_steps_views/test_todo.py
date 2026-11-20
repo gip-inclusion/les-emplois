@@ -449,3 +449,39 @@ def test_menu_counts_the_urgent_actions(employer_client, employer_membership):
     JobApplicationFactory(to_company=company, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True)
     response = employer_client.get(reverse("dashboard:index"))
     assertContains(response, '<span class="visually-hidden">action urgente</span>', count=1)
+
+
+def menu_labels(response):
+    return [
+        (item.label, [sub.label for sub in item.items]) if hasattr(item, "items") else item.label
+        for item in response.context["menu_items"]
+    ]
+
+
+def test_prescriber_menu_has_no_accompaniment_section(client, settings, prescriber_membership):
+    client.force_login(prescriber_membership.user)
+
+    # Without the experiment: the « Accompagnements » section, with the PASS IAE extensions.
+    response = client.get(reverse("dashboard:index"))
+    assert ("Accompagnements", ["Usagers accompagnés", "Prolongations de PASS IAE"]) in menu_labels(response)
+
+    # With it: one entry, « Usagers accompagnés ».
+    settings.NEXT_STEPS_PRESCRIBER_ORGANIZATION_PKS = [prescriber_membership.organization.pk]
+    response = client.get(reverse("dashboard:index"))
+    labels = menu_labels(response)
+    assert "Usagers accompagnés" in labels
+    assert not any(isinstance(label, tuple) and label[0] == "Accompagnements" for label in labels)
+
+    # Active on the lists and on the PASS IAE extensions, which their tabs reach.
+    for url in [
+        reverse("job_seekers_views:list"),
+        reverse("job_seekers_views:list_organization"),
+        reverse("approvals:prolongation_requests_list"),
+    ]:
+        [entry] = [item for item in client.get(url).context["menu_items"] if item.label == "Usagers accompagnés"]
+        assert entry.active, url
+
+
+def test_employer_menu_keeps_its_accompaniment_section(employer_client):
+    labels = menu_labels(employer_client.get(reverse("dashboard:index")))
+    assert any(isinstance(label, tuple) and label[0] == "Accompagnements" for label in labels)
