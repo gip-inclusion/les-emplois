@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                         workflow=django_xworkflows.models._SerializedWorkflow(
                             initial_state="pending",
                             name="ResetRequestWorkflow",
-                            states=["pending", "accepted", "denied", "done"],
+                            states=["pending", "accepted", "denied", "cancelled", "done"],
                         ),
                     ),
                 ),

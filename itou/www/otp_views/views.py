@@ -70,7 +70,7 @@ def reset_request_self_cancel(request, template_name="otp_views/reset_request_se
     except ResetRequest.DoesNotExist:
         context["reset_request"] = reset_request = None
     if request.method == "POST" and reset_request:
-        reset_request.deny(user=request.user, msg=f"Using {request.path}")
+        reset_request.cancel(user=request.user, msg="Le lien d’annulation a été utilisé.")
         return HttpResponseRedirect(reverse("otp_views:reset_request_self_cancelled"))
     return render(request, template_name, context=context)
 
@@ -291,8 +291,9 @@ class VerifyOTPView(FormView):
     def form_valid(self, form):
         otp_login(self.request, self.request.user.otp_device)
         user_logged_in_with_2fa.send(sender=self.__class__, request=self.request, user=self.request.user)
-        ResetRequest.objects.filter(user=self.request.user).cancellable().deny(
-            user=self.request.user, msg="User successfully logged in with its current 2FA"
+        ResetRequest.objects.filter(user=self.request.user).cancellable().cancel(
+            user=self.request.user,
+            msg="Une connexion (incluant le second facteur) a eu lieu avec succès.",
         )  # Invalidate all 2FA reset requests as the user finally has it.
         return super().form_valid(form)
 
@@ -336,8 +337,8 @@ def login_with_backup_code(request, template_name="otp_views/login_with_backup_c
         # since the user seems to have lost them.
         ItouTOTPDevice.objects.filter(user=request.user, disabled_at=None).update(disabled_at=timezone.now())
         ItouStaticDevice.objects.filter(user=request.user).delete()
-        ResetRequest.objects.filter(user=request.user).cancellable().deny(
-            user=request.user, msg="L’utilisateur a réussi à utiliser un code de récupération."
+        ResetRequest.objects.filter(user=request.user).cancellable().cancel(
+            user=request.user, msg="Un code de récupération a été utilisé."
         )
         notify_backup_code_has_been_used(request.user)
 

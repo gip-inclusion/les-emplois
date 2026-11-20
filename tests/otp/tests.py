@@ -95,14 +95,17 @@ def test_mfa_reset_different_browser_and_different_ip_is_always_suspicious(times
     assert reset_request.is_suspicious
 
 
-def test_mfa_reset_close_expired_command():
+def test_mfa_reset_close_expired_command(django_capture_on_commit_callbacks, mailoutbox):
     long_ago = datetime.datetime(1984, 4, 4, tzinfo=datetime.UTC)
     with freeze_time(long_ago):
         reset_request = ResetRequestFactory()
-    call_command("close_expired_mfa_reset_requests")
+    with django_capture_on_commit_callbacks(execute=True):  # To run _async_send_message huey task
+        call_command("close_expired_mfa_reset_requests")
     reset_request.refresh_from_db()
-    assert reset_request.state == ResetRequestState.DENIED
-    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg="Request expired.").exists()
+    assert reset_request.state == ResetRequestState.CANCELLED
+    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg__contains="expiré").exists()
+    [email] = mailoutbox
+    assert "annulée" in email.subject
 
 
 def test_mfa_reset_close_expired_command_keeps_fresh_requests():
@@ -146,8 +149,8 @@ def test_mfa_reset_close_expired_command_grace_for_freshly_accepted_requests():
         call_command("close_expired_mfa_reset_requests")
 
     reset_request.refresh_from_db()
-    assert reset_request.state == ResetRequestState.DENIED
-    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg="Request expired.").exists()
+    assert reset_request.state == ResetRequestState.CANCELLED
+    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg__contains="expiré").exists()
 
 
 def test_mfa_reset_close_expired_command_grace_for_freshly_resent_requests():
@@ -185,5 +188,5 @@ def test_mfa_reset_close_expired_command_grace_for_freshly_resent_requests():
         call_command("close_expired_mfa_reset_requests")
 
     reset_request.refresh_from_db()
-    assert reset_request.state == ResetRequestState.DENIED
-    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg="Request expired.").exists()
+    assert reset_request.state == ResetRequestState.CANCELLED
+    assert ResetRequestTransitionLog.objects.filter(reset_request=reset_request, msg__contains="expiré").exists()

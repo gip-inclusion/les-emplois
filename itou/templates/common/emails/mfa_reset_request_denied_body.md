@@ -2,6 +2,7 @@
 {% block body %}
 
 Bonjour {{ user.get_full_name }},
+
 Votre demande de réinitialisation de vos paramètres de double authentification a été refusée.
 Si elle provenait bien de vous et que vous êtes toujours bloqué(e) :
 
