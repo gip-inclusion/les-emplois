@@ -1309,6 +1309,9 @@ class ProSupportReport(models.Model):
     The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
     """
 
+    # Leaves the prescriber time to get in touch first: no read email then.
+    READ_EMAIL_DELAY = timedelta(hours=1)
+
     public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     job_seeker = models.ForeignKey(
@@ -1381,6 +1384,9 @@ class ProSupportReport(models.Model):
         related_name="+",
     )
     first_read_at = models.DateTimeField(verbose_name="date de première lecture", null=True, blank=True)
+    read_email_sent_at = models.DateTimeField(
+        verbose_name="date de l’e-mail signalant la lecture du bilan", null=True, blank=True
+    )
 
     objects = ProSupportReportQuerySet.as_manager()
 
@@ -1413,21 +1419,24 @@ class ProSupportReport(models.Model):
     def author_has_left(self):
         return self.company_id is not None and not self.company.has_member(self.author)
 
-    def notify_authorized_prescriber(self):
+    def get_last_authorized_prescriber_assignment(self, professional_id=None):
         from itou.users.models import JobSeekerAssignment
+
+        assignments = JobSeekerAssignment.objects.filter(
+            job_seeker_id=self.job_seeker_id,
+            prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+        if professional_id is not None:
+            assignments = assignments.filter(professional_id=professional_id)
+        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
+        return (
+            assignments.select_related("professional", "prescriber_organization").order_by("-last_action_at").first()
+        )
+
+    def notify_authorized_prescriber(self):
         from itou.users.notifications import ProSupportReportCreatedNotification
 
-        # Ended assignments included: the last authorized prescriber may have closed the follow-up.
-        assignment = (
-            JobSeekerAssignment.objects.filter(
-                job_seeker_id=self.job_seeker_id,
-                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
-            )
-            .select_related("professional", "prescriber_organization")
-            .order_by("-last_action_at")
-            .first()
-        )
-        if assignment:
+        if assignment := self.get_last_authorized_prescriber_assignment():
             self.notified_prescriber = assignment.professional
             self.save(update_fields=["notified_prescriber"])
             ProSupportReportCreatedNotification(
@@ -1447,6 +1456,19 @@ class ProSupportReport(models.Model):
             # The person who received the email, even if someone else would be chosen today.
             return self.introduction_email_recipient
         return self.get_company_contact()
+
+    def notify_read(self, contact):
+        from itou.companies.notifications import ProSupportReportReadNotification
+
+        # Without an organization: it may have lost its authorization since the report was sent.
+        assignment = self.get_last_authorized_prescriber_assignment(professional_id=self.notified_prescriber_id)
+        ProSupportReportReadNotification(
+            contact,
+            self.company,
+            report=self,
+            prescriber=self.notified_prescriber,
+            prescriber_organization=assignment and assignment.prescriber_organization,
+        ).send()
 
     def introduction_email(self, contact, prescriber, prescriber_organization):
         to = [contact.email]

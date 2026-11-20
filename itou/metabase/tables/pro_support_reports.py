@@ -75,6 +75,14 @@ TABLE.add_columns(
             ),
         ),
         get_column_from_field(
+            get_model_field(ProSupportReport, "read_email_sent_at"),
+            name="date_mail_bilan_consulté",
+            comment=(
+                "Date à laquelle la structure a été prévenue par e-mail de la première lecture du bilan, "
+                "y compris si le destinataire a désactivé cette notification, vide sinon"
+            ),
+        ),
+        get_column_from_field(
             get_model_field(ProSupportReport, "contract"),
             name="id_contrat_asp",
             comment=(

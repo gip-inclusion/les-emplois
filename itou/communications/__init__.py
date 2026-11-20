@@ -16,6 +16,7 @@ class NotificationCategory(StrEnum):
     JOB_DESCRIPTION = "Gestion des fiches de poste"
     SECURITY = "Sécurité"
     ORIENTATION = "Orientation"
+    END_OF_JOURNEY = "Fin de parcours"
 
 
 class NotificationRegistry:
