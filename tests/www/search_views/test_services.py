@@ -120,20 +120,6 @@ class TestSearchServices:
         assertContains(response, "Vous orientez actuellement")
         assertContains(response, "vers un service")
 
-    def test_keyword_error_suppression(self, client):
-        vannes = create_city_vannes()
-
-        # Choosing to "orienter" a job seeker from the job seekers list
-        # pre-fills the form with a job seeker city, but the keyword field
-        # isn’t yet populated.
-        response = client.get(self.URL, {"city": vannes.slug})
-        error_message = "Votre formulaire contient une erreur"
-        assertContains(response, "Veuillez renseigner un mot-clé pour voir les résultats.")
-        assertNotContains(response, error_message)
-
-        response = client.get(self.URL, {"city": "", "keyword": "keyword"})
-        assertContains(response, error_message)
-
     def test_no_results(self, client):
         vannes = create_city_vannes()
         response = client.get(self.URL, {"city": vannes.slug, "keyword": KEYWORD})
@@ -406,3 +392,44 @@ class TestSearchServices:
         assertContains(response, FUNDING_LABEL_FILTER[1:])
         response = htmx_client.get(self.URL, params)  # No HX-Current-URL header.
         assertContains(response, FUNDING_LABEL_FILTER[1:])
+
+    def test_search_city_only(self, client):
+        vannes = create_city_vannes()
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes")
+        remote.receptions.set([RemoteReceptionFactory()])
+        ServiceFactory()
+        Service.include_inactive.update_search_index()
+
+        params = {"city": vannes.slug}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person])
+
+        # Other filters work
+        params = {"city": vannes.slug, "reception": "tous"}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, remote])
+
+    def test_search_keyword_only(self, client):
+        vannes = create_city_vannes()
+        thematic_metier = GenericReferenceItemFactory(
+            kind=GenericReferenceItemKind.THEMATIC,
+            value="choisir-un-metier--confirmer-son-choix-de-metier",
+            label="Confirmer son choix de métier",
+        )
+
+        in_person = ServiceFactory(coordinates=vannes.coords, city="Vannes", name=KEYWORD)
+        remote = ServiceFactory(coordinates=vannes.coords, city="Vannes", structure__name=KEYWORD)
+        remote.receptions.set([RemoteReceptionFactory()])
+        no_coords = ServiceFactory(city="", coordinates=None)  # thematic value contains KEYWORD
+        ServiceFactory(thematics=[thematic_metier])
+        Service.include_inactive.update_search_index()
+
+        params = {"keyword": KEYWORD}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, no_coords])
+
+        # Other filters work
+        params = {"keyword": KEYWORD, "reception": "tous"}
+        response = client.get(self.URL, params)
+        assertQuerySetEqual(response.context["results"], [in_person, remote, no_coords])

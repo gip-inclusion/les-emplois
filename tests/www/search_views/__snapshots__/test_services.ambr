@@ -110,6 +110,7 @@
       dict({
         'origin': list([
           'in_person_reception_ids[insertion/models.py]',
+          'ServiceQuerySet._get_filters[insertion/models.py]',
           'ServiceQuerySet.filter_search[insertion/models.py]',
           'ServiceQuerySet.search[insertion/models.py]',
           'search_services_results[www/search_views/views.py]',
@@ -133,6 +134,12 @@
           INNER JOIN "insertion_service_receptions" ON ("insertion_service"."id" = "insertion_service_receptions"."service_id")
           WHERE ("insertion_service"."is_active"
                  AND "insertion_service"."coordinates" IS NOT NULL
+                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
+                                                                        %s,
+                                                                        %s])::varchar[]
+                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
+                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
+                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "insertion_service_thematics" U0
@@ -140,12 +147,6 @@
                            AND U0."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
-                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
-                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
-                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
-                                                                        %s,
-                                                                        %s])::varchar[]
-                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (
                                                                                           (SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
                                                                                            FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
@@ -191,6 +192,12 @@
           INNER JOIN "insertion_service_receptions" ON ("insertion_service"."id" = "insertion_service_receptions"."service_id")
           WHERE ("insertion_service"."is_active"
                  AND "insertion_service"."coordinates" IS NOT NULL
+                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
+                                                                        %s,
+                                                                        %s])::varchar[]
+                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
+                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
+                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "insertion_service_thematics" U0
@@ -198,12 +205,6 @@
                            AND U0."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
-                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
-                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
-                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
-                                                                        %s,
-                                                                        %s])::varchar[]
-                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (
                                                                                           (SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
                                                                                            FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
@@ -294,13 +295,13 @@
                  "insertion_service"."updated_at",
                  "insertion_service"."search_vector",
                  "insertion_service"."extra",
-                 (ST_Distance("insertion_service"."coordinates", %s) / %s) AS "distance",
                  EXISTS
             (SELECT %s AS "a"
              FROM "insertion_service_thematics" U0
              WHERE (U0."genericreferenceitem_id" IN (%s)
                     AND U0."service_id" = ("insertion_service"."id"))
              LIMIT 1) AS "has_thematic",
+                 (ST_Distance("insertion_service"."coordinates", %s) / %s) AS "distance",
                  (%s - ((ST_Distance("insertion_service"."coordinates", %s) / %s) / %s)) AS "distance_score",
                  %s AS "is_in_person",
                  %s AS "is_remote",
@@ -370,6 +371,12 @@
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           WHERE ("insertion_service"."is_active"
                  AND "insertion_service"."coordinates" IS NOT NULL
+                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
+                                                                        %s,
+                                                                        %s])::varchar[]
+                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
+                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
+                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
                     FROM "insertion_service_thematics" U0
@@ -377,12 +384,6 @@
                            AND U0."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
-                 AND ST_DWithin("insertion_service"."coordinates", %s, %s)
-                 AND "insertion_service_receptions"."genericreferenceitem_id" IN (%s)
-                 AND ("insertion_service"."eligibility_zones" && (ARRAY[%s,
-                                                                        %s,
-                                                                        %s])::varchar[]
-                      OR "insertion_service"."eligibility_zones" = %s::varchar[])
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (
                                                                                           (SELECT string_agg('(' || concat_ws('|', quote_literal(lexeme), expansion.variants) || ')', ' & ')
                                                                                            FROM unnest(tsvector_to_array(to_tsvector('french_unaccent', %s))) AS lexeme
@@ -422,7 +423,9 @@
          <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xl text-tertiary">
          </i>
         </label>
-        <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Ville ou code postal" data-service-search-city="true" data-theme="bootstrap-5" id="id_services_city" lang="fr" name="city" required="">
+        <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="true" data-minimum-input-length="2" data-placeholder="Ville ou code postal" data-service-search-city="true" data-theme="bootstrap-5" id="id_services_city" lang="fr" name="city">
+         <option value="">
+         </option>
         </select>
        </div>
        <div class="input-group input-group-search input-group-lg flex-nowrap align-items-center">
@@ -433,11 +436,11 @@
          <i aria-hidden="true" class="ri-compass-3-line fw-medium ri-xl text-tertiary">
          </i>
         </label>
-        <div class="w-100 form-group-required">
+        <div class="w-100">
          <label class="visually-hidden" for="id_services_keyword">
           Entrez un mot-clé
          </label>
-         <input class="form-control" id="id_services_keyword" name="keyword" placeholder="Mot-clé, nom de structure, thématique" required="" type="text"/>
+         <input class="form-control" id="id_services_keyword" name="keyword" placeholder="Mot-clé, nom de structure, thématique" type="text"/>
         </div>
        </div>
        <div class="input-group input-group-lg">

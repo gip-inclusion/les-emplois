@@ -1695,7 +1695,6 @@ class TestSearchWithoutCity:
             ("search:employers_results", "Renseignez une ville pour lancer la recherche."),
             ("search:job_descriptions_results", "Renseignez une ville pour lancer la recherche."),
             ("search:prescribers_results", "Renseignez une ville pour lancer la recherche."),
-            ("search:services_results", "Renseignez une ville et une thématique pour lancer la recherche."),
         ],
     )
     def test_unsearched_page_does_not_claim_empty_results(self, client, url_name, empty_text):

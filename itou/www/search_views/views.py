@@ -423,7 +423,6 @@ def search_services_results(request, template_name="search/services/results.html
     services = Service.objects.none()
     display_funding_labels_filter = False
 
-    suppress_keyword_error = False
     if form.is_valid():
         city = form.cleaned_data["city"]
         keyword = form.cleaned_data["keyword"]
@@ -464,19 +463,6 @@ def search_services_results(request, template_name="search/services/results.html
             if funding_label in available_funding_labels
         ]:
             services = services.filter(extra__funding_labels__has_any_keys=selected_funding_labels)
-    elif len(form.errors) == 1:
-        try:
-            # When searching for a job seeker (param job_seeker_public_id), the
-            # location is pre-filled with their city_slug. A keyword is
-            # also required, so the initial page load displays an error.
-            [keyword_error] = form.errors["keyword"]
-        except KeyError, ValueError:
-            pass
-        else:
-            # Keyword not provided or empty.
-            suppress_keyword_error = not request.GET.get("keyword")
-            if suppress_keyword_error:
-                del form.errors["keyword"]
 
     banner_context = get_orient_for_job_seeker_context(request)
     job_seeker = banner_context["job_seeker"]
@@ -490,7 +476,6 @@ def search_services_results(request, template_name="search/services/results.html
         "form": form,
         "city": city,
         "keyword": keyword,
-        "suppress_keyword_error": suppress_keyword_error,
         "display_funding_labels_filter": display_funding_labels_filter,
         "refresh_funding_labels_filter": _must_refresh_funding_labels_filter(request),
         "results": results,
