@@ -17,7 +17,8 @@ runs:
         CLEVER_TOOLS_VERSION: "5.4.0"
         CLEVER_TOOLS_SHA256: "017edd8aed89360c84f2ea383df0db62439a66261b248053a15b9966c7fb8ea3"
       # The CLI receives the Clever credentials: the checksum guards against a tampered download.
-      run: |
+      # GITHUB_ENV only receives a constant path
+      run: | # zizmor: ignore[github-env]
         archive="$RUNNER_TEMP/clever-tools-${CLEVER_TOOLS_VERSION}_linux.tar.gz"
         curl --fail --silent --show-error --location --output "$archive" \
           "https://github.com/CleverCloud/clever-tools/releases/download/${CLEVER_TOOLS_VERSION}/clever-tools-${CLEVER_TOOLS_VERSION}_linux.tar.gz"
