@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 
 from itou.institutions.enums import InstitutionKind
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
@@ -288,6 +289,15 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="institution-geiq-bilan-execution",
     ),
+    # Professionals
+    "professionals-authorizations-list": NavItem(
+        label="Gestion des habilitations",
+        target=reverse_lazy("professionals_views:authorizations_list"),
+        active_view_names=["professionals_views:authorizations_list"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="professionnels-liste-habilitations",
+    ),
 }
 
 
@@ -302,6 +312,19 @@ def nav(request):
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:
+            if (
+                request.current_organization.kind == PrescriberOrganizationKind.DEPT
+                and request.is_current_organization_admin
+            ):
+                menu_items.append(
+                    NavGroup(
+                        label="Territoire",
+                        icon="ri-global-line",
+                        items=[
+                            NAV_ENTRIES["professionals-authorizations-list"],
+                        ],
+                    )
+                )
             menu_items.append(
                 NavGroup(
                     label="Demandes envoyées",
@@ -361,12 +384,17 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.from_institution:
+            territory_items = []
+            if request.current_organization.kind == InstitutionKind.DDETS_IAE:
+                territory_items.append(NAV_ENTRIES["professionals-authorizations-list"])
             if request.current_organization.kind in [InstitutionKind.DDETS_IAE, InstitutionKind.DREETS_IAE]:
+                territory_items.append(NAV_ENTRIES["institutional-organizations-list"])
+            if territory_items:
                 menu_items.append(
                     NavGroup(
-                        items=[NAV_ENTRIES["institutional-organizations-list"]],
                         label="Territoire",
                         icon="ri-global-line",
+                        items=territory_items,
                     )
                 )
             menu_items.append(
