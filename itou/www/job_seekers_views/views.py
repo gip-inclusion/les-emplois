@@ -74,6 +74,7 @@ from itou.www.job_seekers_views.forms import (
     ProSupportReportForm,
     SwitchStalledStatusForm,
 )
+from itou.www.next_steps_views.access import can_view_next_steps
 
 
 logger = logging.getLogger(__name__)
@@ -811,6 +812,19 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
 
     job_seekers_ids = assignments_qs.values_list("job_seeker_id", flat=True).distinct()
+    in_scope = Q(pk__in=job_seekers_ids)
+
+    # The "Prochaines étapes" experiment: the people whose PASS IAE extension awaits a decision are listed too,
+    # since the extensions no longer have their own tab. Those assigned to the user, or to the whole structure.
+    next_steps_prescriber = request.from_prescriber and can_view_next_steps(request)
+    prolongation_requests = None
+    if next_steps_prescriber and request.from_authorized_prescriber:
+        prolongation_requests = ProlongationRequest.objects.filter(
+            prescriber_organization=request.current_organization, status=ProlongationRequestStatus.PENDING
+        )
+        if not list_organization:
+            prolongation_requests = prolongation_requests.filter(assigned_to=request.user)
+        in_scope |= Q(pk__in=prolongation_requests.values("approval__user"))
 
     subquery_count = Subquery(
         user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
@@ -834,13 +848,14 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .values("id")[:1],
         output_field=IntegerField(),
     )
-    queryset = User.objects.with_advisors_count().filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
+    queryset = User.objects.with_advisors_count().filter(Q(kind=UserKind.JOB_SEEKER) & in_scope)
 
     form = FilterForm(
         queryset,
         request.GET,
         request=request,
         from_all_coworkers=list_organization,
+        prolongation_requests=prolongation_requests,
     )
 
     filters_counter = 0
@@ -903,6 +918,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     except ValueError:
         order = JobSeekerOrder.LAST_ACTION_AT_DESC
     queryset = queryset.order_by(*order.order_by)
+    if prolongation_requests is not None:
+        queryset = queryset.annotate(
+            pending_prolongation_request_id=Subquery(
+                prolongation_requests.filter(approval__user=OuterRef("pk")).order_by("created_at").values("pk")[:1]
+            )
+        )
     if request_from_siae:
         queryset = queryset.with_end_of_journey(
             siae=request.current_organization
@@ -939,11 +960,13 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
         has_job_seekers_with_more_actions = has_job_seekers_with_more_actions or job_seeker.show_more_actions
         job_seeker.services_search_url = build_services_search_url(request, job_seeker)
+        job_seeker.pending_prolongation_request_id = getattr(job_seeker, "pending_prolongation_request_id", None)
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
         "can_orient_towards_insertion_service": can_orient_towards_insertion_service(request),
         "list_organization": list_organization,
+        "next_steps_prescriber": next_steps_prescriber,
         "filters_form": form,
         "filters_counter": filters_counter,
         "has_job_seekers_with_more_actions": has_job_seekers_with_more_actions,

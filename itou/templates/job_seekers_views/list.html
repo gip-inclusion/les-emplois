@@ -33,7 +33,10 @@
 {% endblock %}
 
 {% block title_extra %}
-    {% include "job_seekers_views/includes/assignments_nav_tabs.html" with request=request num_rejected_employee_records=num_rejected_employee_records active_tab=list_organization|yesno:"all_assignments,assignments" only %}
+    {# The "Prochaines étapes" experiment: no tabs, a switch for the whole structure and the extensions in the list. #}
+    {% if not next_steps_prescriber %}
+        {% include "job_seekers_views/includes/assignments_nav_tabs.html" with request=request num_rejected_employee_records=num_rejected_employee_records active_tab=list_organization|yesno:"all_assignments,assignments" only %}
+    {% endif %}
 {% endblock title_extra %}
 
 {% block content %}
@@ -43,15 +46,30 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="col-12">
-                    <h2 class="mb-3 mb-md-4">
-                        {% if request.from_prescriber and list_organization %}
-                            Usagers accompagnés de la structure
-                        {% else %}
-                            Usagers accompagnés
+                {% if next_steps_prescriber %}
+                    <div class="col-12 d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2 mb-3 mb-md-4">
+                        <h2 class="mb-0">
+                            {% if list_organization %}
+                                Usagers accompagnés de la structure
+                            {% else %}
+                                Usagers accompagnés
+                            {% endif %}
+                        </h2>
+                        {% if request.current_organization.memberships.count > 1 %}
+                            {% include "job_seekers_views/includes/structure_switch.html" with list_organization=list_organization only %}
                         {% endif %}
-                    </h2>
-                </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <h2 class="mb-3 mb-md-4">
+                            {% if request.from_prescriber and list_organization %}
+                                Usagers accompagnés de la structure
+                            {% else %}
+                                Usagers accompagnés
+                            {% endif %}
+                        </h2>
+                    </div>
+                {% endif %}
             </div>
             {% if list_organization %}
                 {% url 'job_seekers_views:list_organization' as url_list %}
@@ -78,7 +96,7 @@
                         </div>
                         <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}</div>
                     </div>
-                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request csrf_token=csrf_token order=order can_orient_towards_insertion_service=can_orient_towards_insertion_service has_job_seekers_with_more_actions=has_job_seekers_with_more_actions show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active contracts_ending_soon_count=contracts_ending_soon_count last_contract_ended_count=last_contract_ended_count end_of_journey_count=end_of_journey_count list_organization=list_organization only %}
+                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request csrf_token=csrf_token order=order can_orient_towards_insertion_service=can_orient_towards_insertion_service has_job_seekers_with_more_actions=has_job_seekers_with_more_actions show_end_of_contracts_banner=show_end_of_contracts_banner end_of_journey_filter_active=end_of_journey_filter_active contracts_ending_soon_count=contracts_ending_soon_count last_contract_ended_count=last_contract_ended_count end_of_journey_count=end_of_journey_count list_organization=list_organization next_steps_prescriber=next_steps_prescriber only %}
                 </div>
             </div>
         </div>

@@ -1,0 +1,16 @@
+{# The "Prochaines étapes" experiment: the whole structure's job seekers, or the user's, in place of the tabs. #}
+{% if list_organization %}
+    {% url "job_seekers_views:list" as switch_url %}
+{% else %}
+    {% url "job_seekers_views:list_organization" as switch_url %}
+{% endif %}
+<form method="get" action="{{ switch_url }}" class="submit-on-change" id="job-seekers-structure-switch">
+    <div class="form-check form-switch mb-0">
+        <input type="checkbox"
+               class="form-check-input"
+               role="switch"
+               id="id_structure_job_seekers"
+               {% if list_organization %}checked{% endif %} />
+        <label class="form-check-label" for="id_structure_job_seekers">Tous les usagers de la structure</label>
+    </div>
+</form>

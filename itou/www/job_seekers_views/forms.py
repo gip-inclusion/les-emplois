@@ -2,7 +2,7 @@ import datetime
 
 from django import forms
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Exists, OuterRef, Q, Subquery, TextChoices, Value
+from django.db.models import BooleanField, Exists, ExpressionWrapper, OuterRef, Q, Subquery, TextChoices, Value
 from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
@@ -81,8 +81,11 @@ class FilterForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, job_seeker_qs, data, *args, request, from_all_coworkers, **kwargs):
+    def __init__(self, job_seeker_qs, data, *args, request, from_all_coworkers, prolongation_requests=None, **kwargs):
         super().__init__(data, *args, **kwargs)
+        # The "Prochaines étapes" experiment lists the people whose PASS IAE extension awaits a decision, followed
+        # or not: these pending requests.
+        self.prolongation_requests = prolongation_requests
         self.professional = request.user
         self.organization = request.current_organization
         self.from_all_coworkers = from_all_coworkers
@@ -232,16 +235,25 @@ class FilterForm(forms.Form):
             "archived": ARCHIVED_ASSIGNMENTS.get(assignments_filter),
         }
         assignments = JobSeekerAssignment.objects.assigned_to(**assigned_to_kwargs)
-        queryset = queryset.filter(pk__in=assignments.values_list("job_seeker_id", flat=True)).annotate(
+        in_scope = Q(pk__in=assignments.values_list("job_seeker_id", flat=True))
+        archived = (
+            Value(True)
+            if assignments_filter == AssignmentsChoices.ARCHIVED
+            else ~Exists(assignments.filter(job_seeker=OuterRef("pk")).filter(ended_at=None))
+        )
+        if self.prolongation_requests is not None and assignments_filter != AssignmentsChoices.ARCHIVED:
+            in_scope |= Q(pk__in=self.prolongation_requests.values("approval__user"))
+            # Only someone once followed is archived, not someone listed for their extension alone.
+            all_assignments = JobSeekerAssignment.objects.assigned_to(
+                **(assigned_to_kwargs | {"archived": None})
+            ).filter(job_seeker=OuterRef("pk"))
+            archived = ExpressionWrapper(archived & Exists(all_assignments), output_field=BooleanField())
+        queryset = queryset.filter(in_scope).annotate(
             advisors=ArrayAgg(
                 "job_seeker_assignments__professional",
                 distinct=True,
             ),
-            archived=(
-                Value(True)
-                if assignments_filter == AssignmentsChoices.ARCHIVED
-                else ~Exists(assignments.filter(job_seeker=OuterRef("pk")).filter(ended_at=None))
-            ),
+            archived=archived,
         )
 
         # Organization members

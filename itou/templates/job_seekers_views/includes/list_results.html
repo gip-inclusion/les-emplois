@@ -62,6 +62,10 @@
                                                role="button"
                                                tabindex="0"></i>
                                         {% endif %}
+                                        {% if next_steps_prescriber and job_seeker.pending_prolongation_request_id %}
+                                            <a href="{% url "approvals:prolongation_request_show" prolongation_request_id=job_seeker.pending_prolongation_request_id %}"
+                                               class="badge badge-sm rounded-pill bg-warning text-white text-decoration-none ms-1">Demande de prolongation</a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             {% endif %}
