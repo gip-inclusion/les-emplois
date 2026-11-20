@@ -119,8 +119,27 @@ class Command(EmployeeRecordTransferCommand):
                     )
                     if processing_code == EmployeeRecord.ASP_UNKNOWN_APPROVAL_CODE:
                         # The employee record is apparently missing on ASP side and cannot be updated:
-                        # try to recreate it from scratch.
-                        employee_record.recreate()
+                        # recreating it from scratch might be the solution.
+                        # But first, check for the record transition history to prevent endless cycle
+                        last_logs = list(
+                            employee_record.logs.order_by("-timestamp").values_list(
+                                "transition", "asp_processing_code"
+                            )[:7]
+                        )
+                        if last_logs == [
+                            ("reject_modification", "3446"),
+                            ("wait_for_modification_asp_response", None),
+                            ("schedule_modification", None),
+                            ("process", "3436"),
+                            ("wait_for_asp_response", None),
+                            ("recreate", None),
+                            ("reject_modification", "3446"),
+                        ]:
+                            self.logger.error(
+                                "Transition cycle detected for employee_record=%d - NOT recreating", employee_record.pk
+                            )
+                        else:
+                            employee_record.recreate()
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 

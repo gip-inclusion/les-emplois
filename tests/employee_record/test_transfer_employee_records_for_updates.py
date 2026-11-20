@@ -10,7 +10,7 @@ from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordTransition
+from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordFactory
 
@@ -263,8 +263,35 @@ def test_parse_file(snapshot, sftp_directory, caplog):
 
 
 @pytest.mark.usefixtures("mocked_sftp")
-def test_recreate_on_3446(sftp_directory, caplog):
-    employee_record = EmployeeRecordFactory(ready_for_transfer=True, status=Status.MODIFICATION_PENDING)
+@pytest.mark.parametrize("with_cycle", [True, False])
+def test_recreate_on_3446(sftp_directory, caplog, with_cycle):
+    if with_cycle:
+        employee_record = EmployeeRecordFactory(ready_for_transfer=True, status=Status.PROCESSED)
+        employee_record.schedule_modification()
+        call_command(
+            "transfer_employee_records_for_updates", upload=True, download=False, preflight=False, wet_run=True
+        )
+        process_incoming_file(sftp_directory, "3446", "Le PASS IAE n'est pas connu")
+        call_command(
+            "transfer_employee_records_for_updates", upload=False, download=True, preflight=False, wet_run=True
+        )
+        employee_record.refresh_from_db()
+        assert employee_record.status == Status.READY
+        # Tweak asp_batch_file name to avoid "<filename >has already been used" error
+        FAKE_FIRST_FILE = "RIAE_FS_20261203123456.json"
+        EmployeeRecordTransitionLog.objects.update(asp_batch_file=FAKE_FIRST_FILE)
+
+        call_command("transfer_employee_records", upload=True, download=False, preflight=False, wet_run=True)
+        process_incoming_file(sftp_directory, "3436", "Un PASS IAE doit être unique pour un même SIRET")
+        call_command("transfer_employee_records", upload=False, download=True, preflight=False, wet_run=True)
+        employee_record.refresh_from_db()
+        assert employee_record.status == Status.MODIFICATION_PENDING
+        # Tweak asp_batch_file name to avoid "<filename >has already been used" error
+        EmployeeRecordTransitionLog.objects.exclude(asp_batch_file=FAKE_FIRST_FILE).update(
+            asp_batch_file="RIAE_FS_20261203130000.json"
+        )
+    else:
+        employee_record = EmployeeRecordFactory(ready_for_transfer=True, status=Status.MODIFICATION_PENDING)
 
     call_command("transfer_employee_records_for_updates", upload=True, download=False, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
@@ -277,14 +304,26 @@ def test_recreate_on_3446(sftp_directory, caplog):
     caplog.clear()
     call_command("transfer_employee_records_for_updates", upload=False, download=True, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
-    assert employee_record.status == Status.READY
     assert employee_record.asp_processing_code == "3446"
     assert employee_record.archived_json.get("libelleTraitement") == "Le PASS IAE n'est pas connu"
-    expected_transitions = [
-        EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
-        EmployeeRecordTransition.REJECT_MODIFICATION,
-        EmployeeRecordTransition.RECREATE,
-    ]
-    assert (
-        list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True)) == expected_transitions
-    )
+    transitions = list(employee_record.logs.order_by("timestamp").values_list("transition", flat=True))
+    if with_cycle:
+        assert transitions == [
+            EmployeeRecordTransition.SCHEDULE_MODIFICATION,
+            EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+            EmployeeRecordTransition.REJECT_MODIFICATION,
+            EmployeeRecordTransition.RECREATE,
+            EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+            EmployeeRecordTransition.PROCESS,
+            EmployeeRecordTransition.SCHEDULE_MODIFICATION,
+            EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+            EmployeeRecordTransition.REJECT_MODIFICATION,
+        ]
+        assert employee_record.status == Status.MODIFICATION_REJECTED
+    else:
+        assert transitions == [
+            EmployeeRecordTransition.WAIT_FOR_MODIFICATION_ASP_RESPONSE,
+            EmployeeRecordTransition.REJECT_MODIFICATION,
+            EmployeeRecordTransition.RECREATE,
+        ]
+        assert employee_record.status == Status.READY
