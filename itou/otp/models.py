@@ -21,11 +21,7 @@ from django_xworkflows import models as xwf_models
 from encrypted_fields import EncryptedCharField
 
 from itou.audit_trail.models import AuditTrail, AuditTrailEventType
-from itou.otp.emails import (
-    notify_mfa_reset_request_accepted,
-    notify_mfa_reset_request_denied,
-    notify_mfa_reset_request_done,
-)
+from itou.otp import emails
 from itou.otp.enums import ResetRequestState, ResetRequestTransition
 from itou.utils.models import CopyModelFieldsMeta
 from itou.utils.urls import get_absolute_url
@@ -187,16 +183,17 @@ class ResetRequestWorkflow(xwf_models.Workflow):
         (ResetRequestTransition.ACCEPT, ResetRequestState.PENDING, ResetRequestState.ACCEPTED),
         (ResetRequestTransition.RESEND, ResetRequestState.ACCEPTED, ResetRequestState.ACCEPTED),
         (ResetRequestTransition.DENY, ACTIVE_STATES, ResetRequestState.DENIED),
+        (ResetRequestTransition.CANCEL, ACTIVE_STATES, ResetRequestState.CANCELLED),
         (ResetRequestTransition.RESET_DEVICES, ResetRequestState.ACCEPTED, ResetRequestState.DONE),
     )
     initial_state = ResetRequestState.PENDING
 
 
 class ResetRequestQuerySet(models.QuerySet):
-    def deny(self, *, user=None, msg=None):
-        """Deny all Reset Request of this QuerySet."""
+    def cancel(self, *, user=None, msg=None):
+        """Cancel all Reset Request of this QuerySet."""
         for request in self.select_for_update(of=("self",), no_key=True):
-            request.deny(user=user, msg=msg)
+            request.cancel(user=user, msg=msg)
 
     def cancellable(self):
         return self.filter(state__in=ResetRequestWorkflow.ACTIVE_STATES)
@@ -216,7 +213,7 @@ class ResetRequestQuerySet(models.QuerySet):
     def close_expired_requests(self):
         expired_requests = self.expired_requests().select_for_update(of=("self",), no_key=True)
         for request in expired_requests:
-            request.deny(msg="Request expired.")
+            request.cancel(msg="Cette demande de réinitialisation de 2FA a expiré.")
         return len(expired_requests)
 
 
@@ -253,22 +250,26 @@ class ResetRequest(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *, user=None, msg=None):
-        notify_mfa_reset_request_accepted(self)
+        emails.notify_mfa_reset_request_accepted(self)
 
     @xwf_models.transition()
     def deny(self, *, user=None, msg=None):
-        notify_mfa_reset_request_denied(self)
+        emails.notify_mfa_reset_request_denied(self)
+
+    @xwf_models.transition()
+    def cancel(self, *, user=None, msg=None):
+        emails.notify_mfa_reset_request_cancelled(self, msg)
 
     @xwf_models.transition()
     def resend(self, *, user=None, msg=None):
-        notify_mfa_reset_request_accepted(self)
+        emails.notify_mfa_reset_request_accepted(self)
 
     @xwf_models.transition()
     def reset_devices(self, *, user=None, msg=None) -> int:
         """Invalidates or deletes all 2FA user devices."""
         disabled = ItouTOTPDevice.objects.disable_for_user(self.user)
         deleted, _ = ItouStaticDevice.objects.filter(user=self.user).delete()
-        notify_mfa_reset_request_done(self)
+        emails.notify_mfa_reset_request_done(self)
         return disabled + deleted
 
     @xworkflows.transition_check(ResetRequestTransition.RESET_DEVICES)

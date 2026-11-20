@@ -759,7 +759,7 @@ def test_mfa_reset_cannot_request_twice(client, settings, accept_it):
 
 
 @pytest.mark.parametrize("accept_it", [True, False])
-def test_mfa_reset_self_cancel(client, settings, accept_it):
+def test_mfa_reset_self_cancel(client, settings, accept_it, mailoutbox):
     settings.REQUIRE_OTP_FOR_STAFF = True
     user = ItouStaffFactory(with_verified_email=True)
     ItouTOTPDeviceFactory(name="1", user=user)
@@ -776,7 +776,10 @@ def test_mfa_reset_self_cancel(client, settings, accept_it):
     response = client.post(reset_request_cancel_url, follow=True)
     assertContains(response, "Demande de réinitialisation annulée")
     reset_request.refresh_from_db()
-    assert reset_request.state == ResetRequestState.DENIED
+    assert reset_request.state == ResetRequestState.CANCELLED
+    email = mailoutbox.pop()
+    assert "demande annulée" in email.subject
+    assert email.to == [user.email]
 
 
 def test_mfa_reset_mail_to_self_when_reset_request_submitted(client, settings, mailoutbox):
@@ -792,7 +795,7 @@ def test_mfa_reset_mail_to_self_when_reset_request_submitted(client, settings, m
 
 
 @pytest.mark.parametrize("accept_it", [True, False])
-def test_mfa_reset_cleaned_after_successful_login(client, settings, accept_it):
+def test_mfa_reset_cleaned_after_successful_login(client, settings, accept_it, mailoutbox):
     settings.REQUIRE_OTP_FOR_STAFF = True
     user = ItouStaffFactory(with_verified_email=True)
     client.force_login(user)
@@ -804,7 +807,10 @@ def test_mfa_reset_cleaned_after_successful_login(client, settings, accept_it):
         reset_request.accept()
         assert ResetRequest.objects.first().state == ResetRequestState.ACCEPTED
     client.post(reverse("otp_views:verify_otp"), data={"otp_token": TOTP(device.bin_key).token()})
-    assert ResetRequest.objects.first().state == ResetRequestState.DENIED
+    assert ResetRequest.objects.first().state == ResetRequestState.CANCELLED
+    email = mailoutbox.pop()
+    assert "demande annulée" in email.subject
+    assert email.to == [user.email]
 
 
 def test_mfa_reset_cannot_use_reset_link_twice(client, settings):

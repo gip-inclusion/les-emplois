@@ -57,6 +57,8 @@ class ResetRequestTransitionsInline(ReadonlyMixin, ItouTabularInline):
 HIDDEN_TRANSITIONS = {
     # Only the user can reset devices, not even a superuser:
     ResetRequestTransition.RESET_DEVICES,
+    # Cancel is only available to users (while deny is only available to the staff):
+    ResetRequestTransition.CANCEL,
 }
 
 

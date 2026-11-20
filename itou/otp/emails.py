@@ -73,3 +73,14 @@ def notify_mfa_reset_request_denied(reset_request):
         body="common/emails/mfa_reset_request_denied_body.md",
     )
     email.send()
+
+
+def notify_mfa_reset_request_cancelled(reset_request, msg):
+    """Sent to the 2FA devices owner when its request is cancelled."""
+    email = get_email_message(
+        to=[reset_request.user.email],
+        context={"user": reset_request.user, "msg": msg},
+        subject="common/emails/mfa_reset_request_cancelled_subject.txt",
+        body="common/emails/mfa_reset_request_cancelled_body.md",
+    )
+    email.send()
