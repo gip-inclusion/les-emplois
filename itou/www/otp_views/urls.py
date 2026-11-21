@@ -29,9 +29,14 @@ urlpatterns = [
         name="enrollment_step_2_download_app_for_phones",
     ),
     path(
-        "enrollment-step-3-and-4",
-        views.enrollment_step_3_and_4_confirm_device,
-        name="enrollment_step_3_and_4_confirm_device",
+        "enrollment-step-3",
+        views.enrollment_step_3_confirm_device,
+        name="enrollment_step_3_confirm_device",
+    ),
+    path(
+        "enrollment-step-4",
+        views.enrollment_step_4_backup_code,
+        name="enrollment_step_4_backup_code",
     ),
     path(
         "login-with-backup-code",
