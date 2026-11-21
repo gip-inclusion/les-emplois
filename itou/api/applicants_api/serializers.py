@@ -6,6 +6,7 @@ from itou.users.models import User
 class ApplicantSerializer(serializers.ModelSerializer):
     """Applicant serializer: job seeker field of a job application"""
 
+    id = serializers.CharField(source="public_id")
     civilite = serializers.SerializerMethodField()
     nom = serializers.CharField(source="last_name")
     prenom = serializers.CharField(source="first_name")
@@ -24,6 +25,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "civilite",
             "nom",
             "prenom",

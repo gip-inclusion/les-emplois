@@ -170,6 +170,7 @@ class TestApplicantsAPI:
         results = response.json().get("results")
         assert [
             {
+                "id": str(dylan.public_id),
                 "civilite": dylan.title,
                 "nom": dylan.last_name,
                 "prenom": dylan.first_name,
@@ -186,6 +187,7 @@ class TestApplicantsAPI:
                 "uid_structures": sorted([str(company_1.uid), str(company_2.uid)]),
             },
             {
+                "id": str(bob.public_id),
                 "civilite": bob.title,
                 "nom": bob.last_name,
                 "prenom": bob.first_name,
@@ -245,6 +247,7 @@ class TestApplicantsAPI:
             [result_for_jobseeker1, result_for_jobseeker2],
         ):
             assert {
+                "id": str(job_seeker.public_id),
                 "civilite": job_seeker.title,
                 "nom": job_seeker.last_name,
                 "prenom": job_seeker.first_name,
