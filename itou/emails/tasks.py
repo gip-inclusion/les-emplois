@@ -156,7 +156,7 @@ class AsyncEmailBackend(BaseEmailBackend):
                 # Plain-text emails sent by third-party libraries (django-allauth).
                 message.attach_alternative(generate_html_alternative(message.body), "text/html")
             for mjemail in sanitize_mailjet_recipients(message):
-                # Send each email in a separate task, so that Huey retry mecanism only
+                # Send each email in a separate task, so that Huey retry mechanism only
                 # retries the failed email.
                 email = Email.from_email_message(mjemail)
                 email.save()
