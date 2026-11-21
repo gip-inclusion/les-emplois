@@ -7,6 +7,7 @@ import xworkflows
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -159,7 +160,7 @@ def enrollment_step_1_choose_device_type(request, template_name="otp_views/enrol
 @check_user_can_enroll
 def enrollment_step_2_download_app(request, template_name="otp_views/enrollment_step_2_download_app.html"):
     previous_step_url = reverse("otp_views:enrollment_step_1_choose_device_type")
-    next_step_url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
+    next_step_url = reverse("otp_views:enrollment_step_3_confirm_device")
 
     device_type = request.GET.get("device_type")
     if device_type not in DeviceType:
@@ -203,11 +204,13 @@ def enrollment_step_2_download_app_for_phones(
     return response
 
 
+def get_backup_code_cache_key(request):
+    return f"cache:2fa-recovery-code:{request.user.pk})"
+
+
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user_can_enroll
-def enrollment_step_3_and_4_confirm_device(
-    request, template_name="otp_views/enrollment_step_3_and_4_confirm_device.html"
-):
+def enrollment_step_3_confirm_device(request, template_name="otp_views/enrollment_step_3_confirm_device.html"):
     device_type = request.GET.get("device_type") or request.POST.get("device_type")
     if device_type not in DeviceType:
         # should not happen, unless user manipulates the request
@@ -251,27 +254,48 @@ def enrollment_step_3_and_4_confirm_device(
             device.save()
             messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
             otp_login(request, device)  # mark the user as verified
-            user_logged_in_with_2fa.send(
-                sender=enrollment_step_3_and_4_confirm_device, request=request, user=request.user
-            )
+            user_logged_in_with_2fa.send(sender=enrollment_step_3_confirm_device, request=request, user=request.user)
             backup_code = create_otp_backup_code(request.user)
-            if len(get_user_devices(request.user)) > 1:
-                # User added _another_ device, redirect user to where they
-                # come from.
-                post_save_url = reverse("otp_views:otp_devices")
-            else:
-                # User added their _only_ device (required to use the
-                # application), they want to use the app.
-                post_save_url = reverse("dashboard:index")
+            cache_key = get_backup_code_cache_key(request)
+            cache.set(cache_key, backup_code, 3600)  # Keep for an hour
+            return HttpResponseRedirect(reverse("otp_views:enrollment_step_4_backup_code"))
 
     context = {
         "previous_step_url": previous_step_url,
         "form": form,
         "otp_secret": form.fields["key"].initial,
         "qrcode": segno.make(device.config_url).svg_data_uri(),
-        "backup_code": backup_code,
         "post_save_url": post_save_url,
     }
+    return render(request, template_name, context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+@check_user_can_enroll
+def enrollment_step_4_backup_code(request, template_name="otp_views/enrollment_step_4_backup_code.html"):
+    cache_key = get_backup_code_cache_key(request)
+    if request.method == "POST":
+        cache.delete(cache_key)
+        if len(get_user_devices(request.user)) > 1:
+            # User added _another_ device, redirect user to where they
+            # come from.
+            next_step_url = reverse("otp_views:otp_devices")
+        else:
+            # User added their _only_ device (required to use the
+            # application), they want to use the app.
+            next_step_url = reverse("dashboard:index")
+        return HttpResponseRedirect(next_step_url)
+
+    backup_code = cache.get(cache_key)
+    if backup_code is None:
+        messages.error(
+            request,
+            "Vous avez trop attendu pour passer à l'étape suivante, "
+            "veuillez ré-enregistrer un appareil pour conserver le code de récupération",
+        )
+        return HttpResponseRedirect(reverse("otp_views:enrollment_step_1_choose_device_type"))
+
+    context = {"backup_code": backup_code}
     return render(request, template_name, context)
 
 

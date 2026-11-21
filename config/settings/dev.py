@@ -103,6 +103,8 @@ SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/ne
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
+REQUIRE_MFA_FOR_PROS = True
+REQUIRE_MFA_FOR_PROS_BATCH = 10
 
 XP_REF_IAE_DEPARTMENTS = ["06", "30", "67", "83", "974"]
 
