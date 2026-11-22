@@ -31,7 +31,7 @@ class Command(BaseCommand):
         today = timezone.localdate()
         results = []
 
-        # Check if approvals in ERROR on endpoint rech_individu are now linked to an user
+        # Check if approvals in ERROR on endpoint reach_individu are now linked to an user
         # with a pe_obfuscated_nir (meaning the error is likely to be fixed)
         approvals_models.Approval.objects.filter(
             pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
