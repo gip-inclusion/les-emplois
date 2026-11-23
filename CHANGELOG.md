@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2026-11-23
+
+### Ajouté
+
+- [Admin : Ajout d'un filtre sur les organisations avec un SIRET identique](https://github.com/gip-inclusion/les-emplois/pull/9293)
+- [Insertion : Ajouter du traçage de Matomo pour le Zendesk widget](https://github.com/gip-inclusion/les-emplois/pull/9351)
+- [Prescripteur : Permettre à un PH FT de suspendre un PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/9118)
+- [Tech : Ajout d'une action "Saisie d'un bilan d'accompagnement" aux accompagnements](https://github.com/gip-inclusion/les-emplois/pull/9325)
+
+### Modifié
+
+- [Employeur : Permettre un nouveau bilan d’accompagnement après un renouvellement de contrat](https://github.com/gip-inclusion/les-emplois/pull/9282)
+- [Notifications : Afficher l’organisation concernée sur la page « Mes notifications »](https://github.com/gip-inclusion/les-emplois/pull/9280)
+- [Vie privée : Recueillir le consentement au suivi de l’ouverture des emails](https://github.com/gip-inclusion/les-emplois/pull/9031)
+
 ## 2026-11-16
 
 ### Ajouté
