@@ -3289,6 +3289,7 @@ class TestApplicationView:
             jobseeker_profile__pole_emploi_id="1234567A",
             created_by=ProfessionalFactory(),
         )
+        job_seeker_profile_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
         is_prescriber = user.prescribermembership_set.exists()
         is_auto_prescription = user_factory is None
 
@@ -3399,7 +3400,6 @@ class TestApplicationView:
         response = client.get(next_url)
 
         if is_prescriber:
-            job_seeker_profile_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
             assertContains(
                 response,
                 f"""
@@ -3410,33 +3410,31 @@ class TestApplicationView:
                 """,
                 html=True,
             )
+        elif is_auto_prescription:
+            job_application_url = reverse(
+                "apply:details_for_company", kwargs={"job_application_id": job_application.id}
+            )
+            assertContains(
+                response,
+                f"""
+                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_seeker_profile_url}">
+                    Voir le profil usager</a>
+                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_application_url}">
+                    Voir la candidature</a>
+                """,
+                html=True,
+            )
         else:
-            dashboard_url = reverse("dashboard:index")
-            if is_auto_prescription:
-                job_application_url = reverse(
-                    "apply:details_for_company", kwargs={"job_application_id": job_application.id}
-                )
-                assertContains(
-                    response,
-                    f"""
-                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
-                        Tableau de bord</a>
-                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_application_url}">
-                        Voir la candidature</a>
-                    """,
-                    html=True,
-                )
-            else:
-                assertContains(
-                    response,
-                    f"""
-                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{dashboard_url}">
-                        Tableau de bord</a>
-                        <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
-                        Revenir à la recherche pour cet usager</a>
-                    """,
-                    html=True,
-                )
+            assertContains(
+                response,
+                f"""
+                    <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{job_seeker_profile_url}">
+                    Voir le profil usager</a>
+                    <a class="btn btn-primary btn-block w-100 w-md-auto" href={search_url}>
+                    Revenir à la recherche pour cet usager</a>
+                """,
+                html=True,
+            )
 
 
 class TestApplicationEndView:
