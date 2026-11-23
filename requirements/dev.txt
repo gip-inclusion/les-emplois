@@ -2663,11 +2663,11 @@ python-dateutil==2.9.0.post0 \
     #   freezegun
     #   pandas
     #   pendulum
-python-discovery==1.9.5 \
-    --hash=sha256:86279f5d2728bc067de28b7ddc571be2eacc2ae0e7048f8629d2481a0f8848a2 \
-    --hash=sha256:86279f5d2728bc067de28b7ddc571be2eacc2ae0e7048f8629d2481a0f8848a2 \
-    --hash=sha256:a1fae8fca11e4bc61e38491c2aafff29e430b3c5e272d51ae52fb895bc4c0fac \
-    --hash=sha256:a1fae8fca11e4bc61e38491c2aafff29e430b3c5e272d51ae52fb895bc4c0fac
+python-discovery==1.9.6 \
+    --hash=sha256:383aa67858d73a9585a843a37a4383c6be98e4d86a981a031328e393a6eb2632 \
+    --hash=sha256:383aa67858d73a9585a843a37a4383c6be98e4d86a981a031328e393a6eb2632 \
+    --hash=sha256:93b10b90363d4151964cdeee2ec6601f3041b17fc2b253a1c3da7d6e7ddd8337 \
+    --hash=sha256:93b10b90363d4151964cdeee2ec6601f3041b17fc2b253a1c3da7d6e7ddd8337
     # via virtualenv
 python-dotenv==1.2.4 \
     --hash=sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc \
