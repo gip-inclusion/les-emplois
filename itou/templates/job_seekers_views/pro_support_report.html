@@ -11,30 +11,18 @@
 {% endblock %}
 
 {% block title_content %}
-    {# As wide as the box below, which has no column on its right: the button lines up with it. #}
-    <div class="row">
-        <div class="col-12 col-xxl-8 col-xxxl-9">
-            {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
-                {% fragment as c_title__main %}
-                    <h1>Bilan d’accompagnement de {{ report.job_seeker.get_inverted_full_name }}</h1>
-                    <p>
-                        Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.author_has_left %} (a quitté la structure){% endif %}{% if report.company %}, {{ report.company.display_name }}{% endif %}
-                    </p>
-                {% endfragment %}
-                {% fragment as c_title__cta %}
-                    <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"
-                       class="btn btn-lg btn-secondary">Voir la fiche du salarié</a>
-                {% endfragment %}
-            {% endcomponent_title %}
-        </div>
-    </div>
-{% endblock %}
-
-{% block title_messages %}
-    {# As wide as the title and the box. #}
-    <div class="row">
-        <div class="col-12 col-xxl-8 col-xxxl-9">{{ block.super }}</div>
-    </div>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>Bilan d’accompagnement de {{ report.job_seeker.get_inverted_full_name }}</h1>
+            <p>
+                Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.author_has_left %} (a quitté la structure){% endif %}{% if report.company %}, {{ report.company.display_name }}{% endif %}
+            </p>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a href="{% url "job_seekers_views:details" public_id=report.job_seeker.public_id %}"
+               class="btn btn-lg btn-primary">Voir la fiche du salarié</a>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
