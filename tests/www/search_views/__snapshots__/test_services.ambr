@@ -179,6 +179,7 @@
                  "insertion_service"."contact_phone",
                  "insertion_service"."average_orientation_response_delay_days",
                  "insertion_service"."updated_on",
+                 "insertion_service"."score_qualite",
                  "insertion_service"."is_active",
                  "insertion_service"."created_at",
                  "insertion_service"."updated_at",
@@ -242,7 +243,7 @@
                                                                         %s])::varchar[]
                       OR "insertion_service"."eligibility_zones" = %s::varchar[])
                  AND ("insertion_service"."extra" -> %s) ? | %s)
-          ORDER BY 34 ASC,
+          ORDER BY 35 ASC,
                    "insertion_service"."id" ASC
           LIMIT 1
         ''',
