@@ -42,6 +42,14 @@ class OrientationStatus(models.TextChoices):
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
     REFUSED = "REFUSÉE", "Déclinée"
+    DIRECT_CONTACT = "CONTACT", "Prise de contact"
+
+
+class OrientationContactKind(models.TextChoices):
+    """How the sender contacted the service before saving the orientation."""
+
+    PHONE = "tel", "téléphone"
+    EMAIL = "email", "e-mail"
 
 
 class OrientationTransition(enum.StrEnum):

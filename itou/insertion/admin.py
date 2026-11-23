@@ -332,6 +332,7 @@ class OrientationAdmin(ItouModelAdmin):
                     "data_protection_commitment",
                     "refusal_reasons",
                     "refusal_details",
+                    "contact_kind",
                 ]
             },
         ),
@@ -368,6 +369,7 @@ class OrientationAdmin(ItouModelAdmin):
                     "referent_email",
                     "referent_phone",
                     "orientation_reasons",
+                    "referent_notes",
                 ]
             },
         ),

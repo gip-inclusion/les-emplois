@@ -409,6 +409,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."referent_notes",
+                 "insertion_orientation"."contact_kind",
                  "insertion_orientation"."refusal_reasons",
                  "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
@@ -1406,6 +1408,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."referent_notes",
+                 "insertion_orientation"."contact_kind",
                  "insertion_orientation"."refusal_reasons",
                  "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
@@ -2084,6 +2088,44 @@
   
   '''
 # ---
+# name: TestOrientationDetailsForServiceProvider.test_display_actions[CONTACT]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-navinfo">
+                      <div class="c-navinfo__info">
+                          Mise à jour le 01/08/2026
+                      </div>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Accompagnement aux devoirs
+                              <span class="badge rounded-pill text-nowrap badge-base bg-accent-01 text-white">
+                                  Prise de contact
+                              </span>
+                          </h1>
+                          <p>
+                              Demande d’orientation - Émise le 01/08/2026
+                          </p>
+                      </div>
+                      <div class="c-title__cta">
+                          <a class="btn btn-lg btn-secondary" data-matomo-action="clic" data-matomo-category="orientation-detail" data-matomo-event="true" data-matomo-option="voir-service" href="/insertion/services/uid-service/?back_url=/insertion/orientations/process/%3Ftoken%3D[PK of OrientationProcessLink]">
+                              <span>
+                                  Accéder au détail du service
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
 # name: TestOrientationDetailsForServiceProvider.test_display_actions[EXPIR\xc9E]
   '''
   <section class="s-title-02">
@@ -2372,6 +2414,14 @@
                                       </label>
                                   </div>
                               </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="CONTACT"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Prise de contact
+                                      </label>
+                                  </div>
+                              </li>
                           </ul>
                       </div>
                   </fieldset>
@@ -2431,6 +2481,14 @@
                                           <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
                                           <label class="form-check-label" for="id_statuses_3-top">
                                               Déclinée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="CONTACT"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Prise de contact
                                           </label>
                                       </div>
                                   </li>
@@ -2599,6 +2657,14 @@
                                       </label>
                                   </div>
                               </li>
+                              <li>
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_statuses_4" name="statuses" type="checkbox" value="CONTACT"/>
+                                      <label class="form-check-label" for="id_statuses_4">
+                                          Prise de contact
+                                      </label>
+                                  </div>
+                              </li>
                           </ul>
                       </div>
                   </fieldset>
@@ -2707,6 +2773,14 @@
                                           <input class="form-check-input" data-emplois-sync-with="id_statuses_3" id="id_statuses_3-top" name="statuses" type="checkbox" value="REFUSÉE"/>
                                           <label class="form-check-label" for="id_statuses_3-top">
                                               Déclinée
+                                          </label>
+                                      </div>
+                                  </li>
+                                  <li class="dropdown-item">
+                                      <div class="form-check">
+                                          <input class="form-check-input" data-emplois-sync-with="id_statuses_4" id="id_statuses_4-top" name="statuses" type="checkbox" value="CONTACT"/>
+                                          <label class="form-check-label" for="id_statuses_4-top">
+                                              Prise de contact
                                           </label>
                                       </div>
                                   </li>
@@ -3252,6 +3326,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."referent_notes",
+                 "insertion_orientation"."contact_kind",
                  "insertion_orientation"."refusal_reasons",
                  "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
