@@ -1,0 +1,5 @@
+{# Context of a step, as in the prototype: a tinted block (itou-theme utilities). #}
+<div class="rounded-2 p-3 mt-3 d-flex flex-column gap-1 {% if box.variant == "warn" %}bg-warning-lighter{% elif box.variant == "ok" %}bg-success-lighter{% else %}bg-light{% endif %}">
+    {% if box.title %}<b>{{ box.title }}</b>{% endif %}
+    <span>{{ box.text }}</span>
+</div>

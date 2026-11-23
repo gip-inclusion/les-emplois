@@ -1,0 +1,11 @@
+{% load django_bootstrap5 %}
+{# A confirmation step: the answers, then the button that saves them. #}
+{% if form and form.is_bound %}
+    {% bootstrap_form_errors form type="non_fields" %}
+{% endif %}
+{# Each answer framed, as the other facts of the drawers. #}
+<div class="d-flex flex-column gap-2">
+    {% for label, value in recap %}
+        {% include "next_steps/includes/fact.html" with label=label value=value detail="" only %}
+    {% endfor %}
+</div>

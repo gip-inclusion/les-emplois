@@ -1,0 +1,61 @@
+{% load dict_filters %}
+{% load django_bootstrap5 %}
+{# One field, shown as in the prototype: one card per choice, a dropdown, or the theme's field. #}
+{% if show.kind == "options" %}
+    <fieldset class="mb-4">
+        {% if show.legend %}<legend class="fs-base fw-bold mb-2">{{ field.label }}</legend>{% endif %}
+        <div class="d-flex flex-column gap-2">
+            {% if field.widget_type == "checkbox" %}
+                <label class="next-step-option d-flex align-items-start gap-3 border rounded-2 px-3 py-2">
+                    {{ field }}
+                    <span class="d-flex flex-column gap-1">
+                        <b>{{ field.label }}</b>
+                        {% if field.help_text %}<span class="fs-sm text-muted">{{ field.help_text }}</span>{% endif %}
+                    </span>
+                </label>
+            {% else %}
+                {% for choice in field %}
+                    {% if choice.data.value != "" %}
+                        {% with value=choice.data.value|stringformat:"s" %}
+                            {% with custom=show.choices|get_dict_item:value %}
+                                <label class="next-step-option d-flex align-items-start gap-3 border rounded-2 px-3 py-2">
+                                    {{ choice.tag }}
+                                    <span class="d-flex flex-column gap-1">
+                                        <b>
+                                            {% if custom and custom.0 %}
+                                                {{ custom.0 }}
+                                            {% else %}
+                                                {{ choice.choice_label }}
+                                            {% endif %}
+                                        </b>
+                                        {% if custom and custom.1 %}<span class="fs-sm text-muted">{{ custom.1 }}</span>{% endif %}
+                                    </span>
+                                </label>
+                            {% endwith %}
+                        {% endwith %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </fieldset>
+{% elif show.kind == "select" %}
+    <div class="form-group mb-4">
+        <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+        <select class="form-select{% if field.errors %} is-invalid{% endif %}"
+                id="{{ field.auto_id }}"
+                name="{{ field.html_name }}">
+            <option value="">Choisir…</option>
+            {% for choice in field %}
+                {% if choice.data.value != "" %}
+                    <option value="{{ choice.data.value }}" {% if choice.data.selected %}selected{% endif %}>
+                        {{ choice.choice_label }}
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </div>
+{% else %}
+    {% bootstrap_field field %}
+{% endif %}

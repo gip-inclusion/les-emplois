@@ -31,7 +31,15 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-9" id="next-steps-queue">
+                <div class="s-section__col col-12 col-xxl-9"
+                     id="next-steps-queue"
+                     hx-get="{{ request.get_full_path }}"
+                     hx-trigger="nextStepsChanged from:body"
+                     hx-select="#next-steps-queue"
+                     hx-disinherit="*"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    {# Reloaded when a guided journey completes. Its attributes must not reach the action buttons. #}
                     {% for group in groups %}
                         <section class="mb-5" aria-labelledby="next-steps-{{ group.key }}">
                             <h2 class="h3 mb-1" id="next-steps-{{ group.key }}">
@@ -63,4 +71,11 @@
             </div>
         </div>
     </section>
+    {% include "next_steps/includes/journey_drawer.html" %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {# Scripts of the forms the guided journeys show. #}
+    {{ journeys_media.js }}
 {% endblock %}

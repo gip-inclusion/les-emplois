@@ -1,0 +1,42 @@
+{% load dict_filters %}
+{# Administrative criteria as cards, by level. Employers see the written proof to keep, as on the existing screen. #}
+{% if request.from_prescriber %}
+    <p class="fs-sm mb-3">
+        Vous pouvez vous appuyer sur le document
+        <a class="has-external-link"
+           href="{{ ITOU_DIAGNOSTIC_URL }}"
+           target="_blank"
+           rel="noreferrer noopener"
+           aria-label="Diagnostic socio-professionnel des usagers (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+    </p>
+{% endif %}
+{% if criteria_filled_from_job_seeker %}
+    {% include "eligibility/includes/iae/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
+{% endif %}
+{% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+{% for level, prefix in criteria_levels %}
+    <fieldset class="mb-4">
+        <legend class="fs-base fw-bold mb-2">Critères administratifs de niveau {{ level }}</legend>
+        <div class="d-flex flex-column gap-2">
+            {% for field in form %}
+                {% if prefix in field.name %}
+                    {% with criterion=form.OBJECTS|get_dict_item:field.name %}
+                        <label class="next-step-option d-flex align-items-start gap-3 border rounded-2 px-3 py-2">
+                            {{ field }}
+                            <span class="d-flex flex-column gap-1">
+                                <b>{{ field.label }}</b>
+                                {% if field.help_text %}<span class="fs-sm text-muted">{{ field.help_text }}</span>{% endif %}
+                                {% if request.from_employer and criterion.written_proof %}
+                                    <span class="fs-sm text-muted">
+                                        Pièce justificative&nbsp;: {{ criterion.written_proof }}
+                                        {% if criterion.written_proof_validity %}({{ criterion.written_proof_validity|lower }}){% endif %}
+                                    </span>
+                                {% endif %}
+                            </span>
+                        </label>
+                    {% endwith %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </fieldset>
+{% endfor %}

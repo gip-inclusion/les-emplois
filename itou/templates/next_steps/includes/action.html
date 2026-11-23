@@ -24,7 +24,18 @@
         </div>
     </div>
     <div class="flex-shrink-0">
-        {% if action.url %}
+        {% if action.journey_url %}
+            {# The journey runs in the side drawer; without JavaScript, the same journey opens as a page. #}
+            <a class="btn btn-sm {% if group == "watch" %}btn-outline-primary{% else %}btn-primary{% endif %}"
+               href="{{ action.journey_url }}"
+               hx-get="{{ action.journey_url }}"
+               hx-target="#next-step-journey"
+               hx-swap="outerHTML"
+               hx-indicator="#next-step-journey"
+               data-bs-toggle="offcanvas"
+               data-bs-target="#next-step-drawer"
+               aria-controls="next-step-drawer">{{ action.call_to_action }}</a>
+        {% elif action.url %}
             <a class="btn btn-sm {% if group == "watch" %}btn-outline-primary{% else %}btn-primary{% endif %}"
                href="{% url_add_query action.url back_url=request.get_full_path %}">{{ action.call_to_action }}</a>
         {% else %}

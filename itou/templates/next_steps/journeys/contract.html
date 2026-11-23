@@ -1,0 +1,14 @@
+{% load django_bootstrap5 %}
+{# The contract, with the fields of the existing hiring screen. #}
+{% with form_accept=form %}
+    {% bootstrap_form_errors form_accept type="non_fields" %}
+    {% include "apply/includes/job_description_fields.html" %}
+    {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-66" %}
+    {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-66" %}
+    <p class="fs-sm text-muted">
+        {{ form_accept.max_hiring_start_at_explanation }}
+        {% if company.is_subject_to_iae_rules %}En cas de premier PASS&nbsp;IAE pour la personne, la date de début déclenche le début de son parcours.{% endif %}
+    </p>
+    {% bootstrap_field form_accept.advisor %}
+    {% bootstrap_field form_accept.answer %}
+{% endwith %}

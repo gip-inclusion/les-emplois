@@ -409,3 +409,42 @@ table.table td > .modal .modal-content {
 .p-next-steps.l-authenticated > .s-main .s-title-02::after {
     content: none;
 }
+
+/* A small icon tile, as on the barriers: the theme's tiles are 50px. */
+.next-step__tile {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* The side drawer of guided journeys, wider than the theme's offcanvas. */
+.next-step-drawer {
+    --bs-offcanvas-width: min(36rem, 100%);
+}
+
+/* Stepper widths missing from the theme's progress-bar-* list: a hiring journey has six steps. */
+#next-step-journey .progress-bar-16 {
+    width: 16%;
+}
+
+#next-step-journey .progress-bar-83 {
+    width: 83%;
+}
+
+/* Choices as cards, as in the prototype: the theme's form-check has no such variant. */
+.next-step-option {
+    cursor: pointer;
+}
+
+.next-step-option:hover,
+.next-step-option:has(input:checked) {
+    border-color: var(--bs-primary, #000638) !important;
+}
+
+.next-step-option:has(input:checked) {
+    background-color: var(--bs-light, #f8f8f8);
+}
+
+.next-step-option input {
+    flex: none;
+    margin-top: .25rem;
+}

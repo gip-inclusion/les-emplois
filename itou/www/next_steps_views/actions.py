@@ -132,6 +132,8 @@ class Action:
     url: str | None = None
     call_to_action: str | None = None
     status_label: str | None = None
+    # The guided journey running the action in the side drawer, if any (see journeys.py).
+    journey_url: str | None = None
     # Unique on the page, set once the queue is sorted.
     uid: str = ""
 
@@ -156,6 +158,10 @@ class Action:
         if late == 0:
             return "À faire aujourd’hui"
         return f"À faire d’ici le {_fr(self.due)}"
+
+
+def _journey_url(kind, pk):
+    return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
 
 
 def _date(value):
@@ -194,6 +200,7 @@ def _new_job_applications(company):
             due=_after(job_application.created_at, JOB_APPLICATION_ANSWER_DAYS),
             url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             call_to_action="Étudier",
+            journey_url=_journey_url("candidature", job_application.pk),
         )
 
 
@@ -243,6 +250,7 @@ def _end_of_contracts(company):
                         "job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}
                     ),
                     call_to_action="Remplir",
+                    journey_url=_journey_url("bilan", job_seeker.public_id),
                 )
         elif not job_seeker.last_contract_has_pro_support_report:
             yield Action(
@@ -254,6 +262,7 @@ def _end_of_contracts(company):
                 due=_after(end_date, PRO_SUPPORT_REPORT_FILL_DAYS),
                 url=reverse("job_seekers_views:create_pro_support_report", kwargs={"public_id": job_seeker.public_id}),
                 call_to_action="Remplir",
+                journey_url=_journey_url("bilan", job_seeker.public_id),
             )
 
 
@@ -574,3 +583,12 @@ def done_today(request):
     else:
         done = []
     return sorted(done, key=lambda item: item.at)
+
+
+def next_action(actions):
+    """The action to suggest after one is done: the first late one, else today's, else this week's, in the drawer."""
+    for group in (Group.LATE, Group.TODAY, Group.WEEK):
+        for action in actions:
+            if action.group == group and action.journey_url:
+                return action
+    return None

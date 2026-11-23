@@ -1,0 +1,11 @@
+{% load django_bootstrap5 %}
+{# The fields of the current step, each shown as the step asks (see journeys.Show). #}
+{% if form %}
+    {% if step.fields is None %}
+        {% bootstrap_form_errors form type="non_fields" %}
+    {% endif %}
+    {% for field, show in field_rows %}
+        {% include "next_steps/journeys/components/field.html" with field=field show=show only %}
+    {% endfor %}
+    {% for field in hidden_fields %}{{ field }}{% endfor %}
+{% endif %}

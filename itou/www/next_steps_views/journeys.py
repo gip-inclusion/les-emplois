@@ -1,0 +1,904 @@
+"""Guided journeys of the "Prochaines étapes" experiment.
+
+A journey runs an action step by step in a side drawer: the existing forms of the platform, split into steps, with a
+stepper, then a confirmation screen. The data is saved by the same forms and model methods as the existing screens,
+so validation, permissions and side effects (notifications, follow-up) stay the same.
+
+The steps keep no state on the server: the answers of the other steps travel as hidden fields, and every form is
+validated again, in full, before anything is saved. Without JavaScript, a journey is an ordinary page.
+
+When a decision needs a long existing wizard (hiring, refusing an application), the journey hands over to it.
+"""
+
+import dataclasses
+import logging
+import urllib.parse
+
+from django import forms
+from django.conf import settings
+from django.db import transaction
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.template import loader
+from django.urls import reverse
+from django.utils import timezone
+from django_xworkflows import models as xwf_models
+
+from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
+from itou.asp.models import Country
+from itou.common_apps.address.forms import JobSeekerAddressForm
+from itou.companies.enums import CompanyKind, ContractType, ProSupportReportAutonomy
+from itou.companies.models import ProSupportReport
+from itou.eligibility.enums import AuthorKind
+from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
+from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
+from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
+from itou.rdv_insertion.models import InvitationRequest
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, User
+from itou.users.perms import can_fill_pro_support_report
+from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.forms import (
+    AcceptForm,
+    AnswerForm,
+    BirthDateForm,
+    JobApplicationRefusalJobSeekerAnswerForm,
+    JobApplicationRefusalPrescriberAnswerForm,
+    JobApplicationRefusalReasonForm,
+    JobSeekerPersonalDataForm,
+)
+from itou.www.apply.views.batch_views import _get_and_lock_received_applications, _get_recruitment_to_close
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.job_seekers_views.forms import ProSupportReportForm
+
+
+logger = logging.getLogger(__name__)
+
+NBSP = " "
+PASS_IAE = f"PASS{NBSP}IAE"
+FIELDS_TEMPLATE = "next_steps/journeys/fields.html"
+RECAP_TEMPLATE = "next_steps/journeys/recap.html"
+CRITERIA_LEVELS = [(1, AdministrativeCriteriaForm.LEVEL_1_PREFIX), (2, AdministrativeCriteriaForm.LEVEL_2_PREFIX)]
+
+
+def _fr(date):
+    if hasattr(date, "hour"):
+        date = timezone.localdate(date)
+    return f"{date:%d/%m/%Y}"
+
+
+@dataclasses.dataclass
+class Show:
+    """How a field is shown, as in the prototype: "options" (one card per choice), "select" or "default"."""
+
+    kind: str = "default"
+    # For options: value -> (title, or None to keep the choice's label; description, or None).
+    choices: dict = dataclasses.field(default_factory=dict)
+    # Show the field's label above the cards, when the step's question does not already ask for it.
+    legend: bool = False
+
+
+DEFAULT_SHOW = Show()
+
+
+@dataclasses.dataclass
+class Box:
+    """Context shown in a step: a motif, what a choice entails, who receives what."""
+
+    text: str
+    title: str = ""
+    # "", "warn" or "ok".
+    variant: str = ""
+
+
+@dataclasses.dataclass
+class Step:
+    label: str
+    # The form this step shows, by key in Journey.build_forms(), and which of its fields (None: all of them).
+    form: str | tuple | None = None
+    fields: list | None = None
+    template: str = FIELDS_TEMPLATE
+    submit_label: str = "Continuer"
+    # A step that hands over to an existing screen instead of submitting: (label, url).
+    handover: tuple | None = None
+    # Whether the step's template shows the journey's facts itself, instead of above the question.
+    facts_in_template: bool = False
+    # The question the step asks, a hint below it, how its fields are shown, and context boxes.
+    question: str = ""
+    hint: str = ""
+    layout: dict = dataclasses.field(default_factory=dict)
+    boxes: list = dataclasses.field(default_factory=list)
+
+    def __post_init__(self):
+        if self.template == "next_steps/journeys/application.html":
+            self.facts_in_template = True
+
+
+@dataclasses.dataclass
+class Result:
+    title: str
+    lines: list
+    # An optional main link: (label, url).
+    link: tuple | None = None
+
+
+class Journey:
+    title = ""
+    job_seeker = None
+
+    def __init__(self, request, pk):
+        self.request = request
+        self.load(pk)
+
+    def load(self, pk):
+        """Fetch the objects and check the user may act: raise Http404 otherwise."""
+        raise NotImplementedError
+
+    def facts(self):
+        return []
+
+    def build_forms(self, data=None, initial=None):
+        """Forms by key: bound to data to validate, or unbound with initial values to display."""
+        return {}
+
+    def steps(self, data):
+        raise NotImplementedError
+
+    def steps_known(self, data):
+        """Whether the steps are all known yet: some depend on an answer to come."""
+        return True
+
+    def recap(self, forms):
+        """(label, value) pairs shown on a confirmation step."""
+        return []
+
+    def context(self):
+        return {}
+
+    def done(self, forms):
+        raise NotImplementedError
+
+
+class DecisionForm(forms.Form):
+    decision = forms.ChoiceField(label="Votre décision", widget=forms.RadioSelect)
+
+    def __init__(self, *args, choices, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["decision"].choices = choices
+
+
+def _label(form, field_name, value):
+    labels = {}
+    for key, label in form.fields[field_name].choices:
+        if isinstance(label, list | tuple):  # A group of choices
+            labels |= {str(sub_key): sub_label for sub_key, sub_label in label}
+        else:
+            labels[str(key)] = label
+    # Submitted values are strings, choice values may not be.
+    return labels[str(value)]
+
+
+# Employers
+# ------------------------------------------------------------------------------
+
+
+class ProSupportReportFillJourney(Journey):
+    title = "Remplir le bilan d’accompagnement"
+
+    def load(self, pk):
+        request = self.request
+        if not can_fill_pro_support_report(request):
+            raise Http404
+        company = request.current_organization
+        self.job_seeker = get_object_or_404(
+            User.objects.at_end_of_journey(siae=company), public_id=pk, kind=UserKind.JOB_SEEKER
+        )
+        self.contract = self.job_seeker.contracts.filter(company=company).order_by("-start_date", "-pk").first()
+        # Same rules as job_seekers_views.create_pro_support_report.
+        if self.contract is None or ProSupportReport.objects.filter(contract=self.contract).exists():
+            raise Http404
+
+    def facts(self):
+        ended = self.contract.has_ended
+        return [("Contrat terminé le" if ended else "Fin du contrat", _fr(self.contract.end_date))]
+
+    def build_forms(self, data=None, initial=None):
+        request = self.request
+        form = ProSupportReportForm(
+            request.path,
+            data=data,
+            initial=initial,
+            instance=ProSupportReport(
+                job_seeker=self.job_seeker,
+                company=request.current_organization,
+                author=request.user,
+                contract=self.contract,
+                contract_end_date=self.contract.end_date,
+            ),
+        )
+        # Here the follow-up question comes as the next step, not by reloading the form.
+        form.fields["has_solution"].widget.attrs = {}
+        return {"report": form}
+
+    def _report_recipient(self):
+        """Who will receive the report: same query as ProSupportReport.notify_authorized_prescriber."""
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker=self.job_seeker,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("professional", "prescriber_organization")
+            .order_by("-last_action_at")
+            .first()
+        )
+        if assignment is None:
+            return Box("Aucun prescripteur habilité ne suit la personne : le bilan restera consultable sur sa fiche.")
+        return Box(
+            f"Le bilan sera envoyé à {assignment.professional.get_full_name()} "
+            f"({assignment.prescriber_organization.display_name}), le dernier prescripteur habilité "
+            "qui a accompagné la personne."
+        )
+
+    def steps(self, data):
+        if data.get("has_solution") == "False":
+            follow_up = Step(
+                "Orientation",
+                "report",
+                ["orientation"],
+                question="Quelle orientation serait la plus adaptée ?",
+                layout={"orientation": Show("options")},
+            )
+        else:
+            follow_up = Step(
+                "Solution",
+                "report",
+                ["solution"],
+                question="Quelle solution est envisagée ?",
+                layout={"solution": Show("options")},
+            )
+        return [
+            Step(
+                "Freins",
+                "report",
+                ["barriers", "other_barrier"],
+                question="Quels freins restent à travailler ?",
+                hint="Ne cochez rien si aucun frein n’a été identifié.",
+                layout={"barriers": Show("options")},
+            ),
+            Step(
+                "Autonomie",
+                "report",
+                ["autonomy"],
+                question="Son autonomie dans la recherche d’emploi",
+                layout={
+                    "autonomy": Show(
+                        "options",
+                        {
+                            str(level.value): (f"{level.value} sur 5", level.label)
+                            for level in ProSupportReportAutonomy
+                        },
+                    )
+                },
+            ),
+            Step(
+                "La suite",
+                "report",
+                ["has_solution"],
+                question="Une solution est-elle déjà prévue après le contrat ?",
+                hint="Un bilan comporte soit une solution envisagée, soit une orientation.",
+                layout={
+                    "has_solution": Show(
+                        "options",
+                        {
+                            "True": (None, "Emploi, formation, renouvellement…"),
+                            "False": (None, "Vous indiquerez l’accompagnement le plus adapté."),
+                        },
+                    )
+                },
+            ),
+            follow_up,
+            Step(
+                "Envoi",
+                "report",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Envoyer le bilan",
+                question="Vérifiez avant d’envoyer",
+                boxes=[self._report_recipient()],
+            ),
+        ]
+
+    def recap(self, forms):
+        form = forms["report"]
+        report = form.cleaned_data
+        barriers = [_label(form, "barriers", barrier) for barrier in report["barriers"]]
+        lines = [("Freins", ", ".join(barriers) or "Aucun frein identifié")]
+        if report.get("other_barrier"):
+            lines.append(("Autres freins identifiés", report["other_barrier"]))
+        lines.append(("Autonomie", f"{report['autonomy']} sur 5"))
+        if report.get("solution"):
+            lines.append(("Solution envisagée", _label(form, "solution", report["solution"])))
+        else:
+            lines.append(("Orientation", _label(form, "orientation", report["orientation"])))
+        return lines
+
+    def done(self, forms):
+        request = self.request
+        # Same as job_seekers_views.create_pro_support_report.
+        report = forms["report"].save()
+        report.notify_authorized_prescriber()
+        JobSeekerAssignment.objects.upsert_assignment(
+            self.job_seeker, request.user, request.current_organization, ActionKind.FILL_REPORT
+        )
+        if report.notified_prescriber:
+            sent_to = f"Il est transmis par e-mail à {report.notified_prescriber.get_full_name()}."
+        else:
+            sent_to = "Aucun prescripteur habilité ne suit la personne pour le moment."
+        return Result(
+            title="Bilan envoyé",
+            lines=[sent_to, "Il reste consultable sur la fiche de la personne et ne peut plus être modifié."],
+        )
+
+
+class JobApplicationJourney(Journey):
+    """Answer an application: processing, postponed, refused or hired, each with the steps of the existing screens.
+
+    Refusing reuses the forms and the rules of apply.views.batch_views.RefuseWizardView, for one application.
+    Hiring reuses those of apply.views.accept_views and common: the job seeker's missing information, the contract,
+    the employer's eligibility diagnosis when needed, then the confirmation. GEIQ hiring, with its own diagnosis and
+    contract fields, and a company under a posteriori control sanction, still use the existing screens.
+    """
+
+    title = "Répondre à la candidature"
+
+    def load(self, pk):
+        request = self.request
+        if not request.from_employer:
+            raise Http404
+        self.company = request.current_organization
+        self.job_application = get_object_or_404(
+            JobApplication.objects.is_active_company_member(request.user)
+            .visible_by_employers()
+            .filter(to_company=self.company)
+            .select_related(
+                "job_seeker",
+                "job_seeker__jobseeker_profile",
+                "to_company",
+                "sender",
+                "sender_prescriber_organization",
+                "sender_company",
+            )
+            .prefetch_related("selected_jobs__appellation"),
+            pk=pk,
+        )
+        self.job_seeker = self.job_application.job_seeker
+        self.eligibility_diagnosis = None
+        if self.company.is_subject_to_iae_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, self.company
+            )
+        # Same rule as apply.views.accept_views.check_waiting_period.
+        self.blocked_by_waiting_period = self.job_seeker.new_approval_blocked_by_waiting_period(
+            siae=self.company, sender_prescriber_organization=self.job_application.sender_prescriber_organization
+        )
+        self.hiring_in_drawer = self.company.kind != CompanyKind.GEIQ and not (
+            self.company.is_subject_to_iae_rules and self.company.get_active_suspension_text_with_dates()
+        )
+
+    def _sender_display(self):
+        job_application = self.job_application
+        if job_application.sender_kind == SenderKind.JOB_SEEKER:
+            return "La personne elle-même"
+        organization = job_application.sender_prescriber_organization or job_application.sender_company
+        names = [job_application.sender.get_full_name() if job_application.sender else None]
+        names.append(organization.display_name if organization else None)
+        return ", ".join(name for name in names if name)
+
+    def facts(self):
+        job_application = self.job_application
+        jobs = [job_description.display_name for job_description in job_application.selected_jobs.all()]
+        return [
+            ("Reçue le", _fr(job_application.created_at)),
+            ("Envoyée par", self._sender_display()),
+            ("Poste" if len(jobs) == 1 else "Postes", ", ".join(jobs) or "Candidature spontanée"),
+            ("Statut", job_application.get_state_display()),
+        ]
+
+    def _application_boxes(self):
+        """What to know before answering: an earlier contract with the company, and the eligibility."""
+        boxes = []
+        contracts = list(self.job_seeker.contracts.filter(company=self.company).order_by("-start_date"))
+        if contracts:
+            last = contracts[0]
+            text = f"Contrat du {_fr(last.start_date)}" + (f" au {_fr(last.end_date)}" if last.end_date else "")
+            if len(contracts) > 1:
+                text += f", et {len(contracts) - 1} contrat{'s' if len(contracts) > 2 else ''} avant."
+            boxes.append(Box(text, title="Déjà en contrat chez vous"))
+        if not self.company.is_subject_to_iae_rules:
+            return boxes
+        approval = self.job_seeker.latest_approval
+        diagnosis = self.eligibility_diagnosis
+        if self.job_seeker.has_valid_approval:
+            boxes.append(
+                Box(
+                    f"Valide jusqu’au {_fr(approval.end_at)}. L’embauche ne demande pas de nouveau diagnostic.",
+                    title=f"{PASS_IAE} {approval.number_with_spaces}",
+                    variant="ok",
+                )
+            )
+        elif self.blocked_by_waiting_period:
+            # Same rule as apply.views.accept_views.check_waiting_period: hiring is not offered.
+            boxes.append(
+                Box(
+                    f"Son {PASS_IAE} a expiré le {_fr(approval.end_at)}. Jusqu’au {_fr(approval.waiting_period_end)}, "
+                    "seul un prescripteur habilité peut valider à nouveau son éligibilité.",
+                    title="Éligibilité à revalider",
+                    variant="warn",
+                )
+            )
+        elif diagnosis and diagnosis.is_considered_valid:
+            author = diagnosis.author_organization.display_name if diagnosis.author_organization else None
+            boxes.append(
+                Box(
+                    (f"Par {author}, " if author else "")
+                    + f"valable jusqu’au {_fr(diagnosis.considered_to_expire_at)}.",
+                    title="Éligibilité validée",
+                    variant="ok",
+                )
+            )
+        else:
+            boxes.append(
+                Box(
+                    f"Aucun diagnostic valide{NBSP}: vous sélectionnerez les critères administratifs "
+                    "au moment d’embaucher.",
+                    title="Éligibilité à établir",
+                    variant="warn",
+                )
+            )
+        return boxes
+
+    def steps_known(self, data):
+        return bool(data.get("decision"))
+
+    def _choices(self):
+        job_application = self.job_application
+        choices = []
+        if job_application.process.is_available():
+            choices.append(("process", "La mettre à l’étude"))
+        if job_application.postpone.is_available():
+            choices.append(("postpone", "La mettre en attente, avec un message"))
+        if job_application.accept.is_available() and not self.blocked_by_waiting_period:
+            choices.append(("accept", "Accepter l’embauche"))
+        if job_application.refuse.is_available():
+            choices.append(("refuse", "Décliner la candidature"))
+        return choices
+
+    def _job_seeker_info_forms(self, data, initial):
+        """Same forms as apply.views.common.CommonUserInfoFormsMixin: only the missing information is asked."""
+        job_seeker, profile = self.job_seeker, self.job_seeker.jobseeker_profile
+        initial = initial or {}  # These forms merge it with their own initial values.
+        forms = {}
+        personal_data = JobSeekerPersonalDataForm(
+            instance=job_seeker, initial=initial, data=data, back_url=self.request.path
+        )
+        if personal_data.fields:
+            forms["personal_data"] = personal_data
+        birth_data_kwargs = {"instance": profile, "initial": initial, "data": data}
+        birth_data_class = None
+        if profile.birthdate:
+            if not profile.birth_country:
+                birth_data_class = BirthPlaceWithoutBirthdateModelForm
+                birth_data_kwargs["birthdate"] = profile.birthdate
+        elif profile.birth_country_id and profile.birth_country_id != Country.FRANCE_ID:
+            birth_data_class = BirthDateForm
+        else:
+            birth_data_class = BirthPlaceWithBirthdateModelForm
+        if birth_data_class:
+            forms["birth_data"] = birth_data_class(**birth_data_kwargs)
+        if not job_seeker.address_on_one_line:
+            forms["user_address"] = JobSeekerAddressForm(instance=job_seeker, initial=initial, data=data)
+        return forms
+
+    def build_forms(self, data=None, initial=None):
+        job_applications = [self.job_application]
+        refusal_initial = initial
+        if initial is not None and not initial.get("job_seeker_answer") and initial.get("refusal_reason"):
+            refusal_initial = initial | {"job_seeker_answer": self._refusal_message(initial["refusal_reason"])}
+        criteria_initial = initial
+        if initial is None and self.job_seeker.last_checked_at > timezone.now() - timezone.timedelta(hours=24):
+            # Same initial criteria as eligibility_views.BaseIAEEligibilityViewForEmployer.
+            criteria_initial = {"administrative_criteria": get_criteria_from_job_seeker(self.job_seeker)}
+        return {
+            "decision": DecisionForm(data=data, initial=initial, choices=self._choices()),
+            "answer": AnswerForm(data=data, initial=initial),
+            "refusal_reason": JobApplicationRefusalReasonForm(job_applications, data=data, initial=initial),
+            "job_seeker_answer": JobApplicationRefusalJobSeekerAnswerForm(
+                job_applications, data=data, initial=refusal_initial
+            ),
+            "prescriber_answer": JobApplicationRefusalPrescriberAnswerForm(
+                job_applications, data=data, initial=initial
+            ),
+            **self._job_seeker_info_forms(data, initial),
+            "accept": AcceptForm(
+                instance=self.job_application,
+                company=self.company,
+                job_seeker=self.job_seeker,
+                iae_eligibility_diagnosis=self.eligibility_diagnosis,
+                current_user=self.request.user,
+                data=data,
+                initial=initial,
+            ),
+            "criteria": AdministrativeCriteriaForm(
+                is_authorized_prescriber=False, siae=self.company, data=data, initial=criteria_initial
+            ),
+        }
+
+    def _refusal_message(self, refusal_reason):
+        """Same default message as apply.views.batch_views.RefuseWizardView."""
+        if refusal_reason not in RefusalReason.values:
+            return ""
+        return loader.render_to_string(
+            f"apply/refusal_messages/{refusal_reason}.txt",
+            context={"to_company": self.company} if refusal_reason == RefusalReason.NON_ELIGIBLE else {},
+            request=self.request,
+        )
+
+    def _iae_eligibility_needed(self, data):
+        """Same rule as apply.views.common.IsIAEEligibilityDiagnosisNeededMixin."""
+        if not self.company.is_subject_to_iae_rules or self.job_seeker.has_valid_approval:
+            return False
+        diagnosis = self.eligibility_diagnosis
+        if diagnosis is None:
+            return True
+        if diagnosis.author_kind == AuthorKind.PRESCRIBER:
+            return False
+        field = forms.DateField(input_formats=[DuetDatePickerWidget.INPUT_DATE_FORMAT], required=False)
+        try:
+            hiring_start_at = field.clean(data.get("hiring_start_at")) or timezone.localdate()
+        except forms.ValidationError:
+            hiring_start_at = timezone.localdate()
+        return not diagnosis.expires_at > hiring_start_at
+
+    def steps(self, data):
+        pk = self.job_application.pk
+        decision_choices = {
+            "process": (None, f"Statut{NBSP}: {JobApplicationState.PROCESSING.label}"),
+            "postpone": (None, f"Statut{NBSP}: {JobApplicationState.POSTPONED.label}, avec un message"),
+            "accept": (None, "Le contrat, puis la confirmation de l’embauche"),
+            "refuse": (None, f"Statut{NBSP}: {JobApplicationState.REFUSED.label}, avec un motif et un message"),
+        }
+        steps = [
+            # As in the prototype: what to know before answering, then the answer.
+            Step(
+                "La candidature",
+                template="next_steps/journeys/application.html",
+                question="Ce qu’il faut savoir avant de répondre",
+                boxes=self._application_boxes(),
+            ),
+            Step(
+                "Votre réponse",
+                "decision",
+                question="Votre réponse",
+                layout={"decision": Show("options", decision_choices)},
+            ),
+        ]
+        match data.get("decision"):
+            case "postpone":
+                steps.append(
+                    Step(
+                        "Message",
+                        "answer",
+                        submit_label="Mettre en attente",
+                        question="Votre message",
+                        hint="Il sera visible par l’usager et le prescripteur.",
+                    )
+                )
+            case "refuse":
+                job_descriptions, close_spontaneous_applications = _get_recruitment_to_close(
+                    self.company, [self.job_application]
+                )
+                closed = [f"la fiche de poste {job_description.display_name}" for job_description in job_descriptions]
+                if close_spontaneous_applications:
+                    closed.append("toutes les candidatures spontanées")
+                steps += [
+                    Step(
+                        "Motif",
+                        "refusal_reason",
+                        question="Pourquoi déclinez-vous la candidature ?",
+                        layout={
+                            "refusal_reason": Show("select"),
+                            "refusal_reason_shared_with_job_seeker": Show("options"),
+                        },
+                        boxes=[
+                            Box(
+                                f"La réception des candidatures sera désactivée pour {', '.join(closed)}.",
+                                title=f"Avec le motif «{NBSP}{RefusalReason.NO_POSITION.label}{NBSP}»",
+                                variant="warn",
+                            )
+                        ]
+                        if closed
+                        else [],
+                    ),
+                    Step(
+                        "Message à l’usager",
+                        "job_seeker_answer",
+                        question="Votre message à l’usager",
+                        hint="Il est pré-rempli d’après le motif choisi. Vous pouvez le modifier.",
+                    ),
+                ]
+                # Same condition as apply.views.batch_views.RefuseWizardView.get_steps.
+                if self.job_application.sender_kind == SenderKind.PRESCRIBER:
+                    # Same wording as the existing screen: an orienter is not an authorized prescriber.
+                    recipient = (
+                        "au prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "à l’orienteur"
+                    )
+                    steps.append(
+                        Step(
+                            f"Message {recipient}",
+                            "prescriber_answer",
+                            question=f"Votre message {recipient}",
+                            hint="Il n’est pas communiqué à l’usager.",
+                        )
+                    )
+                steps[-1].submit_label = "Décliner la candidature"
+            case "accept" if not self.hiring_in_drawer:
+                url = reverse("apply:start-accept", kwargs={"job_application_id": pk})
+                steps.append(
+                    Step(
+                        "Embauche",
+                        handover=("Commencer l’embauche", url),
+                        question="L’embauche se poursuit sur l’écran habituel",
+                        hint="Elle demande des informations propres à votre structure.",
+                    )
+                )
+            case "accept":
+                info_forms = tuple(self._job_seeker_info_forms(None, None))
+                if info_forms:
+                    steps.append(
+                        Step(
+                            "Usager",
+                            info_forms,
+                            template="next_steps/journeys/job_seeker_infos.html",
+                            question="Informations à compléter",
+                            hint="Elles manquent sur son profil et sont nécessaires à l’embauche.",
+                        )
+                    )
+                steps.append(
+                    Step(
+                        "Contrat",
+                        "accept",
+                        template="next_steps/journeys/contract.html",
+                        question="Le contrat",
+                    )
+                )
+                if self._iae_eligibility_needed(data):
+                    steps.append(
+                        Step(
+                            "Éligibilité",
+                            "criteria",
+                            template="next_steps/journeys/criteria.html",
+                            question="Quels critères administratifs la personne remplit-elle ?",
+                            hint=(
+                                "Aucun diagnostic d’éligibilité valide ne couvre cette embauche. "
+                                "La pièce justificative à conserver est indiquée pour chaque critère."
+                            ),
+                        )
+                    )
+                steps.append(
+                    Step(
+                        "Confirmer",
+                        "accept",
+                        [],
+                        template=RECAP_TEMPLATE,
+                        submit_label="Accepter l’embauche",
+                        question="Vérifiez avant d’accepter l’embauche",
+                    )
+                )
+            case "process":
+                steps[-1].submit_label = "Mettre à l’étude"
+        return steps
+
+    def recap(self, forms):
+        accept_form = forms["accept"]
+        accept = accept_form.cleaned_data
+        lines = [("Début du contrat", _fr(accept["hiring_start_at"]))]
+        if accept.get("hiring_end_at"):
+            lines.append(("Fin prévisionnelle", _fr(accept["hiring_end_at"])))
+        if accept.get("hired_job"):
+            lines.append(("Poste retenu", _label(accept_form, "hired_job", accept["hired_job"])))
+        if self._iae_eligibility_needed(accept_form.data) and forms["criteria"].is_valid():
+            criteria = forms["criteria"].cleaned_data
+            lines.append(("Critères d’éligibilité", ", ".join(c.name for c in criteria) or "Aucun"))
+        if accept.get("answer"):
+            lines.append(("Message à l’usager", accept["answer"]))
+        return lines
+
+    def _meeting(self):
+        """Whom to meet before answering: the job seeker, and the professional who sent the application.
+
+        The job seeker gets an invitation through RDV-Insertion when the company uses it, the same as from the
+        existing application page, and picks a slot online. Otherwise, and for the professional who sent it (a
+        prescriber, or another employer), the platform has no appointment tool: an e-mail with a proposal to
+        complete, and the phone number. An application the company sent itself has no one else to meet.
+        """
+        job_application, job_seeker, company = self.job_application, self.job_seeker, self.company
+        employer = self.request.user
+        jobs = ", ".join(job.display_name for job in job_application.selected_jobs.all()) or "candidature spontanée"
+
+        def mailto(email, first_name):
+            subject = f"Candidature de {job_seeker.get_full_name()}{NBSP}: proposition de rendez-vous"
+            body = (
+                f"Bonjour {first_name},\n\n"
+                f"À la suite de la candidature de {job_seeker.get_full_name()} ({jobs}), "
+                "je vous propose un rendez-vous le … à … .\n\n"
+                f"Cordialement,\n{employer.get_full_name()}\n{company.display_name}"
+            )
+            query = urllib.parse.urlencode({"subject": subject, "body": body}, quote_via=urllib.parse.quote)
+            return f"mailto:{email}?{query}"
+
+        people = []
+        if can_view_personal_information(self.request, job_seeker):
+            rdvi = bool(company.rdv_solidarites_id)
+            people.append(
+                {
+                    "role": "L’usager",
+                    "name": job_seeker.get_full_name(),
+                    "phone": job_seeker.phone,
+                    "mailto": mailto(job_seeker.email, job_seeker.first_name) if job_seeker.email else "",
+                    "rdvi_url": (
+                        reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": job_application.pk})
+                        if rdvi
+                        else ""
+                    ),
+                    "rdvi_pending": rdvi
+                    and InvitationRequest.objects.filter(
+                        company=company,
+                        job_seeker=job_seeker,
+                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                    ).exists(),
+                }
+            )
+        sender = job_application.sender
+        role = organization = None
+        if job_application.sender_kind == SenderKind.PRESCRIBER:
+            role, organization = "Le prescripteur", job_application.sender_prescriber_organization
+        elif job_application.sender_kind == SenderKind.EMPLOYER and job_application.sender_company_id != company.pk:
+            role, organization = "L’employeur émetteur", job_application.sender_company
+        if role and sender:
+            people.append(
+                {
+                    "role": role,
+                    "name": sender.get_full_name() + (f", {organization.display_name}" if organization else ""),
+                    "phone": sender.phone,
+                    "mailto": mailto(sender.email, sender.first_name) if sender.email else "",
+                    "rdvi_url": "",
+                    "rdvi_pending": False,
+                }
+            )
+        return people
+
+    def context(self):
+        job_application = self.job_application
+        return {
+            "meeting": self._meeting(),
+            "details_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            "application_message": job_application.message,
+            "resume_url": (
+                reverse("apply:resume_download", kwargs={"job_application_id": job_application.pk})
+                if job_application.resume_id
+                else None
+            ),
+            "criteria_levels": CRITERIA_LEVELS,
+            "criteria_filled_from_job_seeker": None,
+            "company": self.company,
+            "hide_value": ContractType.OTHER.value,
+            # Set by the engine when the step shows them.
+            "form_personal_data": None,
+            "form_birth_data": None,
+            "form_user_address": None,
+        }
+
+    def done(self, forms):
+        decision = forms["decision"].cleaned_data["decision"]
+        if decision == "refuse":
+            return self._refuse(forms)
+        if decision == "accept":
+            return self._accept(forms)
+        request = self.request
+        job_application = self.job_application
+        # Same transitions as apply.views.process_views.process and postpone.
+        if decision == "postpone":
+            job_application.answer = forms["answer"].cleaned_data["answer"]
+            job_application.postpone(user=request.user)
+            lines = ["Votre message est visible par l’usager et le prescripteur."]
+        else:
+            job_application.process(user=request.user)
+            lines = []
+        return Result(
+            title="Réponse enregistrée", lines=[f"Statut{NBSP}: {job_application.get_state_display()}.", *lines]
+        )
+
+    def _refuse(self, forms):
+        """Same as apply.views.batch_views.RefuseWizardView.done, for one application."""
+        request = self.request
+        reason_data = forms["refusal_reason"].cleaned_data
+        applications = _get_and_lock_received_applications(request, [self.job_application.pk])
+        if not applications:
+            raise Http404
+        job_application = applications[0]
+        job_application.refusal_reason = reason_data["refusal_reason"]
+        job_application.refusal_reason_shared_with_job_seeker = reason_data["refusal_reason_shared_with_job_seeker"]
+        job_application.answer = forms["job_seeker_answer"].cleaned_data["job_seeker_answer"]
+        if job_application.sender_kind == SenderKind.PRESCRIBER:
+            job_application.answer_to_prescriber = forms["prescriber_answer"].cleaned_data["prescriber_answer"]
+        try:
+            job_application.refuse(user=request.user)
+        except xwf_models.InvalidTransitionError:
+            return Result(
+                title="La candidature n’a pas pu être déclinée",
+                lines=[f"Elle est au statut «{NBSP}{job_application.get_state_display()}{NBSP}»."],
+            )
+        lines = [f"Statut{NBSP}: {job_application.get_state_display()}."]
+        if reason_data["refusal_reason"] == RefusalReason.NO_POSITION:
+            job_descriptions, close_spontaneous_applications = _get_recruitment_to_close(
+                self.company, [job_application]
+            )
+            for job_description in job_descriptions:
+                job_description.is_active = False
+                # Save each instance (instead of a bulk update) to record the change in field_history
+                job_description.save(update_fields=["is_active", "updated_at"])
+                lines.append(f"La fiche de poste {job_description.display_name} ne reçoit plus de candidatures.")
+            if close_spontaneous_applications:
+                self.company.spontaneous_applications_open_since = None
+                self.company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+                lines.append("Les candidatures spontanées sont fermées.")
+        return Result(title="Candidature déclinée", lines=lines)
+
+    def _accept(self, forms):
+        """Same as apply.views.common.BaseConfirmationView.confirm_acceptance, after the employer's diagnosis."""
+        request = self.request
+        if self._iae_eligibility_needed(forms["accept"].data):
+            # Same as eligibility_views.BaseIAEEligibilityViewForEmployer.form_valid.
+            EligibilityDiagnosis.create_diagnosis(
+                self.job_seeker,
+                author=request.user,
+                author_siae=self.company,
+                administrative_criteria=forms["criteria"].cleaned_data,
+            )
+        try:
+            for name in ("personal_data", "user_address", "birth_data"):
+                if name in forms:
+                    forms[name].save()
+            # The instance is committed by the transition, performed by django-xworkflows.
+            job_application = forms["accept"].save(commit=False)
+            professional = job_application.advisor or request.user
+            job_application.accept(
+                user=professional,
+                action_kind=ActionKind.ACCEPT,
+                assigned_to_unknown_advisor=job_application.advisor is None,
+            )
+            # Mark job seeker's infos as up-to-date
+            job_application.job_seeker.last_checked_at = timezone.now()
+            job_application.job_seeker.save(update_fields=["last_checked_at"])
+        except xwf_models.InvalidTransitionError:
+            transaction.set_rollback(True)
+            return Result(title="La candidature n’a pas pu être acceptée", lines=["Action déjà effectuée."])
+        lines = [f"Contrat à partir du {_fr(job_application.hiring_start_at)}."]
+        if job_application.to_company.is_subject_to_iae_rules:
+            if job_application.approval:
+                lines.append(f"{PASS_IAE} {job_application.approval.number_with_spaces}.")
+            else:
+                lines.append(f"La demande de {PASS_IAE} est en cours de vérification auprès de nos équipes.")
+        return Result(title="Candidature acceptée", lines=lines)
+
+
+# Prescribers
+# ------------------------------------------------------------------------------
+
+
+JOURNEYS = {
+    "bilan": ProSupportReportFillJourney,
+    "candidature": JobApplicationJourney,
+}

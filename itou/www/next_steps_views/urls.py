@@ -7,4 +7,5 @@ app_name = "next_steps_views"
 
 urlpatterns = [
     path("", views.todo, name="todo"),
+    path("journeys/<slug:kind>/<str:pk>", views.journey, name="journey"),
 ]

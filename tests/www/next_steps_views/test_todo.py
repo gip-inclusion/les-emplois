@@ -22,6 +22,10 @@ TODO_URL = reverse("next_steps_views:todo")
 NBSP = "\u00a0"
 
 
+def journey_url(kind, pk):
+    return reverse("next_steps_views:journey", kwargs={"kind": kind, "pk": pk})
+
+
 NAV_LINK = f'href="{TODO_URL}"'
 
 
@@ -163,6 +167,7 @@ def test_employer_new_job_application(employer_client, employer_membership):
     assertContains(response, "En attente de réponse depuis aujourd’hui")
     assertContains(response, "1 action vous attend")
     assertContains(response, "Répondre à sa candidature")
+    assertContains(response, journey_url("candidature", job_application.pk))
 
 
 def test_employer_ended_contract(employer_client, employer_membership):
@@ -177,6 +182,7 @@ def test_employer_ended_contract(employer_client, employer_membership):
     ]
     assertContains(response, f"En retard de 3{NBSP}jours")
     assertContains(response, f"Le contrat est terminé depuis le {contract.end_date:%d/%m/%Y}")
+    assertContains(response, journey_url("bilan", job_seeker.public_id))
 
     # Once the report is filled, only the suspension remains.
     ProSupportReportFactory(contract=contract)
