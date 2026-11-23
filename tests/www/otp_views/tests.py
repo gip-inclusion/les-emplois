@@ -290,7 +290,7 @@ def test_enrollment_step_1_choose_device_type(client, settings):
     assertContains(response, "<strong>Étape 1</strong>/4 : choisissez votre méthode")
 
 
-class TestEnrollmentSteps2And3ConfirmDevice:
+class TestEnrollmentSteps3And4ConfirmDevice:
     @pytest.fixture(autouse=True)
     def require_otp_for_pros(self, settings):
         # Enrollment pages are only reachable when our own 2FA applies to the user
