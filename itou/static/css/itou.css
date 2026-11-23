@@ -382,3 +382,30 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-primary, #000638);
     color: #fff;
 }
+
+/* Prochaines étapes (experiment)
+--------------------------------------------------------------------------- */
+/* The pages are built with itou-theme components and utilities. Below, only what the theme has no equivalent for. */
+
+/* Pages: a grey background, as in the prototype, so that the white boxes stand out. */
+.p-next-steps,
+.p-next-steps .s-main {
+    background-color: var(--bs-light, #f8f8f8);
+}
+
+/* The side menu shares that grey: a line marks where it ends. */
+@media (min-width: 1280px) {
+    .p-next-steps.l-authenticated #offcanvasNav {
+        border-right: 1px solid var(--bs-border-color, #e6e6eb);
+    }
+}
+
+/* The title scrolls with the page, on the grey background, instead of sticking on white. */
+.p-next-steps.l-authenticated > .s-main .s-title-02 {
+    position: static;
+    background-color: transparent;
+}
+
+.p-next-steps.l-authenticated > .s-main .s-title-02::after {
+    content: none;
+}

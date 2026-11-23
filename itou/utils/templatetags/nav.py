@@ -1,3 +1,5 @@
+import copy
+
 from django import template
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -9,6 +11,7 @@ from itou.www.geiq_assessments_views.views import (
     INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
     employer_has_access_to_assessments,
 )
+from itou.www.next_steps_views.access import can_view_next_steps
 
 
 register = template.Library()
@@ -24,6 +27,7 @@ class NavItem:
         active_view_names,
         is_new=False,
         is_beta=False,
+        counter=0,
         matomo_event_category=None,
         matomo_event_name=None,
         matomo_event_option=None,
@@ -34,6 +38,8 @@ class NavItem:
         self.active_view_names = active_view_names
         self.is_new = is_new
         self.is_beta = is_beta
+        # A number to act upon, as a red badge: set per request, on a copy of the entry.
+        self.counter = counter
         self.matomo_event_category = matomo_event_category
         self.matomo_event_name = matomo_event_name
         self.matomo_event_option = matomo_event_option
@@ -74,6 +80,13 @@ NAV_ENTRIES = {
         icon="ri-home-line",
         target=reverse_lazy("dashboard:index"),
         active_view_names=["dashboard:index", "dashboard:index_stats", "home:hp"],
+    ),
+    # Experiment, see itou.www.next_steps_views.access.
+    "next-steps": NavItem(
+        label="À faire",
+        icon="ri-list-check-3",
+        target=reverse_lazy("next_steps_views:todo"),
+        active_view_names=["next_steps_views:todo"],
     ),
     "employers-search": NavItem(
         label="Un emploi inclusif",
@@ -304,10 +317,22 @@ def is_active(request, menu_item):
     return request.resolver_match.view_name in menu_item.active_view_names
 
 
+def _next_steps_entry(request):
+    """The experiment's entry, with the number of urgent actions (late or due today) as on its page."""
+    # Imported here: the queue's rules import much of the project, which imports this module.
+    from itou.www.next_steps_views.actions import Group, expected_actions
+
+    entry = copy.copy(NAV_ENTRIES["next-steps"])
+    entry.counter = sum(action.group in (Group.LATE, Group.TODAY) for action in expected_actions(request))
+    return entry
+
+
 @register.inclusion_tag("utils/templatetags/nav.html")
 def nav(request):
     menu_items: list[NavItem | NavGroup] = [NAV_ENTRIES["home"]]
     try:
+        if can_view_next_steps(request):
+            menu_items.append(_next_steps_entry(request))
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.from_prescriber:

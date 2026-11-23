@@ -1,0 +1,66 @@
+{% extends "next_steps/layout.html" %}
+{% load components %}
+{% load str_filters %}
+
+{% block title %}À faire {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1 id="next-steps-count"
+                hx-get="{{ request.get_full_path }}"
+                hx-trigger="nextStepsChanged from:body"
+                hx-select="#next-steps-count"
+                hx-target="this"
+                hx-swap="outerHTML">
+                {% if pressing_count %}
+                    {{ pressing_count }} action{{ pressing_count|pluralizefr }} vous attend{{ pressing_count|pluralizefr:"ent" }}
+                {% else %}
+                    Rien ne vous attend
+                {% endif %}
+            </h1>
+            <p>
+                Les personnes que vous accompagnez, rangées par ce qu’il faut faire pour elles.
+                Chaque action se fait étape par étape, dans le panneau de droite.
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-9" id="next-steps-queue">
+                    {% for group in groups %}
+                        <section class="mb-5" aria-labelledby="next-steps-{{ group.key }}">
+                            <h2 class="h3 mb-1" id="next-steps-{{ group.key }}">
+                                {{ group.label }} <span class="text-muted fw-normal">{{ group.count }}</span>
+                            </h2>
+                            <p class="fs-sm text-muted mb-3">{{ group.help }}</p>
+                            {% for action in group.actions %}
+                                {% include "next_steps/includes/action.html" with action=action group=group.key hide_job_seeker=False %}
+                            {% empty %}
+                                <p class="c-box text-muted mb-0">Rien pour le moment.</p>
+                            {% endfor %}
+                            {% if group.folded %}
+                                {# Many job applications would push the rarer actions out of sight: the others are folded, without JavaScript. #}
+                                <details class="mb-2">
+                                    <summary class="btn btn-sm btn-link px-0">
+                                        Afficher {{ group.folded|length }} autre{{ group.folded|length|pluralizefr }} candidature{{ group.folded|length|pluralizefr }}
+                                    </summary>
+                                    <div class="mt-2">
+                                        {% for action in group.folded %}
+                                            {% include "next_steps/includes/action.html" with action=action group=group.key hide_job_seeker=False %}
+                                        {% endfor %}
+                                    </div>
+                                </details>
+                            {% endif %}
+                        </section>
+                    {% endfor %}
+                    {% include "next_steps/includes/done_today.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
