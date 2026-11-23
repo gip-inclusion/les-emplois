@@ -7,6 +7,7 @@
 
 import argparse
 import enum
+import json
 import os
 import shlex
 import subprocess
@@ -28,14 +29,11 @@ def parse_args():
         type=UseCase,
         choices=UseCase,
     )
-    parser.add_argument("--app")
     return parser.parse_args()
 
 
-def read_clever_env(app=None):
-    args = [os.environ["CLEVER_CLI"], "env"]
-    if app:
-        args.extend(["--app", app])
+def read_clever_env(app):
+    args = [os.environ["CLEVER_CLI"], "env", "--app", app]
     output = subprocess.run(args, check=True, capture_output=True, text=True)
     envlines = shlex.split(
         "\n".join(
@@ -49,6 +47,26 @@ def read_clever_env(app=None):
     return env
 
 
+def get_review_apps_names() -> set[str]:
+    args = [os.environ["CLEVER_CLI"], "applications", "list", "--format", "json"]
+    names = set()
+    for space in json.loads(subprocess.run(args, check=True, capture_output=True, text=True).stdout):
+        if space["name"] != "Emplois-review-apps":
+            continue
+        for app in space["applications"]:
+            names.add(app["name"])
+    return names
+
+
+def get_review_apps_bucket_names(s3_client) -> set[str]:
+    bucketnames = set()
+    for bucket in s3_client.list_buckets()["Buckets"]:
+        name = bucket["Name"]
+        if name.startswith("c1-review-"):
+            bucketnames.add(name)
+    return bucketnames
+
+
 def list_old_tests_buckets(s3_client):
     bucketnames = []
     cutoff = date.today() - timedelta(days=1)
@@ -59,30 +77,29 @@ def list_old_tests_buckets(s3_client):
     return bucketnames
 
 
+def get_s3_client(env):
+    return boto3.client(
+        service_name="s3",
+        aws_access_key_id=env["CELLAR_ADDON_KEY_ID"],
+        aws_secret_access_key=env["CELLAR_ADDON_KEY_SECRET"],
+        endpoint_url=f"https://{env['CELLAR_ADDON_HOST']}",
+    )
+
+
 def main(use_case, app=None):
+    bucketnames = ()
     match use_case:
         case UseCase.CI_BUCKETS:
+            s3_client = get_s3_client(os.environ)
             if os.getenv("CI") != "true":
                 raise RuntimeError("Should never run on important environments.")
-            s3_client = boto3.client(
-                service_name="s3",
-                aws_access_key_id=os.environ["CELLAR_ADDON_KEY_ID"],
-                aws_secret_access_key=os.environ["CELLAR_ADDON_KEY_SECRET"],
-                endpoint_url=f"https://{os.environ['CELLAR_ADDON_HOST']}",
-            )
             bucketnames = list_old_tests_buckets(s3_client)
         case UseCase.REVIEW_APP:
-            env = read_clever_env(app)
-            if env.get("ITOU_ENVIRONMENT") != "REVIEW-APP":
-                print("Only run this command for review apps.")
-                return
-            s3_client = boto3.client(
-                service_name="s3",
-                aws_access_key_id=env["CELLAR_ADDON_KEY_ID"],
-                aws_secret_access_key=env["CELLAR_ADDON_KEY_SECRET"],
-                endpoint_url=f"https://{env['CELLAR_ADDON_HOST']}",
-            )
-            bucketnames = [env["S3_STORAGE_BUCKET_NAME"]]
+            if current_apps := get_review_apps_names():
+                env = read_clever_env(list(current_apps)[0])
+                s3_client = get_s3_client(env)
+                current_buckets = get_review_apps_bucket_names(s3_client)
+                bucketnames = current_buckets - current_apps
         case _ as name:
             raise TypeError(f"Unknown use case {name}.")
 
