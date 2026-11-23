@@ -16,30 +16,35 @@
                 </h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
-            <div class="modal-body">
-                {% if can_orient_towards_insertion_service %}
-                    <div class="form-group">
-                        <label class="form-label" for="service-contact-phone-notes">Notes privées</label>
-                        <textarea class="form-control"
-                                  id="service-contact-phone-notes"
-                                  name="notes"
-                                  rows="4"
-                                  placeholder="Ces notes ne sont visibles que par vous et votre organisation."></textarea>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline-primary btn-sm"
-                        data-bs-dismiss="modal"
-                        aria-label="Fermer"
-                        type="button">Fermer</button>
-                {% if can_orient_towards_insertion_service %}
-                    {# FIXME: enabled by the "Prise de contact" PR, which adds the tracking table save procedure. #}
-                    <button class="btn btn-primary btn-sm"
-                            type="button"
-                            disabled>Enregistrer dans le tableau de suivi</button>
-                {% endif %}
-            </div>
+            <form method="post" action="{% url 'insertion_views:start_contact_orientation' service_uid=service.uid %}">
+                <div class="modal-body">
+                    {% if can_orient_towards_insertion_service %}
+                        {% csrf_token %}
+                        <input type="hidden" name="kind" value="tel">
+                        {% if job_seeker %}
+                            <input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">
+                        {% endif %}
+                        <div class="form-group">
+                            <label class="form-label" for="service-contact-phone-notes">Notes privées</label>
+                            <textarea class="form-control"
+                                      id="service-contact-phone-notes"
+                                      name="notes"
+                                      rows="4"
+                                      placeholder="Ces notes ne sont visibles que par vous et votre organisation."></textarea>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-primary btn-sm"
+                            data-bs-dismiss="modal"
+                            aria-label="Fermer"
+                            type="button">Fermer</button>
+                    {% if can_orient_towards_insertion_service %}
+                        <button class="btn btn-primary btn-sm"
+                                type="submit">Enregistrer dans le tableau de suivi</button>
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </div>
 </div>

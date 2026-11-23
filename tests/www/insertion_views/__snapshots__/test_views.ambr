@@ -4294,7 +4294,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_age_only-authorized_prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4340,7 +4340,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_age_only-employer][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4386,7 +4386,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_age_only-prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4430,7 +4430,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_and_dept-authorized_prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4476,7 +4476,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_and_dept-employer][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4522,7 +4522,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_and_dept-prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4566,7 +4566,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_only-authorized_prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4612,7 +4612,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_only-employer][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4658,7 +4658,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_only-prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4702,7 +4702,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_full_info-authorized_prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4748,7 +4748,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_full_info-employer][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">
@@ -4794,7 +4794,7 @@
 # ---
 # name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_full_info-prescriber][send-email-content]
   '''
-  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/?job_seeker_public_id=[PUBLIC ID of JobSeeker]" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
       <div class="modal-content">
           <div class="modal-header">
               <h3 class="modal-title" id="service-send-email-modal-label">

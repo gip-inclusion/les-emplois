@@ -9,7 +9,7 @@
         {% partialdef service-send-email-content inline %}
             <form id="service-send-email-content"
                   class="js-prevent-multiple-submit"
-                  hx-post="{{ request.path }}"
+                  hx-post="{{ request.get_full_path }}"
                   hx-target="#service-send-email-content"
                   hx-swap="outerHTML">
                 <div class="modal-content">

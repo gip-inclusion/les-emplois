@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import json
 import random
 import uuid
@@ -32,6 +33,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     MobilizationEventKind,
+    OrientationContactKind,
     OrientationRefusalReason,
     OrientationStatus,
 )
@@ -47,6 +49,7 @@ from itou.insertion.models import (
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, Title
+from itou.users.models import JobSeekerAssignment
 from itou.utils import triggers
 from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 from itou.utils.brand import product_name
@@ -1280,8 +1283,10 @@ class TestServices:
         modal = parse_response_to_soup(response, "#service-contact-phone-modal")
         save_button = modal.find("button", string="Enregistrer dans le tableau de suivi")
         if user_factory in (PrescriberFactory, EmployerFactory):
-            # The tracking table save procedure is not implemented yet.
-            assert save_button.has_attr("disabled")
+            assert not save_button.has_attr("disabled")
+            assert modal.find("form")["action"] == reverse(
+                "insertion_views:start_contact_orientation", kwargs={"service_uid": service.uid}
+            )
             assert modal.find("textarea", {"name": "notes"})
         else:
             # Users who cannot orient only see the contact details.
@@ -1431,7 +1436,12 @@ class TestServices:
         data = {"body": "Bonjour, je souhaiterais orienter un usager."}
         response = client.post(self.get_service_url(service), headers=headers, data=data)
 
-        assertContains(response, "Le message a bien été envoyé.")
+        # The email is sent, the user is then redirected to the follow up table save procedure.
+        assert response["HX-Redirect"] == reverse(
+            "insertion_views:start_contact_orientation",
+            kwargs={"service_uid": service.uid},
+            query={"kind": "email"},
+        )
         mobilization_email = MobilizationEmail.objects.filter(
             sender=sender,
             sender_prescriber_organization=sender_prescriber_organization,
@@ -1540,6 +1550,164 @@ class TestServices:
             service=service,
         ).last()
         assert mobilization_email.mobilization_event == second_mobilization_event
+
+
+class TestStartContactOrientation:
+    def get_url(self, service, **query):
+        return reverse(
+            "insertion_views:start_contact_orientation",
+            kwargs={"service_uid": service.uid},
+            query=query,
+        )
+
+    @pytest.mark.parametrize(
+        "kind,event_kind",
+        [
+            ("tel", MobilizationEventKind.SERVICE_CONTACT_TEL),
+            ("email", MobilizationEventKind.SERVICE_CONTACT_EMAIL),
+        ],
+    )
+    def test_creates_contact_orientation_with_known_job_seeker(self, client, kind, event_kind):
+        membership = PrescriberMembershipFactory(user__phone="01 23 45 67 89")
+        sender = membership.user
+        service = ServiceFactory(contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        client.force_login(sender)
+        # The iMER registered when clicking "Appeler" / "Envoyer un email".
+        event = MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=membership.organization,
+            service=service,
+            structure=service.structure,
+            kind=event_kind,
+            hashed_session_key=hashlib.sha256(client.session.session_key.encode()).hexdigest(),
+        )
+
+        response = client.post(
+            self.get_url(service, job_seeker_public_id=job_seeker.public_id),
+            data={"kind": kind, "notes": "Rappeler la semaine prochaine."},
+        )
+
+        orientation = Orientation.objects.get()
+        assertRedirects(
+            response,
+            reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id}),
+        )
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+        assert orientation.service == service
+        assert orientation.beneficiary == job_seeker
+        assert orientation.sender == sender
+        assert orientation.sender_kind == SenderKind.PRESCRIBER
+        assert orientation.sender_prescriber_organization == membership.organization
+        assert orientation.referent_notes == "Rappeler la semaine prochaine."
+        assert orientation.referent_email == sender.email
+        assert orientation.referent_last_name == sender.last_name
+        assert orientation.referent_first_name == sender.first_name
+        # The referent phone is normalized from the sender's own phone number.
+        assert orientation.referent_phone == "0123456789"
+        assert orientation.contact_kind == kind
+        # The iMER is linked to the created orientation.
+        event.refresh_from_db()
+        assert event.orientation == orientation
+        assert JobSeekerAssignment.objects.filter(job_seeker=job_seeker, professional=sender).exists()
+        # No notification is sent: the user already contacted the service themselves.
+        assert not OrientationProcessLink.objects.exists()
+
+    def test_email_body_is_saved_as_referent_notes(self, client):
+        service = ServiceFactory(contact_email="contact@example.com")
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberMembershipFactory().user)
+        body = "Bonjour, je souhaiterais orienter un usager."
+
+        # Sending the email redirects to the follow up table save procedure.
+        response = client.post(
+            reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}),
+            headers={"HX-Request": "true"},
+            data={"body": body},
+        )
+        follow_up_url = self.get_url(service, kind="email", job_seeker_public_id=job_seeker.public_id)
+        client.get(follow_up_url)
+
+        orientation = Orientation.objects.get()
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+        assert orientation.referent_notes == body
+        assert response["HX-Redirect"] == self.get_url(service, kind="email")
+
+    def test_employer_sender(self, client):
+        membership = CompanyMembershipFactory()
+        service = ServiceFactory(contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        client.force_login(membership.user)
+
+        client.post(self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "tel"})
+
+        orientation = Orientation.objects.get()
+        assert orientation.sender_kind == SenderKind.EMPLOYER
+        assert orientation.sender_company == membership.company
+        assert orientation.sender_prescriber_organization is None
+        assert orientation.referent_notes == ""
+        assert orientation.contact_kind == OrientationContactKind.PHONE
+
+    def test_without_job_seeker_goes_through_the_selection_tunnel(self, client):
+        membership = PrescriberMembershipFactory()
+        sender = membership.user
+        # A phone only service: it cannot be oriented to via the internal form.
+        service = ServiceFactory(contact_email="", contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        client.force_login(sender)
+
+        response = client.post(self.get_url(service), data={"kind": "tel", "notes": "Pas joignable."})
+        select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+        assertRedirects(response, select_url)
+        assert not Orientation.objects.exists()
+
+        # The selection screen is reachable even though the service is not orientable.
+        response = client.get(select_url)
+        assert response.status_code == 200
+
+        # Selecting a job seeker goes through the wizard entry point, which resumes the contact orientation.
+        start_orientation_url = reverse(
+            "insertion_views:start_orientation",
+            kwargs={"service_uid": service.uid},
+            query={"job_seeker_public_id": job_seeker.public_id},
+        )
+        response = client.get(start_orientation_url)
+        assertRedirects(
+            response,
+            self.get_url(service, job_seeker_public_id=job_seeker.public_id),
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(self.get_url(service, job_seeker_public_id=job_seeker.public_id))
+        orientation = Orientation.objects.get()
+        assertRedirects(
+            response,
+            reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id}),
+        )
+        # The notes typed in the modal survived the tunnel.
+        assert orientation.referent_notes == "Pas joignable."
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+
+    def test_bad_kind(self, client):
+        service = ServiceFactory()
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberMembershipFactory().user)
+
+        response = client.post(
+            self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "carrier pigeon"}
+        )
+        assert response.status_code == 404
+        assert not Orientation.objects.exists()
+
+    @pytest.mark.parametrize("user_factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_forbidden_for_users_who_cannot_orient(self, client, user_factory):
+        service = ServiceFactory()
+        job_seeker = JobSeekerFactory()
+        client.force_login(user_factory())
+
+        response = client.post(self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "tel"})
+        assert response.status_code == 403
+        assert not Orientation.objects.exists()
 
 
 class TestOrientationDetailsForSender:

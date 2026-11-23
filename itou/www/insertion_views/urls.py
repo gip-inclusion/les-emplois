@@ -15,6 +15,11 @@ urlpatterns = [
         name="start_orientation",
     ),
     path(
+        "orientations/<encoded_uid:service_uid>/contact/",
+        views.start_contact_orientation,
+        name="start_contact_orientation",
+    ),
+    path(
         "orientations/<encoded_uid:service_uid>/job-seeker/",
         views.OrientationSelectJobSeekerView.as_view(),
         name="orientation_select_job_seeker",
