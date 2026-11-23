@@ -1,0 +1,49 @@
+{# Barriers in three columns, from the reports, the eligibility criteria and the orientations (next_steps_views.barriers). #}
+<section class="mb-5" aria-labelledby="next-steps-barriers">
+    <h2 class="h3 mb-3" id="next-steps-barriers">Freins à lever</h2>
+    {# On white, as the other sections: the light columns and the white cards stand out. #}
+    <div class="c-box">
+        <p class="fs-sm text-muted mb-3">
+            Ce qui empêche la personne d’avancer, et ce qui est déjà en route, d’après les bilans d’accompagnement, les critères d’éligibilité et les orientations que vous pouvez consulter.
+            {% if not barriers.report %}Aucun bilan d’accompagnement pour le moment.{% endif %}
+        </p>
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <div class="bg-light rounded-3 p-3 d-flex flex-column gap-3 h-100">
+                    <h3 class="mb-0 lh-1">
+                        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning border border-warning">À travailler</span>
+                    </h3>
+                    {% for card in barriers.to_work %}
+                        {% include "next_steps/includes/barrier_card.html" with card=card tone="warning" only %}
+                    {% empty %}
+                        <p class="fs-sm text-muted mb-0">Aucun</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="bg-light rounded-3 p-3 d-flex flex-column gap-3 h-100">
+                    <h3 class="mb-0 lh-1">
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info border border-info">En cours</span>
+                    </h3>
+                    {% for card in barriers.in_progress %}
+                        {% include "next_steps/includes/barrier_card.html" with card=card tone="info" only %}
+                    {% empty %}
+                        <p class="fs-sm text-muted mb-0">Aucun</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="bg-light rounded-3 p-3 d-flex flex-column gap-3 h-100">
+                    <h3 class="mb-0 lh-1">
+                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success border border-success">Levés</span>
+                    </h3>
+                    {% for card in barriers.lifted %}
+                        {% include "next_steps/includes/barrier_card.html" with card=card tone="success" only %}
+                    {% empty %}
+                        <p class="fs-sm text-muted mb-0">Aucun</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

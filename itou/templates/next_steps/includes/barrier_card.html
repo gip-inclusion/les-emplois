@@ -1,0 +1,84 @@
+{# One barrier: its icon and name (itou-theme c-box--results__summary), where it comes from, what is under way. #}
+<article class="c-box p-3 d-flex flex-column gap-2">
+    <div class="d-flex align-items-center gap-2">
+        {# In the colour of the column: warning, info, success. #}
+        <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-{{ tone }}-lighter text-{{ tone }}"
+              aria-hidden="true"><i class="{{ card.icon }}"></i></span>
+        <div>
+            {% if card.category %}<span class="d-block fs-xs text-muted">{{ card.category }}</span>{% endif %}
+            <span class="d-block fw-bold">{{ card.name }}</span>
+        </div>
+    </div>
+    {% for clue in card.clues %}
+        {% if clue.kind == "orientation" %}
+            <p class="fs-xs border-top pt-2 mb-0">
+                <b>En cours&nbsp;:</b>
+                {% if clue.url %}
+                    {# Opens the orientation in the side drawer; without JavaScript, as a page. #}
+                    <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover"
+                       href="{{ clue.url }}"
+                       hx-get="{{ clue.url }}"
+                       hx-target="#next-step-journey"
+                       hx-swap="outerHTML"
+                       hx-indicator="#next-step-journey"
+                       data-bs-toggle="offcanvas"
+                       data-bs-target="#next-step-drawer"
+                       aria-controls="next-step-drawer">{{ clue.text }}</a>
+                {% else %}
+                    {{ clue.text }}
+                {% endif %}
+            </p>
+        {% else %}
+            <p class="fs-xs text-muted mb-0">
+                {{ clue.text }}
+                {% if clue.certified %}<span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>{% endif %}
+            </p>
+            {% if clue.reports %}
+                {# The reports it comes from, in the side drawer; without JavaScript, as pages. #}
+                <p class="d-flex flex-wrap column-gap-3 fs-xs mb-0">
+                    {% for label, url in clue.reports %}
+                        <a class="link-tertiary"
+                           href="{{ url }}"
+                           hx-get="{{ url }}"
+                           hx-target="#next-step-journey"
+                           hx-swap="outerHTML"
+                           hx-indicator="#next-step-journey"
+                           data-bs-toggle="offcanvas"
+                           data-bs-target="#next-step-drawer"
+                           aria-controls="next-step-drawer"><i class="ri-file-edit-line" aria-hidden="true"></i> {{ label }}</a>
+                    {% endfor %}
+                </p>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if card.search_url or card.lift_url or card.back_url %}
+        <div class="d-flex flex-wrap gap-2">
+            {% if card.search_url %}
+                <a class="btn btn-sm btn-primary" href="{{ card.search_url }}">Trouver une solution</a>
+            {% endif %}
+            {# Stating it lifted or back: a confirmation in the side drawer; without JavaScript, as a page. #}
+            {% if card.lift_url %}
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ card.lift_url }}"
+                   hx-get="{{ card.lift_url }}"
+                   hx-target="#next-step-journey"
+                   hx-swap="outerHTML"
+                   hx-indicator="#next-step-journey"
+                   data-bs-toggle="offcanvas"
+                   data-bs-target="#next-step-drawer"
+                   aria-controls="next-step-drawer">Marquer comme levé</a>
+            {% endif %}
+            {% if card.back_url %}
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ card.back_url }}"
+                   hx-get="{{ card.back_url }}"
+                   hx-target="#next-step-journey"
+                   hx-swap="outerHTML"
+                   hx-indicator="#next-step-journey"
+                   data-bs-toggle="offcanvas"
+                   data-bs-target="#next-step-drawer"
+                   aria-controls="next-step-drawer">Le frein est revenu</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</article>

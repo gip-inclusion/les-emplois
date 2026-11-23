@@ -1,0 +1,29 @@
+{# The barriers the professional confirms when validating the eligibility: the ones the criteria and the earlier #}
+{# statements suggest are checked, each with where it comes from. As the criteria step, one card per option. #}
+{% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+{% for error in form.barriers.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+{% if not form.suggested %}
+    <p class="fs-sm text-muted mb-3">Aucun frein repéré par les critères. Ajoutez ceux que vous avez constatés, ou continuez.</p>
+{% endif %}
+<fieldset>
+    <legend class="visually-hidden">{{ form.barriers.label }}</legend>
+    <div class="d-flex flex-column gap-2">
+        {% for option in form.options %}
+            <label class="next-step-option d-flex align-items-center gap-3 border rounded-2 px-3 py-2"
+                   for="{{ option.id }}">
+                <input class="form-check-input flex-shrink-0 mt-0"
+                       type="checkbox"
+                       name="{{ form.barriers.html_name }}"
+                       value="{{ option.value }}"
+                       id="{{ option.id }}"
+                       {% if option.checked %}checked{% endif %}>
+                <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-warning-lighter text-warning"
+                      aria-hidden="true"><i class="{{ option.icon }}"></i></span>
+                <span class="d-flex flex-column">
+                    <b>{{ option.label }}</b>
+                    {% if option.hint %}<span class="fs-sm text-muted">{{ option.hint }}</span>{% endif %}
+                </span>
+            </label>
+        {% endfor %}
+    </div>
+</fieldset>

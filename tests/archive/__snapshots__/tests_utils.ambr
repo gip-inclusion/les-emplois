@@ -197,6 +197,11 @@
       'model': 'job_applications.JobApplicationTransitionLog',
     }),
     dict({
+      'field': 'author',
+      'hidden': True,
+      'model': 'next_steps.JobSeekerBarrier',
+    }),
+    dict({
       'field': 'user',
       'hidden': True,
       'model': 'otp.ResetRequestTransitionLog',
@@ -309,6 +314,11 @@
       'field': 'sender',
       'hidden': False,
       'model': 'invitations.PrescriberWithOrgInvitation',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'next_steps.JobSeekerBarrier',
     }),
     dict({
       'field': 'user',

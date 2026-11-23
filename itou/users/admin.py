@@ -324,6 +324,7 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
     "job_applications",  # JobApplication.job_seeker
     "job_seeker_assignments",  # JobSeekerAssignment.job_seeker
+    "next_steps_barriers",  # JobSeekerBarrier.job_seeker (the « Prochaines étapes » experiment)
     "orientations",  # Orientation.beneficiary
     "pro_support_reports",  # ProSupportReport.job_seeker
 }

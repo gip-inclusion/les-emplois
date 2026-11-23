@@ -24,6 +24,7 @@ from itou.companies.models import ProSupportReport
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.www.job_seekers_views.views import _pro_support_request_company_email
@@ -563,6 +564,7 @@ def _employer_done(request):
     ).select_related("job_seeker")
     for report in reports:
         yield Done(report.job_seeker, "bilan d’accompagnement envoyé", report.created_at)
+    yield from _barriers_lifted(request, author_company=company)
 
 
 def _prescriber_done(request):
@@ -581,6 +583,16 @@ def _prescriber_done(request):
     ).select_related("job_seeker")
     for diagnosis in diagnoses:
         yield Done(diagnosis.job_seeker, "éligibilité IAE validée", diagnosis.created_at)
+    yield from _barriers_lifted(request, author_prescriber_organization=organization)
+
+
+def _barriers_lifted(request, **organization):
+    """The barriers stated lifted from their cards today."""
+    statements = JobSeekerBarrier.objects.filter(
+        author=request.user, status=BarrierStatus.LIFTED, **organization, **_today_lookup("created_at")
+    ).select_related("job_seeker")
+    for statement in statements:
+        yield Done(statement.job_seeker, f"frein levé{NBSP}: {statement.get_barrier_display()}", statement.created_at)
 
 
 def done_today(request):

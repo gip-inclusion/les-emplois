@@ -142,6 +142,10 @@
                         {% endfor %}
                     </section>
 
+                    {% if show_barriers %}
+                        {% include "next_steps/includes/barriers.html" with barriers=barriers only %}
+                    {% endif %}
+
                     {% include "next_steps/includes/file.html" with parts=file_parts request=request only %}
                 </div>
             </div>

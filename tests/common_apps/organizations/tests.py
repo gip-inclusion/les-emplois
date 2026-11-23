@@ -20,6 +20,7 @@ from itou.institutions.models import Institution
 from itou.job_applications import models as job_applications_models
 from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
+from itou.next_steps import models as next_steps_models
 from itou.prescribers import models as prescribers_models
 from itou.rdv_insertion import models as rdv_insertion_models
 from itou.users import enums as users_enums, models as users_models
@@ -136,6 +137,8 @@ class TestOrganizationTransfer:
                 (Appellation, "company"),  # handled through `JobDescription`
                 (job_applications_models.JobApplicationComment, "company"),
                 (job_applications_models.JobApplicationTransitionLog, "target_company"),
+                # Where its author worked when they stated it: not moved by a transfer.
+                (next_steps_models.JobSeekerBarrier, "author_company"),
                 (rdv_insertion_models.Appointment, "company"),
                 (rdv_insertion_models.InvitationRequest, "company"),
                 (users_models.User, "created_company_set"),
@@ -144,6 +147,8 @@ class TestOrganizationTransfer:
                 (NotificationSettings, "company"),
             },
             prescribers_models.PrescriberOrganization: {
+                # Where its author worked when they stated it: not moved by a transfer.
+                (next_steps_models.JobSeekerBarrier, "author_prescriber_organization"),
                 (insertion_models.MobilizationEmail, "sender_prescriber_organization"),
                 (insertion_models.MobilizationEvent, "prescriber_organization"),
                 (users_models.User, "authorization_status_set"),

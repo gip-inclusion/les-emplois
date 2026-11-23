@@ -1,0 +1,70 @@
+{% load matomo %}
+{% load str_filters %}
+{# State a barrier lifted, or back, in the side drawer or inside a page (next_steps_views.barrier_statement). #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">
+                    {% if lifting %}
+                        Marquer le frein comme levé
+                    {% else %}
+                        Le frein est revenu
+                    {% endif %}
+                </h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post"
+          action="{{ request.path }}"
+          class="d-flex flex-column flex-grow-1 overflow-hidden js-prevent-multiple-submit">
+        {% csrf_token %}
+        <div class="flex-grow-1 overflow-auto p-4 d-flex flex-column gap-4">
+            <div class="c-box p-3 d-flex align-items-center gap-3">
+                <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-light text-tertiary"
+                      aria-hidden="true"><i class="{{ icon }}"></i></span>
+                <span class="fw-bold">{{ label }}</span>
+            </div>
+            {% if lifting %}
+                <p class="mb-0">
+                    Le frein passera dans «&nbsp;Levés&nbsp;», avec votre nom, votre structure et la date du jour. Il
+                    reviendra dans «&nbsp;À travailler&nbsp;» si un prochain bilan d’accompagnement le relève.
+                </p>
+                <fieldset>
+                    <legend class="fs-base fw-bold mb-2">{{ form.cause.label }}</legend>
+                    <div class="d-flex flex-column gap-2">
+                        {% for choice in form.cause %}
+                            <label class="next-step-option d-flex align-items-center gap-3 border rounded-2 px-3 py-2">
+                                {{ choice.tag }}
+                                <span>{{ choice.choice_label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            {% else %}
+                <p class="mb-0">
+                    Le frein repassera dans «&nbsp;{{ back_to }}&nbsp;», avec votre nom, votre structure et la date du
+                    jour.
+                </p>
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+            {# pe-8: room on the right for the floating cookie manager button. #}
+            {% if in_drawer %}
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Annuler</button>
+            {% else %}
+                <a class="btn btn-outline-primary" href="{{ job_seeker_url }}">Annuler</a>
+            {% endif %}
+            <button type="submit"
+                    class="btn btn-primary"
+                    {% if lifting %}{% matomo_event "freins" "submit" "frein-leve" %}{% else %}{% matomo_event "freins" "submit" "frein-revenu" %}{% endif %}>
+                Confirmer
+            </button>
+        </div>
+    </form>
+</div>

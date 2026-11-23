@@ -253,7 +253,7 @@ def test_professional_assigned_with_and_without_organization_is_shown_once(clien
     assertNotContains(response, "Aucune structure associée")
 
 
-def test_strip_for_employer(client):
+def test_strip_and_barriers_for_employer(client):
     membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
     contract = ContractFactory(
         company=membership.company,
@@ -261,19 +261,44 @@ def test_strip_for_employer(client):
         end_date=timezone.localdate() - datetime.timedelta(days=10),
     )
     ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    report = ProSupportReportFactory(
+        contract=contract,
+        barriers=[ProSupportReportBarrier.MOBILITY, ProSupportReportBarrier.HEALTH],
+        other_barrier="Garde d’enfant",
+    )
+    # Another company's report is not theirs to read.
+    ProSupportReportFactory(contract__job_seeker=contract.job_seeker, barriers=[ProSupportReportBarrier.DIGITAL])
     client.force_login(membership.user)
 
     response = client.get(page_url(contract.job_seeker))
     assertContains(response, "next-step-frise__block--pass")
     assertContains(response, "Contrat chez vous")
+    assertContains(response, "Freins à lever")
+    assertContains(
+        response,
+        f"Identifié le {fr(timezone.localdate(report.created_at))} dans le bilan d’accompagnement, "
+        f"par {report.author.get_full_name()} ({membership.company.display_name})",
+    )
+    assertContains(response, ProSupportReportBarrier.MOBILITY.label)
+    assertContains(response, ProSupportReportBarrier.HEALTH.label)
+    assertContains(response, "Garde d’enfant")
+    assertNotContains(response, ProSupportReportBarrier.DIGITAL.label)
 
 
-def test_nothing_to_draw_without_pass_nor_contract(client):
+def test_barriers_without_report(client):
     membership = PrescriberMembershipFactory(organization__authorized=True)
     client.force_login(membership.user)
 
     response = client.get(page_url(JobSeekerFactory()))
+    assertContains(response, "Aucun bilan d’accompagnement pour le moment.")
+    # Nothing to draw: no PASS IAE, no contract.
     assertNotContains(response, "next-step-frise")
+
+
+def test_no_barriers_section_for_those_who_cannot_read_reports(client):
+    membership = PrescriberMembershipFactory(organization__authorized=False)
+    client.force_login(membership.user)
+    assertNotContains(client.get(page_url(JobSeekerFactory())), "Freins à lever")
 
 
 # Side drawers of the file

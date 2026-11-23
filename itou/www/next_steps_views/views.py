@@ -2,8 +2,10 @@ import functools
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.http import Http404
+from django.contrib import messages
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.approvals.enums import ProlongationRequestStatus
@@ -14,6 +16,8 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import ProSupportReportBarrier
 from itou.companies.models import ProSupportReport
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.insertion.enums import OrientationRefusalReason
+from itou.next_steps.models import BarrierStatus, JobSeekerBarrier, LiftCause
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
@@ -38,8 +42,9 @@ from itou.www.next_steps_views.advisors import (
     _job_application_url,
     _job_applications,
     advisor_acts,
+    visible_orientations,
 )
-from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER
+from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER, gather_barriers, ongoing_orientations
 from itou.www.next_steps_views.coverage import contract_lines, contract_steps, coverage, period
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
@@ -142,6 +147,7 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
     situation_strip = situation_bar(approval) if request.from_iae_actor else None
 
     actions = [action for action in expected_actions(request) if action.job_seeker.pk == job_seeker.pk]
+    show_barriers = request.from_authorized_prescriber or can_fill_pro_support_report(request)
     describe_job_seekers(actions, lambda job_seeker: can_view_personal_information(request, job_seeker))
 
     context = {
@@ -156,6 +162,8 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
         "contract_lines": contract_lines(job_seeker, approval, contracts, functools.partial(contract_place, request))
         if request.from_iae_actor
         else [],
+        "show_barriers": show_barriers,
+        "barriers": gather_barriers(request, job_seeker, iae_eligibility_diagnosis) if show_barriers else None,
         "file_parts": file_parts(
             request,
             job_seeker,
@@ -164,7 +172,8 @@ def job_seeker(request, public_id, template_name="next_steps/job_seeker.html"):
             eligibility_summary=eligibility_summary,
             contracts=contracts,
             can_view_contracts=_can_view_contracts(request),
-            can_view_report=request.from_authorized_prescriber or can_fill_pro_support_report(request),
+            # Same rule as the barriers: the reports are one of their sources.
+            can_view_report=show_barriers,
             can_view_personal_information=can_view_personal_information(request, job_seeker),
         ),
         "matomo_custom_title": "Prochaines étapes : fiche usager",
@@ -266,6 +275,36 @@ def end_assignment(request, public_id, assignment_pk):
         "matomo_custom_title": "Prochaines étapes : terminer l’accompagnement",
     }
     return _drawer_or_page(request, "next_steps/end_assignment.html", "Terminer l’accompagnement", context)
+
+
+@readonly_view
+def orientation(request, public_id, orientation_id):
+    """An orientation of the job seeker towards a service, from the barriers it works on.
+
+    In the side drawer when loaded by htmx, an ordinary page otherwise. Only an orientation whose details the user
+    may read on the orientations tab of the existing job seeker page.
+    """
+    if not can_view_next_steps(request):
+        raise Http404
+    job_seeker = get_object_or_404(
+        User.objects.select_related("jobseeker_profile"), kind=UserKind.JOB_SEEKER, public_id=public_id
+    )
+    orientation = get_object_or_404(
+        visible_orientations(request, job_seeker)
+        .filter(user_can_see_details=True)
+        .select_related("service__structure", "sender", "sender_company", "sender_prescriber_organization"),
+        pk=orientation_id,
+    )
+    context = {
+        "job_seeker": job_seeker,
+        "orientation": orientation,
+        "refusal_reasons": [OrientationRefusalReason(reason).label for reason in orientation.refusal_reasons],
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "in_drawer": bool(request.htmx),
+        "matomo_custom_title": "Prochaines étapes : orientation",
+    }
+    template_name = "next_steps/orientation.html" if request.htmx else "next_steps/orientation_page.html"
+    return render(request, template_name, context)
 
 
 def _drawer_or_page(request, drawer_template, title, context):
@@ -455,3 +494,83 @@ def contract(request, public_id, contract_id):
         "matomo_custom_title": "Prochaines étapes : contrat",
     }
     return _drawer_or_page(request, "next_steps/contract.html", "Contrat", context)
+
+
+class LiftForm(forms.Form):
+    """What lifted the barrier, if the professional says: an ongoing orientation on it, or a cause. Never free text."""
+
+    cause = forms.ChoiceField(
+        label="Qu’est-ce qui l’a levé ? (facultatif)",
+        required=False,
+        widget=forms.RadioSelect(attrs={"class": "form-check-input flex-shrink-0"}),
+        choices=[],
+    )
+
+    def __init__(self, *args, orientations=(), **kwargs):
+        super().__init__(*args, **kwargs)
+        self.orientations = {f"orientation-{orientation.pk}": orientation for orientation in orientations}
+        self.fields["cause"].choices = [
+            *(
+                (key, f"L’orientation vers «\u00a0{orientation.service.name}\u00a0»")
+                for key, orientation in self.orientations.items()
+            ),
+            (LiftCause.SELF, "La personne a trouvé une solution elle-même"),
+            (LiftCause.OTHER, "Autre"),
+        ]
+
+
+STATEMENT_ACTIONS = {"leve": BarrierStatus.LIFTED, "revenu": BarrierStatus.CONFIRMED}
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def barrier_statement(request, public_id, barrier, action):
+    """State a barrier lifted ("leve"), or back to work on ("revenu"), from its card: in the side drawer, then back
+    to the job seeker's page.
+
+    For those who see the barriers on the job seeker's page; only the report's barriers, « Autre frein » being free
+    text. The statement joins the history the eligibility journey adds to (itou.next_steps.models).
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    key = barrier.upper()
+    can_state = request.from_authorized_prescriber or can_fill_pro_support_report(request)
+    if not can_state or action not in STATEMENT_ACTIONS or key not in ProSupportReportBarrier.values:
+        raise Http404
+    status = STATEMENT_ACTIONS[action]
+    orientations = [orientation for orientation, keys in ongoing_orientations(request, job_seeker) if key in keys]
+    form = LiftForm(data=request.POST or None, orientations=orientations) if status == BarrierStatus.LIFTED else None
+    job_seeker_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    if request.method == "POST" and (form is None or form.is_valid()):
+        cause = form.cleaned_data["cause"] if form else ""
+        orientation = form.orientations.get(cause) if form else None
+        JobSeekerBarrier.objects.create(
+            job_seeker=job_seeker,
+            barrier=key,
+            status=status,
+            author=request.user,
+            author_prescriber_organization=request.current_organization if request.from_prescriber else None,
+            author_company=request.current_organization if request.from_employer else None,
+            lift_cause=LiftCause.ORIENTATION if orientation else cause,
+            orientation=orientation,
+        )
+        label = ProSupportReportBarrier(key).label
+        messages.success(
+            request,
+            f"Frein «\u00a0{label}\u00a0» "
+            + ("levé" if status == BarrierStatus.LIFTED else "de nouveau à travailler"),
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(job_seeker_url)
+    context = {
+        "job_seeker": job_seeker,
+        "label": ProSupportReportBarrier(key).label,
+        "icon": BARRIER_ICONS[key],
+        "lifting": status == BarrierStatus.LIFTED,
+        "form": form,
+        # Back: to work on, or in progress with an orientation still under way on it.
+        "back_to": "En cours" if orientations else "À travailler",
+        "job_seeker_url": job_seeker_url,
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : frein",
+    }
+    title = "Frein levé" if status == BarrierStatus.LIFTED else "Frein revenu"
+    return _drawer_or_page(request, "next_steps/barrier_statement.html", title, context)
