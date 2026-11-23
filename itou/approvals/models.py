@@ -15,7 +15,6 @@ from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
-from django.utils.timesince import timeuntil
 
 from itou.approvals import enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
@@ -36,8 +35,8 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
     pole_emploi_partenaire_api_client,
 )
+from itou.utils.date import get_delta_in_days_display, time_left
 from itou.utils.models import DateRange
-from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import alphanumeric
 
 
@@ -626,46 +625,21 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         except JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned:
             return False
 
-    def _get_obj_remainder(self, obj):
-        """
-        Return the remaining time on an object with start_at and end_at dete fields
-        A.k.a an Approval, a Suspension or a Prolongation
-        """
-        return max(
-            obj.end_at
-            - timezone.localdate()
-            # end_at is inclusive.
-            + datetime.timedelta(days=1),
-            datetime.timedelta(0),
-        ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
-
-    def _get_human_readable_estimate(self, delta: datetime.timedelta) -> str:
-        any_day = timezone.localdate()  # It is not meaningful
-        res = timeuntil(any_day + delta, now=any_day)
-        res = res.replace("année", "an")
-        res = res.split(", ")
-        if any(v in res[0] for v in ["an", "mois"]):
-            return "Environ " + " et ".join(res)
-        return " et ".join(res)
-
     @cached_property
     def remainder(self):
         """
         Return the remaining time of an Approval, we don't count future suspended periods.
         """
-        result = self._get_obj_remainder(self)
+        result = time_left(self.start_at, self.end_at)
 
         result -= sum(
-            (self._get_obj_remainder(suspension) for suspension in self.suspension_set.all()),
+            (time_left(suspension.start_at, suspension.end_at) for suspension in self.suspension_set.all()),
             datetime.timedelta(0),
         )
         return result
 
     def get_remainder_display(self):
-        remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
-        if self.remainder.days >= 7:  # Prevent displaying "2 jours (2 jours)"
-            remainder_display += f" ({self._get_human_readable_estimate(self.remainder)})"
-        return remainder_display
+        return get_delta_in_days_display(self.remainder)
 
     get_remainder_display.short_description = "Reliquat"
 
