@@ -105,7 +105,7 @@
                                                         <span>{{ otp_secret }}</span>
                                                         {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
                                                     </p>
-                                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail %}
+                                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
                                                         {% fragment as c_info__summary %}
                                                             Vous n’avez pas encore de gestionnaire mot de passe ?
                                                         {% endfragment %}
