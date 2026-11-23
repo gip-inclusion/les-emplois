@@ -1,4 +1,159 @@
 # serializer version: 1
+# name: TestEnrollmentSteps3And4ConfirmDevice.test_post_valid_totp
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+          <div aria-atomic="true" aria-live="assertive" class="toast toast--success" data-bs-delay="6000" role="status">
+              <div class="toast-header">
+                  <i aria-hidden="true" class="ri-check-line ri-lg me-1">
+                  </i>
+                  <strong class="me-auto">
+                      Votre nouvel appareil est confirmé
+                  </strong>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="toast" type="button">
+                      <span class="visually-hidden">
+                          J'ai compris
+                      </span>
+                  </button>
+              </div>
+          </div>
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Sécurisez votre accès
+                              </h1>
+                          </div>
+                      </div>
+                      <div class="alert alert-warning" role="status">
+                          <div class="row">
+                              <div class="col-auto pe-0">
+                                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                                  </i>
+                              </div>
+                              <div class="col">
+                                  <p class="mb-2">
+                                      <strong>
+                                          Ne passez pas cette page sans avoir noté votre code de récupération.
+                                      </strong>
+                                  </p>
+                                  <p>
+                                      Il est
+                                      <strong>
+                                          généré une seule fois
+                                      </strong>
+                                      et ne sera plus accessible ensuite.
+                                  </p>
+                                  <ul class="mb-0">
+                                      <li>
+                                          Sans lui,
+                                          <strong>
+                                              vous ne pourrez plus accéder à votre compte
+                                          </strong>
+                                          si vous perdez ou changez votre appareil.
+                                      </li>
+                                      <li>
+                                          <strong>
+                                              Conservez-le dans un endroit sécurisé :
+                                          </strong>
+                                          gestionnaire de mots de passe, document imprimé, coffre-fort numérique…
+                                      </li>
+                                      <li>
+                                          Si vous utilisez l’application mobile pour l’authentification forte,
+                                          <strong>
+                                              évitez de stocker ce code sur ce même téléphone
+                                          </strong>
+                                          , vous risqueriez de tout perdre en même temps.
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="c-stepper mb-3 mb-md-4">
+                          <div class="progress">
+                              <div aria-labelledby="currentProgressState" aria-valuemax="100" aria-valuemin="0" aria-valuenow="100" class="progress-bar progress-bar-100" role="progressbar">
+                              </div>
+                          </div>
+                          <p id="currentProgressState">
+                              <strong>
+                                  Étape 4
+                              </strong>
+                              /4 : sauvegardez le code de récupération
+                          </p>
+                      </div>
+                  </div>
+              </div>
+              <div class="s-section__row row">
+                  <div class="section__col col-12">
+                      <div class="c-form mb-3 mb-md-4">
+                          <h2 class="h3">
+                              Votre code de récupération à conserver
+                          </h2>
+                          <p class="mb-1">
+                              <strong>
+                                  Code de récupération
+                              </strong>
+                          </p>
+                          <p>
+                              <span>
+                                  secret-backup-code
+                              </span>
+                              <button class="btn-ico btn-link btn-sm ms-2 py-0" data-bs-placement="right" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="secret-backup-code" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span>
+                                      Copier
+                                  </span>
+                              </button>
+                          </p>
+                          <div class="form-group">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="confirmation-checkbox" required="" type="checkbox"/>
+                                  <label class="form-check-label" for="confirmation-checkbox">
+                                      Je confirme avoir noté mon code de récupération et j’ai compris que je n’aurai plus l’occasion de le retrouver sur la plateforme.
+                                      <br class="d-none d-xl-inline"/>
+                                      Il me sera nécessaire si je perds accès à mon application ou à mon appareil. *
+                                  </label>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <a class="btn btn-block btn-primary disabled" href="" id="end-button">
+                                              <span>
+                                                  Terminer
+                                              </span>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestLogin.test_login_shows_list_of_devices
   '''
   <div class="c-form mb-5">
