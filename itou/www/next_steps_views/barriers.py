@@ -110,7 +110,9 @@ class Card:
     category: str = ""
     clues: list = dataclasses.field(default_factory=list)
     in_progress: bool = False
-    # « Trouver une solution »: the services search for the barrier, around the job seeker.
+    # « Trouver une solution »: the services for the barrier, around the job seeker, in the side drawer; the full
+    # services search for a barrier without a category.
+    solutions_url: str = ""
     search_url: str = ""
     # « Marquer comme levé » on a barrier to work on or in progress, « Le frein est revenu » on a lifted one.
     lift_url: str = ""
@@ -208,7 +210,7 @@ def ongoing_orientations(request, job_seeker):
         yield orientation, keys
 
 
-def _search_url(request, job_seeker, key):
+def search_url(request, job_seeker, key):
     query = {"back_url": reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})}
     if job_seeker.city_slug:
         query["city"] = job_seeker.city_slug
@@ -350,7 +352,13 @@ def gather_barriers(request, job_seeker, iae_eligibility_diagnosis=None):
     in_progress = [card for card in ordered if card.in_progress]
     lifted = [card for card in lifted if card.key not in {c.key for c in in_progress}]
     for card_to_work in to_work:
-        card_to_work.search_url = _search_url(request, job_seeker, card_to_work.key)
+        if card_to_work.key in SEARCH_CATEGORIES:
+            card_to_work.solutions_url = reverse(
+                "next_steps_views:solutions",
+                kwargs={"public_id": job_seeker.public_id, "barrier": card_to_work.key.lower()},
+            )
+        else:
+            card_to_work.search_url = search_url(request, job_seeker, card_to_work.key)
     # Only the report's barriers can be stated: « Autre frein » is free text.
     for each in to_work + in_progress:
         if each.key in Barrier.values:

@@ -13,6 +13,7 @@ When a decision needs a long existing wizard (hiring, refusing an application), 
 import dataclasses
 import logging
 import urllib.parse
+import uuid
 
 from django import forms
 from django.conf import settings
@@ -39,6 +40,8 @@ from itou.companies.enums import CompanyKind, ContractType, ProSupportReportAuto
 from itou.companies.models import ProSupportReport
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
+from itou.insertion.models import Service
+from itou.insertion.utils import get_missing_orientation_beneficiary_field_labels
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.next_steps.models import BarrierStatus, JobSeekerBarrier
@@ -46,7 +49,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.rdv_insertion.models import InvitationRequest
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
-from itou.users.perms import can_fill_pro_support_report
+from itou.users.perms import can_fill_pro_support_report, can_orient_towards_insertion_service
 from itou.utils.constants import ITOU_DIAGNOSTIC_URL
 from itou.utils.db import (
     ExclusionViolationError,
@@ -54,7 +57,7 @@ from itou.utils.db import (
     maybe_exclusion_violation,
     maybe_unique_violation,
 )
-from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import (
     AcceptForm,
@@ -73,6 +76,12 @@ from itou.www.approvals_views.forms import (
     SuspensionForm,
 )
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.insertion_views.forms import (
+    OrientationConformityForm,
+    OrientationDocumentsForm,
+    OrientationReferentForm,
+)
+from itou.www.insertion_views.views import create_orientation
 from itou.www.job_seekers_views.forms import ProSupportReportForm
 from itou.www.job_seekers_views.views import (
     PRO_SUPPORT_REQUEST_CONTRACT_ENDED,
@@ -144,6 +153,8 @@ class Step:
     boxes: list = dataclasses.field(default_factory=list)
     # A period bar (see period_bar.py), shown under the question.
     bar: object = None
+    # Whether the step sends files: its form is then multipart.
+    files: bool = False
 
     def __post_init__(self):
         if self.template in (FACTS_TEMPLATE, "next_steps/journeys/application.html"):
@@ -1599,7 +1610,110 @@ class ProSupportRequestJourney(Journey):
         )
 
 
+class OrientationJourney(Journey):
+    """Orient the job seeker towards an insertion service, from a barrier's solutions, in the side drawer.
+
+    The orientation wizard's three steps (insertion_views.OrientationWizardView), with its forms, its rules and its
+    creation (create_orientation): the same e-mails and notifications. The key is "<job seeker>.<service>".
+    """
+
+    title = "Orienter vers un service"
+
+    def load(self, pk):
+        request = self.request
+        if not can_orient_towards_insertion_service(request):
+            raise Http404
+        public_id, _, service_id = pk.partition(".")
+        if not service_id.isdigit():
+            raise Http404
+        self.service = get_object_or_404(
+            Service.objects.select_related("kind", "structure", "fee", "source").prefetch_related("publics"),
+            pk=service_id,
+        )
+        if not self.service.is_orientable_via_internal_form:
+            raise Http404
+        try:
+            uuid.UUID(public_id)
+        except ValueError:
+            raise Http404
+        self.job_seeker = get_object_or_404(
+            User.objects.select_related("jobseeker_profile"), kind=UserKind.JOB_SEEKER, public_id=public_id
+        )
+
+    def facts(self):
+        return [("Service", self.service.name), ("Structure", self.service.structure.name)]
+
+    def build_forms(self, data=None, initial=None):
+        user = self.request.user
+        # The referent is the user, unless they say otherwise: as the wizard.
+        referent_initial = {
+            "referent_last_name": user.last_name,
+            "referent_first_name": user.first_name,
+            "referent_phone": user.phone,
+            "referent_email": user.email,
+        } | (initial or {})
+        # Files come with the last step only, the one that sends the request.
+        files = self.request.FILES if data is not None else None
+        return {
+            "conformity": OrientationConformityForm(self.job_seeker, data=data, initial=initial),
+            "referent": OrientationReferentForm(data=data, initial=referent_initial),
+            "documents": OrientationDocumentsForm(data=data, files=files, initial=initial),
+        }
+
+    def steps(self, data):
+        return [
+            Step(
+                "Les conditions",
+                "conformity",
+                template="next_steps/journeys/orientation_conditions.html",
+                question="Les conditions d’accès au service",
+                layout={"confirms_conditions": Show("options")},
+            ),
+            Step(
+                "Le référent",
+                "referent",
+                question="Qui suit la demande ?",
+                hint="Le service contactera cette personne. C’est vous, sauf si vous indiquez quelqu’un d’autre.",
+            ),
+            Step(
+                "L’envoi",
+                "documents",
+                template="next_steps/journeys/orientation_documents.html",
+                submit_label="Envoyer la demande",
+                question="Les documents, puis l’envoi",
+                files=True,
+            ),
+        ]
+
+    def context(self):
+        return {
+            "service": self.service,
+            "missing_fields": get_missing_orientation_beneficiary_field_labels(self.job_seeker),
+            "can_edit_job_seeker": can_edit_personal_information(self.request, self.job_seeker),
+            "credential_documents": self.service.generate_extra_credential_documents_info(),
+            "option": Show("options"),
+        }
+
+    def done(self, forms):
+        create_orientation(
+            self.request,
+            service=self.service,
+            job_seeker=self.job_seeker,
+            referent_data=forms["referent"].cleaned_data,
+            documents_data=forms["documents"].cleaned_data,
+        )
+        return Result(
+            title="Demande d’orientation envoyée",
+            lines=[
+                f"«{NBSP}{self.service.name}{NBSP}» la reçoit par e-mail, avec les coordonnées du référent.",
+                "Le récapitulatif vous est envoyé, ainsi qu’à l’usager.",
+                f"Le frein passe dans «{NBSP}En cours{NBSP}» jusqu’à la réponse du service.",
+            ],
+        )
+
+
 JOURNEYS = {
+    "orientation": OrientationJourney,
     "bilan": ProSupportReportFillJourney,
     "demande-bilan": ProSupportRequestJourney,
     "suspension": SuspensionJourney,

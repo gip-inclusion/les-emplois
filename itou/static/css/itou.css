@@ -427,6 +427,26 @@ table.table td > .modal .modal-content {
     background-color: var(--bs-light, #f8f8f8);
 }
 
+/* Text written in Markdown by a service (data·inclusion), in a drawer's box: no margin under its last block. */
+.next-step-markdown > :last-child {
+    margin-bottom: 0;
+}
+
+/* A box of a drawer that unfolds on request, as the contact of a service: a summary without its marker, a chevron
+   that turns once open. */
+.next-step-unfold > summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.next-step-unfold > summary::-webkit-details-marker {
+    display: none;
+}
+
+.next-step-unfold[open] .next-step-unfold__chevron {
+    transform: rotate(180deg);
+}
+
 /* A score on a gauge of steps, as the autonomy in a report. */
 .next-step-gauge > span {
     height: .5rem;

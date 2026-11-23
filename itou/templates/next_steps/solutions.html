@@ -1,0 +1,93 @@
+{% load str_filters %}
+{# « Trouver une solution »: the services for a barrier around the job seeker, in the side drawer or inside a page #}
+{# (next_steps_views.solutions). Each service opens in the drawer; « Plus de services » appends the next page. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">Trouver une solution</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4 d-flex flex-column gap-3">
+        <div class="c-box p-3 d-flex align-items-center gap-3">
+            <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-light text-tertiary"
+                  aria-hidden="true"><i class="{{ icon }}"></i></span>
+            <div>
+                <span class="d-block fw-bold">{{ label }}</span>
+                <span class="d-block fs-sm text-muted">
+                    {% if city %}
+                        Services autour de {{ city.name }} ({{ city.department }})
+                    {% else %}
+                        Adresse de l’usager non renseignée
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        {% if city %}
+            <nav class="d-flex flex-wrap gap-2" aria-label="Mode d’accueil">
+                {% for reception_label, url, selected in receptions %}
+                    <a class="btn btn-sm rounded-pill {% if selected %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                       href="{{ url }}"
+                       {% if selected %}aria-current="true"{% endif %}
+                       {% if in_drawer %}hx-get="{{ url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>{{ reception_label }}</a>
+                {% endfor %}
+            </nav>
+
+            <div id="next-step-services" class="d-flex flex-column gap-2">
+                {% for service in services %}
+                    <a class="next-step-contract c-box p-3 d-flex align-items-center gap-3 text-decoration-none text-reset"
+                       href="{{ service.drawer_url }}"
+                       {% if in_drawer %}hx-get="{{ service.drawer_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-community-line" only %}
+                        <span class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">{{ service.structure.name }}</span>
+                            <span class="d-block fw-bold">{{ service.name }}</span>
+                            <span class="d-block fs-sm">
+                                {% if service.is_local %}
+                                    {% if service.home_distance is not None %}À {{ service.home_distance|floatformat:"-1" }}&nbsp;km {{ distance_from }} · {% endif %}
+                                    {{ service.post_code }} {{ service.city }}
+                                    {% if service.is_remote %}· également à distance{% endif %}
+                                {% elif service.is_remote %}
+                                    À distance
+                                {% endif %}
+                            </span>
+                        </span>
+                        <i class="ri-arrow-right-s-line text-muted" aria-hidden="true"></i>
+                    </a>
+                {% empty %}
+                    <p class="mb-0">Aucun service trouvé autour de {{ city.name }} pour ce frein.</p>
+                {% endfor %}
+                {% if more_url %}
+                    {# The next page replaces this button: its services, and its own button if there are more. #}
+                    <a class="btn btn-sm btn-outline-primary align-self-start"
+                       href="{{ more_url }}"
+                       {% if in_drawer %}hx-get="{{ more_url }}" hx-select="#next-step-services > *" hx-target="this" hx-swap="outerHTML"{% endif %}>Plus de services</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="mb-0">
+                La recherche part de la ville de l’usager. Renseignez son adresse, ou choisissez une ville dans la
+                recherche complète.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% if in_drawer %}
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Fermer</button>
+        {% else %}
+            <a class="btn btn-outline-primary"
+               href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Retour</a>
+        {% endif %}
+        {# The full search, with its other filters: as before, a page of its own. #}
+        <a class="btn btn-outline-primary" href="{{ search_url }}">Recherche complète</a>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+{% load format_filters %}
+{# First step of an orientation (journeys.OrientationJourney): the job seeker's details the service receives, then #}
+{# what the service asks, as the wizard's first step; the user confirms the person meets it. #}
+{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as page_url %}
+<div class="d-flex flex-column gap-2 mb-4">
+    {% if missing_fields %}
+        <div class="rounded-2 p-3 bg-warning-lighter d-flex flex-column gap-1">
+            <b>Informations manquantes</b>
+            <span>À renseigner pour orienter&nbsp;: {{ missing_fields|join:", " }}.</span>
+            {% if can_edit_job_seeker %}
+                <a class="btn btn-sm btn-outline-primary align-self-start mt-1"
+                   href="{% url "dashboard:edit_job_seeker_info" job_seeker_public_id=job_seeker.public_id %}?back_url={{ page_url|urlencode }}">Compléter les informations</a>
+            {% endif %}
+        </div>
+    {% endif %}
+    {% if can_view_name %}
+        {# The service receives them: as the wizard, the user checks they are up to date. #}
+        <div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+            {% include "next_steps/includes/fact_tile.html" with icon="ri-user-line" only %}
+            <div class="flex-grow-1 fs-sm">
+                <span class="d-block text-muted">Coordonnées transmises au service</span>
+                <span class="d-block">
+                    {% if job_seeker.address_on_one_line %}
+                        {{ job_seeker.address_on_one_line }}
+                    {% elif job_seeker.city %}
+                        {{ job_seeker.post_code }} {{ job_seeker.city }} (adresse non renseignée)
+                    {% else %}
+                        Adresse non renseignée
+                    {% endif %}
+                </span>
+                <span class="d-block">{{ job_seeker.phone|format_phone|default:"Téléphone non renseigné" }}</span>
+                <span class="d-block text-break">{{ job_seeker.email|default:"E-mail non renseigné" }}</span>
+                {% if can_edit_job_seeker %}
+                    <a class="link-tertiary"
+                       href="{% url "dashboard:edit_job_seeker_info" job_seeker_public_id=job_seeker.public_id %}?back_url={{ page_url|urlencode }}">Modifier</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% include "next_steps/includes/service_conditions.html" with service=service only %}
+</div>
+{% include "next_steps/journeys/fields.html" %}

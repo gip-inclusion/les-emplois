@@ -1,0 +1,129 @@
+{% load markdownify %}
+{% load matomo %}
+{% load str_filters %}
+{# An insertion service, in the side drawer or inside a page (next_steps_views.service): what helps choose it, and #}
+{# orienting the job seeker towards it, in the drawer too. The full service card stays one link away. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        {% if back_url %}
+            {# Back to the barrier's solutions, as the « Retour » of the pages. #}
+            <a class="btn btn-ico btn-link fs-sm px-0 mb-2"
+               href="{{ back_url }}"
+               {% if in_drawer %}hx-get="{{ back_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>
+                <i class="ri-arrow-left-s-line" aria-hidden="true"></i>
+                <span>Retour aux solutions</span>
+            </a>
+        {% endif %}
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">{{ service.name }}</h2>
+                <span class="d-block fs-sm">{{ service.structure.name }}</span>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4 d-flex flex-column gap-2">
+        {% if email_sent %}
+            <div class="rounded-2 p-3 bg-success-lighter d-flex align-items-center gap-2 mb-2" role="status">
+                <i class="ri-check-line text-success" aria-hidden="true"></i>
+                <span>Le message a bien été envoyé à {{ service.contact_email }}.</span>
+            </div>
+        {% endif %}
+        {# The distance from the job seeker under the address; on its own for a service without a street address. #}
+        {% if distance is not None %}
+            {% with distance_text=distance|floatformat:"-1"|add:" km "|add:distance_from %}
+                {% if service.address_on_one_line %}
+                    {% include "next_steps/includes/fact.html" with label="Adresse" value=service.address_on_one_line detail=distance_text only %}
+                {% else %}
+                    {% include "next_steps/includes/fact.html" with label="Adresse" value=distance_text detail="" only %}
+                {% endif %}
+            {% endwith %}
+        {% elif service.address_on_one_line %}
+            {% include "next_steps/includes/fact.html" with label="Adresse" value=service.address_on_one_line detail="" only %}
+        {% endif %}
+        {% if receptions %}
+            {% include "next_steps/includes/fact.html" with label="Accueil" value=receptions|join:", " detail="" only %}
+        {% endif %}
+        {% if service.description %}
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-file-text-line" only %}
+                <div class="flex-grow-1 fs-sm text-break">
+                    <span class="d-block text-muted">Description</span>
+                    <div class="next-step-markdown">{{ service.description|markdownify }}</div>
+                </div>
+            </div>
+        {% endif %}
+        {% include "next_steps/includes/service_conditions.html" with service=service only %}
+        {% if has_contact %}
+            {% if contact_shown %}
+                {% include "next_steps/includes/service_contact.html" %}
+            {% else %}
+                {# Folded: showing the details is recorded, as on the full service card (next_steps_views.service_contact). #}
+                <details class="next-step-unfold border rounded-2 px-3 py-2">
+                    <summary class="d-flex align-items-center gap-3"
+                             {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-contacts-line" only %}
+                        <span class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Contact</span>
+                            <span class="d-block fw-bold">Voir les coordonnées</span>
+                        </span>
+                        <i class="next-step-unfold__chevron ri-arrow-down-s-line text-muted" aria-hidden="true"></i>
+                    </summary>
+                    {# With JavaScript, unfolding posts this form and the contact box replaces this one. #}
+                    <form method="post"
+                          action="{{ contact_url }}"
+                          class="mt-2"
+                          hx-post="{{ contact_url }}"
+                          hx-trigger="toggle once from:closest details"
+                          hx-target="closest details"
+                          hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Afficher les coordonnées</button>
+                    </form>
+                </details>
+            {% endif %}
+        {% endif %}
+        {% if opening_hours %}
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-time-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Horaires d’accueil{% if opening_hours.has_ph_off %}, hors jours fériés{% endif %}</span>
+                    <ul class="list-unstyled fs-sm mb-0">
+                        {% for entry in opening_hours.entries %}
+                            <li>
+                                <b>{{ entry.label }}&nbsp;:</b> {{ entry.hours }}
+                                {% if entry.comment %}({{ entry.comment|lower }}){% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+        <a class="fs-sm align-self-start mt-2" href="{{ full_url }}">Voir la fiche complète du service</a>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% if in_drawer %}
+            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="offcanvas">Fermer</button>
+        {% else %}
+            <a class="btn btn-outline-primary"
+               href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Retour</a>
+        {% endif %}
+        {% if orient_url %}
+            <a class="btn btn-primary"
+               href="{{ orient_url }}"
+               {% if in_drawer %}hx-get="{{ orient_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>Orienter vers ce service</a>
+        {% elif external_url %}
+            {# The service takes its orientations on its own website, as the full service card says. #}
+            <a class="btn btn-primary has-external-link"
+               href="{{ external_url }}"
+               target="_blank"
+               rel="noopener">Orienter sur son site</a>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,34 @@
+{% load format_filters %}
+{# A service's contact details, once asked for (next_steps_views.service_contact), as the full service card's modal: #}
+{# the phone number to copy, and the e-mail written from the platform for those who orient. #}
+<div class="border rounded-2 px-3 py-2 d-flex align-items-start gap-3">
+    {% include "next_steps/includes/fact_tile.html" with icon="ri-contacts-line" only %}
+    <div class="flex-grow-1 d-flex flex-column gap-2">
+        <div>
+            <span class="d-block fs-sm text-muted">Contact</span>
+            {% if service.contact_full_name %}<span class="d-block fw-bold">{{ service.contact_full_name }}</span>{% endif %}
+        </div>
+        {% if service.contact_phone %}
+            <div class="d-flex align-items-center gap-2">
+                <i class="ri-phone-line text-muted" aria-hidden="true"></i>
+                <span class="fw-bold">{{ service.contact_phone|format_phone }}</span>
+                {% include "includes/copy_to_clipboard.html" with content=service.contact_phone|cut:" " css_classes="btn btn-ico btn-link btn-sm p-0" only_icon=True text="Copier le numéro de téléphone" only %}
+            </div>
+        {% endif %}
+        {% if service.contact_email %}
+            {% if email_url %}
+                <a class="btn btn-sm btn-outline-primary align-self-start text-start text-break"
+                   href="{{ email_url }}"
+                   {% if in_drawer %}hx-get="{{ email_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>
+                    <i class="ri-mail-line me-1" aria-hidden="true"></i>Écrire un e-mail à {{ service.contact_email }}
+                </a>
+            {% else %}
+                <div class="d-flex align-items-center gap-2">
+                    <i class="ri-mail-line text-muted" aria-hidden="true"></i>
+                    <span class="fw-bold text-break">{{ service.contact_email }}</span>
+                    {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="btn btn-ico btn-link btn-sm p-0" only_icon=True text="Copier l’adresse e-mail" only %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

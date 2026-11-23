@@ -145,8 +145,14 @@ def test_find_a_solution_searches_services_around_the_job_seeker(client, employe
 
     response = page(client, job_seeker)
     [card] = response.context["barriers"].to_work
+    assert card.solutions_url == reverse(
+        "next_steps_views:solutions", kwargs={"public_id": job_seeker.public_id, "barrier": "mobility"}
+    )
+    assertContains(response, "Trouver une solution")
+    # The full search stays one link away, from the drawer.
+    response = client.get(card.solutions_url, HTTP_HX_REQUEST="true")
     page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
-    assert card.search_url == reverse(
+    assert response.context["search_url"] == reverse(
         "search:services_results",
         query={
             "back_url": page_url,
@@ -155,7 +161,6 @@ def test_find_a_solution_searches_services_around_the_job_seeker(client, employe
             "job_seeker_public_id": job_seeker.public_id,
         },
     )
-    assertContains(response, "Trouver une solution")
 
 
 def test_an_ongoing_orientation_opens_in_the_drawer(client, employer):

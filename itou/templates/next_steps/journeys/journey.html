@@ -91,6 +91,7 @@
         <form method="post"
               action="{{ journey_url }}"
               class="d-flex flex-column flex-grow-1 overflow-hidden"
+              {% if step.files %}enctype="multipart/form-data"{% endif %}
               {% if in_drawer %}hx-post="{{ journey_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-disinherit="*"{% endif %}>
             {% csrf_token %}
             <input type="hidden" name="step" value="{{ step_index }}">

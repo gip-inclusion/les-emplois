@@ -1,0 +1,43 @@
+{% load django_bootstrap5 %}
+{# Last step of an orientation (journeys.OrientationJourney): the documents the service asks for, as the wizard's #}
+{# last step, then the commitment that sends the request. #}
+{% bootstrap_form_errors form type="non_fields" %}
+<div class="rounded-2 p-3 bg-light d-flex flex-column gap-1 mb-3">
+    <b>Seulement les pièces strictement nécessaires</b>
+    <span class="fs-sm">
+        Pour des raisons de confidentialité, pas de carte vitale, d’attestation de droits santé ou CPAM, ni d’autre
+        document contenant le numéro de sécurité sociale.
+    </span>
+</div>
+{% if credential_documents %}
+    <p class="fw-bold mb-2">Documents à compléter</p>
+    <ul class="list-unstyled d-flex flex-column gap-1 mb-2">
+        {% for document_name, document_url in credential_documents %}
+            <li>
+                <a class="link-tertiary has-external-link"
+                   href="{{ document_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   download><i class="ri-download-line" aria-hidden="true"></i> {{ document_name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% bootstrap_field form.credentials_documents_files show_label=False %}
+{% endif %}
+{% if service.extra.online_form %}
+    <p class="fw-bold mb-2">Formulaire en ligne</p>
+    <p>
+        <a class="link-tertiary has-external-link"
+           href="{{ service.extra.online_form }}"
+           target="_blank"
+           rel="noopener">{{ service.extra.online_form }}</a>
+    </p>
+{% endif %}
+{% if service.has_prerequisites %}
+    <p class="fw-bold mb-2">Pré-requis et justificatifs, à récupérer auprès de l’usager</p>
+    <div class="fs-sm">
+        {% include "insertion/includes/access_conditions_di.html" with service=service extra_classes="next-step-markdown mb-3" only %}
+    </div>
+    {% bootstrap_field form.credentials_proof_files show_label=False %}
+{% endif %}
+{% include "next_steps/journeys/components/field.html" with field=form.gdpr_consent show=option only %}

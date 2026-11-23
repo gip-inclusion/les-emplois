@@ -1,7 +1,9 @@
 import functools
+import logging
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -16,18 +18,24 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import ProSupportReportBarrier
 from itou.companies.models import ProSupportReport
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.insertion.enums import OrientationRefusalReason
+from itou.insertion.enums import MobilizationEventKind, OrientationRefusalReason
+from itou.insertion.models import MobilizationEvent, Service
+from itou.insertion.opening_hours import format_osm_hours
 from itou.next_steps.models import BarrierStatus, JobSeekerBarrier, LiftCause
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import (
     can_fill_pro_support_report,
+    can_orient_towards_insertion_service,
     can_view_pro_support_report,
 )
+from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.readonly import http_methods, readonly_view
 from itou.utils.views import with_triggers_context
 from itou.www.apply.views.process_views import job_application_sender_left_org
+from itou.www.insertion_views.forms import SendEmailForm
+from itou.www.insertion_views.views import send_email_to_service, service_email_prefilled_body
 from itou.www.next_steps_views import engine
 from itou.www.next_steps_views.access import can_view_next_steps
 from itou.www.next_steps_views.actions import (
@@ -44,12 +52,32 @@ from itou.www.next_steps_views.advisors import (
     advisor_acts,
     visible_orientations,
 )
-from itou.www.next_steps_views.barriers import BARRIER_ICONS, OTHER, gather_barriers, ongoing_orientations
+from itou.www.next_steps_views.barriers import (
+    BARRIER_ICONS,
+    OTHER,
+    SEARCH_CATEGORIES,
+    gather_barriers,
+    ongoing_orientations,
+    search_url,
+)
 from itou.www.next_steps_views.coverage import contract_lines, contract_steps, coverage, period
 from itou.www.next_steps_views.file import file_parts
 from itou.www.next_steps_views.journeys import JOURNEYS
 from itou.www.next_steps_views.period_bar import situation_bar
 from itou.www.next_steps_views.situation import contract_place, situation_sentences
+from itou.www.next_steps_views.solutions import (
+    RECEPTION_IN_PERSON,
+    RECEPTIONS,
+    distance_origin,
+    job_seeker_city,
+    search_services,
+    service_url,
+    solutions_url,
+    with_home_distance,
+)
+
+
+logger = logging.getLogger(__name__)
 
 
 def _journeys_media(request):
@@ -574,3 +602,169 @@ def barrier_statement(request, public_id, barrier, action):
     }
     title = "Frein levé" if status == BarrierStatus.LIFTED else "Frein revenu"
     return _drawer_or_page(request, "next_steps/barrier_statement.html", title, context)
+
+
+@readonly_view
+def solutions(request, public_id, barrier):
+    """« Trouver une solution »: the insertion services for a barrier, around the job seeker, in the side drawer.
+
+    What the services search finds for the barrier's category and the job seeker's city (see solutions.py); the full
+    search, with its other filters, one link away.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    key = barrier.upper()
+    if key not in SEARCH_CATEGORIES:
+        raise Http404
+    reception = request.GET.get("accueil", "")
+    if reception not in RECEPTIONS:
+        reception = ""
+    city = job_seeker_city(job_seeker)
+    origin, distance_from = distance_origin(job_seeker, city)
+    services = pager(
+        with_home_distance(search_services(city, key, reception), origin) if city else Service.objects.none(),
+        request.GET.get("page"),
+        items_per_page=settings.PAGE_SIZE_SMALL,
+    )
+    for each in services:
+        each.drawer_url = service_url(job_seeker, each, key)
+    context = {
+        "job_seeker": job_seeker,
+        "label": ProSupportReportBarrier(key).label,
+        "icon": BARRIER_ICONS[key],
+        "city": city,
+        "distance_from": distance_from,
+        "services": services,
+        "receptions": [
+            (label, solutions_url(job_seeker, key, accueil=value), value == reception)
+            for value, label in RECEPTIONS.items()
+        ],
+        "more_url": solutions_url(job_seeker, key, accueil=reception, page=services.next_page_number())
+        if services.has_next()
+        else "",
+        "search_url": search_url(request, job_seeker, key),
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : trouver une solution",
+    }
+    return _drawer_or_page(request, "next_steps/solutions.html", "Trouver une solution", context)
+
+
+def _service_for(job_seeker, service_id):
+    """The service, with its distance from the job seeker (see solutions.distance_origin), and how to say it."""
+    origin, distance_from = distance_origin(job_seeker, job_seeker_city(job_seeker))
+    service = get_object_or_404(
+        with_home_distance(
+            Service.objects.select_related("source", "fee", "structure").prefetch_related("publics", "receptions"),
+            origin,
+        ),
+        pk=service_id,
+    )
+    return service, distance_from
+
+
+def _service_context(request, job_seeker, service, distance_from):
+    # From a barrier's solutions, the service leads back to them; so do its contact and e-mail.
+    key = request.GET.get("frein", "").upper()
+    if key not in SEARCH_CATEGORIES:
+        key = ""
+    query = {"frein": key.lower()} if key else None
+    kwargs = {"public_id": job_seeker.public_id, "service_id": service.pk}
+    can_orient = can_orient_towards_insertion_service(request)
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
+    full_query = {"back_url": page_url}
+    if can_orient:
+        full_query["job_seeker_public_id"] = job_seeker.public_id
+    receptions = list(service.receptions.all())
+    in_person = any(reception.value == RECEPTION_IN_PERSON for reception in receptions)
+    return {
+        "job_seeker": job_seeker,
+        "service": service,
+        "receptions": [reception.label for reception in receptions],
+        "opening_hours": format_osm_hours(service.opening_hours),
+        # A distance only where the person goes.
+        "distance": getattr(service, "home_distance", None) if in_person else None,
+        "distance_from": distance_from,
+        "has_contact": bool(service.contact_full_name or service.contact_email or service.contact_phone),
+        "contact_url": reverse("next_steps_views:service_contact", kwargs=kwargs, query=query),
+        "email_url": reverse("next_steps_views:service_email", kwargs=kwargs, query=query)
+        if can_orient and service.contact_email
+        else "",
+        "service_url": reverse("next_steps_views:service", kwargs=kwargs, query=query),
+        "back_url": solutions_url(job_seeker, key) if key else "",
+        "orient_url": reverse(
+            "next_steps_views:journey", kwargs={"kind": "orientation", "pk": f"{job_seeker.public_id}.{service.pk}"}
+        )
+        if can_orient and service.is_orientable_via_internal_form
+        else "",
+        "external_url": service.lien_mobilisation if can_orient else "",
+        "full_url": reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}, query=full_query),
+        "contact_shown": False,
+        "email_sent": False,
+        "can_view_name": can_view_personal_information(request, job_seeker),
+        "matomo_custom_title": "Prochaines étapes : service d’insertion",
+    }
+
+
+@readonly_view
+def service(request, public_id, service_id):
+    """An insertion service in the side drawer: what helps choose it, then orient the job seeker towards it.
+
+    Orienting runs in the drawer (journeys.OrientationJourney), as the orientation wizard does; a service that
+    mobilizes on its own website links to it. Its contact details are shown on request (service_contact), as on the
+    full service card, which stays one link away.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    service, distance_from = _service_for(job_seeker, service_id)
+    context = _service_context(request, job_seeker, service, distance_from)
+    return _drawer_or_page(request, "next_steps/service.html", service.name, context)
+
+
+@http_methods(db_write=["POST"])
+def service_contact(request, public_id, service_id):
+    """Show a service's contact details, and record it as the full service card does: a mobilization event (iMER)
+    of the "contact" kind, to which an e-mail written next is linked (send_email_to_service).
+
+    With JavaScript, the contact box replaces the folded one in the drawer; without, the service with its contact.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    service, distance_from = _service_for(job_seeker, service_id)
+    context = _service_context(request, job_seeker, service, distance_from)
+    if not context["has_contact"]:
+        raise Http404
+    try:
+        MobilizationEvent.objects.create_mobilization_event(
+            session_key=request.session.session_key,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
+            user=request.user,
+            organization=request.current_organization,
+            structure=service.structure,
+            service=service,
+        )
+    except Exception:
+        # As insertion_views.register_mobilization_event: the contact details are shown all the same.
+        logger.warning("Unable to register mobilization event for user=%s, service=%s", request.user.pk, service.uid)
+    context |= {"contact_shown": True, "in_drawer": bool(request.htmx)}
+    if request.htmx:
+        return render(request, "next_steps/includes/service_contact.html", context)
+    return _drawer_or_page(request, "next_steps/service.html", service.name, context)
+
+
+@http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
+def service_email(request, public_id, service_id):
+    """« Écrire un e-mail à… »: the full service card's message to a service, prefilled, in the side drawer.
+
+    Sent by the platform as from the card (send_email_to_service), then back to the service.
+    """
+    job_seeker = _job_seeker_or_404(request, public_id)
+    service, distance_from = _service_for(job_seeker, service_id)
+    if not (can_orient_towards_insertion_service(request) and service.contact_email):
+        raise Http404
+    context = _service_context(request, job_seeker, service, distance_from)
+    form = SendEmailForm(
+        initial={"body": service_email_prefilled_body(request, service, job_seeker)}, data=request.POST or None
+    )
+    if request.method == "POST" and form.is_valid():
+        send_email_to_service(request, service, form.cleaned_data["body"])
+        context |= {"email_sent": True, "contact_shown": True}
+        return _drawer_or_page(request, "next_steps/service.html", service.name, context)
+    context |= {"form": form, "matomo_custom_title": "Prochaines étapes : écrire à un service"}
+    return _drawer_or_page(request, "next_steps/service_email.html", "Écrire au service", context)

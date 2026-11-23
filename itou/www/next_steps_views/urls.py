@@ -24,6 +24,18 @@ urlpatterns = [
     path("job-seekers/<uuid:public_id>/eligibility", views.eligibility, name="eligibility"),
     path("job-seekers/<uuid:public_id>/approval", views.approval, name="approval"),
     path(
+        "job-seekers/<uuid:public_id>/barriers/<slug:barrier>/solutions",
+        views.solutions,
+        name="solutions",
+    ),
+    path("job-seekers/<uuid:public_id>/services/<int:service_id>", views.service, name="service"),
+    path(
+        "job-seekers/<uuid:public_id>/services/<int:service_id>/contact",
+        views.service_contact,
+        name="service_contact",
+    ),
+    path("job-seekers/<uuid:public_id>/services/<int:service_id>/email", views.service_email, name="service_email"),
+    path(
         "job-seekers/<uuid:public_id>/barriers/<slug:barrier>/<slug:action>",
         views.barrier_statement,
         name="barrier_statement",
