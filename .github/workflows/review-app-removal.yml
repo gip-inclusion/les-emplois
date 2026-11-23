@@ -50,11 +50,13 @@ jobs:
 
     - name: 🗑 Delete S3 bucket
       run: |
-        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l uv run --script scripts/delete-buckets --use-case=review_app --app
+        $CLEVER_CLI applications list --format json | jq -r ".[] | select(.name == \"Emplois-review-apps\").applications | .[] | select(.name==\"$REVIEW_APP_NAME\").app_id" \
+        | xargs -l uv run --script scripts/delete-buckets --use-case=review_app --app
 
     - name: 🗑 Delete the review app
       run: |
-        $CLEVER_CLI applications list | grep " $REVIEW_APP_NAME " | cut -d' ' -f1 | xargs -l $CLEVER_CLI delete --yes --app
+        $CLEVER_CLI applications list --format json | jq -r ".[] | select(.name == \"Emplois-review-apps\").applications | .[] | select(.name==\"$REVIEW_APP_NAME\").app_id" \
+        | xargs -l $CLEVER_CLI delete --yes --app
 
     - name: 🗑 Delete the review app database
       run: |
