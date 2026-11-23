@@ -1,0 +1,205 @@
+{% load approvals %}
+{% load badges %}
+{% load enums %}
+{% load format_filters %}
+{% load progress_bar %}
+{% load static %}
+{% load str_filters %}
+
+<div class="tab-pane fade{% if active_tab == 'diagnostic' %} show active{% endif %}"
+     id="diagnostic-tab"
+     role="tabpanel"
+     aria-labelledby="diagnostic-tab-title">
+    <div class="c-box mb-3 mb-md-4">
+        {% if pro_support_report or create_pro_support_report_url or pro_support_request_mailto %}
+            <h3>Bilan d’accompagnement</h3>
+            <ul class="list-data">
+                {% if pro_support_report %}
+                    <li>
+                        <small>Rempli par</small>
+                        <div>
+                            <strong>{{ pro_support_report.author.get_inverted_full_name }}{% if pro_support_report.company %} ({{ pro_support_report.company.display_name }}){% endif %}</strong>
+                            <span class="d-block text-muted fs-sm">Le {{ pro_support_report.created_at|date:"d/m/Y" }} · contrat terminé le {{ pro_support_report.contract_end_date|date:"d/m/Y" }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <small>Freins périphériques</small>
+                        {% if pro_support_report.get_barriers_display %}
+                            <strong>{{ pro_support_report.get_barriers_display|join:" · " }}</strong>
+                        {% else %}
+                            <i class="disabled">Aucun frein renseigné</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Autres freins identifiés</small>
+                        {% if pro_support_report.other_barrier %}
+                            <strong>{{ pro_support_report.other_barrier }}</strong>
+                        {% else %}
+                            <i class="disabled">Aucun autre frein renseigné</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Autonomie dans la recherche d’emploi</small>
+                        <div>
+                            <strong>{{ pro_support_report.autonomy }} sur 5</strong>
+                            <span class="d-block text-muted fs-sm">{{ pro_support_report.get_autonomy_display }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <small>Solution après le contrat</small>
+                        {% if pro_support_report.solution %}
+                            <strong>{{ pro_support_report.get_solution_display }}</strong>
+                        {% else %}
+                            <strong>Aucune solution prévue à ce jour</strong>
+                        {% endif %}
+                    </li>
+                    {% if pro_support_report.orientation %}
+                        <li>
+                            <small>Orientation la plus adaptée</small>
+                            <strong>{{ pro_support_report.get_orientation_display }}</strong>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li>
+                        <small>Dernier bilan</small>
+                        <strong>Aucun</strong>
+                    </li>
+                {% endif %}
+            </ul>
+            <hr class="my-4">
+        {% endif %}
+        <div class="row mb-3">
+            <div class="col-12 col-sm">
+                <h3 class="mb-0">Diagnostic d’éligibilité</h3>
+            </div>
+            <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                {% if can_edit_iae_eligibility %}
+                    <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn btn-ico btn-secondary">
+                        <i class="ri-checkbox-circle-line fw-normal" aria-hidden="true"></i>
+                        {% if iae_eligibility_diagnosis %}
+                            <span>Mettre à jour son éligibilité IAE</span>
+                        {% else %}
+                            <span>Valider son éligibilité IAE</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <ul class="list-data">
+            {% if iae_eligibility_diagnosis %}
+                <li>
+                    <small>Confirmée par</small>
+                    <div>
+                        <strong>{{ iae_eligibility_diagnosis.author.get_inverted_full_name }} ({{ iae_eligibility_diagnosis.author_organization.display_name }})</strong>
+                        <span class="d-block text-muted fs-sm">Le {{ iae_eligibility_diagnosis.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                </li>
+                <li>
+                    <small>
+                        Validité
+                        <i class="ri-information-line text-info"
+                           data-bs-toggle="tooltip"
+                           data-bs-title="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
+                           aria-label="Ces critères reflètent la situation de l’usager lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date."
+                           role="button"
+                           tabindex="0"></i>
+                    </small>
+                    <strong>Du {{ iae_eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ iae_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                </li>
+                <li>
+                    <small>
+                        Critères administratifs
+                        {% include "eligibility/includes/situation_criteria_tooltip.html" with request=request kind=kind only %}
+                    </small>
+                    {# Keep ordering from manager (level then ui_rank) #}
+                    {% with criteria=iae_eligibility_diagnosis.administrative_criteria.all %}
+                        {% if not criteria %}
+                            <i class="text-disabled">L’auteur du diagnostic n’a pas renseigné de critères.</i>
+                        {% else %}
+                            <ul>
+                                {% for criterion in criteria %}<li>{{ criterion.name }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </li>
+                <li>
+                    <small>Type</small>
+                    <strong>{{ iae_eligibility_diagnosis.get_author_kind_display }}</strong>
+                </li>
+            {% else %}
+                <li>
+                    <small>Diagnostic</small>
+                    <strong>Aucun diagnostic d’éligibilité IAE</strong>
+                </li>
+            {% endif %}
+        </ul>
+        {% if not iae_eligibility_diagnosis and request.from_prescriber %}
+            <div class="alert alert-warning my-4">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2"><strong>Éligibilité IAE à valider</strong></p>
+                        <p class="mb-0">
+                            {% if request.from_authorized_prescriber %}
+                                Pour postuler en structure d’insertion, {{ job_seeker.get_inverted_full_name }} a besoin d’un diagnostic d’éligibilité IAE valide. En tant que prescripteur habilité, vous pouvez le réaliser.
+                            {% else %}
+                                Votre structure n’est pas habilitée à valider l’éligibilité IAE. Orientez {{ job_seeker.get_inverted_full_name }} vers un prescripteur habilité, ou proposez directement sa candidature : l’employeur fera valider son éligibilité.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                        {% if request.from_authorized_prescriber %}
+                            <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                               class="btn btn-ico btn-primary">Valider l’éligibilité</a>
+                        {% else %}
+                            <a class="btn btn-primary"
+                               href="{% url 'search:prescribers_results' %}{% if job_seeker.jobseeker_profile.hexa_commune.city %}?city={{ job_seeker.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">
+                                Trouver un prescripteur habilité
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% comment %}
+    <hr class="my-4">
+    <h3>Freins</h3>
+        {% endcomment %}
+        <hr class="my-4">
+        <h3>Orientations</h3>
+        {% if orientations %}
+            <ul class="list-group">
+                {% for orientation in orientations %}
+                    {% if forloop.counter == 4 %}
+                        <div class="collapse" id="orientations-collapse">
+                    {% endif %}
+                    <li class="list-group-item d-lg-flex flex-lg-row justify-content-lg-between align-items-lg-start">
+                        <div class="mb-1 mb-lg-0">
+                            <span class="d-block text-muted fs-sm">
+                                Le {{ orientation.created_at|date:"d/m/Y" }} · par {{ orientation.sender.get_inverted_full_name }} ({{ orientation.sender_organization.display_name }})
+                            </span>
+                            <strong class="d-block">{{ orientation.service.name }} · ({{ orientation.service.structure.name }})</strong>
+                        </div>
+                        {% orientation_state_badge orientation extra_classes="badge-sm" %}
+                    </li>
+                    {% if forloop.last and forloop.counter > 3 %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if contracts|length > 3 %}
+                    <button class="btn-link has-collapse-caret mt-3"
+                            type="button"
+                            data-it-collapse-text-show="Voir plus "
+                            data-it-collapse-text-hide="Voir moins "
+                            data-bs-toggle="collapse"
+                            data-bs-target="#orientations-collapse">d’orientations</button>
+                {% endif %}
+            </ul>
+        {% else %}
+            <i>Aucune orientation</i>
+        {% endif %}
+    </div>
+</div>

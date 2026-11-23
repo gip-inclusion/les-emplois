@@ -1,0 +1,78 @@
+{% load approvals %}
+{% load badges %}
+{% load enums %}
+{% load format_filters %}
+{% load progress_bar %}
+{% load static %}
+{% load str_filters %}
+
+<div class="tab-pane fade{% if active_tab == 'assignments' %} show active{% endif %}"
+     id="assignments-tab"
+     role="tabpanel"
+     aria-labelledby="assignments-tab-title">
+    <div class="c-box mb-3 mb-md-4">
+        <form id="display-contact-info-form">
+            {% csrf_token %}{# Used by htmx posts #}
+        </form>
+        <h3>Intervenants actuels</h3>
+        {% if active_assignments %}
+            {% for assignment in active_assignments %}
+                {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
+            {% endfor %}
+        {% else %}
+            <i>Aucun accompagnateur actuel</i>
+        {% endif %}
+        <hr class="my-4">
+        <h3>Accompagnements passés</h3>
+        {% if ended_assignments %}
+            {% for assignment in ended_assignments %}
+                {% include "job_seekers_views/includes/advisor.html" with assignment=assignment csrf_token=csrf_token request=request only %}
+            {% endfor %}
+        {% else %}
+            <i>Aucun accompagnement passé</i>
+        {% endif %}
+        {% if appointments %}
+            <hr class="my-4">
+            <h3>Rendez-vous</h3>
+
+            <ul class="list-group">
+                {% for appointment in appointments %}
+                    {% if forloop.counter == 4 %}
+                        <div class="collapse" id="appointments-collapse">
+                    {% endif %}
+                    <li class="list-group-item d-lg-flex flex-lg-row justify-content-lg-start align-items-lg-start">
+                        <div class="mb-1 mb-lg-0 w-100px">
+                            <strong class="d-block">{{ appointment.start_at|date:"d/m/Y" }}</strong>
+                            <span class="d-block text-muted fs-sm">{{ appointment.start_at|date:"G\hi" }}</span>
+                            <span class="d-block text-muted fs-sm">Reçu par</span>
+                        </div>
+                        <div class="mb-1 mb-lg-0 me-auto">
+                            <strong class="d-block">{{ appointment.reason }}</strong>
+                            <span class="d-block text-muted fs-sm">{{ appointment.theme }} · {{ appointment.organization_name }}</span>
+                            {% for agent in appointment.agents %}
+                                <span class="d-block">{{ agent.get_inverted_full_name }}</span>
+                                {% if agent.email|lower == request.user.email|lower %}
+                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-info">C’est vous</span>
+                                {% endif %}
+                            {% empty %}
+                                <i class="text-disabled fs-sm">Non renseigné</i>
+                            {% endfor %}
+                        </div>
+                        {% participation_status_badge appointment.status appointment.start_at extra_classes="badge-sm" %}
+                    </li>
+                    {% if forloop.last and forloop.counter > 3 %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if appointments|length > 3 %}
+                    <button class="btn-link has-collapse-caret mt-3"
+                            type="button"
+                            data-it-collapse-text-show="Voir plus "
+                            data-it-collapse-text-hide="Voir moins "
+                            data-bs-toggle="collapse"
+                            data-bs-target="#appointments-collapse">de rendez-vous</button>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>

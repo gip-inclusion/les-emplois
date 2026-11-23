@@ -1,0 +1,215 @@
+{% load approvals %}
+{% load badges %}
+{% load enums %}
+{% load format_filters %}
+{% load progress_bar %}
+{% load static %}
+{% load str_filters %}
+
+<div class="tab-pane fade{% if active_tab == 'job' %} show active{% endif %}"
+     id="job-tab"
+     role="tabpanel"
+     aria-labelledby="job-tab-title">
+    <div class="c-box mb-3 mb-md-4">
+        <h3>
+            Contrat et PASS IAE
+            {% now "d/m/Y" as today %}
+            <i class="ri-information-line ri-xl text-info fw-medium"
+               data-bs-toggle="tooltip"
+               data-bs-title="Contrats : Extranet IAE 2.0 de l’ASP, données du {{ today }} (quelques jours de décalage possibles) · PASS IAE : les emplois de l’inclusion, à jour."
+               aria-label="Contrats : Extranet IAE 2.0 de l’ASP, données du {{ today }} (quelques jours de décalage possibles) · PASS IAE : les emplois de l’inclusion, à jour."
+               role="button"
+               tabindex="0"></i>
+        </h3>
+        {% if can_view_contracts %}
+            <ul class="list-data">
+                {% if latest_contract %}
+                    <li>
+                        <small>Employeur</small>
+                        <strong>{{ latest_contract.company.display_name }} ({{ latest_contract.company.kind }})</strong>
+                    </li>
+                    <li>
+                        <small>Poste</small>
+                        {% if latest_contract.job %}
+                            <strong>{{ latest_contract.job }}</strong>
+                        {% else %}
+                            <i class="text-disabled">Non renseigné</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Contrat</small>
+                        <div>
+                            {% progress_bar latest_contract extra_classes=latest_contract.has_ended|yesno:"bg-nuance-04,bg-success" %}
+                            <span class="d-block text-muted fs-sm mt-2">
+                                {% if not latest_contract.has_started %}
+                                    À venir · début dans {{ latest_contract.get_remainder_until_start_display }}
+                                {% elif latest_contract.has_ended %}
+                                    {% if latest_contract.end_date %}
+                                        Terminé depuis {{ latest_contract.get_time_since_end_display }}
+                                    {% else %}
+                                        Pas de date de fin connue
+                                    {% endif %}
+                                {% elif latest_contract.end_date %}
+                                    {{ latest_contract.get_remainder_display|lower }} restant{{ latest_contract.remainder.days|pluralizefr }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </li>
+                {% else %}
+                    <li>
+                        <small>Contrat</small>
+                        <div>
+                            <strong>Aucun contrat IAE en cours.</strong>
+                            <span class="d-block text-muted fs-sm">Aucun contrat déclaré dans l’Extranet IAE 2.0 de l’ASP au cours des 2 dernières années.</span>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+            <hr class="my-3">
+        {% endif %}
+        <ul class="list-data">
+            <li>
+                <small>PASS IAE</small>
+                <div>
+                    {% if not approval %}
+                        <strong>Pas de PASS IAE</strong>
+                        <span class="d-block text-muted fs-sm">
+                            {% if iae_eligibility_diagnosis and iae_eligibility_diagnosis.is_considered_valid %}
+                                Il sera délivré à l’embauche dans une structure d’insertion · éligibilité IAE validée le {{ iae_eligibility_diagnosis.created_at|date:"d/m/Y" }} par {{ eligibility_diagnosis.author.get_inverted_full_name }}
+                                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                                {% if eligibility_diagnosis.author_prescriber_organization %}
+                                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                                {% endif %} · valable jusqu’au {{ iae_eligibility_diagnosis.expires_at|date:"d/m/Y" }}
+                            {% else %}
+                                Éligibilité IAE à valider. Un diagnostic doit être réalisé.
+                            {% endif %}
+                        </span>
+                    {% elif approval.state == ApprovalStatus.VALID %}
+                        {% progress_bar approval extra_classes=approval_expires_soon|yesno:"bg-warning,bg-success" %}
+                        <span class="d-block text-muted fs-sm">
+                            {{ approval.get_remainder_display|lower }} restant{{ approval.remainder.days|pluralizefr }} · n° {{ approval.number_with_spaces }}
+                        </span>
+                    {% elif approval.state == ApprovalStatus.FUTURE %}
+                        {% progress_bar approval %}
+                        <span class="d-block text-muted fs-sm">
+                            {{ approval.get_state_display }} · {{ approval.get_remainder_display|lower }} restant{{ approval.remainder.days|pluralizefr }} · n° {{ approval.number_with_spaces }}
+                        </span>
+                    {% elif approval.state == ApprovalStatus.SUSPENDED %}
+                        {% progress_bar approval extra_classes="bg-nuance-04" %}
+                        <span class="d-block text-muted fs-sm">
+                            {{ approval.get_remainder_display|lower }} restant{{ approval.remainder.days|pluralizefr }} · en pause du {{ approval.ongoing_suspension.start_at|date:"d/m/Y" }} au {{ approval.ongoing_suspension.end_at|date:"d/m/Y" }} · n° {{ approval.number_with_spaces }}
+                        </span>
+                    {% else %}
+                        {% progress_bar approval extra_classes="bg-nuance-04" %}
+                        <span class="d-block text-muted fs-sm">
+                            Expiré depuis {{ approval.end_at|date:"d/m/Y" }} ·
+                            {% if approval.waiting_period_has_elapsed %}
+                                période de carence terminée ·
+                            {% endif %}
+                            n° {{ approval.number_with_spaces }}
+                        </span>
+                    {% endif %}
+                </div>
+            </li>
+        </ul>
+        <hr class="my-4">
+        <h3>Candidatures</h3>
+        {% if job_applications %}
+            <ul class="list-group">
+                {% for jobapp in job_applications %}
+                    {% if forloop.counter == 4 %}
+                        <div class="collapse" id="jobapps-collapse">
+                    {% endif %}
+                    <li class="list-group-item d-lg-flex flex-lg-row justify-content-lg-between align-items-lg-start">
+                        <div class="mb-1 mb-lg-0">
+                            <span class="d-block text-muted fs-sm">Le {{ jobapp.created_at|date:"d/m/Y" }}</span>
+                            <strong class="d-block">{{ jobapp.to_company.display_name }} ({{ jobapp.to_company.kind }}) ·
+                                {% with all_jobs=jobapp.selected_jobs.all %}
+                                    {% if all_jobs|length == 0 %}
+                                        Candidature spontanée
+                                    {% else %}
+                                        {% for job in all_jobs %}
+                                            {{ job.display_name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                            </strong>
+                            <span class="d-block text-muted fs-sm">Envoyée par {{ jobapp.sender.get_inverted_full_name }}
+                                {% if jobapp.sender_organization %}
+                                    ({{ jobapp.sender_organization.display_name }})
+                                {% elif jobapp.sender.is_professional %}
+                                    (Aucune structure associée)
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% job_application_state_badge jobapp extra_classes="badge-sm" %}
+                    </li>
+                    {% if forloop.last and forloop.counter > 3 %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% if job_applications|length > 3 %}
+                <button class="btn-link has-collapse-caret mt-3"
+                        type="button"
+                        data-it-collapse-text-show="Voir plus "
+                        data-it-collapse-text-hide="Voir moins "
+                        data-bs-toggle="collapse"
+                        data-bs-target="#jobapps-collapse">de candidatures</button>
+            {% endif %}
+        {% else %}
+            <i>Aucune candidature au cours des 2 dernières années</i>
+        {% endif %}
+        {% if can_view_contracts %}
+            <hr class="my-4">
+            <h3>Contrats IAE</h3>
+            {% if contracts %}
+                <ul class="list-group">
+                    {% for contract in contracts %}
+                        {% if forloop.counter == 4 %}
+                            <div class="collapse" id="contracts-collapse">
+                        {% endif %}
+                        <li class="list-group-item d-lg-flex flex-lg-row justify-content-lg-between align-items-lg-start">
+                            <div class="mb-1 mb-lg-0">
+                                <span class="d-block text-muted fs-sm">
+                                    {% if contract.has_ended %}
+                                        {% if contract.end_date %}
+                                            Du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}
+                                        {% else %}
+                                            Démarré le {{ contract.start_date|date:"d/m/Y" }}, date de fin inconnue
+                                        {% endif %}
+                                    {% else %}
+                                        Depuis le {{ contract.start_date|date:"d/m/Y" }}
+                                        {% if contract.end_date %}
+                                            , fin prévue le {{ contract.end_date|date:"d/m/Y" }}
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                                <strong class="d-block">
+                                    {% if contract.company %}
+                                        {{ contract.company.display_name }} ({{ contract.company.kind }})
+                                    {% else %}
+                                        Structure non renseignée
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </li>
+                        {% if forloop.last and forloop.counter > 3 %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% if contracts|length > 3 %}
+                    <button class="btn-link has-collapse-caret mt-3"
+                            type="button"
+                            data-it-collapse-text-show="Voir plus "
+                            data-it-collapse-text-hide="Voir moins "
+                            data-bs-toggle="collapse"
+                            data-bs-target="#contracts-collapse">de contrats</button>
+                {% endif %}
+            {% else %}
+                <i>Aucun contrat IAE au cours des 2 dernières années</i>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

@@ -2,6 +2,7 @@ import sys
 import uuid
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
@@ -41,6 +42,7 @@ from itou.companies.enums import (
 )
 from itou.emails.utils import get_email_message
 from itou.users.enums import UserKind
+from itou.utils.date import get_delta_in_days_display, get_timedelta
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -1259,6 +1261,10 @@ class Contract(models.Model):
     objects = ContractQuerySet.as_manager()
 
     @property
+    def has_started(self):
+        return self.start_date <= timezone.localdate()
+
+    @property
     def has_ended(self):
         """
         A contract has ended if:
@@ -1269,6 +1275,29 @@ class Contract(models.Model):
         if self.end_date:
             return self.end_date < timezone.localdate()
         return not self.company or not self.company.is_active
+
+    @property
+    def ended_recently(self):
+        if self.has_ended and self.end_date:
+            return timezone.localdate() <= self.end_date + relativedelta(months=6)
+        return False
+
+    @property
+    def remainder(self):
+        if not self.end_date:
+            return timedelta(0)
+        return get_timedelta(timezone.localdate(), self.end_date)
+
+    def get_remainder_until_start_display(self):
+        delta = get_timedelta(timezone.localdate(), self.start_date)
+        return get_delta_in_days_display(delta)
+
+    def get_remainder_display(self):
+        return get_delta_in_days_display(self.remainder)
+
+    def get_time_since_end_display(self):
+        delta = get_timedelta(self.end_date + timedelta(days=1), timezone.localdate())
+        return get_delta_in_days_display(delta, now=self.end_date)
 
     class Meta:
         verbose_name = "contrat IAE"

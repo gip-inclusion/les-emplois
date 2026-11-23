@@ -1,5 +1,9 @@
 {% extends "layout/base.html" %}
 {% load approvals %}
+{% load badges %}
+{% load enums %}
+{% load format_filters %}
+{% load progress_bar %}
 {% load static %}
 {% load str_filters %}
 
@@ -15,102 +19,192 @@
     {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=can_edit_iae_eligibility iae_eligibility_diagnosis=iae_eligibility_diagnosis services_search_url=services_search_url service_search_event_option="services-search-from-details-general" only %}
 {% endblock %}
 
-{% block title_extra %}
-    {% include "job_seekers_views/includes/nav_tabs.html" with request=request job_seeker=job_seeker show_appointments_tab=show_appointments_tab active_nav_tab="details" back_url=back_url only %}
-{% endblock %}
-
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="s-section__row row">
-                <div class="s-section__col col-12">
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active">
-                            <div class="row">
-                                <div class="col-12 col-xxl-12 order-1 order-xxl-1">
-                                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
-                                        <h2 class="mb-0">Informations générales</h2>
-                                        <div class="d-flex flex-column flex-md-row gap-2">
-                                            {% if can_edit_iae_eligibility %}
-                                                <a href="{% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
-                                                   class="btn btn-ico btn-secondary">
-                                                    <i class="ri-checkbox-circle-line fw-normal" aria-hidden="true"></i>
-                                                    {% if iae_eligibility_diagnosis %}
-                                                        <span>Mettre à jour son éligibilité IAE</span>
-                                                    {% else %}
-                                                        <span>Valider son éligibilité IAE</span>
-                                                    {% endif %}
-                                                </a>
+    {% enums "approvals" "ApprovalStatus" as ApprovalStatus %}
+    <section class="s-tabs-synthesis-01">
+        <div class="s-tabs-synthesis-01__container container">
+            <div class="s-tabs-synthesis-01__row row">
+                <div class="s-tabs-synthesis-01__col col-12">
+                    <div class="s-tabs-synthesis-01__wrapper">
+                        <ul class="s-tabs-synthesis-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active"
+                                   id="job-tab-title"
+                                   data-bs-toggle="tab"
+                                   href="#job-tab"
+                                   role="tab"
+                                   aria-controls="job-tab"
+                                   aria-selected="true"
+                                   hx-get="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}"
+                                   hx-vals='{"tab": "job"}'
+                                   hx-swap="innerHTML"
+                                   hx-target="#tab-content"
+                                   hx-indicator="#tab-content">
+                                    <div class="flex-grow-1">
+                                        <span class="h4 mb-0">Emploi & PASS IAE</span>
+                                        <hr>
+                                        <div>
+                                            {% if latest_contract %}
+                                                {% if latest_contract.has_ended %}
+                                                    <strong class="mb-1">Contrat terminé</strong>
+                                                    <span class="d-block text-muted fs-sm lh-sm">
+                                                        {% if latest_contract.end_date %}
+                                                            le {{ latest_contract.end_date|date:"d/m/Y" }}
+                                                        {% else %}
+                                                            Aucune date de fin renseignée
+                                                        {% endif %}
+                                                    </span>
+                                                {% else %}
+                                                    <strong class="mb-1 text-success">Contrat en cours</strong>
+                                                    <span class="d-block text-muted fs-sm lh-sm">
+                                                        {% if latest_contract.end_date %}
+                                                            jusqu’au {{ latest_contract.end_date|date:"d/m/Y" }}
+                                                        {% else %}
+                                                            Aucune date de fin renseignée
+                                                        {% endif %}
+                                                    </span>
+                                                {% endif %}
+                                            {% else %}
+                                                <strong class="mb-1">Aucun contrat IAE en cours</strong>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mt-3 mt-md-4">
+                                            {% if approval %}
+                                                <strong class="mb-1 {{ approval.is_valid|yesno:"text-success,text-danger" }}">PASS IAE {{ approval.get_state_display|lower }}</strong>
+                                                {% if approval.state == ApprovalStatus.VALID %}
+                                                    <span class="d-block text-muted fs-sm lh-sm">jusqu’au {{ approval.end_at|date:"d/m/Y" }}</span>
+                                                {% elif approval.state == ApprovalStatus.FUTURE %}
+                                                    <span class="d-block text-muted fs-sm lh-sm">démarre le {{ approval.start_at|date:"d/m/Y" }}</span>
+                                                {% elif approval.state == ApprovalStatus.SUSPENDED %}
+                                                    <span class="d-block text-muted fs-sm lh-sm">en pause jusqu’au {{ approval.ongoing_suspension.end_at|date:"d/m/Y" }}</span>
+                                                {% else %}
+                                                    <span class="d-block text-muted fs-sm lh-sm">depuis le {{ approval.end_at|date:"d/m/Y" }}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <strong class="mb-1">Aucun PASS IAE</strong>
                                             {% endif %}
                                         </div>
                                     </div>
-                                </div>
-                                {% if pro_support_report %}
-                                    <div class="col-12 order-1 order-xxl-1">
-                                        {% include "job_seekers_views/includes/pro_support_report_card_banner.html" with report=pro_support_report request=request only %}
+                                    <div class="mt-3 mt-md-4 d-flex justify-content-end">
+                                        <i class="ri-arrow-down-line ri-xl" aria-hidden="true"></i>
                                     </div>
-                                {% elif contract_end_date %}
-                                    <div class="col-12 order-1 order-xxl-1">
-                                        {% include "job_seekers_views/includes/end_of_contract_card_banner.html" with contract_end_date=contract_end_date contract_ended=contract_ended create_pro_support_report_url=create_pro_support_report_url pro_support_request_mailto=pro_support_request_mailto fiche_banner_extra_id=fiche_banner_extra_id request=request only %}
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link"
+                                   id="diagnostic-tab-title"
+                                   data-bs-toggle="tab"
+                                   href="#diagnostic-tab"
+                                   role="tab"
+                                   aria-controls="diagnostic-tab"
+                                   aria-selected="false"
+                                   tabindex="-1"
+                                   hx-get="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}"
+                                   hx-vals='{"tab": "diagnostic"}'
+                                   hx-swap="innerHTML"
+                                   hx-target="#tab-content"
+                                   hx-indicator="#tab-content">
+                                    <div class="flex-grow-1">
+                                        <span class="h4 mb-0">Diagnostic, freins et orientations</span>
+                                        <hr>
+                                        {% if iae_eligibility_diagnosis and iae_eligibility_diagnosis.is_considered_valid %}
+                                            <strong class="mb-1 d-flex align-items-center gap-1">Éligibilité IAE validée</strong>
+                                            {% if approval.is_valid %}
+                                                <span class="d-block text-muted fs-sm lh-sm">couverte par le PASS IAE</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if iae_eligibility_diagnosis %}
+                                                <strong class="mb-1 d-flex align-items-center gap-1">Éligibilité IAE à renouveler</strong>
+                                            {% else %}
+                                                <strong class="mb-1 d-flex align-items-center gap-1">Éligibilité IAE à valider</strong>
+                                            {% endif %}
+                                            <span class="d-block text-muted fs-sm lh-sm">par un prescripteur habilité</span>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
-                                <div class="col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
-                                    <div class="c-box mb-3 mb-md-4">
-                                        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token only %}
+                                    <div class="mt-3 mt-md-4 d-flex justify-content-end">
+                                        <i class="ri-arrow-down-line ri-xl" aria-hidden="true"></i>
                                     </div>
-                                    {% if iae_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" request=request only %}
-                                    {% endif %}
-                                    {% if geiq_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.from_employer request=request only %}
-                                    {% endif %}
-                                </div>
-                                <div class="col-12 col-xxl-4 col-xxxl-3 order-2 order-xxl-3">
-                                    {% if approval %}
-                                        {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
-                                    {% endif %}
-                                    {% include "job_seekers_views/includes/last_advisor.html" with job_seeker=job_seeker last_user_assignment=last_user_assignment request=request csrf_token=csrf_token only %}
-                                    {% if immersion_search_url %}
-                                        {# Immersion Facilitée proposal #}
-                                        <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
-                                            <div class="c-box__header--immersion-facile p-3 p-lg-4">
-                                                <span class="h4 m-0">Trouver une immersion</span>
-                                            </div>
-                                            <div class="p-3 p-lg-4">
-                                                <p>
-                                                    {% if approval_expires_soon %}
-                                                        Le PASS IAE de cet usager arrive bientôt à expiration.
-                                                        <br />
-                                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
-                                                    {% elif approval_missing_or_expired %}
-                                                        Cet usager n'a pas de PASS IAE aujourd'hui.
-                                                        <br />
-                                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
-                                                    {% else %}
-                                                        <strong>Immersion Facilitée</strong> vous aide à trouver une immersion professionnelle pour cet usager sur son territoire.
-                                                    {% endif %}
-                                                </p>
-                                                <p>
-                                                    <a href="{{ immersion_search_url }}"
-                                                       class="btn-link has-external-link"
-                                                       rel="noopener"
-                                                       target="_blank"
-                                                       aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">Rechercher une immersion</a>
-                                                </p>
-                                                <p class="mb-0">
-                                                    <a href="{{ immersion_convention_url }}"
-                                                       class="btn-link has-external-link"
-                                                       rel="noopener"
-                                                       target="_blank"
-                                                       aria-label="Initier une convention (ouverture dans un nouvel onglet)">Initier une convention</a>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link"
+                                   id="assignments-tab-title"
+                                   data-bs-toggle="tab"
+                                   href="#assignments-tab"
+                                   role="tab"
+                                   aria-controls="assignments-tab"
+                                   aria-selected="false"
+                                   tabindex="-1"
+                                   hx-get="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}"
+                                   hx-vals='{"tab": "assignments"}'
+                                   hx-swap="innerHTML"
+                                   hx-target="#tab-content"
+                                   hx-indicator="#tab-content">
+                                    <div class="flex-grow-1">
+                                        <span class="h4 mb-0">Accompagnement</span>
+                                        <hr>
+                                        <strong class="mb-1 d-flex align-items-center gap-1">
+                                            Intervenants
+                                            <span class="badge rounded-pill badge-sm bg-info-lighter text-info">{{ job_seeker.active_advisors_nb }}</span>
+                                        </strong>
+                                    </div>
+                                    <div class="mt-3 mt-md-4 d-flex justify-content-end">
+                                        <i class="ri-arrow-down-line ri-xl" aria-hidden="true"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link"
+                                   id="informations-tab-title"
+                                   data-bs-toggle="tab"
+                                   href="#informations-tab"
+                                   role="tab"
+                                   aria-controls="informations-tab"
+                                   aria-selected="false"
+                                   tabindex="-1"
+                                   hx-get="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}"
+                                   hx-vals='{"tab": "informations"}'
+                                   hx-swap="innerHTML"
+                                   hx-target="#tab-content"
+                                   hx-indicator="#tab-content">
+                                    <div class="flex-grow-1">
+                                        <span class="h4 mb-0">Informations personnelles</span>
+                                        {% if job_seeker.email or job_seeker.phone %}
+                                            {% if can_view_personal_information %}
+                                                <hr>
+                                                {% if job_seeker.phone %}
+                                                    <strong>{{ job_seeker.phone|format_phone }}</strong>
+                                                {% else %}
+                                                    <i class="text-disabled">Numéro de  téléphone non renseigné</i>
+                                                {% endif %}
+                                                {% if job_seeker.email %}
+                                                    <span class="text-muted fs-sm lh-sm text-break">{{ job_seeker.email }}</span>
+                                                {% else %}
+                                                    <i class="text-disabled">Adresse e-mail non renseignée</i>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-3 mt-md-4 d-flex justify-content-end">
+                                        <i class="ri-arrow-down-line ri-xl" aria-hidden="true"></i>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
+                </div>
+                <div id="tab-content" class="tab-content">
+                    {# Job tab #}
+                    {% include "job_seekers_views/includes/job_tab.html" %}
+
+                    {# Diagnostic tab #}
+                    {% include "job_seekers_views/includes/diagnostic_tab.html" %}
+
+                    {# Assignments tab #}
+                    {% include "job_seekers_views/includes/assignments_tab.html" %}
+
+                    {# Informations tab #}
+                    {% include "job_seekers_views/includes/informations_tab.html" %}
                 </div>
             </div>
         </div>

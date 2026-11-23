@@ -35,7 +35,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
     pole_emploi_partenaire_api_client,
 )
-from itou.utils.date import get_delta_in_days_display, time_left
+from itou.utils.date import get_delta_in_days_display, get_timedelta
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
@@ -630,10 +630,11 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         """
         Return the remaining time of an Approval, we don't count future suspended periods.
         """
-        result = time_left(self.start_at, self.end_at)
+        today = timezone.localdate()
+        result = get_timedelta(today, self.end_at)
 
         result -= sum(
-            (time_left(suspension.start_at, suspension.end_at) for suspension in self.suspension_set.all()),
+            (get_timedelta(today, suspension.end_at) for suspension in self.suspension_set.all()),
             datetime.timedelta(0),
         )
         return result
@@ -642,6 +643,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         return get_delta_in_days_display(self.remainder)
 
     get_remainder_display.short_description = "Reliquat"
+
+    def get_time_since_end_display(self):
+        delta = get_timedelta(self.end_at + datetime.timedelta(days=1), timezone.localdate())
+        return get_delta_in_days_display(delta, now=self.end_at)
 
     @property
     def remainder_as_date(self):

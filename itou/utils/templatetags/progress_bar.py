@@ -27,19 +27,18 @@ def progress_bar(obj, extra_classes="bg-success"):
     return format_html(
         """
         <div>
-            <p class="mb-0">
+            <div class="d-flex justify-content-between">
                 <strong>{}</strong>
-                <strong class="float-md-end">{}</strong>
-            </p>
-            <div class="progress">
-                <div class="progress-bar {}" role="progressbar" style="width: {}%" aria-valuenow="{}" aria-valuemin="0"
-                    aria-valuemax="100" aria-labelledby="currentProgressState"></div>
+                <strong>{}</strong>
+            </div>
+            <div class="progress my-1" role="progressbar" aria-valuenow="{}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar {}" style="width: {}%"></div>
             </div>
         </div>
         """,
         start.strftime("%d/%m/%y"),
-        end.strftime("%d/%m/%y"),
-        extra_classes,
+        end and end.strftime("%d/%m/%y") or "Pas de date de fin connue",
         progress_percentage,
+        extra_classes,
         progress_percentage,
     )

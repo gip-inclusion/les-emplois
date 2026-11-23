@@ -24,11 +24,8 @@ def nb_days_in_year(start: datetime.date, end: datetime.date, *, year: int):
     return (end - start).days + 1
 
 
-def time_left(start: datetime.date, end: datetime.date, end_inclusive: bool = True):
-    today = timezone.localdate()
-    return max(end - today + datetime.timedelta(int(end_inclusive)), datetime.timedelta(0)) - max(
-        start - today, datetime.timedelta(0)
-    )
+def get_timedelta(start: datetime.date, end: datetime.date, end_inclusive: bool = True) -> datetime.timedelta:
+    return max(end - start + datetime.timedelta(int(end_inclusive)), datetime.timedelta(0))
 
 
 def get_human_readable_estimate(delta: datetime.timedelta, now=None) -> str:
@@ -41,8 +38,8 @@ def get_human_readable_estimate(delta: datetime.timedelta, now=None) -> str:
     return " et ".join(res)
 
 
-def get_delta_in_days_display(delta: datetime.timedelta) -> str:
+def get_delta_in_days_display(delta: datetime.timedelta, now=None) -> str:
     display = f"{delta.days} jour{pluralizefr(delta.days)}"
     if delta.days >= 7:  # Prevent displaying "2 jours (2 jours)"
-        display += f" ({get_human_readable_estimate(delta)})"
+        display += f" ({get_human_readable_estimate(delta, now)})"
     return display

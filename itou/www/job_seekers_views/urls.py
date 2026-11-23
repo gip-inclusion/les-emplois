@@ -12,31 +12,6 @@ urlpatterns = [
         name="details",
     ),
     path(
-        "job_applications/<uuid:public_id>",
-        views.JobApplicationTabView.as_view(),
-        name="job_applications",
-    ),
-    path(
-        "contracts/<uuid:public_id>",
-        views.ContractsTabView.as_view(),
-        name="contracts",
-    ),
-    path(
-        "advisors/<uuid:public_id>",
-        views.AdvisorsTabView.as_view(),
-        name="advisors",
-    ),
-    path(
-        "orientations/<uuid:public_id>",
-        views.OrientationsTabView.as_view(),
-        name="orientations",
-    ),
-    path(
-        "appointments/<uuid:public_id>",
-        views.AppointmentsTabView.as_view(),
-        name="appointments",
-    ),
-    path(
         "appointments/<uuid:public_id>/<int:rdv_insertion_id>",
         views.appointment_details,
         name="appointment_details",

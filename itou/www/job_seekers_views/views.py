@@ -28,7 +28,7 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
-from itou.companies.enums import ProSupportReportRecipientSource
+from itou.companies.enums import CompanyKind, ProSupportReportRecipientSource
 from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -134,9 +134,13 @@ def get_last_assignment(request, job_seeker, from_all_coworkers=False, archived=
     )
 
 
-class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
+class JobSeekerDetailTabView(UserPassesTestMixin, ReadonlyViewMixin, DetailView):
     model = User
-    queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
+    queryset = (
+        User.objects.select_related("jobseeker_profile")
+        .filter(kind=UserKind.JOB_SEEKER)
+        .with_advisors_count(active=True)
+    )
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
     context_object_name = "job_seeker"
@@ -159,24 +163,6 @@ class BaseJobSeekerDetailView(UserPassesTestMixin, ReadonlyViewMixin, DetailView
     def appointments(self):
         return _get_job_seeker_appointments(self.request, self.object)
 
-    def get_context_data(self, **kwargs):
-        fallback_back_url = (
-            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
-        )
-
-        return super().get_context_data(**kwargs) | {
-            "matomo_custom_title": "Détail candidat",
-            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
-            "can_view_personal_information": can_view_personal_information(self.request, self.object),
-            "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
-            "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
-            "show_appointments_tab": bool(self.appointments),
-        }
-
-
-class JobSeekerDetailTabView(BaseJobSeekerDetailView):
-    template_name = "job_seekers_views/details.html"
-
     def get_queryset(self):
         queryset = super().get_queryset()
         if can_fill_pro_support_report(self.request):
@@ -187,35 +173,98 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             )
         return queryset.with_end_of_journey()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_template_names(self):
+        htmx_templates = {
+            "job": "job_seekers_views/includes/job_tab.html",
+            "diagnostic": "job_seekers_views/includes/diagnostic_tab.html",
+            "assignments": "job_seekers_views/includes/assignments_tab.html",
+            "informations": "job_seekers_views/includes/informations_tab.html",
+        }
+        selected_tab = self.request.htmx and self.request.GET.get("tab", None)
+        return [htmx_templates[selected_tab] if selected_tab else "job_seekers_views/details.html"]
 
-        geiq_eligibility_diagnosis = None
-        if self.request.from_prescriber or not self.request.from_iae_actor:
-            geiq_eligibility_diagnosis = (
-                GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                    self.object,
-                    for_geiq=self.request.current_organization if self.request.from_employer else None,
-                )
-                .prefetch_related("selected_administrative_criteria__administrative_criteria")
-                .first()
+    @cached_property
+    def can_view_external(self):
+        return can_view_external_actions(self.object, self.request)
+
+    def get_job_tab_context(self):
+        # Contracts
+        if self.approval_missing_or_expired:
+            two_years_ago = timezone.localdate() - relativedelta(years=2)
+            contracts = (
+                self.object.contracts.select_related("company")
+                .exclude(end_date__lt=two_years_ago)
+                .order_by("-start_date")
             )
+        else:
+            contracts = get_contracts(self.approval)
 
-        iae_eligibility_diagnosis = None
-        can_edit_iae_eligibility = False
+        latest_contract = contracts.first()
 
-        if self.request.from_iae_actor:
-            iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.object,
-                for_siae=self.request.current_organization if self.request.from_employer else None,
-                prefetch=["selected_administrative_criteria__administrative_criteria"],
+        if (
+            latest_contract
+            and latest_contract.has_ended
+            and (
+                latest_contract.end_date
+                and timezone.localdate() <= latest_contract.end_date + relativedelta(months=6)
+                or not latest_contract.end_date
             )
-            if iae_eligibility_diagnosis:
-                # The job_seeker object already contains a lot of information: no need to re-retrieve it
-                iae_eligibility_diagnosis.job_seeker = self.object
+        ):
+            latest_contract = None
 
-        if self.request.from_authorized_prescriber and self.approval_missing_or_expired:
-            can_edit_iae_eligibility = True
+        latest_contract_is_ongoing = latest_contract and not latest_contract.has_ended
+        can_view_contracts = self.request.from_authorized_prescriber or (
+            self.request.from_employer
+            and latest_contract_is_ongoing
+            and latest_contract.company_id == self.request.current_organization.pk
+        )
+
+        if latest_contract:
+            latest_contract.job = getattr(
+                JobApplication.objects.accepted()
+                .select_related("hired_job")
+                .filter(job_seeker=self.object, to_company=latest_contract.company)
+                .order_by("-hiring_start_at")
+                .first(),
+                "hired_job",
+                None,
+            )
+            contracts = list(contracts)[1:]
+
+        # Job applications
+        if self.request.from_employer:
+            # Retrieve the applications of the job seeker sent by the company or to the company
+            job_applications_qs = JobApplication.objects.for_company(self.request.current_organization).filter(
+                job_seeker=self.object
+            )
+        else:
+            # Retrieve the applications of the job seeker sent by the prescriber or their organization
+            job_applications_qs = self.object.job_applications.prescriptions_of(
+                self.request.user,
+                self.request.current_organization,
+            ) | xp_ref_iae_job_applications(self.request).filter(job_seeker=self.object)
+
+        if self.can_view_external:
+            job_applications = self.object.job_applications.annotate(
+                user_can_see_details=Exists(job_applications_qs.filter(pk=OuterRef("pk"))),
+            ).all()
+        else:
+            job_applications = job_applications_qs.annotate(user_can_see_details=Value(True)).all()
+
+        job_applications = job_applications.select_related(
+            "job_seeker", "to_company", "sender", "sender_company", "sender_prescriber_organization"
+        ).prefetch_related("selected_jobs")
+
+        return {
+            "can_view_external_actions": self.can_view_external,
+            "contracts": contracts,
+            "job_applications": job_applications,
+            "latest_contract": latest_contract,
+            "can_view_contracts": can_view_contracts,
+        }
+
+    def get_diagnostic_tab_context(self, context):
+        # Pro support report
 
         # Job seeker card banner: the pro support report for the SIAE, a support request for the authorized prescriber.
         contract_end_date = None
@@ -238,9 +287,6 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
                     pro_support_request_mailto = _build_pro_support_request_mailto(
                         company_email, self.object.get_full_name(), contract_ended=contract_ended
                     )
-        approval_expires_soon = (
-            self.approval and self.approval.is_valid and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS
-        )
 
         # Unless a report remains to be filled, the latest report the user can view replaces this banner.
         pro_support_report = None
@@ -256,119 +302,32 @@ class JobSeekerDetailTabView(BaseJobSeekerDetailView):
             if pro_support_report and not can_view_pro_support_report(self.request, pro_support_report):
                 pro_support_report = None
 
-        return context | {
-            "approval": self.approval,
-            "approval_expires_soon": approval_expires_soon,
-            "approval_missing_or_expired": self.approval_missing_or_expired,
-            "contract_end_date": contract_end_date,
-            "contract_ended": contract_ended,
-            "create_pro_support_report_url": create_pro_support_report_url,
-            "pro_support_request_mailto": pro_support_request_mailto,
-            "pro_support_report": pro_support_report,
-            "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
-            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
-            "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
-            "can_edit_iae_eligibility": can_edit_iae_eligibility,
-            "immersion_convention_url": immersion_convention_url(),
-            "immersion_search_url": immersion_search_url(self.object),
-            "last_user_assignment": get_last_assignment(self.request, self.object),
-        }
-
-
-class JobApplicationTabView(BaseJobSeekerDetailView):
-    template_name = "job_seekers_views/job_applications.html"
-
-    def get_job_applications(self, can_view_external):
-        if self.request.from_employer:
-            # Retrieve the applications of the job seeker sent by the company or to the company
-            applications_qs = JobApplication.objects.for_company(self.request.current_organization).filter(
-                job_seeker=self.object
+        # Orientations
+        orientation_kwargs = {"beneficiary": self.object} | (
+            {"sender_company": self.request.current_organization}
+            if self.request.from_employer
+            else {"sender_prescriber_organization": self.request.current_organization}
+        )
+        orientations_qs = Orientation.objects.filter(**orientation_kwargs)
+        if self.can_view_external:
+            orientations = self.object.orientations.annotate(
+                user_can_see_details=Exists(orientations_qs.filter(pk=OuterRef("pk")))
             )
         else:
-            # Retrieve the applications of the job seeker sent by the prescriber or their organization
-            applications_qs = self.object.job_applications.prescriptions_of(
-                self.request.user,
-                self.request.current_organization,
-            ) | xp_ref_iae_job_applications(self.request).filter(job_seeker=self.object)
-        if can_view_external:
-            applications = self.object.job_applications.annotate(
-                user_can_see_details=Exists(applications_qs.filter(pk=OuterRef("pk"))),
-            ).all()
-        else:
-            applications = applications_qs.annotate(user_can_see_details=Value(True)).all()
-        return applications.select_related(
-            "job_seeker", "to_company", "sender", "sender_company", "sender_prescriber_organization"
-        ).prefetch_related("selected_jobs")
+            orientations = orientations_qs.annotate(user_can_see_details=Value(True))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        can_view_external = can_view_external_actions(self.object, self.request)
-        job_applications = self.get_job_applications(can_view_external)
-        received_job_applications, sent_job_applications = None, job_applications
-
-        if self.request.from_employer:
-            received_job_applications, sent_job_applications = [], []
-            for job_app in job_applications:
-                if job_app.to_company.id == self.request.current_organization.pk:
-                    received_job_applications.append(job_app)
-                elif job_app.sender_company.id == self.request.current_organization.pk:
-                    sent_job_applications.append(job_app)
-
-        has_external_applications = any(not a.user_can_see_details for a in job_applications)
-
-        return context | {
-            "can_view_external_job_applications": can_view_external,
-            "received_job_applications": received_job_applications,
-            "sent_job_applications": sent_job_applications,
-            "has_external_applications": has_external_applications,
-        }
-
-
-class ContractsTabView(BaseJobSeekerDetailView):
-    template_name = "job_seekers_views/contracts.html"
-
-    def test_func(self):
-        return self.request.from_authorized_prescriber or (
-            self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
+        orientations = orientations.order_by("-updated_at", "-created_at", "-pk").select_related(
+            "beneficiary", "sender", "service", "service__structure"
         )
 
-    def get_contracts(self):
-        """
-        Return contracts related to the current PASS IAE.
-        If the job seeker has an expired PASS or no PASS at all,
-        return all of their contracts in the past 2 years.
-        """
-        if self.approval_missing_or_expired:
-            two_years_ago = timezone.localdate() - relativedelta(years=2)
-            return self.object.contracts.exclude(end_date__lt=two_years_ago).order_by("-start_date")
-        return get_contracts(self.approval)
-
-    def get_context_data(self, **kwargs):
-        contracts = list(self.get_contracts())
-        has_ongoing_contract = self.request.from_employer and any(
-            [
-                (not contract.has_ended) and contract.company_id == self.request.current_organization.pk
-                for contract in contracts
-            ]
-        )
-        return super().get_context_data(**kwargs) | {
-            "contracts": contracts,
-            "approval_missing_or_expired": self.approval_missing_or_expired,
-            "has_ongoing_contract": has_ongoing_contract,
+        return {
+            "create_pro_support_report_url": create_pro_support_report_url,
+            "orientations": orientations,
+            "pro_support_request_mailto": pro_support_request_mailto,
+            "pro_support_report": pro_support_report,
         }
 
-
-class AdvisorsTabView(BaseJobSeekerDetailView):
-    queryset = (
-        User.objects.select_related("jobseeker_profile")
-        .filter(kind=UserKind.JOB_SEEKER)
-        .with_advisors_count(active=True)
-        .with_advisors_count(active=False)
-    )
-    template_name = "job_seekers_views/advisors.html"
-
-    def get_context_data(self, **kwargs):
+    def get_assignments_tab_context(self):
         assignments = list(
             JobSeekerAssignment.objects.filter(job_seeker=self.object)
             .select_related("professional", "company", "prescriber_organization")
@@ -430,49 +389,86 @@ class AdvisorsTabView(BaseJobSeekerDetailView):
             else:
                 active_assignments.append(assignment)
 
-        return super().get_context_data(**kwargs) | {
+        return {
             "active_assignments": active_assignments,
             "ended_assignments": ended_assignments,
             "calendar_url": settings.ADVISORS_CALENDAR_URL,
+            "appointments": self.appointments,
         }
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class OrientationsTabView(BaseJobSeekerDetailView):
-    template_name = "job_seekers_views/orientations.html"
-
-    def get_orientations(self, can_view_external):
-        orientation_kwargs = {"beneficiary": self.object} | (
-            {"sender_company": self.request.current_organization}
-            if self.request.from_employer
-            else {"sender_prescriber_organization": self.request.current_organization}
+        # Create base context
+        approval_expires_soon = (
+            self.approval and self.approval.is_valid and self.approval.remainder.days < APPROVAL_ENDING_SOON_DAYS
         )
-        orientations_qs = Orientation.objects.filter(**orientation_kwargs)
-        if can_view_external:
-            orientations = self.object.orientations.annotate(
-                user_can_see_details=Exists(orientations_qs.filter(pk=OuterRef("pk")))
+        iae_eligibility_diagnosis = None
+        can_edit_iae_eligibility = False
+
+        if self.request.from_iae_actor:
+            iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.object,
+                for_siae=self.request.current_organization if self.request.from_employer else None,
+                prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
-        else:
-            orientations = orientations_qs.annotate(user_can_see_details=Value(True))
+            if iae_eligibility_diagnosis:
+                # The job_seeker object already contains a lot of information: no need to re-retrieve it
+                iae_eligibility_diagnosis.job_seeker = self.object
 
-        return orientations.order_by("-updated_at", "-created_at", "-pk").select_related(
-            "beneficiary", "sender", "service", "service__structure"
+        if self.request.from_authorized_prescriber and self.approval_missing_or_expired:
+            can_edit_iae_eligibility = True
+
+        geiq_eligibility_diagnosis = None
+        if self.request.from_prescriber or self.request.current_organization.kind == CompanyKind.GEIQ:
+            geiq_eligibility_diagnosis = (
+                GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                    self.object,
+                    for_geiq=self.request.current_organization if self.request.from_employer else None,
+                )
+                .prefetch_related("selected_administrative_criteria__administrative_criteria")
+                .first()
+            )
+
+        active_tab = "job"
+        if self.request.htmx and self.request.GET.get("tab", "") in [
+            "job",
+            "diagnostic",
+            "assignments",
+            "informations",
+        ]:
+            active_tab = self.request.GET["tab"]
+
+        fallback_back_url = (
+            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
 
-    def get_context_data(self, **kwargs):
-        can_view_external = can_view_external_actions(self.object, self.request)
-        orientations = self.get_orientations(can_view_external)
-
-        return super().get_context_data(**kwargs) | {
-            "can_view_external_orientations": can_view_external,
-            "orientations": orientations,
+        context |= {
+            "active_tab": active_tab,
+            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "can_view_personal_information": can_view_personal_information(self.request, self.object),
+            "approval": self.approval,
+            "approval_expires_soon": approval_expires_soon,
+            "approval_missing_or_expired": self.approval_missing_or_expired,
+            "can_edit_iae_eligibility": can_edit_iae_eligibility,
+            "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
+            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+            "fiche_banner_extra_id": f"fin-de-contrat-fiche-{self.object.public_id}",
+            "matomo_custom_title": "Détail candidat",
+            "immersion_convention_url": immersion_convention_url(),
+            "immersion_search_url": immersion_search_url(self.object),
+            "services_search_url": build_services_search_url(self.request, job_seeker=self.object),
         }
 
+        if active_tab == "job":
+            context |= self.get_job_tab_context()
+        elif active_tab == "diagnostic":
+            context |= self.get_diagnostic_tab_context(context)
+        elif active_tab == "assignments":
+            context |= self.get_assignments_tab_context()
 
-class AppointmentsTabView(BaseJobSeekerDetailView):
-    template_name = "job_seekers_views/appointments.html"
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"appointments": self.appointments}
+        return context
 
 
 @readonly_view
