@@ -6,6 +6,7 @@ Each contract is a line under the situation strip, which opens its details in th
 import dataclasses
 import datetime
 
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
@@ -88,6 +89,8 @@ class ContractLine:
     period: str
     ongoing: bool
     coverage: Note
+    # Its details in the side drawer.
+    url: str
 
     @property
     def tone(self):
@@ -103,6 +106,9 @@ def contract_lines(job_seeker, approval, contracts, where):
             period=period(contract),
             ongoing=not contract.has_ended,
             coverage=coverage(approval, contract),
+            url=reverse(
+                "next_steps_views:contract", kwargs={"public_id": job_seeker.public_id, "contract_id": contract.pk}
+            ),
         )
         for contract in sorted(contracts, key=lambda contract: contract.start_date, reverse=True)
     ]

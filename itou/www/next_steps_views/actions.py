@@ -400,6 +400,11 @@ def _pro_support_reports_to_read(request):
             due=_after(report.created_at, PRO_SUPPORT_REPORT_READ_DAYS),
             url=reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id}),
             call_to_action="Lire",
+            # Read in the side drawer, as the guided journeys run.
+            journey_url=reverse(
+                "next_steps_views:pro_support_report",
+                kwargs={"public_id": report.job_seeker.public_id, "report_id": report.public_id},
+            ),
         )
 
 

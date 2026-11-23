@@ -1,0 +1,78 @@
+{% load str_filters %}
+{# A report on the job seeker, in the side drawer or inside a page: the same facts as its own page, in sections. #}
+{# job_seekers_views/pro_support_report.html has no include to share: keep the two in step. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-1" id="next-step-journey-title">Bilan d’accompagnement</h2>
+                <span class="d-block fs-sm text-muted">
+                    Rempli le {{ report.created_at|date:"d/m/Y" }} par {{ report.author.get_full_name }}{% if report.company %}, {{ report.company.display_name }}{% endif %}
+                </span>
+                <span class="badge badge-sm rounded-pill mt-2 {% if contract_has_ended %}bg-light text-muted{% else %}bg-success-lighter text-success{% endif %}">
+                    {% if contract_has_ended %}
+                        Contrat terminé le {{ report.contract_end_date|date:"d/m/Y" }}
+                    {% else %}
+                        Contrat en cours, fin le {{ report.contract_end_date|date:"d/m/Y" }}
+                    {% endif %}
+                </span>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        {# Barriers, with the icons of the « Freins à lever » section. #}
+        <section class="mb-4" aria-labelledby="next-step-report-barriers">
+            <h3 class="h5 mb-2" id="next-step-report-barriers">Freins périphériques</h3>
+            {# One frame each, as the other facts of the drawers. #}
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                {% for label, icon in barriers %}
+                    <li class="border rounded-2 px-3 py-2 d-flex align-items-center gap-2">
+                        <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-warning-lighter text-warning"
+                              aria-hidden="true"><i class="{{ icon }}"></i></span>
+                        <span class="fw-bold">{{ label }}</span>
+                    </li>
+                {% empty %}
+                    <li class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-error-warning-line" only %}<div class="flex-grow-1">Aucun frein identifié</div></li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {# Autonomy on a five-step gauge, then its meaning. #}
+        <section class="mb-4" aria-labelledby="next-step-report-autonomy">
+            <h3 class="h5 mb-2" id="next-step-report-autonomy">Autonomie dans la recherche d’emploi</h3>
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-compass-3-line" only %}
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <span class="next-step-gauge d-flex gap-1 flex-grow-1" aria-hidden="true">
+                            {% for filled in autonomy_steps %}
+                                <span class="flex-grow-1 rounded-pill {% if filled %}bg-tertiary{% else %}bg-light border{% endif %}"></span>
+                            {% endfor %}
+                        </span>
+                        <b class="flex-shrink-0">{{ report.autonomy }} sur 5</b>
+                    </div>
+                    <p class="fs-sm text-muted mb-0">{{ report.get_autonomy_display }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="next-step-report-after">
+            <h3 class="h5 mb-2" id="next-step-report-after">Après le contrat</h3>
+            <div class="d-flex flex-column gap-2">
+                {% if report.solution %}
+                    {% include "next_steps/includes/fact.html" with label="Solution" value=report.get_solution_display detail="" only %}
+                {% else %}
+                    {% include "next_steps/includes/fact.html" with label="Solution" value="Aucune solution prévue à ce jour" detail="" only %}
+                {% endif %}
+                {% if report.orientation %}
+                    {% include "next_steps/includes/fact.html" with label="Orientation recommandée" value=report.get_orientation_display|capfirst detail="" only %}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>

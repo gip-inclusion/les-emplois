@@ -1,0 +1,208 @@
+{% load enums %}
+{% load matomo %}
+{% load str_filters %}
+{% load url_add_query %}
+{% enums "users" "JobSeekerAssignmentDisplayMode" as JobSeekerAssignmentDisplayMode %}
+{# An advisor of the job seeker, in the side drawer or inside a page: who, how to reach them, their acts. #}
+{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            {% include "next_steps/includes/avatar.html" with assignment=assignment request=request only %}
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">Accompagne {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">
+                    {% if assignment.assigned_to_unknown_advisor %}
+                        {{ assignment.organization.display_name }}
+                    {% else %}
+                        {{ assignment.professional.get_full_name }}
+                        {% if assignment.professional_id == request.user.pk %}<span class="text-muted fw-normal">· vous</span>{% endif %}
+                    {% endif %}
+                </h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button"
+                        class="btn-close align-self-start"
+                        data-bs-dismiss="offcanvas"
+                        aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        {# Contact details as on the existing advisors tab: behind a button, never for oneself. #}
+        <form id="display-contact-info-form">
+            {% csrf_token %}
+        </form>
+        {# In blocks, as the facts of the guided journeys: a long value on a whole row. #}
+        <div class="row g-2 mb-4">
+            <div class="col-12">
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-building-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Structure</span>
+                        <span class="d-block fw-bold text-break">
+                            {% if assignment.assigned_to_unknown_advisor %}
+                                Accompagnateur non renseigné
+                            {% elif assignment.organization %}
+                                {{ assignment.organization.member_kind_display|capfirst }} pour {{ assignment.organization.display_name }}
+                            {% else %}
+                                Aucune structure associée
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% if assignment.advisor != request.user %}
+                {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_NO_MEMBERSHIP %}
+                    <div class="col-12">
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-mail-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Adresse e-mail</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="email" value=assignment.advisor.email only %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_WITH_ORG_AND_MEMBERSHIP or assignment.display_mode == JobSeekerAssignmentDisplayMode.ACTIVE_NO_ORG %}
+                    <div class="col-12">
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-phone-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Téléphone</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="phone" value=assignment.advisor.phone only %}
+                            </div>
+                        </div>
+                    </div>
+                {% elif assignment.organization %}
+                    <div class="col-12">
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-mail-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">E-mail de la structure</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_email" value=assignment.organization.email only %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                            {% include "next_steps/includes/fact_tile.html" with icon="ri-phone-line" only %}
+                            <div class="flex-grow-1">
+                                <span class="d-block fs-sm text-muted">Téléphone de la structure</span>
+                                {% include "job_seekers_views/includes/button_display_advisor_contact_info.html" with assignment=assignment mode="org_phone" value=assignment.organization.phone only %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+            <div class="col-12">
+                <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                    <div class="flex-grow-1">
+                        <span class="d-block fs-sm text-muted">Accompagne depuis le</span>
+                        <span class="d-block fw-bold">{{ assignment.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% if assignment.reason %}
+                <div class="col-12">
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-chat-quote-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
+                            <span class="d-block">{{ assignment.reason|linebreaksbr }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% elif can_manage %}
+                {# As on the existing advisors tab: a clear motif helps the advisors coordinate. #}
+                <div class="col-12">
+                    <div class="border rounded-2 px-3 py-2 h-100 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-chat-quote-line" only %}
+                        <span class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">Motif de l’accompagnement</span>
+                            <i class="d-block text-disabled">Non renseigné</i>
+                        </span>
+                        <a class="btn btn-sm btn-outline-primary btn-ico flex-shrink-0"
+                           href="{% url "job_seekers_views:edit_assignment" public_id=job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ job_seeker_url|urlencode }}"
+                           aria-label="Préciser le motif de mon accompagnement"
+                           {% matomo_event "accompagnateur" "clic" "renseigner-motif-accompagnement" %}>
+                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                            <span>Préciser</span>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <h3 class="h4 mb-1">Ses actes</h3>
+        <p class="fs-sm text-muted mb-3">
+            Retrouvés dans les candidatures, diagnostics, bilans et orientations que vous pouvez consulter, du plus récent au plus ancien.
+        </p>
+        {# itou-theme's list of steps, as the history of a job application. #}
+        <ul class="list-step mb-0">
+            {% for act in acts %}
+                <li>
+                    <time datetime="{{ act.at|date:"Y-m-d" }}">{{ act.at|date:"d/m/Y" }}</time>
+                    <span>
+                        {% if act.url %}
+                            <a class="link-tertiary fw-bold"
+                               href="{% url_add_query act.url back_url=job_seeker_url %}">{{ act.title }}</a>
+                        {% else %}
+                            <b>{{ act.title }}</b>
+                        {% endif %}
+                    </span>
+                    {% if act.detail %}<small>{{ act.detail }}</small>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if must_switch %}
+            {# As on the existing advisors tab: one's assignment is managed from its organization. #}
+            <div class="bg-info-lighter rounded-2 p-3 mt-4">
+                <p class="fs-sm mb-1">
+                    Connectez-vous à la structure {{ assignment.organization.display_name }} pour modifier ou terminer cet accompagnement.
+                </p>
+                <form action="{% url "dashboard:switch_organization" %}?next_url={{ job_seeker_url|urlencode }}"
+                      method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-sm btn-link ps-0"
+                            name="organization_key"
+                            value="{{ assignment.organization.organization_switch_key }}">Me connecter à cette structure</button>
+                </form>
+            </div>
+        {% elif has_left %}
+            <div class="bg-warning-lighter rounded-2 p-3 mt-4">
+                <p class="fs-sm mb-0">Vous ne faites plus partie de cette structure. Vous ne pouvez plus modifier cet accompagnement.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between gap-2 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% if can_manage %}
+            {# One's own assignment: what the existing advisors tab offers; ending it is confirmed in the drawer. #}
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary btn-ico"
+                   href="{% url "job_seekers_views:edit_assignment" public_id=job_seeker.public_id assignment_pk=assignment.pk %}?back_url={{ job_seeker_url|urlencode }}"
+                   {% matomo_event "accompagnateur" "clic" "modifier-accompagnement" %}>
+                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                    <span>Modifier mon accompagnement</span>
+                </a>
+                {% url "next_steps_views:end_assignment" public_id=job_seeker.public_id assignment_pk=assignment.pk as end_url %}
+                <a class="btn btn-sm btn-outline-primary btn-ico"
+                   href="{{ end_url }}"
+                   {% if in_drawer %}hx-get="{{ end_url }}" hx-target="#next-step-journey" hx-swap="outerHTML" hx-indicator="#next-step-journey"{% endif %}>
+                    <i class="ri-stop-circle-line fw-medium" aria-hidden="true"></i>
+                    <span>Terminer mon accompagnement</span>
+                </a>
+            </div>
+        {% endif %}
+        <a class="btn btn-sm btn-outline-primary btn-ico"
+           href="{% url "job_seekers_views:advisors" public_id=job_seeker.public_id %}?back_url={{ job_seeker_url|urlencode }}">
+            <i class="ri-team-line fw-medium" aria-hidden="true"></i>
+            <span>Tous les accompagnateurs</span>
+        </a>
+    </div>
+</div>

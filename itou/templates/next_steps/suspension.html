@@ -1,0 +1,53 @@
+{% load str_filters %}
+{# A suspension of the job seeker's PASS IAE, in the side drawer or inside a page. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">PASS&nbsp;IAE de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">Suspension</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        <div class="d-flex flex-column gap-2">
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Période</span>
+                    <span class="d-block fw-bold">Du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            {% include "next_steps/includes/fact.html" with label="Motif" value=suspension.get_reason_display detail=suspension.reason_explanation|linebreaksbr only %}
+            <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                {% include "next_steps/includes/fact_tile.html" with icon="ri-calendar-line" only %}
+                <div class="flex-grow-1">
+                    <span class="d-block fs-sm text-muted">Déclarée</span>
+                    <span class="d-block fw-bold">
+                        Le {{ suspension.created_at|date:"d/m/Y" }}
+                        {% if suspension.siae %}par {{ suspension.siae.display_name }}{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {# The PASS IAE in the same drawer. #}
+        {% url "next_steps_views:approval" public_id=job_seeker.public_id as approval_url %}
+        <a class="btn btn-outline-primary btn-ico"
+           href="{{ approval_url }}"
+           hx-get="{{ approval_url }}"
+           hx-target="#next-step-journey"
+           hx-swap="outerHTML"
+           hx-indicator="#next-step-journey">
+            <i class="ri-pass-valid-line fw-medium" aria-hidden="true"></i>
+            <span>Voir le PASS&nbsp;IAE</span>
+        </a>
+    </div>
+</div>

@@ -56,6 +56,8 @@ class Fact:
     badge_classes: str = ""
     # Shown with the platform's own state badge.
     job_application: object = None
+    # Its details in the side drawer, if any: the label opens them.
+    url: str = ""
 
 
 @dataclasses.dataclass
@@ -69,6 +71,8 @@ class Part:
     badge_classes: str = ""
     link_label: str = ""
     link_url: str = ""
+    # The link opens the side drawer rather than the existing page.
+    link_in_drawer: bool = False
 
     @property
     def can_open(self):
@@ -93,6 +97,10 @@ def _approval_part(approval, job_seeker):
                     "Suspension en cours",
                     _period(suspension.start_at, suspension.end_at),
                     detail=suspension.get_reason_display(),
+                    url=reverse(
+                        "next_steps_views:suspension",
+                        kwargs={"public_id": job_seeker.public_id, "suspension_id": suspension.pk},
+                    ),
                 )
             )
     return Part(
@@ -104,7 +112,8 @@ def _approval_part(approval, job_seeker):
         badge_label=badge_label,
         badge_classes=_badge(badge_tone),
         link_label=f"Voir le PASS{NBSP}IAE",
-        link_url=reverse("approvals:details", kwargs={"public_id": approval.public_id}),
+        link_url=reverse("next_steps_views:approval", kwargs={"public_id": job_seeker.public_id}),
+        link_in_drawer=True,
     )
 
 
@@ -143,6 +152,9 @@ def _eligibility_part(diagnosis, summary, job_seeker):
         # Valid either way; the summary says when it is through the PASS IAE.
         badge_label="Valide",
         badge_classes=_badge("success"),
+        link_label="Voir le diagnostic",
+        link_url=reverse("next_steps_views:eligibility", kwargs={"public_id": job_seeker.public_id}),
+        link_in_drawer=True,
     )
 
 
@@ -181,6 +193,10 @@ def _job_applications_part(request, job_seeker):
             job_application.to_company.display_name,
             detail=f"Envoyée le {_fr(timezone.localdate(job_application.created_at))}",
             job_application=job_application,
+            url=reverse(
+                "next_steps_views:job_application",
+                kwargs={"public_id": job_seeker.public_id, "job_application_id": job_application.pk},
+            ),
         )
         for job_application in job_applications[:JOB_APPLICATIONS_SHOWN]
     ]
@@ -219,7 +235,11 @@ def _report_part(request, job_seeker):
         f"Rempli le {_fr(timezone.localdate(report.created_at))}",
         facts,
         link_label="Lire le bilan",
-        link_url=reverse("job_seekers_views:pro_support_report", kwargs={"public_id": report.public_id}),
+        link_url=reverse(
+            "next_steps_views:pro_support_report",
+            kwargs={"public_id": job_seeker.public_id, "report_id": report.public_id},
+        ),
+        link_in_drawer=True,
     )
 
 

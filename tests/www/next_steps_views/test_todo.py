@@ -275,9 +275,15 @@ def test_prescriber_pro_support_report_to_request_then_to_read(prescriber_client
     assertContains(response, "C’est la SIAE qui remplit le bilan.")
     assertNotContains(response, "pro-support-report/create")
 
-    ProSupportReportFactory(contract=contract)
+    report = ProSupportReportFactory(contract=contract)
     response = prescriber_client.get(TODO_URL)
     assert summary(response) == [(Group.WEEK, Kind.PRO_SUPPORT_REPORT_READ, contract.job_seeker)]
+    # Read in the side drawer.
+    panel_url = reverse(
+        "next_steps_views:pro_support_report",
+        kwargs={"public_id": contract.job_seeker.public_id, "report_id": report.public_id},
+    )
+    assertContains(response, f'hx-get="{panel_url}"')
 
 
 def test_prescriber_eligibility_to_validate(prescriber_client, prescriber_membership):

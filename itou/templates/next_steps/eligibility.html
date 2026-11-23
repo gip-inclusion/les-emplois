@@ -1,0 +1,46 @@
+{% load str_filters %}
+{# The eligibility diagnosis of the job seeker's file, in the side drawer or inside a page: who, when, which criteria. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">{{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-0" id="next-step-journey-title">Diagnostic d’éligibilité</h2>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        <div class="d-flex flex-column gap-2 mb-4">
+            {% include "next_steps/includes/fact.html" with label="Réalisé le" value=diagnosis.created_at|date:"d/m/Y" detail="" only %}
+            {% if diagnosis.author and diagnosis.author_organization %}
+                {% include "next_steps/includes/fact.html" with label="Par" value=diagnosis.author.get_full_name detail=diagnosis.author_organization.display_name only %}
+            {% elif diagnosis.author %}
+                {% include "next_steps/includes/fact.html" with label="Par" value=diagnosis.author.get_full_name detail="" only %}
+            {% endif %}
+            {% if diagnosis.is_valid %}
+                {% include "next_steps/includes/fact.html" with label="Valide jusqu’au" value=diagnosis.expires_at|date:"d/m/Y" detail="" only %}
+            {% else %}
+                {% include "next_steps/includes/fact.html" with label="Expiré le" value=diagnosis.expires_at|date:"d/m/Y" detail="" only %}
+            {% endif %}
+        </div>
+        {# The criteria, one frame each. #}
+        <h3 class="h5 mb-2">Critères administratifs</h3>
+        <div class="d-flex flex-column gap-2">
+            {% for selected in criteria %}
+                <div class="border rounded-2 px-3 py-2 d-flex flex-wrap align-items-center column-gap-2">
+                    {% include "next_steps/includes/fact_tile.html" with icon="ri-shield-check-line" only %}
+                    <span class="fw-bold">{{ selected.administrative_criteria.name }}</span>
+                    {% if selected.certified_at %}
+                        <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Certifié</span>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="border rounded-2 px-3 py-2 text-muted d-flex align-items-center gap-3">{% include "next_steps/includes/fact_tile.html" with icon="ri-shield-check-line" only %}<div class="flex-grow-1">Aucun critère renseigné.</div></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

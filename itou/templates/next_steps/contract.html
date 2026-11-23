@@ -1,0 +1,76 @@
+{% load str_filters %}
+{# A contract of the job seeker, in the side drawer or inside a page: where, when, how the PASS IAE covers it. #}
+<div id="next-step-journey" class="d-flex flex-column h-100">
+    <div class="px-4 pt-4 pb-3 border-bottom">
+        <div class="d-flex align-items-start gap-3">
+            <div class="flex-grow-1">
+                <span class="d-block fs-sm text-muted">Contrat de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_name }}</span>
+                <h2 class="h3 mb-2" id="next-step-journey-title">
+                    {% if contract.company %}
+                        {{ contract.company.display_name }}
+                    {% else %}
+                        Structure d’insertion
+                    {% endif %}
+                </h2>
+                <span class="badge badge-sm rounded-pill {% if contract.has_ended %}bg-light text-muted{% else %}bg-success-lighter text-success{% endif %}">
+                    {% if contract.has_ended %}Terminé{% else %}En cours{% endif %}
+                </span>
+            </div>
+            {% if in_drawer %}
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto p-4">
+        {# How the PASS IAE covers it: what the situation says next to it. #}
+        <div class="mb-4">{% include "next_steps/includes/note_badge.html" with note=coverage only %}</div>
+
+        <div class="d-flex flex-column gap-2 mb-4">
+            {% if contract.company %}
+                {% include "next_steps/includes/fact.html" with label="Structure" value=contract.company.display_name detail=contract.company.kind only %}
+            {% else %}
+                {% include "next_steps/includes/fact.html" with label="Structure" value="Non retrouvée sur la plateforme" detail="" only %}
+            {% endif %}
+            {% include "next_steps/includes/fact.html" with label="Période" value=period detail="" only %}
+            {% if contract.has_ended and not contract.end_date %}
+                {% include "next_steps/includes/fact.html" with value="" label="Fin" detail="La date de fin n’est pas disponible car l’entreprise est inactive." only %}
+            {% endif %}
+        </div>
+
+        {% if steps %}
+            {# The contract's records in the ASP data, as the existing contracts tab gets them: one frame each. #}
+            <h3 class="h5 mb-2">Déclaré à l’ASP</h3>
+            <div class="d-flex flex-column gap-2">
+                {% for step in steps %}
+                    <div class="border rounded-2 px-3 py-2 d-flex align-items-center gap-3">
+                        {% include "next_steps/includes/fact_tile.html" with icon="ri-file-text-line" only %}
+                        <div class="flex-grow-1">
+                            <span class="d-block fs-sm text-muted">{{ step.kind|default:"Contrat" }}</span>
+                            <span class="d-block fw-bold">À partir du {{ step.start|date:"d/m/Y"|default:"—" }}</span>
+                            {% if step.end or step.left %}
+                                <span class="d-block fs-sm">
+                                    {% if step.end %}Fin prévue le {{ step.end|date:"d/m/Y" }}{% endif %}
+                                    {% if step.left %}· sortie définitive le {{ step.left|date:"d/m/Y" }}{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <p class="fs-xs text-muted mt-4 mb-0">
+            Contrat déclaré dans l’Extranet IAE 2.0 de l’ASP, avec quelques jours de décalage.
+        </p>
+    </div>
+
+    <div class="d-flex justify-content-between gap-3 py-3 ps-4 pe-8 border-top">
+        {# pe-8: room on the right for the floating cookie manager button. #}
+        {% url "next_steps_views:job_seeker" public_id=job_seeker.public_id as job_seeker_url %}
+        <a class="btn btn-outline-primary btn-ico"
+           href="{% url "job_seekers_views:contracts" public_id=job_seeker.public_id %}?back_url={{ job_seeker_url|urlencode }}">
+            <i class="ri-file-text-line fw-medium" aria-hidden="true"></i>
+            <span>Tous les contrats</span>
+        </a>
+    </div>
+</div>

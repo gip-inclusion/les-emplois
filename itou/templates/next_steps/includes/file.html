@@ -19,7 +19,22 @@
                         <ul class="list-data">
                             {% for fact in part.facts %}
                                 <li>
-                                    <small>{{ fact.label }}</small>
+                                    {% if fact.url %}
+                                        {# Opens its details in the side drawer; without JavaScript, as a page. #}
+                                        <small>
+                                            <a class="link-tertiary fw-bold"
+                                               href="{{ fact.url }}"
+                                               hx-get="{{ fact.url }}"
+                                               hx-target="#next-step-journey"
+                                               hx-swap="outerHTML"
+                                               hx-indicator="#next-step-journey"
+                                               data-bs-toggle="offcanvas"
+                                               data-bs-target="#next-step-drawer"
+                                               aria-controls="next-step-drawer">{{ fact.label }}</a>
+                                        </small>
+                                    {% else %}
+                                        <small>{{ fact.label }}</small>
+                                    {% endif %}
                                     <div class="d-flex flex-wrap align-items-center column-gap-2">
                                         {% if fact.value %}<strong class="text-break">{{ fact.value }}</strong>{% endif %}
                                         {% if fact.job_application %}
@@ -32,7 +47,17 @@
                                 </li>
                             {% endfor %}
                         </ul>
-                        {% if part.link_url %}
+                        {% if part.link_url and part.link_in_drawer %}
+                            <a class="btn btn-sm btn-outline-primary mt-3"
+                               href="{{ part.link_url }}"
+                               hx-get="{{ part.link_url }}"
+                               hx-target="#next-step-journey"
+                               hx-swap="outerHTML"
+                               hx-indicator="#next-step-journey"
+                               data-bs-toggle="offcanvas"
+                               data-bs-target="#next-step-drawer"
+                               aria-controls="next-step-drawer">{{ part.link_label }}</a>
+                        {% elif part.link_url %}
                             <a class="btn btn-sm btn-outline-primary mt-3"
                                href="{{ part.link_url }}?back_url={{ request.get_full_path|urlencode }}">{{ part.link_label }}</a>
                         {% endif %}
