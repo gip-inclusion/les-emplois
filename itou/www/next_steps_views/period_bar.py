@@ -13,6 +13,8 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
+from itou.approvals.enums import ProlongationRequestStatus
+
 
 NBSP = " "
 PASS_IAE = f"PASS{NBSP}IAE"
@@ -282,3 +284,90 @@ def suspension_bar(approval, start_at, end_at, approval_end=None):
         )
     ]
     return _mark_today(PeriodBar(blocks=_share_columns(blocks), notes=notes))
+
+
+def situation_bar(approval):
+    """The job seeker's PASS IAE with its suspensions and a pending prolongation; None without a PASS IAE.
+
+    Their contracts are listed under it, each with how the PASS IAE covers it (see coverage.py).
+    """
+    blocks = []
+    # Suspensions shown only in part, said in a note so that the strip does not hide a date the database holds.
+    clipped = []
+    if approval is not None:
+        expired = approval.end_at < timezone.localdate()
+        kind = "expired" if expired else "pass"
+        # Greyed out when expired: the block without PASS IAE that follows says since when.
+        label = PASS_IAE
+        cursor = approval.start_at
+        pieces = []
+        for suspension in sorted(approval.suspension_set.all(), key=lambda suspension: suspension.start_at):
+            # Within the PASS IAE and after the previous suspension: the application refuses anything else, but older
+            # or imported data may hold it, and the blocks would overlap.
+            start, end = max(suspension.start_at, cursor), min(suspension.end_at, approval.end_at)
+            if (start, end) != (suspension.start_at, suspension.end_at):
+                outside = suspension.start_at < approval.start_at or suspension.end_at > approval.end_at
+                clipped.append((suspension, f"en partie hors du {PASS_IAE}" if outside else "sur une autre"))
+            if start > end:
+                continue
+            if start > cursor:
+                pieces.append(Block(kind, label, "", cursor, start - datetime.timedelta(days=1)))
+            pieces.append(
+                Block(
+                    "suspension",
+                    "Suspension",
+                    short_duration(start, end),
+                    start,
+                    end,
+                    left=Edge(start, "Du"),
+                    right=Edge(end, "Au"),
+                )
+            )
+            cursor = end + datetime.timedelta(days=1)
+        if cursor <= approval.end_at:
+            pieces.append(Block(kind, label, "", cursor, approval.end_at))
+        for piece in pieces:
+            if piece.kind != "suspension":
+                piece.duration = short_duration(piece.start, piece.end)
+        # The PASS IAE's dates go under the strip's ends, whatever block is there.
+        if pieces:
+            pieces[0].left = Edge(approval.start_at, "Début")
+            pieces[-1].right = Edge(approval.end_at, "Fin" if expired else "Fin prévue")
+        blocks += pieces
+        pending = [
+            request
+            for request in approval.prolongationrequest_set.all()
+            if request.status == ProlongationRequestStatus.PENDING
+        ]
+        for request in pending:
+            blocks.append(
+                Block(
+                    "prolongation",
+                    "Prolongation demandée",
+                    f"+ {short_duration(request.start_at, request.end_at)}",
+                    request.start_at,
+                    request.end_at,
+                    right=Edge(request.end_at, "Fin demandée"),
+                )
+            )
+        # Today is always on the strip: when it falls before or after the PASS IAE, a block without PASS IAE leads
+        # to it, so that the strip reads "there was one, there is none today" or "there will be one".
+        today = timezone.localdate()
+        if blocks and today > blocks[-1].end:
+            start = blocks[-1].end + datetime.timedelta(days=1)
+            blocks.append(Block("gap", f"Sans {PASS_IAE}", f"depuis {short_duration(start, today)}", start, today))
+        elif blocks and today < blocks[0].start:
+            end = blocks[0].start - datetime.timedelta(days=1)
+            blocks.insert(0, Block("gap", f"{PASS_IAE} à venir", f"dans {short_duration(today, end)}", today, end))
+    notes = [
+        Note(
+            f"Suspension du {_fr(suspension.start_at)} au {_fr(suspension.end_at)} enregistrée {where_}",
+            variant="warn",
+            icon="ri-error-warning-line",
+        )
+        for suspension, where_ in clipped
+    ]
+    if not blocks and not notes:
+        return None
+    bar = PeriodBar(blocks=_share_columns(blocks) if blocks else [], notes=notes)
+    return _mark_today(bar, _remaining(approval) if approval else "")

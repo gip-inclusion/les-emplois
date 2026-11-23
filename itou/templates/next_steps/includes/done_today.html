@@ -11,7 +11,7 @@
                 <li class="d-flex align-items-baseline gap-2 fs-sm text-muted">
                     <i class="ri-check-line text-success" aria-hidden="true"></i>
                     <span>
-                        <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover fw-bold" href="{% url "job_seekers_views:details" public_id=item.job_seeker.public_id %}">{{ item.job_seeker.get_inverted_full_name|mask_unless:item.user_can_view_personal_information }}</a>
+                        <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover fw-bold" href="{% url "next_steps_views:job_seeker" public_id=item.job_seeker.public_id %}">{{ item.job_seeker.get_inverted_full_name|mask_unless:item.user_can_view_personal_information }}</a>
                         · {{ item.label }} · {{ item.at|time:"H\hi" }}
                     </span>
                 </li>

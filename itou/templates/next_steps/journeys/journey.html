@@ -53,7 +53,7 @@
                     </div>
                 {% endif %}
                 <a class="fs-sm"
-                   href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}">Voir la fiche</a>
+                   href="{% url "next_steps_views:job_seeker" public_id=job_seeker.public_id %}">Voir la fiche</a>
             </div>
             {# Keep the momentum: what remains within the week, and what comes next. #}
             {% if remaining is not None %}

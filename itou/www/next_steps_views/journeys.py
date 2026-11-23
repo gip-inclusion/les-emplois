@@ -1316,7 +1316,7 @@ class EligibilityJourney(Journey):
         return Summary(
             title,
             lines,
-            url=reverse("job_seekers_views:details", kwargs={"public_id": self.job_seeker.public_id}),
+            url=reverse("next_steps_views:job_seeker", kwargs={"public_id": self.job_seeker.public_id}),
         )
 
     def build_forms(self, data=None, initial=None):

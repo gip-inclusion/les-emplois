@@ -5,6 +5,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains
 
+from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import Suspension
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
@@ -12,9 +13,10 @@ from itou.www.next_steps_views.period_bar import (
     approval_bar,
     duration_display,
     prolongation_bar,
+    situation_bar,
     suspension_bar,
 )
-from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -180,3 +182,98 @@ def test_suspension_journey_shows_the_bars_and_matches_the_database(client, sett
     # The strip announced the date the database trigger set.
     assert approval.end_at == datetime.date(2028, 9, 11)
     assertContains(response, announced)
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar():
+    approval = ApprovalFactory(start_at=datetime.date(2025, 2, 1), end_at=datetime.date(2027, 3, 31))
+    SuspensionFactory(approval=approval, start_at=datetime.date(2025, 9, 1), end_at=datetime.date(2025, 10, 31))
+    ProlongationRequestFactory(
+        approval=approval, start_at=datetime.date(2027, 4, 1), end_at=datetime.date(2027, 7, 31)
+    )
+    ProlongationRequestFactory(
+        approval=approval,
+        start_at=datetime.date(2027, 4, 1),
+        end_at=datetime.date(2027, 5, 31),
+        status=ProlongationRequestStatus.DENIED,
+        processed=True,
+    )
+
+    bar = situation_bar(approval)
+
+    # The PASS IAE around its suspension, then the pending prolongation request only.
+    assert [(block.kind, block.label, block.start, block.end) for block in bar.blocks] == [
+        ("pass", f"PASS{NBSP}IAE", datetime.date(2025, 2, 1), datetime.date(2025, 8, 31)),
+        ("suspension", "Suspension", datetime.date(2025, 9, 1), datetime.date(2025, 10, 31)),
+        ("pass", f"PASS{NBSP}IAE", datetime.date(2025, 11, 1), datetime.date(2027, 3, 31)),
+        ("prolongation", "Prolongation demandée", datetime.date(2027, 4, 1), datetime.date(2027, 7, 31)),
+    ]
+    assert edges(bar) == [
+        ("01/02/2025", "Début"),
+        ("01/09/2025", "Du"),
+        ("31/10/2025", "Au"),
+        ("31/03/2027", "Fin prévue"),
+        ("31/07/2027", "Fin demandée"),
+    ]
+    assert sum(block.columns for block in bar.blocks) == 12
+    assert [block.today != "" for block in bar.blocks] == [False, False, True, False]
+    # The contracts are not on it: they are listed under it (coverage).
+    assert bar.notes == []
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar_clips_a_suspension_outside_the_approval():
+    # The application refuses it, but older or imported data may hold a suspension starting before the PASS IAE.
+    approval = ApprovalFactory(start_at=datetime.date(2025, 8, 1), end_at=datetime.date(2027, 7, 31))
+    SuspensionFactory(approval=approval, start_at=datetime.date(2024, 1, 1), end_at=datetime.date(2025, 9, 1))
+    approval.refresh_from_db()
+
+    bar = situation_bar(approval)
+
+    # Only the part within the PASS IAE is on the strip: the blocks follow each other, the PASS IAE's start first.
+    assert [(block.kind, block.start, block.end) for block in bar.blocks] == [
+        ("suspension", datetime.date(2025, 8, 1), datetime.date(2025, 9, 1)),
+        ("pass", datetime.date(2025, 9, 2), approval.end_at),
+    ]
+    assert edges(bar) == [
+        ("01/08/2025", "Début"),
+        ("01/09/2025", "Au"),
+        (f"{approval.end_at:%d/%m/%Y}", "Fin prévue"),
+    ]
+    # The dates the database holds are not hidden.
+    assert [(note.text, note.variant) for note in bar.notes] == [
+        (f"Suspension du 01/01/2024 au 01/09/2025 enregistrée en partie hors du PASS{NBSP}IAE", "warn"),
+    ]
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar_expired_or_empty():
+    approval = ApprovalFactory(start_at=datetime.date(2023, 2, 1), end_at=datetime.date(2025, 1, 31))
+
+    bar = situation_bar(approval)
+
+    # The PASS IAE greyed out, then a block without PASS IAE up to today, which is always on the strip.
+    assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
+        ("expired", f"PASS{NBSP}IAE", f"2{NBSP}ans"),
+        ("gap", f"Sans PASS{NBSP}IAE", f"depuis 1{NBSP}an et 10{NBSP}mois"),
+    ]
+    assert edges(bar) == [("01/02/2023", "Début"), ("31/01/2025", "Fin")]
+    assert [block.today != "" for block in bar.blocks] == [False, True]
+    assert bar.blocks[1].today_align == "end"
+    assert bar.today_display == "16/11/2026"
+    assert situation_bar(None) is None
+
+
+@freeze_time("2026-11-16")
+def test_situation_bar_before_the_approval():
+    approval = ApprovalFactory(start_at=datetime.date(2027, 2, 1), end_at=datetime.date(2029, 1, 31))
+
+    bar = situation_bar(approval)
+
+    # A block without PASS IAE from today, which is always on the strip, then the PASS IAE.
+    assert [(block.kind, block.label, block.duration) for block in bar.blocks] == [
+        ("gap", f"PASS{NBSP}IAE à venir", f"dans 3{NBSP}mois"),
+        ("pass", f"PASS{NBSP}IAE", f"2{NBSP}ans"),
+    ]
+    assert [block.today != "" for block in bar.blocks] == [True, False]
+    assert bar.blocks[0].today_align == "start"

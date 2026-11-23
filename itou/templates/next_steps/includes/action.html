@@ -10,7 +10,7 @@
             {% if not hide_job_seeker %}
                 {# As in the prototype: the name, then the age and the city. #}
                 <p class="d-flex flex-wrap align-items-baseline column-gap-2 fs-sm text-muted mb-1">
-                    <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover fw-bold" href="{% url "job_seekers_views:details" public_id=action.job_seeker.public_id %}">{{ action.job_seeker.get_inverted_full_name|mask_unless:action.user_can_view_personal_information }}</a>
+                    <a class="link-tertiary link-underline-opacity-0 link-underline-opacity-100-hover fw-bold" href="{% url "next_steps_views:job_seeker" public_id=action.job_seeker.public_id %}">{{ action.job_seeker.get_inverted_full_name|mask_unless:action.user_can_view_personal_information }}</a>
                     {% if action.job_seeker_details %}<span>{{ action.job_seeker_details }}</span>{% endif %}
                 </p>
             {% endif %}

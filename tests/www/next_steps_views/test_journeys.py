@@ -715,5 +715,5 @@ def test_validate_eligibility_recalls_who_the_person_is(client):
     assertContains(response, f"Candidature du {created:%d/%m/%Y} · {job_application.to_company.display_name}")
     assertContains(response, "Vous l’accompagnez depuis le")
     assertContains(response, f"Jamais de PASS{NBSP}IAE")
-    page_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+    page_url = reverse("next_steps_views:job_seeker", kwargs={"public_id": job_seeker.public_id})
     assertContains(response, f'href="{page_url}" target="_blank"')

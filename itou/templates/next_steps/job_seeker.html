@@ -1,0 +1,137 @@
+{% extends "next_steps/layout.html" %}
+{% load components %}
+{% load str_filters %}
+
+{% block title %}
+    {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% url "next_steps_views:todo" as todo_url %}
+    {% include "layout/previous_step.html" with back_url=todo_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a class="btn btn-lg btn-outline-primary btn-ico"
+               href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                <i class="ri-file-user-line fw-medium" aria-hidden="true"></i>
+                <span>Voir la fiche complète</span>
+            </a>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-9"
+                     id="next-steps-job-seeker"
+                     hx-get="{{ request.get_full_path }}"
+                     hx-trigger="nextStepsChanged from:body"
+                     hx-select="#next-steps-job-seeker"
+                     hx-disinherit="*"
+                     hx-target="this"
+                     hx-swap="outerHTML">
+                    {# Reloaded when a guided journey completes. Its attributes must not reach the action buttons. #}
+                    {# Who follows the person #}
+                    <section class="mb-5" aria-labelledby="next-steps-advisors">
+                        <h2 class="h3 mb-3" id="next-steps-advisors">Accompagnement</h2>
+                        {% if assignments %}
+                            <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0">
+                                {% for assignment in assignments %}
+                                    {# As in the prototype: initials in a round, filled for the signed-in professional. #}
+                                    <li>
+                                        <div class="c-box d-flex align-items-center gap-3 py-2 px-3">
+                                            {% include "next_steps/includes/avatar.html" with assignment=assignment request=request only %}
+                                            <div>
+                                                {% if assignment.assigned_to_unknown_advisor %}
+                                                    <strong>{{ assignment.organization.display_name }}</strong>
+                                                    <span class="d-block fs-sm text-muted">Accompagnateur non renseigné</span>
+                                                {% else %}
+                                                    <strong>{{ assignment.professional.get_full_name }}</strong>
+                                                    {% if assignment.professional_id == request.user.pk %}<span class="text-muted">· vous</span>{% endif %}
+                                                    <span class="d-block fs-sm text-muted">
+                                                        {% if assignment.organization %}
+                                                            {{ assignment.organization.display_name }}
+                                                        {% else %}
+                                                            Aucune structure associée
+                                                        {% endif %}
+                                                    </span>
+                                                {% endif %}
+                                                <span class="d-block fs-sm text-muted">Depuis le {{ assignment.created_at|date:"d/m/Y" }}</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="c-box text-muted mb-0">Aucun accompagnement en cours.</p>
+                        {% endif %}
+                    </section>
+
+                    {# Where the person stands #}
+                    {% if situation %}
+                        <section class="mb-5" aria-labelledby="next-steps-situation">
+                            <h2 class="h3 mb-3" id="next-steps-situation">Situation</h2>
+                            <div class="c-box">
+                                {% for sentence in situation %}<p class="mb-2">{{ sentence }}</p>{% endfor %}
+                                {% if situation_bar %}
+                                    <div class="mt-3">
+                                        {% include "next_steps/journeys/components/period_bar.html" with bar=situation_bar only %}
+                                    </div>
+                                {% endif %}
+                                {% if contract_lines %}
+                                    {# Each contract as a card, in the colour of how the PASS IAE covers it. #}
+                                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0 mt-3">
+                                        {% for line in contract_lines %}
+                                            <li>
+                                                <div class="d-flex align-items-center gap-3 border rounded-3 px-3 py-2">
+                                                    <span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-{{ line.tone }}-lighter text-{{ line.tone }}"
+                                                          aria-hidden="true"><i class="ri-file-text-line"></i></span>
+                                                    <span class="flex-grow-1 lh-sm">
+                                                        <span class="d-block fw-bold">{{ line.label }}</span>
+                                                        <span class="d-block fs-sm text-muted">
+                                                            {{ line.period }} · {% if line.ongoing %}en cours{% else %}terminé{% endif %}
+                                                        </span>
+                                                        <span class="d-block fs-sm text-{{ line.tone }} mt-1">{{ line.coverage.text }}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </section>
+                    {% endif %}
+
+                    {# What to do for the person #}
+                    <section class="mb-5" aria-labelledby="next-steps-actions">
+                        <h2 class="h3 mb-3" id="next-steps-actions">
+                            À faire pour {{ job_seeker.first_name|mask_unless:can_view_personal_information|default:"cette personne" }}
+                        </h2>
+                        {% for action in actions %}
+                            {% include "next_steps/includes/action.html" with action=action group=action.group hide_job_seeker=True %}
+                        {% empty %}
+                            <p class="c-box text-muted mb-0">Rien à faire pour le moment.</p>
+                        {% endfor %}
+                    </section>
+
+                    {% include "next_steps/includes/file.html" with parts=file_parts request=request only %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% include "next_steps/includes/journey_drawer.html" %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {# Scripts of the forms the guided journeys show. #}
+    {{ journeys_media.js }}
+{% endblock %}

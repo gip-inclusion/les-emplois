@@ -1,0 +1,10 @@
+{# A part's line in the job seeker's file: its icon, then its title, badge and summary, which wrap on narrow screens. #}
+<span class="next-step__tile rounded-2 d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-light text-tertiary"
+      aria-hidden="true"><i class="{{ part.icon }}"></i></span>
+<span class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 flex-grow-1">
+    <span class="next-step-file__title fw-bold">{{ part.title }}</span>
+    {% if part.badge_label %}
+        <span class="badge badge-sm rounded-pill {{ part.badge_classes }}">{{ part.badge_label }}</span>
+    {% endif %}
+    <span class="fs-sm text-muted text-break">{{ part.summary }}</span>
+</span>
