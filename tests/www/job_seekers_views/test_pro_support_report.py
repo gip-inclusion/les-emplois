@@ -721,7 +721,17 @@ class TestSendProSupportReportIntroduction:
         assert email.cc == [prescriber.email]
 
         response = client.get(report_url(report))
-        assertContains(response, f"N’hésitez pas à prendre contact rapidement avec {report.author.get_full_name()}.")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "Demande de contact envoyée||Vous venez de recevoir un e-mail de mise en relation. "
+                    f"N’hésitez pas à prendre contact rapidement avec {report.author.get_full_name()}.",
+                    extra_tags="toast",
+                )
+            ],
+        )
         assertContains(response, "Demande de contact envoyée le 15/01/2026")
         assertNotContains(response, f"<span>Contacter {report.author.get_full_name()}</span>", html=True)
 

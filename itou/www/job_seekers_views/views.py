@@ -724,8 +724,9 @@ def send_pro_support_report_introduction(
         report.introduction_email(contact, prescriber, request.current_organization).send()
         messages.success(
             request,
-            "Demande de contact envoyée. Vous venez de recevoir un e-mail de mise en relation. "
+            "Demande de contact envoyée||Vous venez de recevoir un e-mail de mise en relation. "
             f"N’hésitez pas à prendre contact rapidement avec {contact.get_full_name()}.",
+            extra_tags="toast",
         )
         # Reloads the page with its back_url.
         return HttpResponseClientRefresh()
