@@ -234,6 +234,7 @@ def _end_of_contracts(company):
                     ),
                     url=reverse("approvals:suspend", kwargs={"approval_id": approval.pk}),
                     call_to_action="Suspendre",
+                    journey_url=_journey_url("suspension", approval.pk),
                 )
             if not job_seeker.last_contract_has_pro_support_report:
                 yield Action(
@@ -336,6 +337,7 @@ def _prolongation_requests_to_process(request):
                 kwargs={"prolongation_request_id": prolongation_request.pk},
             ),
             call_to_action="Traiter",
+            journey_url=_journey_url("prolongation", prolongation_request.pk),
         )
 
 
@@ -367,6 +369,7 @@ def _pro_support_reports_to_request(request):
             due=_after(end_date, PRO_SUPPORT_REPORT_FILL_DAYS),
             url=reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}),
             call_to_action="Demander",
+            journey_url=_journey_url("demande-bilan", job_seeker.public_id) if job_seeker.company_email else None,
         )
 
 
@@ -433,6 +436,7 @@ def _eligibility_to_validate(request):
             due=_after(job_application.created_at, JOB_APPLICATION_ANSWER_DAYS),
             url=reverse("eligibility_views:update_iae", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             call_to_action="Valider",
+            journey_url=_journey_url("eligibilite", job_seeker.public_id),
         )
 
 

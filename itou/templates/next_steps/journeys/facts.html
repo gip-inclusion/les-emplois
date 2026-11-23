@@ -1,0 +1,15 @@
+{# A step that only shows the facts, with links to the existing screens. #}
+{% include "next_steps/journeys/facts_list.html" with facts=facts only %}
+{% if report_file_url %}
+    <p class="mb-2">
+        <a href="{{ report_file_url }}"
+           target="_blank"
+           rel="noopener"
+           class="has-external-link">Voir le justificatif</a>
+    </p>
+{% endif %}
+{% if details_url %}
+    <p class="mb-0">
+        <a href="{{ details_url }}">Voir le détail complet</a>
+    </p>
+{% endif %}

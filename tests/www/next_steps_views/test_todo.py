@@ -182,6 +182,7 @@ def test_employer_ended_contract(employer_client, employer_membership):
     ]
     assertContains(response, f"En retard de 3{NBSP}jours")
     assertContains(response, f"Le contrat est terminé depuis le {contract.end_date:%d/%m/%Y}")
+    assertContains(response, journey_url("suspension", job_seeker.approvals.get().pk))
     assertContains(response, journey_url("bilan", job_seeker.public_id))
 
     # Once the report is filled, only the suspension remains.
@@ -252,6 +253,10 @@ def test_prescriber_prolongation_request(prescriber_client, prescriber_membershi
     # Due 10 days after it was asked, as the platform's reminder, but the PASS IAE ends in 3 days.
     assert summary(response) == [(Group.WEEK, Kind.PROLONGATION_REQUEST, prolongation_request.approval.user)]
     assert [action.due for action in actions_of(response)] == [prolongation_request.approval.end_at]
+    assertContains(
+        response,
+        journey_url("prolongation", prolongation_request.pk),
+    )
 
 
 def test_prescriber_pro_support_report_to_request_then_to_read(prescriber_client, prescriber_membership):
@@ -284,6 +289,7 @@ def test_prescriber_eligibility_to_validate(prescriber_client, prescriber_member
 
     response = prescriber_client.get(TODO_URL)
     assert summary(response) == [(Group.WEEK, Kind.ELIGIBILITY, job_seeker)]
+    assertContains(response, journey_url("eligibilite", job_seeker.public_id))
 
     IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
     assert summary(prescriber_client.get(TODO_URL)) == []

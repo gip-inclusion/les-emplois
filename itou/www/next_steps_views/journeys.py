@@ -17,6 +17,7 @@ import urllib.parse
 from django import forms
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Exists, OuterRef
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template import loader
@@ -24,6 +25,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
+from itou.approvals.models import (
+    Approval,
+    Prolongation,
+    ProlongationRequest,
+    ProlongationRequestDenyInformation,
+)
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
 from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
@@ -32,12 +40,19 @@ from itou.companies.models import ProSupportReport
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.job_applications.enums import JobApplicationState, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.rdv_insertion.models import InvitationRequest
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.perms import can_fill_pro_support_report
+from itou.utils.constants import ITOU_DIAGNOSTIC_URL
+from itou.utils.db import (
+    ExclusionViolationError,
+    UniqueViolationError,
+    maybe_exclusion_violation,
+    maybe_unique_violation,
+)
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import (
@@ -50,8 +65,22 @@ from itou.www.apply.forms import (
     JobSeekerPersonalDataForm,
 )
 from itou.www.apply.views.batch_views import _get_and_lock_received_applications, _get_recruitment_to_close
+from itou.www.approvals_views.forms import (
+    ProlongationRequestDenyInformationProposedActionsForm,
+    ProlongationRequestDenyInformationReasonExplanationForm,
+    ProlongationRequestDenyInformationReasonForm,
+    SuspensionForm,
+)
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.job_seekers_views.forms import ProSupportReportForm
+from itou.www.job_seekers_views.views import (
+    PRO_SUPPORT_REQUEST_CONTRACT_ENDED,
+    PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON,
+    PRO_SUPPORT_REQUEST_EMAIL_BODY,
+    PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
+    _pro_support_request_company_email,
+)
+from itou.www.next_steps_views.period_bar import approval_bar, prolongation_bar, suspension_bar
 
 
 logger = logging.getLogger(__name__)
@@ -59,6 +88,7 @@ logger = logging.getLogger(__name__)
 NBSP = " "
 PASS_IAE = f"PASS{NBSP}IAE"
 FIELDS_TEMPLATE = "next_steps/journeys/fields.html"
+FACTS_TEMPLATE = "next_steps/journeys/facts.html"
 RECAP_TEMPLATE = "next_steps/journeys/recap.html"
 CRITERIA_LEVELS = [(1, AdministrativeCriteriaForm.LEVEL_1_PREFIX), (2, AdministrativeCriteriaForm.LEVEL_2_PREFIX)]
 
@@ -110,10 +140,25 @@ class Step:
     hint: str = ""
     layout: dict = dataclasses.field(default_factory=dict)
     boxes: list = dataclasses.field(default_factory=list)
+    # A period bar (see period_bar.py), shown under the question.
+    bar: object = None
 
     def __post_init__(self):
-        if self.template == "next_steps/journeys/application.html":
+        if self.template in (FACTS_TEMPLATE, "next_steps/journeys/application.html"):
             self.facts_in_template = True
+
+
+@dataclasses.dataclass
+class Summary:
+    """Who the person is, for a professional who follows hundreds: why they are asked, and what links them to them.
+
+    Shown at the top of the first step, in a box, with a link to the job seeker's page in a new tab: the drawer often
+    opens from « À faire », without the page behind it.
+    """
+
+    title: str
+    lines: list
+    url: str = ""
 
 
 @dataclasses.dataclass
@@ -122,6 +167,8 @@ class Result:
     lines: list
     # An optional main link: (label, url).
     link: tuple | None = None
+    # An optional period bar (see period_bar.py).
+    bar: object = None
 
 
 class Journey:
@@ -138,6 +185,14 @@ class Journey:
 
     def facts(self):
         return []
+
+    def identity(self):
+        """A line under the person's name in the drawer's header, on every step, to recognize them: "" for none."""
+        return ""
+
+    def summary(self):
+        """A Summary at the top of the first step, or None."""
+        return None
 
     def build_forms(self, data=None, initial=None):
         """Forms by key: bound to data to validate, or unbound with initial values to display."""
@@ -339,6 +394,108 @@ class ProSupportReportFillJourney(Journey):
         return Result(
             title="Bilan envoyé",
             lines=[sent_to, "Il reste consultable sur la fiche de la personne et ne peut plus être modifié."],
+        )
+
+
+class SuspensionJourney(Journey):
+    title = f"Suspendre le {PASS_IAE}"
+
+    def load(self, pk):
+        request = self.request
+        if not request.from_employer:
+            raise Http404
+        self.company = request.current_organization
+        # Same rules as approvals_views.suspend.
+        self.approval = get_object_or_404(
+            Approval.objects.filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        approval=OuterRef("pk"), to_company=self.company, state=JobApplicationState.ACCEPTED
+                    )
+                )
+            ).select_related("user"),
+            pk=pk,
+        )
+        if not self.approval.can_be_suspended_by_siae(self.company):
+            raise Http404
+        self.job_seeker = self.approval.user
+
+    def facts(self):
+        return [
+            (PASS_IAE, self.approval.number_with_spaces),
+            ("Fin prévue", _fr(self.approval.end_at)),
+            ("Reliquat", self.approval.get_remainder_display()),
+        ]
+
+    def build_forms(self, data=None, initial=None):
+        return {"suspension": SuspensionForm(approval=self.approval, siae=self.company, data=data, initial=initial)}
+
+    def steps(self, data):
+        contract = self.job_seeker.contracts.filter(company=self.company).order_by("-start_date", "-pk").first()
+        hint = f"La suspension arrête le décompte des jours du {PASS_IAE}."
+        if contract and contract.end_date and contract.has_ended:
+            hint = f"Le contrat est terminé depuis le {_fr(contract.end_date)}. " + hint
+        # The bar of the confirmation step shows the suspension once its dates are valid.
+        suspension_form = self.build_forms(data=data)["suspension"] if data else None
+        recap_bar = None
+        if suspension_form is not None and suspension_form.is_valid():
+            recap_bar = suspension_bar(
+                self.approval, suspension_form.cleaned_data["start_at"], suspension_form.cleaned_data["end_at"]
+            )
+        return [
+            Step(
+                "La suspension",
+                "suspension",
+                hint=hint,
+                bar=approval_bar(self.approval, contract_end=contract.end_date if contract else None),
+                layout={
+                    "set_default_end_date": Show("options"),
+                    "reason": Show("options", legend=True),
+                },
+            ),
+            Step(
+                "Vérifier",
+                "suspension",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Suspendre",
+                question="Vérifiez avant de suspendre",
+                bar=recap_bar,
+            ),
+        ]
+
+    def recap(self, forms):
+        form = forms["suspension"]
+        suspension = form.cleaned_data
+        # The dates are on the strip above.
+        lines = [("Motif", _label(form, "reason", suspension["reason"]))]
+        if suspension.get("reason_explanation"):
+            lines.append(("Explications", suspension["reason_explanation"]))
+        return lines
+
+    def done(self, forms):
+        previous_end = self.approval.end_at
+        # Same as approvals_views.suspend.
+        suspension = forms["suspension"].save(commit=False)
+        suspension.created_by = self.request.user
+        suspension.save()
+        logger.info(
+            "user=%s created suspension=%s (approval=%s) from %s to %s",
+            self.request.user.pk,
+            suspension.pk,
+            self.approval.pk,
+            suspension.start_at,
+            suspension.end_at,
+        )
+        self.approval.refresh_from_db()
+        return Result(
+            title=f"{PASS_IAE} suspendu",
+            lines=[
+                f"Du {_fr(suspension.start_at)} au {_fr(suspension.end_at)}, "
+                f"motif{NBSP}: {suspension.get_reason_display()}.",
+                f"Sa date de fin passe au {_fr(self.approval.end_at)}.",
+            ],
+            bar=suspension_bar(self.approval, suspension.start_at, suspension.end_at, approval_end=previous_end),
         )
 
 
@@ -898,7 +1055,425 @@ class JobApplicationJourney(Journey):
 # ------------------------------------------------------------------------------
 
 
+class ProlongationJourney(Journey):
+    title = "Traiter la demande de prolongation"
+
+    def load(self, pk):
+        request = self.request
+        if not request.from_authorized_prescriber:
+            raise Http404
+        # Same rules as approvals_views.ProlongationRequestViewMixin, for a request still to process.
+        self.prolongation_request = get_object_or_404(
+            ProlongationRequest.objects.filter(
+                prescriber_organization=request.current_organization, status=ProlongationRequestStatus.PENDING
+            ).select_related("approval__user", "declared_by_siae"),
+            pk=pk,
+        )
+        self.job_seeker = self.prolongation_request.approval.user
+
+    def facts(self):
+        # The dates are in the strip above: here, who asks and why.
+        prolongation_request = self.prolongation_request
+        facts = [("Demandée le", _fr(prolongation_request.created_at))]
+        if prolongation_request.declared_by_siae:
+            facts.append(("Par", prolongation_request.declared_by_siae.display_name))
+        return facts + [("Motif", prolongation_request.get_reason_display())]
+
+    def build_forms(self, data=None, initial=None):
+        employee = self.prolongation_request.approval.user
+        return {
+            "decision": DecisionForm(
+                data=data,
+                initial=initial,
+                choices=[("grant", "Accepter la prolongation"), ("deny", "Refuser la prolongation")],
+            ),
+            "reason": ProlongationRequestDenyInformationReasonForm(data=data, initial=initial, employee=employee),
+            "reason_explanation": ProlongationRequestDenyInformationReasonExplanationForm(data=data, initial=initial),
+            "proposed_actions": ProlongationRequestDenyInformationProposedActionsForm(data=data, initial=initial),
+        }
+
+    def _bar(self):
+        prolongation_request = self.prolongation_request
+        # Contracts are visible to authorized prescribers, the only ones processing prolongation requests.
+        contract = self.job_seeker.contracts.order_by("-start_date", "-pk").first()
+        contract_end = contract.end_date if contract and not contract.has_ended else None
+        return prolongation_bar(
+            prolongation_request.approval,
+            prolongation_request.start_at,
+            prolongation_request.end_at,
+            contract_end=contract_end,
+        )
+
+    def steps(self, data):
+        prolongation_request = self.prolongation_request
+        bar = self._bar()
+        requester = prolongation_request.declared_by_siae
+        steps = [
+            Step(
+                "La demande",
+                template=FACTS_TEMPLATE,
+                question=(
+                    f"{requester.display_name if requester else 'La structure'} demande de prolonger "
+                    f"le {PASS_IAE} de {self.job_seeker.first_name}"
+                ),
+                bar=bar,
+            ),
+            Step(
+                "Votre décision",
+                "decision",
+                question="Votre décision",
+                layout={
+                    "decision": Show(
+                        "options",
+                        {
+                            "grant": (
+                                None,
+                                f"Le {PASS_IAE} est prolongé jusqu’au {_fr(prolongation_request.end_at)}.",
+                            ),
+                            "deny": (None, "La structure en est informée, avec votre motif."),
+                        },
+                    )
+                },
+            ),
+        ]
+        if data.get("decision") == "deny":
+            steps += [
+                Step(
+                    "Motif",
+                    "reason",
+                    question="Pourquoi refusez-vous la prolongation ?",
+                    layout={"reason": Show("options")},
+                ),
+                Step("Explication", "reason_explanation", question="Expliquez votre décision"),
+            ]
+            # Same condition as approvals_views.ProlongationRequestDenyView.
+            if data.get("reason") == ProlongationRequestDenyReason.IAE:
+                steps.append(
+                    Step(
+                        "Actions proposées",
+                        "proposed_actions",
+                        question="Quelles actions proposez-vous à la personne ?",
+                        layout={"proposed_actions": Show("options")},
+                    )
+                )
+            steps[-1].submit_label = "Refuser la prolongation"
+        else:
+            steps.append(
+                Step(
+                    "Confirmer",
+                    "decision",
+                    [],
+                    template=RECAP_TEMPLATE,
+                    submit_label="Accepter la prolongation",
+                    bar=bar,
+                    question="Vérifiez avant d’accepter la prolongation",
+                )
+            )
+        return steps
+
+    def steps_known(self, data):
+        return bool(data.get("decision"))
+
+    def recap(self, forms):
+        prolongation_request = self.prolongation_request
+        return [
+            ("Prolongation", f"du {_fr(prolongation_request.start_at)} au {_fr(prolongation_request.end_at)}"),
+            (f"Nouvelle fin du {PASS_IAE}", _fr(prolongation_request.end_at)),
+        ]
+
+    def context(self):
+        pk = self.prolongation_request.pk
+        report_file_url = None
+        if self.prolongation_request.report_file_id:
+            report_file_url = reverse(
+                "approvals:prolongation_request_report_file", kwargs={"prolongation_request_id": pk}
+            )
+        return {
+            "report_file_url": report_file_url,
+            "details_url": reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": pk}),
+        }
+
+    def done(self, forms):
+        request = self.request
+        prolongation_request = self.prolongation_request
+        if forms["decision"].cleaned_data["decision"] == "grant":
+            # Same as approvals_views.ProlongationRequestGrantView.
+            try:
+                with (
+                    maybe_exclusion_violation(Prolongation, "exclude_prolongation_overlapping_dates"),
+                    maybe_unique_violation(Prolongation, "approvals_prolongation_request_id_key"),
+                ):
+                    prolongation_request.grant(request.user)
+            except (ExclusionViolationError, UniqueViolationError) as e:
+                return Result(title="La prolongation n’a pas pu être acceptée", lines=[str(e)])
+            return Result(
+                title="Prolongation acceptée",
+                lines=[f"Le {PASS_IAE} se termine désormais le {_fr(prolongation_request.end_at)}."],
+            )
+        # Same as approvals_views.ProlongationRequestDenyView.
+        cleaned_data = forms["reason"].cleaned_data | forms["reason_explanation"].cleaned_data
+        if cleaned_data["reason"] == ProlongationRequestDenyReason.IAE:
+            cleaned_data |= forms["proposed_actions"].cleaned_data
+        prolongation_request.deny(request.user, ProlongationRequestDenyInformation(**cleaned_data))
+        return Result(title="Prolongation refusée", lines=["La structure qui l’a demandée en est informée."])
+
+
+class EligibilityJourney(Journey):
+    title = "Valider l’éligibilité IAE"
+
+    def load(self, pk):
+        request = self.request
+        if not request.from_authorized_prescriber:
+            raise Http404
+        self.job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=pk)
+        # Same rule as eligibility_views.BaseIAEEligibilityViewForPrescriber: nothing to do with a valid PASS IAE.
+        if self.job_seeker.approvals.valid().exists():
+            raise Http404
+        self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, None)
+        self.criteria_filled_from_job_seeker = None
+
+    def identity(self):
+        # Under the name, and masked with it.
+        if not can_view_personal_information(self.request, self.job_seeker):
+            return ""
+        profile = self.job_seeker.jobseeker_profile
+        parts = []
+        if profile.age is not None:
+            parts.append(f"{profile.age}{NBSP}ans")
+        if self.job_seeker.city:
+            department = f" ({self.job_seeker.department})" if self.job_seeker.department else ""
+            parts.append(f"{self.job_seeker.city}{department}")
+        if profile.pole_emploi_id:
+            parts.append(f"ID France Travail {profile.pole_emploi_id}")
+        return " · ".join(parts)
+
+    def _job_application(self):
+        """The job application the action comes from (actions._eligibility_to_validate): the oldest pending one to
+        an SIAE; else the latest."""
+        job_applications = self.job_seeker.job_applications.select_related(
+            "to_company", "sender", "sender_company", "sender_prescriber_organization"
+        )
+        pending = job_applications.filter(
+            state__in=JobApplicationWorkflow.PENDING_STATES, to_company__kind__in=CompanyKind.siae_kinds()
+        ).order_by("created_at")
+        return pending.first() or job_applications.order_by("-created_at").first()
+
+    def _relationship(self):
+        """What links the professional, or their organization, to the person."""
+        request = self.request
+        assignments = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker=self.job_seeker, prescriber_organization=request.current_organization, ended_at=None
+            )
+            .select_related("professional")
+            .order_by("created_at")
+        )
+        own = next((each for each in assignments if each.professional_id == request.user.pk), None)
+        assignment = own or assignments.first()
+        if assignment is None:
+            return "Pas encore accompagnée par votre structure"
+        if own:
+            text = f"Vous l’accompagnez depuis le {_fr(own.created_at)}"
+        else:
+            text = f"Accompagnée par {assignment.professional.get_full_name()} depuis le {_fr(assignment.created_at)}"
+        # The last action, when it is not the one that started the assignment.
+        if assignment.last_action_kind and _fr(assignment.last_action_at) != _fr(assignment.created_at):
+            action = assignment.get_last_action_kind_display()
+            text += f", dernière action le {_fr(assignment.last_action_at)}{NBSP}: {action}"
+        return text
+
+    def _iae_history(self):
+        """The person's IAE path in a few words: there is no valid PASS IAE here (see load)."""
+        approval = self.job_seeker.approvals.order_by("-end_at").first()
+        if approval:
+            return f"{PASS_IAE} expiré le {_fr(approval.end_at)}"
+        diagnosis = EligibilityDiagnosis.objects.filter(job_seeker=self.job_seeker).order_by("-expires_at").first()
+        if diagnosis and diagnosis != self.eligibility_diagnosis:
+            return f"Diagnostic d’éligibilité précédent expiré le {_fr(diagnosis.expires_at)}"
+        return f"Jamais de {PASS_IAE}"
+
+    def summary(self):
+        job_application = self._job_application()
+        lines = []
+        if job_application:
+            title = f"Candidature du {_fr(job_application.created_at)} · {job_application.to_company.display_name}"
+            job = job_application.selected_jobs.first()
+            if job_application.sender_id == self.request.user.pk:
+                sender = "envoyée par vous"
+            elif job_application.sender:
+                sender = f"envoyée par {job_application.sender.get_full_name()}"
+                organization = job_application.sender_company or job_application.sender_prescriber_organization
+                if organization:
+                    sender += f" ({organization.display_name})"
+            else:
+                sender = ""
+            job_name = job.display_name if job else "Candidature spontanée"
+            lines.append(" · ".join(part for part in (job_name, sender) if part))
+            lines.append(f"{self._relationship()} · {self._iae_history()}")
+        else:
+            title = self._relationship()
+            lines.append(self._iae_history())
+        return Summary(
+            title,
+            lines,
+            url=reverse("job_seekers_views:details", kwargs={"public_id": self.job_seeker.public_id}),
+        )
+
+    def build_forms(self, data=None, initial=None):
+        if data is None and initial is None:
+            # Same initial criteria as eligibility_views.BaseIAEEligibilityViewForPrescriber.
+            initial = {}
+            if self.eligibility_diagnosis:
+                initial["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
+            elif self.job_seeker.last_checked_at > timezone.now() - timezone.timedelta(hours=24):
+                self.criteria_filled_from_job_seeker = get_criteria_from_job_seeker(self.job_seeker)
+                initial["administrative_criteria"] = self.criteria_filled_from_job_seeker
+        return {
+            "criteria": AdministrativeCriteriaForm(
+                is_authorized_prescriber=True, siae=None, data=data, initial=initial
+            )
+        }
+
+    def steps(self, data):
+        expires_at = EligibilityDiagnosis._expiration_date(AuthorKind.PRESCRIBER)
+        return [
+            Step(
+                "Les critères",
+                "criteria",
+                template="next_steps/journeys/criteria.html",
+                question="Quels critères administratifs avez-vous constatés ?",
+                hint=(
+                    "À l’issue d’un diagnostic socio-professionnel réalisé lors d’un entretien individuel. "
+                    "Il est recommandé de sélectionner les critères correspondants."
+                ),
+            ),
+            Step(
+                "Confirmer",
+                "criteria",
+                [],
+                template=RECAP_TEMPLATE,
+                submit_label="Valider l’éligibilité",
+                question=f"Vous confirmez l’éligibilité IAE de {self.job_seeker.first_name}",
+                boxes=[
+                    Box(
+                        "Pour un diagnostic réalisé par un prescripteur habilité.",
+                        title=f"Diagnostic valable jusqu’au {_fr(expires_at)}",
+                        variant="ok",
+                    )
+                ],
+            ),
+        ]
+
+    def recap(self, forms):
+        criteria = forms["criteria"].cleaned_data
+        return [("Critères administratifs", ", ".join(c.name for c in criteria) or "Aucun critère sélectionné")]
+
+    def context(self):
+        return {
+            "ITOU_DIAGNOSTIC_URL": ITOU_DIAGNOSTIC_URL,
+            "criteria_filled_from_job_seeker": self.criteria_filled_from_job_seeker,
+            "criteria_levels": CRITERIA_LEVELS,
+        }
+
+    def done(self, forms):
+        request = self.request
+        # Same as eligibility_views.BaseIAEEligibilityViewForPrescriber.form_valid.
+        if self.eligibility_diagnosis:
+            EligibilityDiagnosis.update_diagnosis(
+                self.eligibility_diagnosis,
+                author=request.user,
+                author_prescriber_organization=request.current_organization,
+                administrative_criteria=forms["criteria"].cleaned_data,
+            )
+        else:
+            EligibilityDiagnosis.create_diagnosis(
+                self.job_seeker,
+                author=request.user,
+                author_prescriber_organization=request.current_organization,
+                administrative_criteria=forms["criteria"].cleaned_data,
+            )
+        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, None)
+        return Result(title="Éligibilité validée", lines=[f"Valable jusqu’au {_fr(diagnosis.expires_at)}."])
+
+
+class ProSupportRequestForm(forms.Form):
+    subject = forms.CharField(label="Objet")
+    body = forms.CharField(label="Message", widget=forms.Textarea(attrs={"rows": 12}))
+
+
+class ProSupportRequestJourney(Journey):
+    """Only the SIAE fills the report: the prescriber asks for it by e-mail, from their own mailbox.
+
+    Like the button of the job seeker's page, the platform neither sends nor stores anything.
+    """
+
+    title = "Demander le bilan d’accompagnement"
+
+    def load(self, pk):
+        request = self.request
+        if not request.from_authorized_prescriber:
+            raise Http404
+        assigned = User.objects.filter(
+            pk__in=User.objects.assigned_job_seeker_ids(request.user, request.current_organization, archived=False)
+        )
+        self.job_seeker = get_object_or_404(
+            assigned.at_end_of_journey()
+            .with_end_of_journey()
+            .annotate(company_email=_pro_support_request_company_email()),
+            public_id=pk,
+        )
+        # The job seeker's name is in the message: same rule as the job seeker's page.
+        if not self.job_seeker.company_email or not can_view_personal_information(request, self.job_seeker):
+            raise Http404
+
+    def facts(self):
+        return [("Destinataire", self.job_seeker.company_email)]
+
+    def build_forms(self, data=None, initial=None):
+        if data is None and not initial:
+            situation = (
+                PRO_SUPPORT_REQUEST_CONTRACT_ENDED
+                if self.job_seeker.last_contract_ended_with_valid_approval
+                else PRO_SUPPORT_REQUEST_CONTRACT_ENDING_SOON
+            ).format(job_seeker_full_name=self.job_seeker.get_full_name())
+            initial = {
+                "subject": PRO_SUPPORT_REQUEST_EMAIL_SUBJECT,
+                "body": PRO_SUPPORT_REQUEST_EMAIL_BODY.format(situation=situation),
+            }
+        return {"message": ProSupportRequestForm(data=data, initial=initial)}
+
+    def steps(self, data):
+        return [
+            Step(
+                "Le message",
+                "message",
+                submit_label="Préparer l’e-mail",
+                question="Votre message à la structure d’insertion",
+                hint="Il s’ouvrira dans votre messagerie, prêt à être envoyé. Vous pouvez le modifier ici avant.",
+            )
+        ]
+
+    def done(self, forms):
+        message = forms["message"].cleaned_data
+        query = urllib.parse.urlencode(
+            {"subject": message["subject"], "body": message["body"]}, quote_via=urllib.parse.quote
+        )
+        return Result(
+            title="Votre e-mail est prêt",
+            lines=[
+                f"Il s’ouvre dans votre messagerie, adressé à {self.job_seeker.company_email}.",
+                "La plateforme n’enregistre pas cet envoi. "
+                f"Le bilan apparaîtra dans «{NBSP}À faire{NBSP}» une fois rempli par la structure.",
+            ],
+            link=("Ouvrir dans ma messagerie", f"mailto:{self.job_seeker.company_email}?{query}"),
+        )
+
+
 JOURNEYS = {
     "bilan": ProSupportReportFillJourney,
+    "demande-bilan": ProSupportRequestJourney,
+    "suspension": SuspensionJourney,
     "candidature": JobApplicationJourney,
+    "prolongation": ProlongationJourney,
+    "eligibilite": EligibilityJourney,
 }

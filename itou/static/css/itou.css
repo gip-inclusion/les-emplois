@@ -448,3 +448,93 @@ table.table td > .modal .modal-content {
     flex: none;
     margin-top: .25rem;
 }
+
+/* Period strip: the blocks' colours, the ticks under the dates, and today. */
+.next-step-frise__block {
+    min-height: 3.25rem;
+}
+
+/* A gauge: the part already run, up to today (--elapsed, set on the block), is darker than what is left.
+   DSFR « Bleu France » shades, which itou-theme does not expose: blue-france-850-200 for the part run,
+   blue-france-950-100 for what is left, on the theme's tertiary (blue-france-sun-113-625). */
+.next-step-frise__block--pass {
+    color: var(--bs-tertiary, #000091);
+    background: linear-gradient(90deg, #cacafb var(--elapsed, 0%), #ececfe var(--elapsed, 0%));
+}
+
+.next-step-frise__block--expired {
+    color: var(--bs-secondary-color, #727492);
+    background-color: var(--bs-light, #f8f8f8);
+}
+
+/* No PASS IAE, before or after it, up to today: an empty slot. */
+.next-step-frise__block--gap {
+    color: var(--bs-secondary-color, #727492);
+    border: 1.5px dashed currentColor;
+    background-color: var(--bs-white, #fff);
+}
+
+/* Hatched with a dashed edge: what is asked for or put on hold, not yet run. */
+.next-step-frise__block--prolongation {
+    color: var(--bs-warning, #b34000);
+    border: 1.5px dashed currentColor;
+    background: repeating-linear-gradient(135deg, #fff3df 0 .5rem, #ffe7c2 .5rem 1rem);
+}
+
+.next-step-frise__block--suspension {
+    color: var(--bs-info, #0063cb);
+    border: 1.5px dashed currentColor;
+    background: repeating-linear-gradient(135deg, #eef2ff 0 .5rem, #dfe6ff .5rem 1rem);
+}
+
+/* A date hangs from its block's edge by a small tick. */
+.next-step-frise__edge {
+    position: relative;
+    padding-top: .5rem;
+}
+
+.next-step-frise__edge::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: .375rem;
+    border-radius: 1px;
+    background-color: #cccdd7;
+}
+
+.next-step-frise__edge--right::before {
+    right: 0;
+    left: auto;
+}
+
+/* Today: a red line from a red pill down to its block's lower edge, never reaching the dates under the blocks,
+   so that it does not read as one of them. The pill leans inwards near the ends of the strip. */
+.next-step-frise__today {
+    position: absolute;
+    top: -.5rem;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--bs-danger, #ce0500);
+}
+
+.next-step-frise__today-caption {
+    position: absolute;
+    bottom: 100%;
+    white-space: nowrap;
+}
+
+.next-step-frise__today--start .next-step-frise__today-caption {
+    left: 0;
+}
+
+.next-step-frise__today--center .next-step-frise__today-caption {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.next-step-frise__today--end .next-step-frise__today-caption {
+    right: 0;
+}

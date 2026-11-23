@@ -1,0 +1,70 @@
+{# A PASS IAE and what changes it, as blocks with their dates and today (next_steps_views.period_bar). No outer margin. #}
+{# itou-theme has no such strip: utilities for the layout, .next-step-frise* for the blocks' colours, the ticks and today. #}
+<figure class="mb-0{% if bar.today_display %} pt-4{% endif %}">
+    {% if bar.blocks %}
+        <div class="row g-1">
+            {% for block in bar.blocks %}
+                <div class="col-{{ block.columns }} d-flex flex-column">
+                    <div class="position-relative d-flex flex-grow-1">
+                        {# A PASS IAE fills up to today, like a gauge: --elapsed is computed server side, as today's position. #}
+                        <div class="next-step-frise__block next-step-frise__block--{{ block.kind }} d-flex flex-wrap align-items-center justify-content-between column-gap-3 flex-grow-1 rounded-3 px-3 py-2 lh-sm overflow-hidden"
+                             {% if block.elapsed %}style="--elapsed: {{ block.elapsed }}%"{% endif %}>
+                            <span class="d-flex flex-column">
+                                <span class="fs-sm fw-bold">{{ block.label }}</span>
+                                <span class="fs-xs">{{ block.duration }}</span>
+                                {% if block.remaining and block.remaining_side == "start" %}
+                                    {# Today's line leaves no room after it: what is left, under the label. #}
+                                    <span class="fs-xs fw-bold mt-1">Reste {{ block.remaining }}</span>
+                                {% endif %}
+                            </span>
+                            {% if block.remaining and block.remaining_side == "end" %}
+                                <span class="d-flex flex-column text-end ms-auto">
+                                    <span class="fs-xs">Reste</span>
+                                    <span class="fs-sm fw-bold">{{ block.remaining }}</span>
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if block.today %}
+                            {# The position is computed server side: a style attribute, like the employee record progress bar. #}
+                            <span class="next-step-frise__today next-step-frise__today--{{ block.today_align }}"
+                                  style="left: {{ block.today }}%">
+                                <span class="next-step-frise__today-caption badge rounded-pill bg-danger text-white fs-xs fw-normal"><b>Aujourd’hui</b> · {{ bar.today_display }}</span>
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between gap-2 mt-1">
+                        {% if block.left %}
+                            <span class="next-step-frise__edge d-flex flex-column lh-sm">
+                                <b class="fs-sm">{{ block.left.date_display }}</b>
+                                <small class="fs-xs text-muted">{{ block.left.caption }}</small>
+                            </span>
+                        {% endif %}
+                        {% if block.right %}
+                            <span class="next-step-frise__edge next-step-frise__edge--right d-flex flex-column lh-sm ms-auto text-end">
+                                <b class="fs-sm">{{ block.right.date_display }}</b>
+                                <small class="fs-xs text-muted">{{ block.right.caption }}</small>
+                            </span>
+                        {% endif %}
+                        {% if not block.left and not block.right %}
+                            {# Room for dates all the same, so that every block of the strip has the same height. #}
+                            <span class="next-step-frise__edge d-flex flex-column lh-sm invisible" aria-hidden="true">
+                                <b class="fs-sm">&nbsp;</b>
+                                <small class="fs-xs">&nbsp;</small>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if bar.notes %}
+        <figcaption class="d-flex flex-wrap gap-2{% if bar.blocks %} mt-3{% endif %}">
+            {% for note in bar.notes %}
+                <span class="badge rounded-pill fs-sm fw-normal text-wrap text-start d-inline-flex align-items-center gap-1 {% if note.variant == "ok" %}bg-success-lighter text-success{% elif note.variant == "warn" %}bg-warning-lighter text-warning{% else %}bg-info-lighter text-info{% endif %}">
+                    <i class="{{ note.icon }}" aria-hidden="true"></i>
+                    {{ note.text }}
+                </span>
+            {% endfor %}
+        </figcaption>
+    {% endif %}
+</figure>

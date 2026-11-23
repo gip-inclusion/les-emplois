@@ -6,14 +6,15 @@ from django.utils import timezone
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.approvals.models import Approval
+from itou.approvals.enums import ProlongationRequestDenyReason, ProlongationRequestStatus
+from itou.approvals.models import Approval, Suspension
 from itou.companies.enums import CompanyKind, ProSupportReportBarrier, ProSupportReportSolution
 from itou.companies.models import Company, ProSupportReport
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState, RefusalReason
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -21,7 +22,7 @@ from tests.companies.factories import (
 )
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory
 
@@ -213,6 +214,32 @@ def test_fill_pro_support_report_with_a_solution(client):
     report = ProSupportReport.objects.get()
     assert report.solution == ProSupportReportSolution.TRAINING
     assert report.orientation == ""
+
+
+def test_suspend_approval(client):
+    membership = CompanyMembershipFactory(company__kind=CompanyKind.AI)
+    contract, approval = ended_contract(membership.company)
+    client.force_login(membership.user)
+    url = journey_url("suspension", approval.pk)
+    end_at_before = approval.end_at
+
+    answers = {
+        "start_at": contract.end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "end_at": (contract.end_date + datetime.timedelta(days=90)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "reason": Suspension.Reason.FINISHED_CONTRACT,
+        "reason_explanation": "",
+    }
+    response = walk(client, url, answers)
+    assertContains(response, Suspension.Reason.FINISHED_CONTRACT.label)
+    assert not approval.suspension_set.exists()
+
+    response = walk(client, url, answers, {})
+    assertContains(response, "PASS IAE suspendu")
+    suspension = approval.suspension_set.get()
+    assert suspension.created_by == membership.user
+    assert suspension.reason == Suspension.Reason.FINISHED_CONTRACT
+    approval.refresh_from_db()
+    assert approval.end_at > end_at_before
 
 
 def test_job_application_is_read_before_answering(client):
@@ -511,6 +538,90 @@ def test_geiq_hiring_is_handed_over(client):
     assert job_application.state == JobApplicationState.PROCESSING
 
 
+# Prescribers
+# ------------------------------------------------------------------------------
+
+
+def test_grant_prolongation_request(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prolongation_request = ProlongationRequestFactory(
+        prescriber_organization=membership.organization, assigned_to=membership.user
+    )
+    client.force_login(membership.user)
+    url = journey_url("prolongation", prolongation_request.pk)
+
+    response = walk(client, url, {}, {"decision": "grant"}, {})
+    assertContains(response, "Prolongation acceptée")
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.GRANTED
+    assert prolongation_request.processed_by == membership.user
+    # Already processed: nothing left to do.
+    assert client.get(url).status_code == 404
+
+
+@pytest.mark.parametrize("reason", [ProlongationRequestDenyReason.IAE, ProlongationRequestDenyReason.SIAE])
+def test_deny_prolongation_request(client, reason):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prolongation_request = ProlongationRequestFactory(
+        prescriber_organization=membership.organization, assigned_to=membership.user
+    )
+    client.force_login(membership.user)
+    url = journey_url("prolongation", prolongation_request.pk)
+
+    steps = [{}, {"decision": "deny"}, {"reason": reason}, {"reason_explanation": "Lorem ipsum"}]
+    if reason == ProlongationRequestDenyReason.IAE:
+        # Only this reason asks for the proposed actions, as on the existing screen.
+        steps.append({"proposed_actions": ["SOCIAL_PARTNER"], "proposed_actions_explanation": "Lorem ipsum"})
+    response = walk(client, url, *steps)
+    assertContains(response, "Prolongation refusée")
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.DENIED
+    assert prolongation_request.deny_information.reason == reason
+
+
+def test_validate_eligibility(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory()
+    client.force_login(membership.user)
+    url = journey_url("eligibilite", job_seeker.public_id)
+
+    response = client.get(url)
+    assertContains(response, "Critères administratifs de niveau 1")
+    response = walk(client, url, {"level_1_1": "on"}, {})
+    assertContains(response, "Éligibilité validée")
+    diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=None)
+    assert diagnosis.author == membership.user
+    assert diagnosis.is_valid
+
+
+def test_no_eligibility_journey_with_a_valid_approval(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    approval = ApprovalFactory()
+    client.force_login(membership.user)
+    assert client.get(journey_url("eligibilite", approval.user.public_id)).status_code == 404
+
+
+def test_request_pro_support_report_by_email(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    end_date = timezone.localdate() - datetime.timedelta(days=10)
+    contract = ContractFactory(
+        end_date=end_date, start_date=end_date - datetime.timedelta(days=200), company__email="siae@example.com"
+    )
+    ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date)
+    JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker, professional=membership.user, prescriber_organization=membership.organization
+    )
+    client.force_login(membership.user)
+    url = journey_url("demande-bilan", contract.job_seeker.public_id)
+
+    response = client.get(url)
+    assertContains(response, "siae@example.com")
+    assertContains(response, contract.job_seeker.get_full_name())
+    response = walk(client, url, {"subject": "Bilan", "body": "Bonjour, pouvez-vous remplir le bilan ?"})
+    assertContains(response, "Votre e-mail est prêt")
+    assertContains(response, "mailto:siae@example.com?subject=Bilan&amp;body=Bonjour%2C%20pouvez-vous")
+
+
 # Action buttons
 # ------------------------------------------------------------------------------
 
@@ -563,3 +674,46 @@ def test_done_today_and_next_action(client):
     assertContains(response, "Fait aujourd’hui")
     assertContains(response, "candidature mise à l’étude")
     assert [item.job_seeker for item in response.context["done_today"]] == [first.job_seeker]
+
+
+def test_done_today_for_a_prescriber(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    prolongation_request = ProlongationRequestFactory(
+        prescriber_organization=membership.organization, assigned_to=membership.user
+    )
+    client.force_login(membership.user)
+    walk(client, journey_url("prolongation", prolongation_request.pk), {}, {"decision": "grant"}, {})
+    walk(client, journey_url("eligibilite", JobSeekerFactory().public_id), {"level_1_1": "on"}, {})
+
+    response = client.get(reverse("next_steps_views:todo"))
+    assert [item.label for item in response.context["done_today"]] == [
+        "prolongation acceptée",
+        "éligibilité IAE validée",
+    ]
+
+
+def test_validate_eligibility_recalls_who_the_person_is(client):
+    membership = PrescriberMembershipFactory(organization__authorized=True)
+    job_seeker = JobSeekerFactory(city="Tarascon")
+    JobSeekerAssignmentFactory(
+        professional=membership.user, prescriber_organization=membership.organization, job_seeker=job_seeker
+    )
+    job_application = JobApplicationFactory(
+        job_seeker=job_seeker, state=JobApplicationState.NEW, sent_by_authorized_prescriber=True
+    )
+    client.force_login(membership.user)
+
+    response = client.get(journey_url("eligibilite", job_seeker.public_id), **HTMX)
+    profile = job_seeker.jobseeker_profile
+    # Under the name, on every step.
+    department = f" ({job_seeker.department})" if job_seeker.department else ""
+    assertContains(response, f"{profile.age}{NBSP}ans · Tarascon{department}")
+    if profile.pole_emploi_id:
+        assertContains(response, f"ID France Travail {profile.pole_emploi_id}")
+    # Why the professional is asked, and what links them to the person.
+    created = timezone.localdate(job_application.created_at)
+    assertContains(response, f"Candidature du {created:%d/%m/%Y} · {job_application.to_company.display_name}")
+    assertContains(response, "Vous l’accompagnez depuis le")
+    assertContains(response, f"Jamais de PASS{NBSP}IAE")
+    page_url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+    assertContains(response, f'href="{page_url}" target="_blank"')
