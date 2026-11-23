@@ -317,7 +317,7 @@ class TestEnrollmentSteps3And4ConfirmDevice:
         else:
             assertNotContains(response, qr_code_text)
 
-    def test_post_valid_totp(self, client):
+    def test_post_valid_totp(self, client, snapshot):
         user = random_pro_user_factory()
         client.force_login(user)
         url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
@@ -338,8 +338,7 @@ class TestEnrollmentSteps3And4ConfirmDevice:
         assertMessages(
             response, [messages.Message(messages.SUCCESS, "Votre nouvel appareil est confirmé", extra_tags="toast")]
         )
-        assertContains(response, "Votre code de récupération à conserver")
-        assertContains(response, "secret-backup-code")
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
         device = user.itou_totp_devices.get()
         assert device.key == fake_device.key
         assert client.session[DEVICE_ID_SESSION_KEY] == device.persistent_id
