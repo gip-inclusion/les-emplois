@@ -148,7 +148,8 @@ def redact_urls_in_text(text):
     Our own request is not affected: Sentry stores it as a `url` without the query and a
     `query_string` without the host, so neither can match the scheme and host this looks for,
     and the filters of our own pages stay readable. A full URL of ours quoted elsewhere, in the
-    `Referer` header or a `next` parameter, is redacted like an outgoing one.
+    `Referer` header, a `next` parameter or the `url.full` of the span of our request, is
+    redacted like an outgoing one.
 
     Example:
         `GET https://api.example.com/search?nom=Dupont&page=2 failed`

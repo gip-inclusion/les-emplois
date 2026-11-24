@@ -8,7 +8,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.httpx import HttpxIntegration
 from sentry_sdk.integrations.huey import HueyIntegration
-from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
+from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger_for_events
 from sentry_sdk.integrations.redis import RedisIntegration
 
 from itou.utils.redaction import (
@@ -174,6 +174,9 @@ _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
 _SENSITIVE_FRAGMENTS_RE = re.compile(
     "|".join(re.escape(fragment) for fragment in sorted(SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS))
 )
+# The keys holding a bare query string: `http.query` in the HTTP breadcrumbs and the span of our
+# own request, `url.query` in the spans of an outgoing request since sentry-sdk 3.0
+_QUERY_STRING_KEYS = frozenset({"http.query", "url.query"})
 
 # The only form fields whose value is sent to Sentry, all others being redacted by
 # `scrub_request_data`. Keep it short: forms of this app mostly collect personal data, so only
@@ -194,6 +197,20 @@ READABLE_FORM_FIELDS = re.compile(
 PII_SCRUBBING_FAILED = "PII scrubbing failed"
 # Where the scrubbing code lives, and so the frame that says why it failed
 _SCRUBBING_FILES = ("config/sentry.py", "itou/utils/redaction.py")
+
+# Span attributes that never carry personal data: the only ones kept when scrubbing fails
+SPAN_PII_FREE_ATTRIBUTES = [
+    "http.request.method",
+    "http.response.status_code",
+    "sentry.environment",
+    "sentry.op",
+    "sentry.origin",
+    "sentry.release",
+    "sentry.sdk.name",
+    "sentry.sdk.version",
+    "sentry.segment.id",
+    "sentry.segment.name",
+]
 
 # Event fields that never carry personal data: the only ones kept when scrubbing fails
 EVENT_PII_FREE_KEYS = [
@@ -232,10 +249,10 @@ def _is_sensitive_key(key):
 def _scrub_dict_value(key, value):
     if _is_sensitive_key(key):
         return REDACTED
-    if key == "http.query" and isinstance(value, str):
-        # `http.query` holds a query string without a host, so we can't tell whether it comes from
-        # an outgoing API call or from a request to our own site. We therefore redact every
-        # value, except `NON_PERSONAL_QUERY_KEYS`
+    if key in _QUERY_STRING_KEYS and isinstance(value, str):
+        # A query string without a host, so we can't tell whether it comes from an outgoing API
+        # call or from a request to our own site. We therefore redact every value, except
+        # `NON_PERSONAL_QUERY_KEYS`
         return redact_query_values_by_default(value)
     return scrub_sensitive_data(value)
 
@@ -246,8 +263,8 @@ def scrub_sensitive_data(value):
     This includes: the message of an exception, the log entry, breadcrumbs, span data, and
     the local variables of the stack frames.
 
-    It is the only layer to do so: `data_collection` disables the SDK's `EventScrubber`, so
-    this has to reach every depth of every mapping on its own.
+    It is the only layer to do so: sentry-sdk 3.0 removed the SDK's `EventScrubber`, so this
+    has to reach every depth of every mapping on its own.
     """
     match value:
         case str():
@@ -337,7 +354,7 @@ def degraded_event(event, exc):
     “<unlabeled event>”. The exception types are the one detail of the event known to be safe,
     and they also group the degraded events, so that muting one of their issues does not hide
     every later failure. Everything else goes, `contexts` included, and with it the trace that
-    would link this event to its transaction.
+    would link this event to its spans.
     """
     degraded = _failed_scrubbing_event()
     degraded.update({key: event[key] for key in EVENT_PII_FREE_KEYS if key in event})
@@ -354,7 +371,7 @@ def degraded_event(event, exc):
 
 
 def scrub_event(event):
-    """Remove personal data from an event, whether an error or a transaction."""
+    """Remove personal data from an error event."""
     anonymize_user(event)
     scrub_request_data(event)
     return scrub_sensitive_data(event)
@@ -381,24 +398,55 @@ def strip_sentry_sensitive_data(event, _hint):
             return {"event_id": event["event_id"], "level": "error", **_failed_scrubbing_event()}
 
 
-def strip_sentry_sensitive_data_from_transaction(event, _hint):
-    """`before_send_transaction` hook to remove personal data from Sentry transactions.
+def scrub_span(span):
+    """Remove personal data from the name and the attributes of a span, all the SDK reads back."""
+    attributes = {
+        key: value
+        for key, value in (span.get("attributes") or {}).items()
+        # The user is reduced to its ID, as on an error, see `anonymize_user`
+        if not key.startswith("user.") or key == "user.id"
+    }
+    return {**span, "name": scrub_sensitive_data(span["name"]), "attributes": scrub_sensitive_data(attributes)}
 
-    Spans carry the query string of outgoing HTTP requests. The user is anonymized as for
-    errors, which the performance product did not use to get.
 
-    On failure the transaction is dropped: unlike an error, losing it loses no alert, and
-    the degraded shape above is not a valid transaction anyway. Why it failed is logged, which
-    Sentry ignores: the client reports would otherwise be the only trace of it.
+def degraded_span(span, failure):
+    """Reduce a span to the attributes that cannot carry personal data, once scrubbing failed.
+
+    Its place in the trace and its duration are kept: the SDK only lets `before_send_span`
+    change the name and the attributes of a span.
+    """
+    attributes = span.get("attributes") or {}
+    return {
+        "name": PII_SCRUBBING_FAILED,
+        "attributes": {
+            **{key: attributes[key] for key in SPAN_PII_FREE_ATTRIBUTES if key in attributes},
+            "pii_scrubbing": "failed",
+            **failure,
+        },
+    }
+
+
+def strip_sentry_sensitive_data_from_span(span, _hint):
+    """`before_send_span` hook to remove personal data from Sentry spans.
+
+    Spans carry the URL of outgoing HTTP requests, and the URL and the headers of our own.
+
+    Since sentry-sdk 3.0, spans are streamed one by one and cannot be dropped, and the SDK sends
+    a span as it was when this hook raises. So when scrubbing fails, the span is reduced by
+    `degraded_span`, and why it failed is logged, which Sentry ignores.
     """
     try:
-        return scrub_event(event)
+        return scrub_span(span)
     except Exception as exc:
-        logger.warning(
-            "Dropped a transaction, scrubbing it raised %(pii_scrubbing_error)s at %(pii_scrubbing_location)s",
-            _scrubbing_failure(exc),
-        )
-        return None
+        try:
+            failure = _scrubbing_failure(exc)
+            logger.warning(
+                "Degraded a span, scrubbing it raised %(pii_scrubbing_error)s at %(pii_scrubbing_location)s", failure
+            )
+            return degraded_span(span, failure)
+        except Exception:
+            # Raising would send the span as it was
+            return {"name": PII_SCRUBBING_FAILED, "attributes": {"pii_scrubbing": "failed"}}
 
 
 def sentry_init():
@@ -416,7 +464,10 @@ def sentry_init():
         # DSN is read from the SENTRY_DSN environment variable.
         integrations=[
             LoggingIntegration(
-                level=logging.INFO,  # Capture info and above as breadcrumbs.
+                # No Sentry logs: since sentry-sdk 3.0, `level` sends the records as Sentry logs,
+                # which `before_send` never sees. The logs go to Datadog, redacted.
+                level=None,
+                breadcrumb_level=logging.INFO,  # Capture info and above as breadcrumbs.
                 event_level=logging.ERROR,  # Send errors as events.
             ),
             DjangoIntegration(middleware_spans=True, signals_spans=True, cache_spans=True, db_transaction_spans=True),
@@ -427,9 +478,12 @@ def sentry_init():
         ],
         # https://docs.sentry.io/platforms/python/sampling/
         traces_sample_rate=traces_sample_rate,
+        # Since sentry-sdk 3.0, the stack, local variables included, is attached to every message
+        # and every error log by default. They say where they come from already, and each frame
+        # would be as many more values for `before_send` to scrub.
+        attach_stacktrace=False,
         # What the integrations are allowed to collect, category by category. It replaces
-        # `send_default_pii`, deprecated since sentry-sdk 2.72.0, which must stay unset, and it
-        # disables `event_scrubber`.
+        # `send_default_pii`, which sentry-sdk 3.0 removed, and whose defaults collected less.
         # https://docs.sentry.io/platforms/python/configuration/options/#data_collection
         # https://docs.sentry.io/platforms/python/data-management/data-collected/
         # https://develop.sentry.dev/sdk/foundations/client/data-collection/
@@ -444,12 +498,13 @@ def sentry_init():
             },
             # The submitted form, which `scrub_request_data` reduces to its field names
             "http_bodies": ["incoming_request"],
-            # Filtered by the SDK before `before_send` runs, for incoming and outgoing requests.
+            # Filtered by the SDK before `before_send` and `before_send_span` run, for incoming and outgoing requests.
             # The SDK always masks its own credential terms (`key`, `auth`, `token`...), ours add up.
             # "off" would drop everything, even `?page=2`, which makes errors harder to reproduce.
             "url_query_params": {"mode": "denylist", "terms": sorted(SENSITIVE_KEY_FRAGMENTS)},
             "graphql": {"document": False, "variables": False},
             "gen_ai": {"inputs": False, "outputs": False},
+            "mcp": {"inputs": False, "outputs": False},
             "database_query_data": False,
             # The frames are what makes an error diagnosable, `before_send` scrubs them. The
             # `{"mode": "denylist"}` of the SDK would only test the names of the locals, not the
@@ -465,12 +520,12 @@ def sentry_init():
         # https://docs.sentry.io/platforms/python/data-management/sensitive-data/#before-send-before-send-transaction--before-send-span
         # https://docs.sentry.io/platforms/python/configuration/filtering/
         before_send=strip_sentry_sensitive_data,
-        before_send_transaction=strip_sentry_sensitive_data_from_transaction,
+        before_send_span=strip_sentry_sensitive_data_from_span,
         # https://docs.sentry.io/platforms/python/configuration/options/#custom_repr
         custom_repr=scrubbed_repr,
         **shutdown_timeout_option,
     )
-    ignore_logger("django.security.DisallowedHost")
-    ignore_logger("django_datadog_logger.middleware.request_log")
+    ignore_logger_for_events("django.security.DisallowedHost")
+    ignore_logger_for_events("django_datadog_logger.middleware.request_log")
     # Its warnings are about the scrubbing itself, which they would only go through again
-    ignore_logger(__name__)
+    ignore_logger_for_events(__name__)
