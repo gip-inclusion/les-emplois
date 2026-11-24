@@ -16,7 +16,7 @@ CHANGELOG = """
 
 ## 2026-07-09
 
-- endpoints `employee-records` et `employee-record-notifications` :
+- endpoints `employee-records` :
   champ `salarieLangueFrancaise`
 
   À partir du 09/07/2026, la signification du champ
