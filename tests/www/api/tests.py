@@ -5,5 +5,5 @@ from pytest_django.asserts import assertContains
 
 def test_index(client):
     response = client.get(reverse("api:index"))
-    assertContains(response, reverse("v1:redoc"))
+    assertContains(response, reverse("v1:documentation"))
     assertContains(response, f"mailto:{settings.API_EMAIL_CONTACT}")

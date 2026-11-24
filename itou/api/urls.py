@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_not_required
 from django.urls import path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
 
@@ -18,7 +19,7 @@ from itou.api.nexus.views import (
     SyncStartView,
     UsersView,
 )
-from itou.api.redoc_views import ItouSpectacularRedocView
+from itou.api.scalar_views import ScalarView
 from itou.api.siae_api.viewsets import SiaeViewSet
 from itou.api.token_auth.views import ObtainAuthToken
 
@@ -44,9 +45,11 @@ urlpatterns = [
         login_not_required(SpectacularAPIView.as_view()),
         name="openapi_schema",
     ),
+    path("documentation/", ScalarView.as_view(), name="documentation"),
+    # Legacy URL of the documentation (rendered by Redoc), kept for existing links.
     path(
         "redoc/",
-        ItouSpectacularRedocView.as_view(url_name="v1:openapi_schema"),
+        login_not_required(RedirectView.as_view(pattern_name="v1:documentation", permanent=True, query_string=True)),
         name="redoc",
     ),
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),

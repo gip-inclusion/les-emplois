@@ -164,26 +164,20 @@ ASSET_INFOS = {
             ],
         },
     },
-    "redoc": {
+    "@scalar/api-reference": {
         "download": {
-            "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js",
-            "sha256": "c7f107f5259486ec29f726db25e31a46a563b09f5209fd90c0371677e576d311",
+            "url": "https://registry.npmjs.org/@scalar/api-reference/-/api-reference-1.77.0.tgz",
+            "sha256": "f9c070c02f96cbfd179e2d87a72906cce0b13074e0e95ffabd5d292e359bca17",
         },
-        "target": "vendor/redoc/redoc.standalone.js",
-    },
-    "redoc/map": {
-        "download": {
-            "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js.map",
-            "sha256": "ae54c013193df71fe0a18ddddf20e8893b1c0c80b4a3ddcd8a969dae03fdf198",
+        "extract": {
+            "origin": "package",
+            "destination": "vendor/scalar",
+            "files": [
+                ("dist/browser/standalone.js", "standalone.js"),
+                ("dist/browser/standalone.js.map", "standalone.js.map"),
+                "package.json",
+            ],
         },
-        "target": "vendor/redoc/redoc.standalone.js.map",
-    },
-    "redoc/LICENSE": {
-        "download": {
-            "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js.LICENSE.txt",
-            "sha256": "d346d7ec025844f5f7df51887302bb105782b8199eb9b382d9133435e348b9b2",
-        },
-        "target": "vendor/redoc/redoc.standalone.js.LICENSE.txt",
     },
     "tarteaucitronjs": {
         "download": {

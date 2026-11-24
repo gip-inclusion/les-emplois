@@ -741,7 +741,6 @@ csp_img_src = [
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
     "https://*.tile.openstreetmap.org",
-    "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
     # Zendesk Web Widget assets (launcher icons, avatars).
     "https://*.zdassets.com",
@@ -809,10 +808,7 @@ SECURE_CSP = {
         # It would be better to whilelist styles hashes but it's to much work for now.
         CSP.UNSAFE_INLINE,
     ],
-    "worker-src": [
-        CSP.SELF,
-        "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
-    ],
+    "worker-src": [CSP.SELF],
 }
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"

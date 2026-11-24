@@ -1,4 +1,4 @@
-# This is included at the top of `/api/v1/redoc/`
+# This is included at the top of `/api/v1/documentation/`
 CHANGELOG = """
 # Changelog
 
