@@ -30,7 +30,12 @@ from itou.utils import constants as global_constants, triggers
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    ContractFactory,
+    ProSupportReportFactory,
+)
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
@@ -195,7 +200,7 @@ class TestDashboardView:
         assert response.context["num_rejected_employee_records"] == 0
 
     @freeze_time("2026-01-15")
-    def test_dashboard_end_of_journey_count_for_employer(self, client):
+    def test_dashboard_pro_support_report_to_fill_count_for_employer(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         client.force_login(employer)
@@ -204,11 +209,12 @@ class TestDashboardView:
         twenty_days_ago = today - timedelta(days=20)
         in_twenty_days = today + timedelta(days=20)
         url = reverse("dashboard:index")
+        badge_selector = f"a[href$='{reverse('job_seekers_views:list_organization')}?end_of_journey=on'] + .badge"
 
         # No employee at the end of their journey yet: the entry is shown without a badge.
         response = client.get(url)
         assertContains(response, "Fins de contrats")
-        assert response.context["end_of_journey_count"] == 0
+        assert response.context["pro_support_report_to_fill_count"] == 0
 
         def create_employee(contract_end_date, *, contract_company=company):
             job_seeker = ApprovalFactory(
@@ -227,14 +233,20 @@ class TestDashboardView:
         create_employee(in_twenty_days, contract_company=CompanyFactory())
 
         response = client.get(url)
-        assert response.context["end_of_journey_count"] == 2
+        assert response.context["pro_support_report_to_fill_count"] == 2
 
-        # The dashboard counter matches the filtered "Accompagnements" list results.
-        list_response = client.get(reverse("job_seekers_views:list_organization"), {"end_of_journey": "on"})
-        assert set(list_response.context["page_obj"].object_list) == {
-            job_seeker_with_contract_ending_soon,
-            job_seeker_with_ended_contract,
-        }
+        # A filled report is no longer counted.
+        ProSupportReportFactory(contract=job_seeker_with_contract_ending_soon.contracts.get())
+        response = client.get(url)
+        assert response.context["pro_support_report_to_fill_count"] == 1
+        assert parse_response_to_soup(response, badge_selector).text == "1"
+
+        # Every report is filled: the badge disappears, the entry stays.
+        ProSupportReportFactory(contract=job_seeker_with_ended_contract.contracts.get())
+        response = client.get(url)
+        assert response.context["pro_support_report_to_fill_count"] == 0
+        assertContains(response, "Fins de contrats")
+        assert parse_response_to_soup(response).select(badge_selector) == []
 
     @freeze_time("2026-01-15")
     def test_dashboard_end_of_journey_count_for_prescriber(self, client):
