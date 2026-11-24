@@ -169,9 +169,10 @@ class TestServiceKeywordSearch:
 
         service.refresh_from_db()
         assert service.search_vector == (
-            "'agefiph':11B 'decouvr':1A 'emploi':22C 'franc':9B 'garag':5A 'handicape':18B 'insert':15B 'jeun':19C "
-            "'meti':3A 'person':17B,20C 'reconvers':4A 'repar':12B 'san':21C 'solidair':6A 'travail':10B "
-            "'vehicul':14B 'zzdecouvertemetier':7A 'zzforummetiers':8A"
+            "'agefiph':15B 'btp':4A 'decouvr':1A 'emploi':26C 'franc':13B 'garag':6A 'handicape':22B 'insert':19B "
+            "'jeun':23C 'meti':3A 'person':21B,24C 'reconvers':5A 'repar':16B 'san':25C 'solidair':7A 'travail':14B "
+            "'vehicul':18B 'zzdecouvertemetier':8A 'zzespacesverts':10A 'zzespacevert':9A 'zzforummetiers':11A "
+            "'zzorientationprofessionnelle':12A"
         )
 
     def test_update_search_index_without_thematics_nor_publics(self):
