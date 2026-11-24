@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.contrib.gis.geos import Point
 
@@ -311,6 +313,34 @@ class TestServiceKeywordSearch:
         Service.include_inactive.update_search_index()
 
         assert Service.objects.keyword_search(q).exists() is expected
+
+    @pytest.mark.parametrize("q,expected", [("mobilité", True), ("santé", False)])
+    def test_keyword_search_category_aliases(self, q, expected):
+        ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", value="mobilite--preparer-un-permis", label="Code")
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert Service.objects.keyword_search(q).exists() is expected
+
+    def test_update_search_index_category_aliases_once_per_service(self):
+        service = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", value="mobilite--preparer-un-permis", label="Code"),
+                GenericReferenceItemFactory(
+                    kind="THEMATIC", value="mobilite--entretenir-reparer-son-vehicule", label="Garage"
+                ),
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        service.refresh_from_db()
+        positions_by_lexeme = dict(re.findall(r"'(\S+)':(\S+)", service.search_vector))
+        # "mobilité" and "mobilités" share the "mobilit" stem, "mobilte" is a typo with its own stem.
+        assert len(positions_by_lexeme["mobilit"].split(",")) == 2
+        assert len(positions_by_lexeme["mobilt"].split(",")) == 1
 
     def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
         in_publics_details = ServiceFactory(publics_details="Titre de séjour")

@@ -326,6 +326,13 @@ class ServiceQuerySet(models.QuerySet):
     def update_search_index(self):
         """Weighted like data·inclusion's `build_search_index`."""
         thematics = self.model.thematics.through.objects.filter(service=models.OuterRef("pk"))
+        category = models.Func(
+            "genericreferenceitem__value",
+            models.Value("--"),
+            models.Value(1),
+            function="split_part",
+            output_field=models.TextField(),
+        )
         structure = Structure.include_inactive.filter(pk=models.OuterRef("structure"))
         self.update(
             search_vector=postgres_search.SearchVector(
@@ -334,17 +341,29 @@ class ServiceQuerySet(models.QuerySet):
                         text=Concat(
                             "genericreferenceitem__label",
                             models.Value(" "),
-                            _aliases(insertion_search.SINGLE_WORD_ALIASES),
+                            _aliases(insertion_search.SINGLE_WORD_ALIASES, "genericreferenceitem__value"),
                             output_field=models.TextField(),
                         )
                     )
+                ),
+                _joined(
+                    thematics.values(text=_aliases(insertion_search.SINGLE_WORD_ALIASES, category))
+                    .distinct()
+                    .order_by("text")
                 ),
                 "name",
                 config="french_unaccent",
                 weight="A",
             )
             + postgres_search.SearchVector(
-                _joined(thematics.values(text=_aliases(insertion_search.MULTI_WORD_ALIASES))),
+                _joined(
+                    thematics.values(text=_aliases(insertion_search.MULTI_WORD_ALIASES, "genericreferenceitem__value"))
+                ),
+                _joined(
+                    thematics.values(text=_aliases(insertion_search.MULTI_WORD_ALIASES, category))
+                    .distinct()
+                    .order_by("text")
+                ),
                 config="simple",
                 weight="A",
             )
@@ -389,10 +408,10 @@ def _joined(queryset):
     )
 
 
-def _aliases(aliases_by_thematic):
+def _aliases(aliases_by_thematic, value):
     return models.Func(
         models.Value(aliases_by_thematic, output_field=models.JSONField()),
-        "genericreferenceitem__value",
+        value,
         function="jsonb_extract_path_text",
         output_field=models.TextField(),
     )
