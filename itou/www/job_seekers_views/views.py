@@ -593,11 +593,19 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         raise Http404
     other_company = company if company != request.current_organization else None
     last_contract = job_seeker.contracts.filter(company=company).order_by("-start_date", "-pk").first()
-    if last_contract.pro_support_reports.covering_contract_end_date().exists():
-        raise Http404
+    pro_support_report = None
+    if other_company is None:
+        # Several reports cover a contract whose renewal was cancelled: the latest one is shown.
+        pro_support_report = (
+            last_contract.pro_support_reports.covering_contract_end_date()
+            .select_related("author")
+            .order_by("-contract_end_date")
+            .first()
+        )
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
     context = {
         "other_company": other_company,
+        "pro_support_report": pro_support_report,
         "job_seeker": job_seeker,
         "last_contract": last_contract,
         "back_url": back_url,
@@ -605,7 +613,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
         "services_search_url": build_services_search_url(request, job_seeker),
         "matomo_custom_title": "Bilan d’accompagnement",
     }
-    if other_company:
+    if other_company or pro_support_report:
         return render(request, template_name, context)
 
     form = ProSupportReportForm(
