@@ -11,8 +11,10 @@ import sentry_sdk
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
+from django.db import DatabaseError
 from django.http import HttpResponseServerError
 from django.urls import include, path
+from django.utils.functional import SimpleLazyObject
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient
 from rest_framework.views import APIView
@@ -41,6 +43,7 @@ from itou.utils.apis.geocoding import call_ban_geocoding_api
 from itou.utils.apis.pole_emploi import Endpoints, PoleEmploiAPIException, PoleEmploiRoyaumePartenaireApiClient
 from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
 from itou.utils.redaction import ANONYMOUS_USER_ID, REDACTED
+from itou.www.middleware import sentry_user_id
 from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
@@ -755,6 +758,26 @@ def test_error_raised_before_authentication_reports_a_user(client, mocker, captu
 
     assert response.status_code == 500
     assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+def test_event_is_kept_when_the_user_cannot_be_read(rf, captured_event):
+    """Since sentry-sdk 3.0, an event processor that raises drops the event it was given."""
+
+    def load_user():
+        raise DatabaseError("the database is down")
+
+    def get_response(request):
+        sentry_sdk.capture_message("Test message")
+
+    request = rf.get("/")
+    # As `AuthenticationMiddleware` does, the user is only loaded from the database when read
+    request.user = SimpleLazyObject(load_user)
+
+    sentry_user_id(get_response)(request)
+
+    event = captured_event()
+    assert event["message"] == "Test message"
+    assert "user" not in event
 
 
 @pytest.mark.usefixtures("failing_urlconf")
