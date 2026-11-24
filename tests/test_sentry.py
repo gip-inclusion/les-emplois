@@ -529,8 +529,13 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("proxy_authorization", True),
         ("sessionid", True),
         ("x_forwarded_for", True),
+        ("x_real_ip", True),
+        ("remote_addr", True),
         ("key", True),  # the TOTP secret of the OTP views
         ("sid", True),
+        ("auth", True),
+        ("cookie", True),
+        ("private_key", True),
         # Ordinary words a fragment must not swallow, and the exceptions to it
         ("template_name", False),
         ("model_name", False),

@@ -10,7 +10,6 @@ from sentry_sdk.integrations.httpx import HttpxIntegration
 from sentry_sdk.integrations.huey import HueyIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.redis import RedisIntegration
-from sentry_sdk.scrubber import DEFAULT_DENYLIST, DEFAULT_PII_DENYLIST
 
 from itou.utils.redaction import (
     ANONYMOUS_USER_ID,
@@ -53,7 +52,7 @@ SENSITIVE_KEY_FRAGMENTS = {
 # The credential terms the SDK matches on its own in the headers it collects (see
 # `sentry_sdk.data_collection`), applied here to the frame variables and the mappings it never
 # visits. Those that would redact too much as fragments are not: `key` and `sid` are the whole
-# names below, and `auth` (inside `author`) is matched as a whole key by `_SDK_DENYLIST` below.
+# names below, as is `auth` (inside `author`).
 # `sso` (inside `processor`) and `identity` (inside `identity_provider`) are left out.
 SENSITIVE_CREDENTIAL_FRAGMENTS = {
     "apikey",
@@ -77,13 +76,24 @@ SENSITIVE_CREDENTIAL_FRAGMENTS = {
 SENSITIVE_VARIABLE_NAMES = {
     "ft_id",
     "ip",  # see itou.audit_trail.models.AuditTrail
+    # The other names of an IP address that the `EventScrubber` of sentry-sdk 2.x matched
+    "remote_addr",
+    "x_forwarded_for",
+    "x_real_ip",
 }
 
 # Credential terms the SDK matches as fragments in the headers it collects, matched here as whole
-# keys: as fragments they would redact `cache_key` and `residence`. A bare `key` is also what the
-# OTP views name the TOTP secret, see itou.www.otp_views.views.
+# keys: as fragments they would redact `author`, `cache_key` and `residence`. A bare `key` is also
+# what the OTP views name the TOTP secret, see itou.www.otp_views.views. The others are the keys
+# that the `EventScrubber` of sentry-sdk 2.x matched and that no fragment above catches, save the
+# session cookies of other frameworks (`PHPSESSID`, `connect.sid`, `symfony`).
 SENSITIVE_CREDENTIAL_NAMES = {
+    "auth",
+    "cookie",
     "key",
+    "private_key",
+    "privatekey",
+    "set_cookie",
     "sid",
 }
 
@@ -164,8 +174,6 @@ _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
 _SENSITIVE_FRAGMENTS_RE = re.compile(
     "|".join(re.escape(fragment) for fragment in sorted(SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS))
 )
-# What `EventScrubber` used to match before `data_collection` disabled it, whole keys only
-_SDK_DENYLIST = frozenset(key.lower() for key in DEFAULT_DENYLIST + DEFAULT_PII_DENYLIST)
 
 # The only form fields whose value is sent to Sentry, all others being redacted by
 # `scrub_request_data`. Keep it short: forms of this app mostly collect personal data, so only
@@ -218,7 +226,7 @@ def _is_sensitive_key(key):
     key = key.lower()
     if key in NON_SENSITIVE_KEYS:
         return False
-    return key in _SENSITIVE_NAMES_LOWER or key in _SDK_DENYLIST or bool(_SENSITIVE_FRAGMENTS_RE.search(key))
+    return key in _SENSITIVE_NAMES_LOWER or bool(_SENSITIVE_FRAGMENTS_RE.search(key))
 
 
 def _scrub_dict_value(key, value):
