@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}API {% brand "de" %}{% endblock %}
 
@@ -8,30 +9,28 @@
             <div class="row">
                 <div class="col-12 p-3">
                     <h1 class="h1-hero-c1">API {% brand "de" %}</h1>
-                    <p class="lead">
-                        <a href="{% url 'v1:documentation' %}">L'API {% brand "de" %}</a> met à disposition des données de la plateforme.
-                    </p>
-                    <p>Cette API est encore en construction et est appelée à évoluer.</p>
-                    <p class="text-muted">Version: 1</p>
+                    <p>L'API {% brand "de" %} met à disposition des données de la plateforme.</p>
+                    <p>Cette documentation est générée automatiquement à partir du code.</p>
                 </div>
             </div>
-            <div class="row mt-5">
-                <div class="col-12 bg-info text-white p-3">
-                    L’accès à certaines ressources peut nécessiter une authentification avec des droits particuliers.
+            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
+                {% fragment as c_info__summary %}
+                    Comment utiliser cette API ?
+                {% endfragment %}
+                {% fragment as c_info__detail %}
+                    L’accès à certaines ressources peut nécessiter une authentification avec des droits particuliers (voir la documentation de chaque ressource ci-dessous).
                     <br />
-                    Si vous désirez obtenir ces droits sur votre compte, ou de l’aide pour utiliser l’API, merci de
-                    <a class="text-decoration-underline fw-bold text-white"
+                    Si vous désirez obtenir de l’aide pour utiliser l’API, merci de
+                    <a class="fw-bold text-decoration-none stretched-link"
                        href="mailto:{{ API_EMAIL_CONTACT }}"
                        aria-label="Nous contacter par e-mail">nous contacter</a>
                     <i class="ri-external-link-line" aria-hidden="true"></i>.
-                </div>
-            </div>
+                {% endfragment %}
+            {% endcomponent_info %}
             <div class="row mt-5">
                 <div class="col-md-12">
-                    <h2 class="h1">Documentation</h2>
-                    <p>Cette documentation est générée automatiquement à partir du code.</p>
                     <p>
-                        <a href="{% url 'v1:documentation' %}" class="btn btn-success">Ouvrir la documentation</a>
+                        <a href="{% url 'v1:documentation' %}" class="btn btn-primary">Ouvrir la documentation</a>
                     </p>
                 </div>
             </div>
