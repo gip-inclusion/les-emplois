@@ -275,7 +275,7 @@ def enrollment_step_3_and_4_confirm_device(
     return render(request, template_name, context)
 
 
-@http_methods(db_readonly=["HEAD"], db_write=["POST"])
+@http_methods(db_readonly=["HEAD", "POST"])
 @check_user_can_enroll
 def enrollment_step_4_print_backup_code(request, template_name="otp_views/enrollment_step_4_print_backup_code.html"):
     backup_code = request.POST.get("backup_code")
@@ -286,7 +286,7 @@ def enrollment_step_4_print_backup_code(request, template_name="otp_views/enroll
     context = {
         "backup_code": backup_code,
         "now": timezone.now(),
-        "site_url": get_absolute_url()[:-1],  # remove the trailing /
+        "site_url": get_absolute_url().rstrip("/"),
     }
     return render(request, template_name, context)
 
