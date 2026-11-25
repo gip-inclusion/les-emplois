@@ -40,7 +40,8 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s)))
         ''',
       }),
       dict({
@@ -90,7 +91,8 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s)))
           ORDER BY "companies_company"."id" ASC
           LIMIT 2
         ''',

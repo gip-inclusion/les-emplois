@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -8,7 +7,7 @@ from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.common_apps.address.models import AddressMixin
+from itou.common_apps.address.models import AddressMixin, AddressQuerySet
 from itou.common_apps.organizations.models import (
     MEMBERSHIP_FUNCTION_MAX_LENGTH,
     MembershipAbstract,
@@ -29,7 +28,7 @@ from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
-class PrescriberOrganizationQuerySet(OrganizationQuerySet):
+class PrescriberOrganizationQuerySet(AddressQuerySet, OrganizationQuerySet):
     def autocomplete(self, search_string, limit=10):
         queryset = (
             self.annotate(similarity=TrigramSimilarity("name", search_string))
@@ -40,9 +39,6 @@ class PrescriberOrganizationQuerySet(OrganizationQuerySet):
 
     def by_safir_code(self, safir_code):
         return self.filter(code_safir_pole_emploi=safir_code).first()
-
-    def within(self, point, distance_km):
-        return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
     def with_has_active_members(self):
         return self.annotate(
