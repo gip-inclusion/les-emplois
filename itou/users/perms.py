@@ -1,3 +1,4 @@
+from itou.job_applications.utils import xp_ref_iae_departments
 from itou.users.models import JobSeekerAssignment
 
 
@@ -29,6 +30,7 @@ def can_view_pro_support_report(request, report):
     if request.from_authorized_prescriber:
         return (
             report.notified_prescriber_organization_id == request.current_organization.pk
+            or (report.company is not None and report.company.department in xp_ref_iae_departments(request))
             or JobSeekerAssignment.objects.assigned_to(
                 request.user, request.current_organization, from_all_coworkers=True
             )

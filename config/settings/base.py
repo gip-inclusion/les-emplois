@@ -975,8 +975,8 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
 NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 
-# Experiment: the France Travail agents of XP_REF_IAE_USER_PKS can view job applications sent to SIAE in the
-# departments associated with the department of their agency, until the end date (inclusive).
+# Experiment: the France Travail agents of XP_REF_IAE_USER_PKS can view job applications sent to SIAE, and their pro
+# support reports, in the departments associated with the department of their agency, until the end date (inclusive).
 XP_REF_IAE_DEPARTMENTS = {
     "06": ["06"],
     "13": ["13"],
