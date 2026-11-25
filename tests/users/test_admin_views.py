@@ -21,7 +21,7 @@ from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
 from tests.cities.factories import create_city_saint_andre
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, ContractFactory
 from tests.insertion.factories import OrientationFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -192,6 +192,7 @@ class TestTransferUserData:
             # Time is frozen: without this, the -created_at ordering of the inconsistency checks would be a tie
             created_at=job_application_1.created_at - datetime.timedelta(days=1),
         )
+        contract = ContractFactory(job_seeker=from_user)
 
         orientation = OrientationFactory(beneficiary=from_user)
 
@@ -215,18 +216,21 @@ class TestTransferUserData:
         assertContains(response, str(job_application_2))
         assertContains(response, str(approval))
         assertContains(response, str(orientation))
+        assertContains(response, str(contract))
 
         response = admin_client.post(
-            transfer_url_2, data={"fields_to_transfer": ["job_applications", "approvals", "orientations"]}
+            transfer_url_2, data={"fields_to_transfer": ["job_applications", "approvals", "orientations", "contracts"]}
         )
         assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": from_user.pk}))
 
         job_application_1.refresh_from_db()
         approval.refresh_from_db()
         orientation.refresh_from_db()
+        contract.refresh_from_db()
         assert job_application_1.job_seeker == to_user
         assert approval.user == to_user
         assert orientation.beneficiary == to_user
+        assert contract.job_seeker == to_user
         assertMessages(
             response,
             [

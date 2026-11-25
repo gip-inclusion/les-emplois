@@ -326,6 +326,7 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "job_seeker_assignments",  # JobSeekerAssignment.job_seeker
     "orientations",  # Orientation.beneficiary
     "pro_support_reports",  # ProSupportReport.job_seeker
+    "contracts",  # Contract.job_seeker
 }
 
 
