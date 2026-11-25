@@ -85,19 +85,10 @@ update_snapshots: $(VIRTUAL_ENV)
 
 # After migrate
 populate_db_with_reference_data: $(VIRTUAL_ENV)
-	cat \
-		itou/fixtures/postgres/cities_city.sql \
-		itou/fixtures/postgres/asp_commune.sql \
-		itou/fixtures/postgres/asp_department.sql \
-		itou/fixtures/postgres/asp_country.sql \
-		itou/fixtures/postgres/jobs_rome.sql \
-		itou/fixtures/postgres/jobs_appellation.sql \
-	| python manage.py dbshell
-	python manage.py loaddata_bulk itou/geo/fixtures/QPV_2024.json
+	python manage.py populate_db reference
 
 populate_db: populate_db_with_reference_data
-	python manage.py loaddata_bulk itou/fixtures/django/*.json
-	python manage.py shell -c 'from itou.fixtures.django.dynamic import load_dynamic; load_dynamic()'
+	python manage.py populate_db fixtures dynamic
 
 # Tests.
 # =============================================================================
