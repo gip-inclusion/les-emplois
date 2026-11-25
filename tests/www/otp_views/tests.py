@@ -463,6 +463,15 @@ class TestEnrollmentSteps3And4ConfirmDevice:
 
 
 @pytest.mark.usefixtures("require_mfa_for_pros")
+def test_enrollment_step_2_download_app_for_phones(client):
+    user = random_pro_user_factory()
+    client.force_login(user)
+    url = reverse("otp_views:enrollment_step_2_download_app_for_phones")
+    response = client.get(url)
+    assertContains(response, "Applications d’authentification disponibles sur")
+
+
+@pytest.mark.usefixtures("require_mfa_for_pros")
 class TestLogin:
     def test_login_with_totp(self, client, pro_connect, mocker):
         # For a user conserned with totp
