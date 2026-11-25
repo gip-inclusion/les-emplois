@@ -449,6 +449,18 @@ class TestEnrollmentSteps3And4ConfirmDevice:
         assertRedirects(response, expected_redirection)
         assert user.itou_totp_devices.count() == 0
 
+    @freeze_time("2025-03-11 15:18:56")
+    def test_print_backup_code(self, client, snapshot, settings):
+        user = random_pro_user_factory(email="james.bond@test.local")
+        client.force_login(user)
+        settings.ITOU_FQDN = "la.plateforme.inc"
+
+        data = {
+            "backup_code": "secret-backup-code",
+        }
+        response = client.post(reverse("otp_views:enrollment_step_4_print_backup_code"), data)
+        assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
+
 
 class TestLogin:
     def test_login_with_totp(self, client, settings, pro_connect, mocker):

@@ -1,0 +1,71 @@
+{% extends "layout/base_printable.html" %}
+
+{% block title %}
+    Code de récupération {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4 px-5">
+        <div class="row justify-content-center d-print-none">
+            <div class="mt-5">
+                <button class="btn btn-primary btn-ico"
+                        type="button"
+                        data-it-action="print"
+                        aria-label="Imprimer le code de récupération">
+                    <i class="ri-printer-line" aria-hidden="true"></i>
+                    <span>Imprimer</span>
+                </button>
+            </div>
+        </div>
+
+        <section class="mt-5">
+            <h1 class="mt-5">Code de récupération</h1>
+            <p>Document généré le {{ now|date:"d/m/Y à H:i" }}</p>
+            <div class="c-box">
+                <ul class="list-data fs-lg">
+                    <li><small>site :</small><strong>{{ site_url }}</strong></li>
+                    <li><small>identifiant :</small><strong class="text-break">{{ request.user.email }}</strong></li>
+                    <li><small>code de récupération :</small><strong>{{ backup_code }}</strong></li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mt-5">
+            <h2>À quoi sert ce code ?</h2>
+            <p>Ce code de récupération vous permet de vous connecter à votre compte si vous n'avez plus accès à votre application d'authentification (par exemple, en cas de perte ou de changement de téléphone).</p>
+
+            <p><strong>Il vous permet de remplacer exceptionnellement le code de validation unique (OTP)</strong></p>
+
+            <p><strong>Important :</strong> ce code ne remplace pas votre mot de passe. Vous devrez toujours saisir votre adresse e-mail et votre mot de passe pour vous connecter.</p>
+
+            <p><strong>Attention : ce code ne peut être utilisé qu'une seule fois !</strong></p>
+
+            <p>Une fois utilisé, votre code de récupération sera définitivement invalidé. Il vous permettra de retrouver l'accès à votre compte et de configurer une nouvelle application d'authentification sur un appareil.</p>
+
+            <p>Un nouveau code de récupération sera alors généré. Pensez à le conserver précieusement pour vos prochains besoins.</p>
+
+            <p><strong>Comment conserver votre code en toute sécurité ?</strong></p>
+
+            <ul class="list-unstyled">
+                <li>Imprimez ce document et conservez-le dans un endroit où vous pourrez facilement y accéder en cas de besoin, comme votre portefeuille.</li>
+                <li>Ne partagez jamais ce code avec une autre personne.</li>
+                <li>Ne le stockez pas au même endroit que l’application qui génère le code.</li>
+                <li>Ne le stockez pas dans un fichier non protégé ou dans un espace accessible à d'autres personnes.</li>
+            </ul>
+
+            <p><strong>Ce code est personnel et confidentiel.</strong> Toute personne qui le possède pourrait l'utiliser pour franchir la deuxième étape de vérification de votre connexion.</p>
+
+            <div class="row justify-content-center d-print-none">
+                <div class="mt-5">
+                    <button class="btn btn-primary btn-ico"
+                            type="button"
+                            data-it-action="print"
+                            aria-label="Imprimer le code de récupération">
+                        <i class="ri-printer-line" aria-hidden="true"></i>
+                        <span>Imprimer</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

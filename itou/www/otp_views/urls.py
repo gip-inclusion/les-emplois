@@ -34,6 +34,11 @@ urlpatterns = [
         name="enrollment_step_3_and_4_confirm_device",
     ),
     path(
+        "enrollment-step-4-print-backup-code",
+        views.enrollment_step_4_print_backup_code,
+        name="enrollment_step_4_print_backup_code",
+    ),
+    path(
         "login-with-backup-code",
         views.login_with_backup_code,
         name="login_with_backup_code",
