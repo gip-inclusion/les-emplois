@@ -877,18 +877,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         """
         return uuid.uuid4().hex
 
-    @classmethod
-    def email_already_exists(cls, email, exclude_pk=None):
-        """
-        RFC 5321 Part 2.4 states that only the domain portion of an email
-        is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
-        the same email.
-        """
-        queryset = cls.objects.filter(email__iexact=email)
-        if exclude_pk:
-            queryset = queryset.exclude(pk=exclude_pk)
-        return queryset.exists()
-
     def get_kind_display(self):
         return UserKind(self.kind).label
 

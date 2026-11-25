@@ -527,11 +527,6 @@ class TestModel:
         # normalize_email should not set it to ""
         assert user.email is None
 
-    def test_email_already_exists(self):
-        JobSeekerFactory(email="foo@bar.com")
-        assert User.email_already_exists("foo@bar.com")
-        assert User.email_already_exists("FOO@bar.com")
-
     def test_save_for_unique_email_on_create_and_update(self):
         """
         Ensure `email` is unique when using the save() method for creating or updating a User instance.

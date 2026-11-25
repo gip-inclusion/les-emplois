@@ -64,16 +64,6 @@ class UserAdminForm(EnforceStaffEmailDomainMixin, UserChangeForm):
         super().clean()
         self.cleaned_data["is_staff"] = self.instance.kind == UserKind.ITOU_STAFF
 
-        # smart warning if email already exist
-        try:
-            email = self.cleaned_data["email"]
-        except KeyError:
-            # Email already registered, e.g. comes from SSO.
-            pass
-        else:
-            if self.instance.email_already_exists(email, exclude_pk=self.instance.pk):
-                raise ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
-
         if self.instance.is_job_seeker:
             # Update job seeker geolocation
             posted_fields = [
