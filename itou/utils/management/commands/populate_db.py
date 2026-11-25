@@ -32,7 +32,9 @@ class Command(BaseCommand):
         if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD:
             raise RuntimeError("Nope.")
 
-        if os.getenv("SKIP_POPULATE_DB"):
+        # TODO(xafer): drop deprecated SKIP_FIXTURES flag when it is unused
+        # in all review apps
+        if os.getenv("SKIP_POPULATE_DB") or os.getenv("SKIP_FIXTURES"):
             self.logger.info("SKIP_POPULATE_DB set - skipping")
             return
 
