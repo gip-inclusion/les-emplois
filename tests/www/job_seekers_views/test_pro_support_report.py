@@ -128,8 +128,8 @@ def test_create_pro_support_report_for_employer(
         [
             messages.Message(
                 messages.SUCCESS,
-                f"Bilan envoyé à {advisor_membership.user.get_full_name()}, "
-                f"de {advisor_membership.organization.display_name}",
+                f"Bilan envoyé||Bilan envoyé à {advisor_membership.user.get_full_name()}, "
+                f"de {advisor_membership.organization.display_name}.",
             )
         ],
     )
@@ -285,7 +285,8 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
         response,
         [
             messages.Message(
-                messages.SUCCESS, "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne."
+                messages.SUCCESS,
+                "Bilan enregistré||Bilan enregistré dans le dossier du salarié et n’a été envoyé à personne.",
             )
         ],
     )
@@ -363,8 +364,8 @@ def test_create_pro_support_report_for_a_prescriber_chosen_by_employer(
         [
             messages.Message(
                 messages.SUCCESS,
-                f"Bilan envoyé à {chosen_membership.user.get_full_name()}, "
-                f"de {chosen_membership.organization.display_name}",
+                f"Bilan envoyé||Bilan envoyé à {chosen_membership.user.get_full_name()}, "
+                f"de {chosen_membership.organization.display_name}.",
             )
         ],
     )

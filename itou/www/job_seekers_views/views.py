@@ -621,13 +621,13 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
             report.notify_prescriber(prescriber, organization, form.cleaned_data["source"])
             messages.success(
                 request,
-                f"Bilan envoyé à {prescriber.get_full_name()}, de {organization.display_name}",
+                f"Bilan envoyé||Bilan envoyé à {prescriber.get_full_name()}, de {organization.display_name}.",
                 extra_tags="toast",
             )
         else:
             messages.success(
                 request,
-                "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne.",
+                "Bilan enregistré||Bilan enregistré dans le dossier du salarié et n’a été envoyé à personne.",
                 extra_tags="toast",
             )
         return HttpResponseRedirect(back_url)
