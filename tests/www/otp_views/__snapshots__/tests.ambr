@@ -14,52 +14,120 @@
               <div class="col">
                   <p class="mb-2">
                       <strong>
-                          Ouvrez l’un de vos appareils configurés et recopiez le code affiché
+                          Ouvrez l’un de vos appareils configurés et recopiez le code affiché :
                       </strong>
                   </p>
-                  <ol class="list-unstyled">
+                  <ul class="mb-0">
                       <li>
                           <em>
                               Mon appareil
                           </em>
                           –
-                                                  Dernière utilisation le
-                                                  01 juin 2026 à 12h00
+                                                  dernière utilisation le
+                                                  01/06/2026 à 12h00
                       </li>
-                  </ol>
-                  <p>
-                      <strong>
-                          Vous n’avez plus accès à votre appareil ?
-                      </strong>
-                      <a class="btn-link" href="/otp/login-with-backup-code">
-                          Cliquez ici pour utiliser votre code de récupération
-                      </a>
-                      .
-                  </p>
-                  <h5>
-                      Où trouver mon code ?
-                  </h5>
-                  <p>
-                      Lors de l’activation de la double authentification, vous avez associé votre compte à une
-                      <strong>
-                          application d’authentification
-                      </strong>
-                      installée sur votre téléphone ou votre ordinateur.
-                  </p>
-                  <p>
-                      Il s’agit peut-être de l’une des
-                      <a aria-label="Ouverture dans un nouvel onglet" href="/otp/apps" target="_blank">
-                          applications recommandées
-                      </a>
-                      , comme Google Authenticator, Aegis, Microsoft Authenticator, Authy, ou un gestionnaire de mots de passe comme Bitwarden.
-                  </p>
-                  <p class="mb-0">
-                      Elle affiche automatiquement un
-                      <strong>
-                          code à 6 chiffres
-                      </strong>
-                      à recopier ci-dessous.
-                  </p>
+                  </ul>
+              </div>
+          </div>
+      </div>
+      <h3 class="mt-2">
+          Où trouver mon code ?
+      </h3>
+      <div class="row">
+          <div class="col-12 col-md-4 mb-3">
+              <div class="c-box h-100">
+                  <div class="d-flex flex-column align-items-center text-center row-gap-2">
+                      <div class="d-flex align-self-stretch align-items-center">
+                          <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">
+                              1
+                          </span>
+                          <span class="flex-grow-1">
+                              <img alt="Illustration : ordinateur ou smartphone." loading="lazy" src="/static/img/otp/etape-1-appareils.svg" width="80"/>
+                          </span>
+                          <span aria-hidden="true" class="badge badge-xl rounded-circle invisible">
+                              1
+                          </span>
+                      </div>
+                      <p class="mb-0">
+                          Sur
+                          <strong>
+                              mon téléphone
+                          </strong>
+                          ou
+                          <strong>
+                              mon ordinateur
+                          </strong>
+                          , je lance l’
+                          <strong>
+                              application que j'ai choisie
+                          </strong>
+                          lors de l'activation de la
+                          <strong>
+                              double authentification
+                          </strong>
+                          .
+                      </p>
+                      <p class="fs-sm mb-0">
+                          <a aria-label="Voir les applications recommandées (ouverture dans un nouvel onglet)" href="/otp/apps" target="_blank">
+                              Voir les applications recommandées
+                          </a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="col-12 col-md-4 mb-3">
+              <div class="c-box h-100">
+                  <div class="d-flex flex-column align-items-center text-center row-gap-2">
+                      <div class="d-flex align-self-stretch align-items-center">
+                          <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">
+                              2
+                          </span>
+                          <span class="flex-grow-1">
+                              <img alt="Illustration : code OTP dans l’application." loading="lazy" src="/static/img/otp/etape-2-code.svg" width="80"/>
+                          </span>
+                          <span aria-hidden="true" class="badge badge-xl rounded-circle invisible">
+                              2
+                          </span>
+                      </div>
+                      <p class="mb-0">
+                          Dans cette application, je cherche le
+                          <strong>
+                              code
+                          </strong>
+                          associé à la
+                          <strong>
+                              Plateforme de l’inclusion
+                          </strong>
+                          .
+                      </p>
+                      <p class="fs-sm mb-0">
+                          Il est temporaire et change toutes les 30 secondes.
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="col-12 col-md-4 mb-3">
+              <div class="c-box h-100">
+                  <div class="d-flex flex-column align-items-center text-center row-gap-2">
+                      <div class="d-flex align-self-stretch align-items-center">
+                          <span class="badge badge-xl bg-tertiary text-white fw-bold rounded-circle">
+                              3
+                          </span>
+                          <span class="flex-grow-1">
+                              <img alt="Illustration : saisie du code OTP." loading="lazy" src="/static/img/otp/etape-3-saisie-validee.svg" width="80"/>
+                          </span>
+                          <span aria-hidden="true" class="badge badge-xl rounded-circle invisible">
+                              3
+                          </span>
+                      </div>
+                      <p class="mb-0">
+                          Je recopie le
+                          <strong>
+                              code à 6 chiffres
+                          </strong>
+                          ci-dessous.
+                      </p>
+                  </div>
               </div>
           </div>
       </div>
@@ -70,12 +138,19 @@
                   <label class="form-label" for="id_otp_token">
                       Entrez le code de validation unique (OTP)
                   </label>
-                  <input aria-describedby="id_otp_token_helptext" autocomplete="one-time-code" autofocus="" class="form-control" id="id_otp_token" maxlength="6" name="otp_token" required="" type="text"/>
+                  <input aria-describedby="id_otp_token_helptext" autocomplete="one-time-code" autofocus="" class="form-control" id="id_otp_token" inputmode="numeric" maxlength="6" name="otp_token" pattern="[0-9]*" placeholder="123456" required="" type="text"/>
                   <div class="form-text" id="id_otp_token_helptext">
                       Code à 6 chiffres généré par votre application mobile ou votre gestionnaire de mot de passe sur votre ordinateur
                   </div>
               </div>
           </fieldset>
+          <p class="mt-2">
+              Vous n’avez plus accès à votre appareil ?
+              <a class="btn-link fw-bold" href="/otp/login-with-backup-code">
+                  Cliquez ici
+              </a>
+              pour utiliser votre code de récupération.
+          </p>
           <div class="row">
               <div class="col-12">
                   <hr class="mb-3"/>

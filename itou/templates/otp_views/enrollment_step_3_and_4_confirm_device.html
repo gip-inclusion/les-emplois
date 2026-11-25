@@ -19,21 +19,9 @@
 
 {% block title_extra %}
     {% if backup_code %}
-        {% component_alert title=title content=content variant="warning" %}
+        {% component_alert title=title variant="warning" %}
             {% fragment as title %}
                 Ne passez pas cette page sans avoir noté votre code de récupération.
-            {% endfragment %}
-            {% fragment as content %}
-                <p>Il est <strong>généré une seule fois</strong> et ne sera plus accessible ensuite.</p>
-                <ul class="mb-0">
-                    <li>Sans lui, <strong>vous ne pourrez plus accéder à votre compte</strong> si vous perdez ou changez votre appareil.</li>
-                    <li>
-                        <strong>Conservez-le dans un endroit sécurisé :</strong> gestionnaire de mots de passe, document imprimé, coffre-fort numérique…
-                    </li>
-                    <li>
-                        Si vous utilisez l’application mobile pour l’authentification forte, <strong>évitez de stocker ce code sur ce même téléphone</strong>, vous risqueriez de tout perdre en même temps.
-                    </li>
-                </ul>
             {% endfragment %}
         {% endcomponent_alert %}
     {% endif %}
@@ -97,7 +85,7 @@
                                             </li>
                                         {% else %}
                                             <li>
-                                                <div>
+                                                <div class="mb-3">
                                                     <p class="mb-1">
                                                         <strong>Copiez ce code dans votre gestionnaire de mot de passe en cliquant sur « + » ou sur « ajouter » :</strong>
                                                     </p>
@@ -111,7 +99,7 @@
                                                         {% endfragment %}
                                                         {% fragment as c_info__detail %}
                                                             <p>
-                                                                Nous vous conseillons d’installer <a href="https://proton.me/fr/authenticator">Proton Authenticator</a>
+                                                                Nous vous conseillons d’installer <a href="https://proton.me/fr/authenticator" class="has-external-link">Proton Authenticator</a>
                                                             </p>
                                                         {% endfragment %}
                                                     {% endcomponent_info %}
@@ -161,6 +149,23 @@
                                 <span>{{ backup_code }}</span>
                                 {% include "includes/copy_to_clipboard.html" with content=backup_code css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
                             </p>
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Ne passez pas cette page sans avoir noté votre code de récupération.
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    <p>Il est <strong>généré une seule fois</strong> et ne sera plus accessible ensuite.</p>
+                                    <ul class="mb-0">
+                                        <li>Sans lui, <strong>vous ne pourrez plus accéder à votre compte</strong> si vous perdez ou changez votre appareil.</li>
+                                        <li>
+                                            <strong>Conservez-le dans un endroit sécurisé :</strong> gestionnaire de mots de passe, document imprimé, coffre-fort numérique…
+                                        </li>
+                                        <li>
+                                            Si vous utilisez l’application mobile pour l’authentification forte, <strong>évitez de stocker ce code sur ce même téléphone</strong>, vous risqueriez de tout perdre en même temps.
+                                        </li>
+                                    </ul>
+                                {% endfragment %}
+                            {% endcomponent_info %}
                             <div class="form-group">
                                 <div class="form-check">
                                     <input type="checkbox" id="confirmation-checkbox" class="form-check-input" required>
