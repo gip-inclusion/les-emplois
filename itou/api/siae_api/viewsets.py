@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import viewsets
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.api.auth import DepartmentTokenAuthentication
@@ -126,7 +126,7 @@ class SiaeViewSet(LoginNotRequiredMixin, ReadonlyViewMixin, viewsets.mixins.List
     ordering = ["id"]
 
     # The authentication is mainly here to have some information on who uses our API
-    authentication_classes = [DepartmentTokenAuthentication, TokenAuthentication, SessionAuthentication]
+    authentication_classes = [DepartmentTokenAuthentication, TokenAuthentication]
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
 

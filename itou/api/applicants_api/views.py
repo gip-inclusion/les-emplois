@@ -16,10 +16,7 @@ from itou.utils.readonly import ReadonlyViewMixin
 
 
 class ApplicantsView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIView):
-    authentication_classes = (
-        authentication.TokenAuthentication,
-        authentication.SessionAuthentication,
-    )
+    authentication_classes = [authentication.TokenAuthentication]
     permission_classes = (ApplicantsAPIPermission,)
     serializer_class = ApplicantSerializer
 

@@ -2,7 +2,7 @@ import logging
 
 from django.db.models.functions import TruncDate
 from rest_framework import mixins, viewsets
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
@@ -29,10 +29,7 @@ class AbstractEmployeeRecordViewSet(
 ):
     throttle_classes = [FailSafeEmployeeRecordRateThrottle]
 
-    # Possible authentication frameworks:
-    # - token auth: for external access / real world use case
-    # - session auth: for dev context and browsable API
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    authentication_classes = [TokenAuthentication]
 
     # Additional / custom permission classes:
     # Enforce the default one (IsAuthenticated)

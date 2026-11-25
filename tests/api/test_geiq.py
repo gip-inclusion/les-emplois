@@ -18,7 +18,7 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import JobSeekerFactory
 
 
 def _api_client():
@@ -66,19 +66,6 @@ def test_candidatures_geiq_token_authentication():
     assert response.json()["count"] == 2
     assert response.json()["results"][0]["siret_employeur"] == "11832575900001"
     assert response.json()["results"][1]["siret_employeur"] == "11832575900037"
-
-
-def test_candidatures_geiq_api_authentication(client):
-    user = ItouStaffFactory(is_superuser=False)
-    client.force_login(user)
-    with transaction.atomic():  # Prevent this failing request from messing with the test's transaction
-        response = client.get(reverse("v1:geiq_jobapplication_list"))
-    assert response.status_code == 403
-
-    user.is_superuser = True
-    user.save()
-    response = client.get(reverse("v1:geiq_jobapplication_list"))
-    assert response.status_code == 200
 
 
 @pytest.mark.parametrize(

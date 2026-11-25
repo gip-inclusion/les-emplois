@@ -663,7 +663,6 @@ SPECTACULAR_SETTINGS = {
     # cf. https://github.com/tfranzel/drf-spectacular/issues/235
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
     "AUTHENTICATION_WHITELIST": [
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
 }

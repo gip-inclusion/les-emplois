@@ -43,10 +43,7 @@ class InvalidSirenError(exceptions.APIException):
 
 
 class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIView):
-    authentication_classes = (
-        GeiqApiAuthentication,
-        authentication.SessionAuthentication,
-    )
+    authentication_classes = [GeiqApiAuthentication]
     permission_classes = (IsSessionAdminOrToken,)
     serializer_class = GeiqJobApplicationSerializer
 
