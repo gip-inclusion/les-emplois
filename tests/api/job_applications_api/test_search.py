@@ -118,12 +118,9 @@ class TestJobApplicationSearchApi:
 
     def test_fuzzy_match_on_control_payload(self, api_client):
         api_client.force_authenticate(ServiceAccount(), self.token)
-        payload = {
-            "nir": "269054958815780",
-            "nom": "DURANT",
-            "prenom": "NATALIE",
-            "date_naissance": "1969-05-12",
-        }
+        payload = dict(**VALID_SEARCH_DATA)
+        payload["prenom"] = "NATALIE"  # missing "H", should match "NATHALIE"
+        payload["nom"] = "DURANT"  # with "T", should match "DURAND" with a "D"
         response = api_client.post(self.ENDPOINT_URL, payload, format="json")
         assert response.status_code == 200
         assert len(response.json()["results"]) == 3
