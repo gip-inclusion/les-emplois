@@ -11,6 +11,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
+    assertFormError,
     assertMessages,
     assertNotContains,
     assertQuerySetEqual,
@@ -252,6 +253,54 @@ def test_change_email(admin_client, caplog):
             emailaddress.verified,
         ),
     )
+
+
+@pytest.mark.parametrize("email_initially_none", [True, False])
+def test_change_other_fields_with_empty_email(admin_client, email_initially_none):
+    # The phone field is not important, it could any other field
+    # but changing a user should be possible despite its missing email
+    NEW_PHONE = "0123456789"
+    email_kwargs = {"email": None} if email_initially_none else {}
+    user = JobSeekerFactory(phone="", **email_kwargs)
+    response = admin_client.post(
+        reverse("admin:users_user_change", kwargs={"object_id": user.pk}),
+        {
+            "username": user.username,
+            "email": "",
+            "last_login_0": "21/02/2025",
+            "last_login_1": "09:46:54",
+            "date_joined_0": "19/02/2025",
+            "date_joined_1": "18:00:47",
+            "initial-date_joined_0": "19/02/2025",
+            "initial-date_joined_1": "18:00:47",
+            "last_checked_at_0": "19/02/2025",
+            "last_checked_at_1": "18:00:47",
+            "initial-last_checked_at_0": "19/02/2025",
+            "initial-last_checked_at_1": "18:00:47",
+            "title": "",
+            "phone": NEW_PHONE,
+            "address_line_1": "",
+            "address_line_2": "",
+            "post_code": "",
+            "department": "",
+            "city": "",
+            "created_by": "",
+            "_save": "Enregistrer",
+            **USER_FORMSETS_PAYLOAD,
+        },
+    )
+    if email_initially_none:
+        assertRedirects(response, reverse("admin:users_user_changelist"))
+        user.refresh_from_db()
+        assert user.email is None
+        assert user.phone == NEW_PHONE
+    else:
+        # You cannot empty the email field
+        assert response.status_code == 200
+        assertFormError(response.context["adminform"], "email", "Ce champ est obligatoire.")
+        user.refresh_from_db()
+        assert user.email is not None
+        assert user.phone != NEW_PHONE
 
 
 @freeze_time("2025-06-16")
