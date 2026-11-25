@@ -86,7 +86,7 @@ def get_s3_client(env):
     )
 
 
-def main(use_case, app=None):
+def main(use_case):
     bucketnames = ()
     match use_case:
         case UseCase.CI_BUCKETS:
@@ -126,4 +126,4 @@ def main(use_case, app=None):
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.use_case, args.app)
+    main(args.use_case)
