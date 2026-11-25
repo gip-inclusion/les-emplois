@@ -87,8 +87,8 @@ update_snapshots: $(VIRTUAL_ENV)
 populate_db_with_reference_data: $(VIRTUAL_ENV)
 	python manage.py populate_db reference
 
-populate_db: populate_db_with_reference_data
-	python manage.py populate_db fixtures dynamic
+populate_db: $(VIRTUAL_ENV)
+	python manage.py populate_db all
 
 # Tests.
 # =============================================================================
