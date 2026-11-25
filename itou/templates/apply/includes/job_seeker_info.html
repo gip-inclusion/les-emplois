@@ -42,7 +42,11 @@
     </li>
     <li>
         <small>Nom de naissance</small>
-        <strong>{{ job_seeker.jobseeker_profile.birth_name|upper|mask_unless:can_view_personal_information }}</strong>
+        {% if can_edit_personal_information and not job_seeker.jobseeker_profile.birth_name %}
+            <i class="text-warning">À renseigner</i>
+        {% else %}
+            <strong>{{ job_seeker.jobseeker_profile.birth_name|upper|mask_unless:can_view_personal_information }}</strong>
+        {% endif %}
     </li>
     <li>
         <small>Nom d’usage</small>

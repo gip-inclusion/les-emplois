@@ -460,8 +460,9 @@
               <small>
                   Nom de naissance
               </small>
-              <strong>
-              </strong>
+              <i class="text-warning">
+                  À renseigner
+              </i>
           </li>
           <li>
               <small>

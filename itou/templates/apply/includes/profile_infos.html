@@ -33,7 +33,11 @@
         </li>
         <li>
             <small>Nom de naissance</small>
-            <strong>{{ profile.birth_name|upper }}</strong>
+            {% if profile.birth_name %}
+                <strong>{{ profile.birth_name|upper }}</strong>
+            {% else %}
+                <i class="text-warning">À renseigner</i>
+            {% endif %}
         </li>
         <li>
             <small>Nom d’usage</small>
