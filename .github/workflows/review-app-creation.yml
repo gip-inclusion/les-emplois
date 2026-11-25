@@ -137,7 +137,7 @@ jobs:
 
     - name: ⏭ Skip fixtures
       run:
-        $CLEVER_CLI env set SKIP_FIXTURES true
+        $CLEVER_CLI env set SKIP_POPULATE_DB true
 
     - name: 💂 Install Python
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
