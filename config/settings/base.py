@@ -975,9 +975,24 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 REDIRECT_TO_NEW_DOMAIN = os.getenv("REDIRECT_TO_NEW_DOMAIN", "False") == "True"
 NEW_DOMAIN = "plateforme.inclusion.gouv.fr"
 
-# Experiment: France Travail agents of these departments can view job applications sent to SIAE of their department,
-# until the end date (inclusive).
-XP_REF_IAE_DEPARTMENTS = ["06", "30", "67", "83", "974"]
+# Experiment: the France Travail agents of XP_REF_IAE_USER_PKS can view job applications sent to SIAE in the
+# departments associated with the department of their agency, until the end date (inclusive).
+XP_REF_IAE_DEPARTMENTS = {
+    "06": ["06"],
+    "13": ["13"],
+    "30": ["30"],
+    "35": ["35"],
+    "67": ["67", "68"],
+    "81": ["12", "81"],
+    "83": ["83"],
+    "84": ["84"],
+    "89": ["89"],
+    "94": ["75", "91", "92", "93", "94", "95"],
+    "974": ["974"],
+    "978": ["971"],
+}
+# Kept as a setting to not let User pks in clear in the code.
+XP_REF_IAE_USER_PKS = json.loads(os.getenv("XP_REF_IAE_USER_PKS", "[]"))
 XP_REF_IAE_END_DATE = datetime.date(2026, 12, 31)
 
 # This API seems to be rarely used (which is understandable) and will soon have to be dropped
