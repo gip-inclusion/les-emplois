@@ -90,7 +90,7 @@
                                                         <strong>Ou copiez la clé de configuration suivante dans l’application (valable une seule fois pour configurer votre appareil) :</strong>
                                                     </p>
                                                     <p>
-                                                        <span>{{ otp_secret }}</span>
+                                                        <span class="fs-lg">{{ otp_secret }}</span>
                                                         {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
                                                     </p>
                                                 </div>
@@ -154,13 +154,20 @@
                     <div class="section__col col-12">
                         <div class="c-form mb-3 mb-md-4">
                             <h2 class="h3">Votre code de récupération à conserver</h2>
-                            <p class="mb-1">
-                                <strong>Code de récupération</strong>
-                            </p>
-                            <p>
-                                <span>{{ backup_code }}</span>
-                                {% include "includes/copy_to_clipboard.html" with content=backup_code css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
-                            </p>
+                            <div class="d-flex flex-wrap align-items-center gap-3 mb-3 mb-md-4">
+                                <span class="fs-ls">{{ backup_code }}</span>
+                                {% include "includes/copy_to_clipboard.html" with content=backup_code css_classes="btn btn-link btn-ico" placement="top" text="Copier mon code" %}
+                                <form method="post"
+                                      action="{% url 'otp_views:enrollment_step_4_print_backup_code' %}"
+                                      target="_blank">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="backup_code" value="{{ backup_code }}">
+                                    <button class="btn btn-link btn-ico" type="submit">
+                                        <i class="ri-printer-line fw-normal" aria-hidden="true"></i>
+                                        <span>Imprimer mon code</span>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="form-group">
                                 <div class="form-check">
                                     <input type="checkbox" id="confirmation-checkbox" class="form-check-input" required>

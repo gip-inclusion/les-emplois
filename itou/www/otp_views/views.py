@@ -275,6 +275,22 @@ def enrollment_step_3_and_4_confirm_device(
     return render(request, template_name, context)
 
 
+@http_methods(db_readonly=["HEAD"], db_write=["POST"])
+@check_user_can_enroll
+def enrollment_step_4_print_backup_code(request, template_name="otp_views/enrollment_step_4_print_backup_code.html"):
+    backup_code = request.POST.get("backup_code")
+    if not backup_code:
+        # should not happen, unless user manipulates the request
+        return HttpResponseRedirect(reverse("otp_views:enrollment_step_1_choose_device_type"))
+
+    context = {
+        "backup_code": backup_code,
+        "now": timezone.now(),
+        "site_url": get_absolute_url()[:-1],  # remove the trailing /
+    }
+    return render(request, template_name, context)
+
+
 @method_decorator(check_user_can_manage_devices, name="dispatch")
 class VerifyOTPView(FormView):
     template_name = "otp_views/verify_otp.html"

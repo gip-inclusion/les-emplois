@@ -101,23 +101,29 @@
                           <h2 class="h3">
                               Votre code de récupération à conserver
                           </h2>
-                          <p class="mb-1">
-                              <strong>
-                                  Code de récupération
-                              </strong>
-                          </p>
-                          <p>
-                              <span>
+                          <div class="d-flex flex-wrap align-items-center gap-3 mb-3 mb-md-4">
+                              <span class="fs-ls">
                                   secret-backup-code
                               </span>
-                              <button class="btn-ico btn-link btn-sm ms-2 py-0" data-bs-placement="right" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="secret-backup-code" type="button">
+                              <button class="btn btn-link btn-ico" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="secret-backup-code" type="button">
                                   <i aria-hidden="true" class="ri-file-copy-line fw-normal">
                                   </i>
                                   <span>
-                                      Copier
+                                      Copier mon code
                                   </span>
                               </button>
-                          </p>
+                              <form action="/otp/enrollment-step-4-print-backup-code" method="post" target="_blank">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <input name="backup_code" type="hidden" value="secret-backup-code"/>
+                                  <button class="btn btn-link btn-ico" type="submit">
+                                      <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                      </i>
+                                      <span>
+                                          Imprimer mon code
+                                      </span>
+                                  </button>
+                              </form>
+                          </div>
                           <div class="form-group">
                               <div class="form-check">
                                   <input class="form-check-input" id="confirmation-checkbox" required="" type="checkbox"/>
@@ -150,6 +156,128 @@
               </div>
           </div>
       </section>
+  </main>
+  
+  '''
+# ---
+# name: TestEnrollmentSteps3And4ConfirmDevice.test_print_backup_code
+  '''
+  <main>
+      <div class="container py-4 px-5">
+          <div class="row justify-content-center d-print-none">
+              <div class="mt-5">
+                  <button aria-label="Imprimer le code de récupération" class="btn btn-primary btn-ico" data-it-action="print" type="button">
+                      <i aria-hidden="true" class="ri-printer-line">
+                      </i>
+                      <span>
+                          Imprimer
+                      </span>
+                  </button>
+              </div>
+          </div>
+          <section class="mt-5">
+              <h1 class="mt-5">
+                  Code de récupération
+              </h1>
+              <p>
+                  Document généré le 11/03/2025 à 16:18
+              </p>
+              <div class="c-box">
+                  <ul class="list-data fs-lg">
+                      <li>
+                          <small>
+                              site :
+                          </small>
+                          <strong>
+                              http://la.plateforme.inc
+                          </strong>
+                      </li>
+                      <li>
+                          <small>
+                              identifiant :
+                          </small>
+                          <strong class="text-break">
+                              james.bond@test.local
+                          </strong>
+                      </li>
+                      <li>
+                          <small>
+                              code de récupération :
+                          </small>
+                          <strong>
+                              secret-backup-code
+                          </strong>
+                      </li>
+                  </ul>
+              </div>
+          </section>
+          <section class="mt-5">
+              <h2>
+                  À quoi sert ce code ?
+              </h2>
+              <p>
+                  Ce code de récupération vous permet de vous connecter à votre compte si vous n'avez plus accès à votre application d'authentification (par exemple, en cas de perte ou de changement de téléphone).
+              </p>
+              <p>
+                  <strong>
+                      Il vous permet de remplacer exceptionnellement le code de validation unique (OTP)
+                  </strong>
+              </p>
+              <p>
+                  <strong>
+                      Important :
+                  </strong>
+                  ce code ne remplace pas votre mot de passe. Vous devrez toujours saisir votre adresse e-mail et votre mot de passe pour vous connecter.
+              </p>
+              <p>
+                  <strong>
+                      Attention : ce code ne peut être utilisé qu'une seule fois !
+                  </strong>
+              </p>
+              <p>
+                  Une fois utilisé, votre code de récupération sera définitivement invalidé. Il vous permettra de retrouver l'accès à votre compte et de configurer une nouvelle application d'authentification sur un appareil.
+              </p>
+              <p>
+                  Un nouveau code de récupération sera alors généré. Pensez à le conserver précieusement pour vos prochains besoins.
+              </p>
+              <p>
+                  <strong>
+                      Comment conserver votre code en toute sécurité ?
+                  </strong>
+              </p>
+              <ul class="list-unstyled">
+                  <li>
+                      Imprimez ce document et conservez-le dans un endroit où vous pourrez facilement y accéder en cas de besoin, comme votre portefeuille.
+                  </li>
+                  <li>
+                      Ne partagez jamais ce code avec une autre personne.
+                  </li>
+                  <li>
+                      Ne le stockez pas au même endroit que l’application qui génère le code.
+                  </li>
+                  <li>
+                      Ne le stockez pas dans un fichier non protégé ou dans un espace accessible à d'autres personnes.
+                  </li>
+              </ul>
+              <p>
+                  <strong>
+                      Ce code est personnel et confidentiel.
+                  </strong>
+                  Toute personne qui le possède pourrait l'utiliser pour franchir la deuxième étape de vérification de votre connexion.
+              </p>
+              <div class="row justify-content-center d-print-none">
+                  <div class="mt-5">
+                      <button aria-label="Imprimer le code de récupération" class="btn btn-primary btn-ico" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line">
+                          </i>
+                          <span>
+                              Imprimer
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </section>
+      </div>
   </main>
   
   '''
