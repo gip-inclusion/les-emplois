@@ -63,6 +63,7 @@ from tests.users.factories import (
     PrescriberFactory,
     ProfessionalFactory,
     UserFactory,
+    random_user_kind_factory,
 )
 from tests.utils.testing import email_tracking_consent_url, normalize_fields_history
 
@@ -519,6 +520,12 @@ class TestModel:
             "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
+
+    def test_clean_doesnt_change_null_email(self):
+        user = random_user_kind_factory(email=None)
+        user.clean()
+        # normalize_email should not set it to ""
+        assert user.email is None
 
     def test_email_already_exists(self):
         JobSeekerFactory(email="foo@bar.com")

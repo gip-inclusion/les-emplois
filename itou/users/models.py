@@ -218,6 +218,12 @@ class UserQuerySet(models.QuerySet):
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
+    @classmethod
+    def normalize_email(cls, email):
+        if email is None:
+            return None
+        return super().normalize_email(email)
+
     def get_duplicated_pole_emploi_ids(self):
         """
         Returns an array of `pole_emploi_id` used more than once:
