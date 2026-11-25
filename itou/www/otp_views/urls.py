@@ -24,7 +24,7 @@ urlpatterns = [
         name="enrollment_step_2_download_app",
     ),
     path(
-        "apps",
+        "enrollment-apps",
         views.enrollment_step_2_download_app_for_phones,
         name="enrollment_step_2_download_app_for_phones",
     ),
