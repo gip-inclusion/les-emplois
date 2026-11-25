@@ -67,11 +67,9 @@ def _request(client, endpoint, job_seeker):
 
 
 USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
-# `birth_name` is not required for two reasons:
-# - it could be empty for "old" users;
-# - even if `birth_name` is populated, `last_name` is always
-#   populated, and callers use either `birth_name` or `last_name`
-#   depending on context.
+# `birth_name` is not required because it is empty for users who
+# registered before the field was added (and were never updated
+# afterwards).
 JOBSEEKER_PROFILE_REQUIRED_FIELDS = ["birthdate", "birth_country", "birth_place"]
 
 

@@ -112,7 +112,7 @@ class _API_PersonSerializer(serializers.Serializer):
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.last_name).upper()
 
-    def get_nomNaissance(self, obj: EmployeeRecord) -> str:
+    def get_nomNaissance(self, obj: EmployeeRecord) -> str | None:
         # See employee_record.serializers._PersonSerializer
         job_seeker = obj.job_application.job_seeker
         return job_seeker.jobseeker_profile.birth_name or None

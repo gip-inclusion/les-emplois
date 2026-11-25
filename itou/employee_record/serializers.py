@@ -59,7 +59,7 @@ class _PersonSerializer(serializers.Serializer):
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.last_name).upper()
 
-    def get_nomNaissance(self, obj: EmployeeRecord) -> str:
+    def get_nomNaissance(self, obj: EmployeeRecord) -> str | None:
         job_seeker = obj.job_application.job_seeker
         # ASP probably expects us to return `None`, not an empty
         # string, if birth name is unknown.

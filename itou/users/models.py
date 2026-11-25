@@ -339,7 +339,7 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     Notes about last name and birth name:
 
     - For job seekers: ``User.last name`` is the "nom d'usage";
-      ``JobSeekerProfile.birth_name`` is the "nom de naissance.  The
+      ``JobSeekerProfile.birth_name`` is the "nom de naissance".  The
       ``last_name`` is never empty: it's either the same as
       ``birth_name``, or a different name (for example after a
       marriage).
@@ -962,7 +962,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
 
     Instead of augmenting the 'User' model, additional data is collected in a "profile" object.
 
-    This user profile has 2 main parts:
+    This user profile has the following parts:
 
     1 - Job seeker birth name
 

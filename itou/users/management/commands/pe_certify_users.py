@@ -109,7 +109,7 @@ class Command(BaseCommand):
                         # the last name was actually the first name,
                         # and the first name was actually the _birth_
                         # name. The last name being unknown, we set it
-                        # as the birth name as well.
+                        # to the birth name as well.
                         clear_last_name = not user.jobseeker_profile.birth_name
                         user.jobseeker_profile.birth_name, user.first_name = (
                             user.first_name,

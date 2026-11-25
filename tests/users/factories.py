@@ -3,7 +3,6 @@ import random
 import string
 
 import factory.fuzzy
-import faker
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -36,8 +35,6 @@ from tests.utils.factory_boy import AutoNowOverrideMixin
 DEFAULT_PASSWORD = "$up3rP4ssw0rd!*****"
 HASHED_DEFAULT_PASSWORD = make_password(DEFAULT_PASSWORD)
 UNUSABLE_PASSWORD = make_password(None)
-
-fake = faker.Faker("fr_FR")
 
 
 def default_password(obj):

@@ -464,9 +464,10 @@ class TestFranceConnect:
         response = answer_email_tracking_consent(client, response)
         assertRedirects(response, reverse("dashboard:edit_user_info"))
         assert User.objects.count() == 1
-        user = User.objects.get(email=FC_USERINFO["email"])
+        user = User.objects.select_related("jobseeker_profile").get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
         assert user.last_name == FC_USERINFO["preferred_username"]
+        assert user.jobseeker_profile.birth_name == FC_USERINFO["family_name"]
         assert user.username == FC_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT

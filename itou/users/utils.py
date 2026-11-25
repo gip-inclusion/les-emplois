@@ -192,7 +192,6 @@ def refresh_rsa_certification(job_seeker: User) -> None:
 
 
 def guess_last_name(last_name, birth_name, mode: GuessLastNameMode):
-    """Used by forms to populate the form and the User object."""
     if mode == GuessLastNameMode.BEFORE_DISPLAY:
         # When displaying the edit form, empty the last name field
         # unless it's different from the birth_name.

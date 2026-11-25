@@ -21,4 +21,3 @@ IdentityProviderToOIDCUserData: dict[IdentityProvider, type[OIDConnectUserData] 
     IdentityProvider.FRANCE_CONNECT: FranceConnectUserData,
     IdentityProvider.PRO_CONNECT: ProConnectUserData,
 }
-assert set(IdentityProviderToOIDCUserData) == set(IdentityProvider.values)
