@@ -127,8 +127,6 @@ ASSERT_SNAPSHOT_QUERIES_EXTRA_PACKAGES_ALLOWLIST = [
 GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
-XP_REF_IAE_DEPARTMENTS = []
-
 # Inbound parsing
 # ------------------------------------------------------------------------------
 INBOUND_PARSING_SUBDOMAIN = "reply.inclusion.test.fr"
