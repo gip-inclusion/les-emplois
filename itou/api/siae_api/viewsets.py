@@ -93,7 +93,7 @@ class CompanyFilterSet(FilterSet):
         if distance and code_insee:
             try:
                 city = City.objects.get(code_insee=code_insee)
-                return filtered_queryset.within(city.coords, distance)
+                return filtered_queryset.within_city(city, distance)
             except City.DoesNotExist:
                 # Ensure the error comes from a missing city, which may not be that clear
                 # with get_object_or_404
@@ -111,8 +111,8 @@ class SiaeViewSet(LoginNotRequiredMixin, ReadonlyViewMixin, viewsets.mixins.List
     """
     # Liste des structures
 
-    La plateforme renvoie une liste de structures à proximité d’une ville (déterminée par son code INSEE)
-    et dans un rayon de recherche en kilomètres autour du centre de cette ville.
+    La plateforme renvoie une liste de structures situées dans une ville (déterminée par son code INSEE)
+    ou dans un rayon de recherche en kilomètres autour du centre de cette ville.
 
     Les coordonnées des centres-villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
 

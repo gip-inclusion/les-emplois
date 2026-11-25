@@ -57,11 +57,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -194,11 +195,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
@@ -292,7 +294,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
         ''',
       }),
@@ -385,11 +388,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -522,11 +526,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
@@ -620,7 +625,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
         ''',
       }),
@@ -741,7 +747,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
@@ -772,7 +779,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
         ''',
@@ -807,11 +815,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -939,7 +948,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
           ORDER BY 40 DESC,
@@ -1071,7 +1081,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND (V0."insee_city_id" = %s
+                                OR ST_DWithin(V0."coords", %s, %s))
                            AND V0."is_searchable"
                            AND V0."id" = %s))
                  AND "companies_jobdescription"."is_active"
@@ -1171,7 +1182,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
@@ -1202,7 +1214,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
         ''',
       }),
@@ -1236,11 +1249,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -1368,7 +1382,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY 40 DESC,
                    39 DESC,
@@ -1499,7 +1514,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND (V0."insee_city_id" = %s
+                                OR ST_DWithin(V0."coords", %s, %s))
                            AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,
@@ -1600,7 +1616,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
@@ -1631,7 +1648,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
         ''',
       }),
@@ -1665,11 +1683,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -1797,7 +1816,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY 40 DESC,
                    39 DESC,
@@ -1928,7 +1948,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND (V0."insee_city_id" = %s
+                                OR ST_DWithin(V0."coords", %s, %s))
                            AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,
@@ -2063,7 +2084,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
@@ -2094,7 +2116,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
         ''',
       }),
@@ -2128,11 +2151,12 @@
                                           AND U0."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
-                 AND ((ST_DWithin("cities_city"."coords", %s, %s)
-                       AND "companies_jobdescription"."location_id" IS NOT NULL)
-                      OR (ST_DWithin("companies_company"."coords", %s, %s)
-                          AND "companies_company"."coords" IS NOT NULL
-                          AND "companies_jobdescription"."location_id" IS NULL))
+                 AND (("companies_jobdescription"."location_id" IS NOT NULL
+                       AND ("companies_jobdescription"."location_id" = %s
+                            OR ST_DWithin("cities_city"."coords", %s, %s)))
+                      OR ("companies_jobdescription"."location_id" IS NULL
+                          AND ("companies_company"."insee_city_id" = %s
+                               OR ST_DWithin("companies_company"."coords", %s, %s))))
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
@@ -2260,7 +2284,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND ("companies_company"."insee_city_id" = %s
+                      OR ST_DWithin("companies_company"."coords", %s, %s))
                  AND "companies_company"."is_searchable")
           ORDER BY 40 DESC,
                    39 DESC,
@@ -2391,7 +2416,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND (V0."insee_city_id" = %s
+                                OR ST_DWithin(V0."coords", %s, %s))
                            AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,

@@ -16,7 +16,7 @@ from django.db.models.functions import Cast, Coalesce, Greatest
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.common_apps.address.models import AddressMixin
+from itou.common_apps.address.models import AddressMixin, AddressQuerySet
 from itou.common_apps.organizations.models import (
     MEMBERSHIP_FUNCTION_MAX_LENGTH,
     MembershipAbstract,
@@ -47,7 +47,7 @@ from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
-class CompanyQuerySet(OrganizationQuerySet):
+class CompanyQuerySet(AddressQuerySet, OrganizationQuerySet):
     @property
     def active_lookup(self):
         # Prefer a sub query to a join for performance reasons.
@@ -92,9 +92,6 @@ class CompanyQuerySet(OrganizationQuerySet):
             # Include siaes experiencing their grace period.
             | Q(has_convention_in_grace_period=True)
         )
-
-    def within(self, point, distance_km):
-        return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
     def with_count_recent_received_job_apps(self):
         """
@@ -753,13 +750,15 @@ class JobDescriptionQuerySet(models.QuerySet):
         )
         return self.annotate(is_siae_active=Exists(subquery)).filter(is_active=True, is_siae_active=True)
 
-    def within(self, point, distance_km):
+    def within_city(self, city, distance_km):
         return self.filter(
-            Q(location__isnull=False, location__coords__dwithin=(point, D(km=distance_km)))
-            | Q(
-                location__isnull=True,
-                company__coords__isnull=False,
-                company__coords__dwithin=(point, D(km=distance_km)),
+            (
+                Q(location__isnull=False)
+                & (Q(location=city) | Q(location__coords__dwithin=(city.coords, D(km=distance_km))))
+            )
+            | (
+                Q(location__isnull=True)
+                & (Q(company__insee_city=city) | Q(company__coords__dwithin=(city.coords, D(km=distance_km))))
             )
         )
 

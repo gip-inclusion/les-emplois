@@ -132,13 +132,13 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ReadonlyViewMixin, ApplyForJ
 
         siaes = (
             Company.objects.active()
-            .within(city.coords, distance)
+            .within_city(city, distance)
             .filter(is_searchable=True)
             .annotate(distance=Distance("coords", city.coords) / 1000)
         )
         job_descriptions = (
             JobDescription.objects.active()
-            .within(city.coords, distance)
+            .within_city(city, distance)
             .select_related("company", "location", "appellation")
             .filter(company__is_searchable=True)
             .exclude(company__block_job_applications=True)
@@ -371,7 +371,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         if category:
             prescriber_orgs = prescriber_orgs.filter(kind__in=kinds_for_category(category))
         prescriber_orgs = (
-            prescriber_orgs.within(city.coords, distance)
+            prescriber_orgs.within_city(city, distance)
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")
         )

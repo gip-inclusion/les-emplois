@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -106,6 +107,11 @@ def geolocate_qs(qs, is_verbose=False):
             obj.ban_api_resolved_address = geo_result["result_label"]
             obj.geocoding_updated_at = now
             yield obj
+
+
+class AddressQuerySet(models.QuerySet):
+    def within_city(self, city, distance_km):
+        return self.filter(Q(insee_city=city) | Q(coords__dwithin=(city.coords, D(km=distance_km))))
 
 
 class AddressMixin(models.Model):

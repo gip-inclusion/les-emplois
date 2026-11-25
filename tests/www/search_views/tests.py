@@ -610,6 +610,31 @@ class TestSearchCompany:
         response = client.get(self.URL, {"city": "something\x00whatever"})
         assertContains(response, "Aucun résultat avec les filtres actuels.")
 
+    def test_find_matching_city_despite_distance(self, client):
+        city = create_city_vannes()
+        search = {"city": city.slug, "distance": 25}
+        company = CompanyFactory(
+            department="56",
+            coords=city.coords,
+            post_code="56760",
+            kind=CompanyKind.AI,
+            insee_city=None,
+        )
+        # Now move the city center a lot to simulate large commune like Maripasoula
+        city.coords = Point(0, 0)
+        city.save(update_fields={"coords"})
+        company_marker = f"<h3>{company.display_name}</h3>"
+        # If the company is not linked to the city it cannot be found
+        response = client.get(self.URL, search)
+        assertNotContains(response, company_marker)
+
+        # When linked to the city it should be findable despite its coords being more than 25 km away
+        # from the city center
+        company.insee_city = city
+        company.save(update_fields={"insee_city", "updated_at"})
+        response = client.get(self.URL, search)
+        assertContains(response, company_marker)
+
 
 class TestSearchPrescriber:
     def test_home_anonymous(self, client, settings, snapshot):
@@ -803,6 +828,31 @@ class TestSearchPrescriber:
         response = client.get(url)
         assertContains(response, f"<h3>{searchable_org.display_name}</h3>")
         assertNotContains(response, f"<h3>{unsearchable_org.display_name}</h3>")
+
+    def test_find_matching_city_despite_distance(self, client):
+        city = create_city_vannes()
+        url = reverse("search:prescribers_results", query={"city": city.slug, "distance": 25})
+        searchable_org = PrescriberOrganizationFactory(
+            department="44",
+            coords=city.coords,
+            post_code="44117",
+            authorized=True,
+            insee_city=None,
+        )
+        # Now move the city center a lot to simulate large commune like Maripasoula
+        city.coords = Point(0, 0)
+        city.save(update_fields={"coords"})
+        organization_marker = f"<h3>{searchable_org.display_name}</h3>"
+        # If the organization is not linked to the city it cannot be found
+        response = client.get(url)
+        assertNotContains(response, organization_marker)
+
+        # When linked to the city it should be findable despite its coords being more than 25 km away
+        # from the city center
+        searchable_org.insee_city = city
+        searchable_org.save(update_fields={"insee_city", "updated_at"})
+        response = client.get(url)
+        assertContains(response, organization_marker)
 
 
 class TestJobDescriptionSearchView:
@@ -1686,6 +1736,42 @@ class TestJobDescriptionSearchView:
             "<span>Effacer tout</span></a>"
         )
         assertContains(response, reset_button, html=True)
+
+    @pytest.mark.parametrize("city_link", ["company", "job_description"])
+    def test_find_matching_city_despite_distance(self, client, city_link):
+        create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
+        city = create_city_vannes()
+        search = {"city": city.slug, "distance": 25}
+        company = CompanyFactory(
+            department="56",
+            coords=city.coords,
+            post_code="56760",
+            kind=CompanyKind.AI,
+            insee_city=None,
+        )
+        job_description = JobDescriptionFactory(company=company, location=None)
+        # Now move the city center a lot to simulate large commune like Maripasoula
+        city.coords = Point(0, 0)
+        city.save(update_fields={"coords"})
+        company_marker = f"<span>{company.kind} - {company.display_name}</span>"
+        # If the company/job is not linked to the city it cannot be found
+        response = client.get(self.URL, search)
+        assertNotContains(response, company_marker)
+
+        # When linked to the city it should be findable despite its coords being more than 25 km away
+        # from the city center
+        match city_link:
+            case "company":
+                company.insee_city = city
+                company.save(update_fields={"insee_city", "updated_at"})
+            case "job_description":
+                job_description.location = city
+                job_description.save(update_fields={"location", "updated_at"})
+            case _:
+                raise ValueError("Unexpected value")
+
+        response = client.get(self.URL, search)
+        assertContains(response, company_marker)
 
 
 class TestSearchWithoutCity:

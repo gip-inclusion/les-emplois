@@ -2,6 +2,18 @@
 CHANGELOG = """
 # Changelog
 
+## 2026-11-25
+
+- endpoint `siaes_list` :
+
+  Quand un `code_insee` est fourni, toutes les entreprises situées dans la
+  ville correspondante sont renvoyées, indépendamment de `distance_max_km`.
+  Si des entreprises se situent dans une autre ville à moins de
+  `distance_max_km` du barycentre de la ville correspondant au `code_insee`
+  elles sont toujours renvoyées.
+  Le comportement change donc uniquement pour les entreprises situées dans
+  la ville recherchée mais situées à plus de `distance_max_km` du barycentre.
+
 ## 2026-07-09
 
 - endpoints `employee-records` et `employee-record-notifications` :
