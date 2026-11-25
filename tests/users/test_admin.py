@@ -104,7 +104,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "assessmenttransitionlog",  # AssessmentTransitionLog.user
         "auth_token",  # rest_framework.authtoken.models.Token.user
         "authorization_status_set",  # PrescriberOrganization.authorization_updated_by
-        "contracts",  # Contract.job_seeker
         "company",  # Company.members
         "created_assessments",  # Assessment.created_by
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
