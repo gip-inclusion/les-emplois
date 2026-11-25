@@ -63,22 +63,6 @@ class TestEmployeeRecordAPIPermissions:
         # Result list exists, but user is not member of any SIAE
         assert response.status_code == 403
 
-    def test_permission_ok_with_session(self, api_client):
-        """
-        A session authentication is valid to use the API (same security level as token)
-        => Allows testing in DEV context
-        """
-        api_client.force_login(self.user)
-
-        response = api_client.get(self.endpoint_url, format="json")
-        assert response.status_code == 200
-
-    def test_permission_ko_with_session(self, api_client):
-        api_client.force_login(self.unauthorized_user)
-
-        response = api_client.get(self.endpoint_url, format="json")
-        assert response.status_code == 403
-
 
 class TestEmployeeRecordAPIFetchList:
     endpoint_url = reverse("v1:employee-records-list")
@@ -102,7 +86,7 @@ class TestEmployeeRecordAPIFetchList:
             side_effect=mock_get_geocoding_data,
         )
         # Using session auth (same as token but less steps)
-        api_client.force_login(self.employer)
+        api_client.force_authenticate(self.employer)
 
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
@@ -182,13 +166,13 @@ class TestEmployeeRecordAPIFetchList:
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.ready()
 
-        api_client.force_login(self.employer)
+        api_client.force_authenticate(self.employer)
         response = api_client.get(self.endpoint_url + "?status=READY", format="json")
         assert response.status_code == 200
         assert response.data["count"] == 1
 
     def test_fetch_employee_record_list_query_count(self, api_client, snapshot):
-        api_client.force_login(self.employer)
+        api_client.force_authenticate(self.employer)
 
         with assertSnapshotQueries(snapshot):
             api_client.get(self.endpoint_url, data={"status": list(Status)}, format="json")
@@ -201,7 +185,7 @@ class TestEmployeeRecordAPIFetchList:
         # BUGFIX:
         # Test that employee phone number and email address are passed
         # to API serializer.
-        api_client.force_login(self.employer)
+        api_client.force_authenticate(self.employer)
 
         response = api_client.get(self.endpoint_url + "?status=READY", format="json")
         assert response.status_code == 200
@@ -215,7 +199,7 @@ class TestEmployeeRecordAPIFetchList:
 
     def test_salarieLangueFrancaise(self, api_client, caplog):
         # Test use of `X-API-salarieLangueFrancaise-like-asp`.
-        api_client.force_login(self.employer)
+        api_client.force_authenticate(self.employer)
 
         # Force value to True to avoid depending on factory.
         profile = self.employee_record.job_application.job_seeker.jobseeker_profile
@@ -258,7 +242,7 @@ class TestEmployeeRecordAPIParameters:
         employee_record.ready()
 
         member = employee_record.job_application.to_company.members.first()
-        api_client.force_login(member)
+        api_client.force_authenticate(member)
 
         response = api_client.get(self.endpoint_url + "?status=READY", format="json")
 
@@ -292,7 +276,7 @@ class TestEmployeeRecordAPIParameters:
         employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         member = employee_record.job_application.to_company.members.first()
-        api_client.force_login(member)
+        api_client.force_authenticate(member)
         response = api_client.get(self.endpoint_url + "?status=READY", format="json")
         assert response.status_code == 200
 
@@ -326,7 +310,7 @@ class TestEmployeeRecordAPIParameters:
         yesterday_param = f"{today - relativedelta(days=1):%Y-%m-%d}"
 
         member = employee_record.job_application.to_company.members.first()
-        api_client.force_login(member)
+        api_client.force_authenticate(member)
         response = api_client.get(self.endpoint_url + f"?created={today_param}", format="json")
         assert response.status_code == 200
 
@@ -368,7 +352,7 @@ class TestEmployeeRecordAPIParameters:
 
         member = employee_record_1.job_application.to_company.members.first()
 
-        api_client.force_login(member)
+        api_client.force_authenticate(member)
         response = api_client.get(self.endpoint_url + f"?since={today}", format="json")
         assert response.status_code == 200
 
@@ -412,7 +396,7 @@ class TestEmployeeRecordAPIParameters:
 
         member = employee_record_1.job_application.to_company.members.first()
 
-        api_client.force_login(member)
+        api_client.force_authenticate(member)
         response = api_client.get(self.endpoint_url + "?status=NEW", format="json")
         assert response.status_code == 200
 
