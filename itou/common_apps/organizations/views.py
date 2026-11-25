@@ -4,14 +4,13 @@ Functions used in organization views.
 
 import logging
 
-from allauth.account.views import redirect
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.forms.boundfield import format_html
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 
