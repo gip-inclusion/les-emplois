@@ -522,6 +522,11 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                     ~models.Q(is_staff=True, is_active=True) | models.Q(email__endswith="@inclusion.gouv.fr")
                 ),
             ),
+            models.CheckConstraint(
+                name="no_empty_string_email",
+                violation_error_message="L’email ne doit pas être vide.",
+                condition=~models.Q(email=""),
+            ),
         ]
         permissions = [
             ("hijack", "Can impersonate (hijack) other accounts"),

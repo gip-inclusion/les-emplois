@@ -1355,6 +1355,14 @@ def test_user_invalid_kind():
         UserFactory(kind="")
 
 
+def test_user_disallowed_empty_email():
+    with pytest.raises(
+        ValidationError,
+        match="L’email ne doit pas être vide.",
+    ):
+        random_user_kind_factory(email="")
+
+
 @pytest.mark.parametrize(
     "user_kind,profile_expected",
     [(UserKind.JOB_SEEKER, True), (UserKind.PROFESSIONAL, False)],
