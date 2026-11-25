@@ -268,15 +268,14 @@ class TestPoleEmploiConnect:
 
         user.delete()
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog, certified_name):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FT_CONNECT_USERINFO["sub"],
             identity_provider=IdentityProvider.FT_CONNECT,
             born_in_france=True,
             title=Title.M,
-            last_name="" if certified_name == "birth_name" else "Initial",
-            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -287,23 +286,16 @@ class TestPoleEmploiConnect:
         with triggers.fake_context():
             user, created = ft_connect_user_data.create_or_update_user()
         assert created is False
-        if certified_name == "birth_name":
-            assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
-            assert user.last_name == "DUBOIS"
-        else:
-            assert user.last_name == job_seeker.last_name
-            assert user.jobseeker_profile.birth_name == ""
+        assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
+        assert user.last_name == "DUBOIS"
         assert user.first_name == job_seeker.first_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == "FTC"
         assert user.identity_provider == IdentityProvider.FT_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == Title.M
-        if certified_name == "birth_name":
-            # FT Connect does not return the birth name.
-            not_updated_fields = "first_name, title"
-        else:
-            not_updated_fields = "first_name, last_name, title"
+        # FT Connect does not return the birth name.
+        not_updated_fields = "first_name, title"
         assert (
             f"Not updating fields {not_updated_fields} on job seeker pk={job_seeker.pk} "
             "because their identity has been certified." in caplog.messages

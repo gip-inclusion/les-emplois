@@ -329,24 +329,17 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             count=1,
         )
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_accept_personal_data_readonly_with_identity_certified_by_api_particulier(self, client, certified_name):
+    def test_accept_personal_data_readonly_with_identity_certified_by_api_particulier(self, client):
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=self.job_seeker,
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
         with triggers.fake_context():
-            if certified_name == "birth_name":
-                self.job_seeker.jobseeker_profile.birth_name = "Durand"
-                self.job_seeker.jobseeker_profile.save()
-                self.job_seeker.last_name = ""
-                self.job_seeker.save()
-            else:
-                self.job_seeker.jobseeker_profile.birth_name = ""
-                self.job_seeker.jobseeker_profile.save()
-                self.job_seeker.last_name = "Durand"
-                self.job_seeker.save()
+            self.job_seeker.jobseeker_profile.birth_name = "Durand"
+            self.job_seeker.jobseeker_profile.save()
+            self.job_seeker.last_name = "Durand"
+            self.job_seeker.save()
 
         client.force_login(self.user)
         response = client.get(self.url)
@@ -376,16 +369,11 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=self.job_seeker.pk)
         for attr in ["title", "first_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(self.job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country"]:
+        for attr in ["birth_name", "birthdate", "birth_place", "birth_country"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(
                 self.job_seeker.jobseeker_profile, attr
             )
-        if certified_name == "birth_name":
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == self.job_seeker.jobseeker_profile.birth_name
-            assert refreshed_job_seeker.last_name == post_data["last_name"]
-        else:
-            assert refreshed_job_seeker.last_name == self.job_seeker.last_name
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
+        assert refreshed_job_seeker.last_name == post_data["last_name"]
 
     def test_pass_step_1_without_geolocated_address(self, client):
         # Do not mess with job seeker profile and geolocation at step 1

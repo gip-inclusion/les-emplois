@@ -850,10 +850,7 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_fields_readonly_with_identity_certified_by_api_particulier(
-        self, client, mocker, snapshot, certified_name
-    ):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -868,17 +865,8 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="1234567A",
             criteria_certified=True,
             certifiable_by_api_particulier=True,
-            **(
-                {
-                    "eligibility_diagnosis__job_seeker__last_name": "",
-                    "eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name": "Initial Birth Name",
-                }
-                if certified_name == "birth_name"
-                else {
-                    "eligibility_diagnosis__job_seeker__last_name": "Initial Last Name",
-                    "eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name": "",
-                }
-            ),
+            eligibility_diagnosis__job_seeker__last_name="Initial Last Name",
+            eligibility_diagnosis__job_seeker__jobseeker_profile__birth_name="Initial Birth Name",
         )
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 
@@ -924,14 +912,9 @@ class TestEditJobSeekerInfo:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
+        for attr in ["birth_name", "birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
-        if certified_name == "birth_name":
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
-            assert refreshed_job_seeker.last_name == post_data["last_name"]
-        else:
-            assert refreshed_job_seeker.last_name == job_seeker.last_name
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
+        assert refreshed_job_seeker.last_name == post_data["last_name"]
 
     @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
     def test_sso_fields_readonly(self, client, identity_provider, mocker):

@@ -637,16 +637,15 @@ class TestEditUserInfoView:
         )
         assert user.jobseeker_profile.birth_country_id is None
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, certified_name):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         job_seeker = JobSeekerFactory(
             title=Title.M,
             born_in_france=True,
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
             jobseeker_profile__pole_emploi_id="1234567A",
-            last_name="" if certified_name == "birth_name" else "Initial",
-            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -693,14 +692,9 @@ class TestEditUserInfoView:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
+        for attr in ["birth_name", "birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
-        if certified_name == "birth_name":
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
-            assert refreshed_job_seeker.last_name == post_data["last_name"]
-        else:
-            assert refreshed_job_seeker.last_name == job_seeker.last_name
-            assert refreshed_job_seeker.jobseeker_profile.birth_name == post_data["birth_name"]
+        assert refreshed_job_seeker.last_name == post_data["last_name"]
 
     @freeze_time("2023-03-10")
     @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])

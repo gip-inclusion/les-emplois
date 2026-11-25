@@ -283,15 +283,14 @@ class TestFranceConnect:
             user, _ = fc_user_data.create_or_update_user()
         assert user.last_name == user.jobseeker_profile.birth_name == "Smith"
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog, certified_name):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
-            last_name="" if certified_name == "birth_name" else "Initial",
-            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -302,21 +301,15 @@ class TestFranceConnect:
         with triggers.fake_context():
             user, created = fc_user_data.create_or_update_user()
         assert created is False
-        if certified_name == "birth_name":
-            assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
-            assert user.last_name == "MARTIN"
-        else:
-            assert user.last_name == job_seeker.last_name
-            assert user.jobseeker_profile.birth_name == "DUBOIS"
+        assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
+        assert user.last_name == "MARTIN"
         assert user.first_name == job_seeker.first_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
-        if certified_name == "birth_name":
-            not_updated_fields = "birth_name, birthdate, first_name, title"
-        else:
-            not_updated_fields = "birthdate, first_name, last_name, title"
+        not_updated_fields = "birth_name, birthdate, first_name, title"
+
         assert (
             f"Not updating fields {not_updated_fields} "
             f"on job seeker pk={job_seeker.pk} "

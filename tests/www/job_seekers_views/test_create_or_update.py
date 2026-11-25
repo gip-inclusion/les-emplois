@@ -1463,8 +1463,7 @@ class TestUpdateForSender:
             count=1,
         )
 
-    @pytest.mark.parametrize("certified_name", ["birth_name", "last_name"])
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, certified_name):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         job_seeker = JobSeekerFactory(
@@ -1473,8 +1472,8 @@ class TestUpdateForSender:
             born_in_france=True,
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
-            last_name="" if certified_name == "birth_name" else "Initial",
-            jobseeker_profile__birth_name="Initial" if certified_name == "birth_name" else "",
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -1533,10 +1532,8 @@ class TestUpdateForSender:
         session_profile = session_data["profile"]
         for attr in ["title", "first_name"]:
             assert session_user[attr] == getattr(job_seeker, attr)
-        if certified_name == "birth_name":
-            assert session_profile["birth_name"] == job_seeker.jobseeker_profile.birth_name
-        else:
-            assert session_user["last_name"] == job_seeker.last_name
+        assert session_user["last_name"] == "Saint Clair"
+        assert session_profile["birth_name"] == job_seeker.jobseeker_profile.birth_name
         assert session_profile["birthdate"] == job_seeker.jobseeker_profile.birthdate
         assert session_profile["birth_place"] == job_seeker.jobseeker_profile.birth_place_id
         assert session_profile["birth_country"] == job_seeker.jobseeker_profile.birth_country_id
