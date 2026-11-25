@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load markdownify %}
 
 {% block title %}API {% brand "de" %}{% endblock %}
 
@@ -32,6 +33,12 @@
                     <p>
                         <a href="{% url 'v1:documentation' %}" class="btn btn-primary">Ouvrir la documentation</a>
                     </p>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h2>Changelog</h2>
+                    {{ changelog|markdownify:"api_changelog" }}
                 </div>
             </div>
         </div>

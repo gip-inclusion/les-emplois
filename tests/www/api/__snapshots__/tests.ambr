@@ -1,0 +1,103 @@
+# serializer version: 1
+# name: test_index
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 p-3">
+                  <h1 class="h1-hero-c1">
+                      API de La plateforme de l’inclusion
+                  </h1>
+                  <p>
+                      L'API de La plateforme de l’inclusion met à disposition des données de la plateforme.
+                  </p>
+                  <p>
+                      Cette documentation est générée automatiquement à partir du code.
+                  </p>
+              </div>
+          </div>
+          <div class="c-info mb-3">
+              <span class="c-info__summary">
+                  Comment utiliser cette API ?
+              </span>
+              <div class="c-info__detail">
+                  L’accès à certaines ressources peut nécessiter une authentification avec des droits particuliers (voir la documentation de chaque ressource ci-dessous).
+                  <br/>
+                  Si vous désirez obtenir de l’aide pour utiliser l’API, merci de
+                  <a aria-label="Nous contacter par e-mail" class="fw-bold text-decoration-none stretched-link" href="mailto:api.emplois@inclusion.gouv.fr">
+                      nous contacter
+                  </a>
+                  <i aria-hidden="true" class="ri-external-link-line">
+                  </i>
+                  .
+              </div>
+          </div>
+          <div class="row mt-5">
+              <div class="col-md-12">
+                  <p>
+                      <a class="btn btn-primary" href="/api/v1/documentation/">
+                          Ouvrir la documentation
+                      </a>
+                  </p>
+              </div>
+          </div>
+          <div class="row mt-5">
+              <div class="col-md-12">
+                  <h2>
+                      Changelog
+                  </h2>
+                  <h3>
+                      2026-07-09
+                  </h3>
+                  <ul>
+                      <li>
+                          <p>
+                              endpoints
+                              <code>
+                                  employee-records
+                              </code>
+                              : champ
+                              <code>
+                                  salarieLangueFrancaise
+                              </code>
+                          </p>
+                          <p>
+                              À partir du 09/07/2026, la signification du champ
+                              <code>
+                                  salarieLangueFrancaise
+                              </code>
+                              peut être inversée avec l'en-tête HTTP
+                              <code>
+                                  X-API-salarieLangueFrancaise-like-asp
+                              </code>
+                              .
+                          </p>
+                          <p>
+                              Entre le 01/01/2027 et le 15/01/2027, l'inversion du champ deviendra définitive, que l'en-tête HTTP soit présent ou non.
+                          </p>
+                          <p>
+                              <strong>
+                                  Les clients doivent être mis à jour avant le 01/01/2027
+                              </strong>
+                              pour éviter un changement incompatible.
+                          </p>
+                          <p>
+                              Cf. la note sur le champ
+                              <code>
+                                  salarieLangueFrancaise
+                              </code>
+                              dans la
+                              <a href="/api/v1/documentation/#tag/employee-records">
+                                  documentation de l'API fiches salarié
+                              </a>
+                              pour plus de détails.
+                          </p>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
