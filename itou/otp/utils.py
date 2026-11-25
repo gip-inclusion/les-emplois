@@ -8,6 +8,9 @@ from itou.prescribers.models import PrescriberMembership
 
 FAKE_DEVICE_MODEL = "fake-for-external-totp-device"
 STATIC_DEVICE_BACKUP_CODE_NAME = "backup-code"
+# Session variable containing the name of the device the user just enrolled when enabling 2FA. Used to display a
+# one-time dismissable alert on the dashboard.
+JUST_ENROLLED_DEVICE_NAME_SESSION_KEY = "otp_just_enrolled_device_name"
 
 
 def get_user_devices(user):

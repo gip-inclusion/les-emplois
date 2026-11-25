@@ -15,6 +15,26 @@
     {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     {{ block.super }}
 
+    {% if just_enrolled_otp_device_name %}
+        {% component_alert title=title content=content call_to_action=call_to_action variant="info" custom_icon="ri-error-warning-line" dismissible_once=True extra_id=just_enrolled_otp_alert_id extra_classes="mb-3" %}
+            {% fragment as title %}
+                La double authentification est activée
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Un code généré par l’application de votre appareil «&nbsp;{{ just_enrolled_otp_device_name }}&nbsp;» vous sera désormais demandé à chaque connexion.
+                    Nous vous conseillons de vous reconnecter afin de vous familiariser avec cette procédure.
+                </p>
+            {% endfragment %}
+            {% fragment as call_to_action %}
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary">Déconnexion</button>
+                </form>
+            {% endfragment %}
+        {% endcomponent_alert %}
+    {% endif %}
+
     {% if request.from_employer and request.current_organization and not request.current_organization.jobs.exists %}
         {% component_alert content=content variant="warning" dismissible=True %}
             {% fragment as content %}
