@@ -67,6 +67,12 @@ ENROLLMENT_URL_NAMES = [
 ]
 
 
+@pytest.fixture()
+def require_mfa_for_pros(settings):
+    settings.REQUIRE_MFA_FOR_PROS = True
+    settings.REQUIRE_MFA_FOR_PROS_BATCH = 10  # target 100% of pros
+
+
 class TestPermissions:
     """Pages of the OTP section are hidden (404) from users for whom our own 2FA is not
     required: job seekers, users of an organization that is not in the allowlist, and users
@@ -83,8 +89,8 @@ class TestPermissions:
         assert response.status_code == 404
 
     @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
-    def test_visible_for_a_concerned_user_with_a_device(self, client, settings, url_name):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    @pytest.mark.usefixtures("require_mfa_for_pros")
+    def test_visible_for_a_concerned_user_with_a_device(self, client, url_name):
         user = random_pro_user_factory()
         client.force_login(user)
         attach_device_to_user_session(client, ItouTOTPDeviceFactory(user=user))
@@ -96,10 +102,10 @@ class TestPermissions:
             assert response.status_code == 200
 
     @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
-    def test_hidden_without_a_device_but_for_enrollment(self, client, settings, url_name):
+    @pytest.mark.usefixtures("require_mfa_for_pros")
+    def test_hidden_without_a_device_but_for_enrollment(self, client, url_name):
         # A concerned user without any enabled device is sent to enrollment by the middleware:
         # the other pages have nothing to show
-        settings.REQUIRE_MFA_FOR_PROS = True
         user = random_pro_user_factory()
         device = ItouTOTPDeviceFactory(user=user)
         client.force_login(user)
@@ -118,10 +124,9 @@ class TestPermissions:
 
     @pytest.mark.parametrize("with_device", [True, False])
     @pytest.mark.parametrize("url_name", OTP_URL_NAMES)
-    def test_hidden_when_mfa_comes_from_identity_provider(self, client, settings, url_name, with_device):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    @pytest.mark.usefixtures("require_mfa_for_pros")
+    def test_hidden_when_mfa_comes_from_identity_provider(self, client, url_name, with_device):
         user = EmployerFactory()
-        settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
         if with_device:
             ItouTOTPDeviceFactory(user=user)  # shouldn't happen anyway
         client.force_login(user)
@@ -163,19 +168,18 @@ class TestConfigurationOtpMenuLink:
         else:
             assertNotContains(response, self.OTP_CONFIG_MARKUP)
 
-    def test_hidden_when_mfa_comes_from_identity_provider(self, client, settings):
+    @pytest.mark.usefixtures("require_mfa_for_pros")
+    def test_hidden_when_mfa_comes_from_identity_provider(self, client):
         # The user is concerned by 2FA but was verified by ProConnect: they never enroll
         # a TOTP device on our side, so there is nothing to configure
-        settings.REQUIRE_MFA_FOR_PROS = True
         user = EmployerFactory()
-        settings.REQUIRE_MFA_ON_COMPANY_IDS = {user.company_set.get().id}
         client.force_login(user)
         attach_external_device_to_user_session(client, user)
         response = client.get(reverse("dashboard:index"), follow=True)
         assertNotContains(response, self.OTP_CONFIG_MARKUP)
 
-    def test_hidden_when_only_device_is_disabled(self, client, settings):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    @pytest.mark.usefixtures("require_mfa_for_pros")
+    def test_hidden_when_only_device_is_disabled(self, client):
         user = random_pro_user_factory()
         device = ItouTOTPDeviceFactory(user=user)
         client.force_login(user)
@@ -189,8 +193,8 @@ class TestConfigurationOtpMenuLink:
 
 
 @freeze_time("2025-03-11 05:18:56")
-def test_device_list(client, snapshot, settings):
-    settings.REQUIRE_MFA_FOR_PROS = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_device_list(client, snapshot):
     user = random_pro_user_factory()
     device = ItouTOTPDeviceFactory(user=user, name="Mon appareil")
 
@@ -214,8 +218,8 @@ def test_device_list(client, snapshot, settings):
     )
 
 
-def test_delete_devices(client, snapshot, settings):
-    settings.REQUIRE_MFA_FOR_PROS = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_delete_devices(client, snapshot):
     user = random_pro_user_factory()
     url = reverse("otp_views:otp_devices")
 
@@ -270,8 +274,8 @@ def test_delete_devices(client, snapshot, settings):
         assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
 
 
-def test_enrollment_step_0_intro(client, settings):
-    settings.REQUIRE_MFA_FOR_PROS = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_enrollment_step_0_intro(client):
     user = random_pro_user_factory()
 
     client.force_login(user)
@@ -280,8 +284,8 @@ def test_enrollment_step_0_intro(client, settings):
     assertContains(response, "Nous vous guidons étape par étape")
 
 
-def test_enrollment_step_1_choose_device_type(client, settings):
-    settings.REQUIRE_MFA_FOR_PROS = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_enrollment_step_1_choose_device_type(client):
     user = random_pro_user_factory()
 
     client.force_login(user)
@@ -290,12 +294,8 @@ def test_enrollment_step_1_choose_device_type(client, settings):
     assertContains(response, "<strong>Étape 1</strong>/4 : choisissez votre méthode")
 
 
+@pytest.mark.usefixtures("require_mfa_for_pros")
 class TestEnrollmentSteps3And4ConfirmDevice:
-    @pytest.fixture(autouse=True)
-    def require_otp_for_pros(self, settings):
-        # Enrollment pages are only reachable when our own 2FA applies to the user
-        settings.REQUIRE_MFA_FOR_PROS = True
-
     @pytest.mark.parametrize(
         "device_type,should_show_qr_code",
         (
@@ -462,9 +462,9 @@ class TestEnrollmentSteps3And4ConfirmDevice:
         assert pretty_indented(parse_response_to_soup(response, "main")) == snapshot
 
 
+@pytest.mark.usefixtures("require_mfa_for_pros")
 class TestLogin:
-    def test_login_with_totp(self, client, settings, pro_connect, mocker):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    def test_login_with_totp(self, client, pro_connect, mocker):
         # For a user conserned with totp
         mocker.patch("itou.otp.utils._require_otp_for_pro", return_value=True)
         user = random_pro_user_factory(email=pro_connect.oidc_userinfo["email"], has_completed_welcoming_tour=True)
@@ -528,9 +528,8 @@ class TestLogin:
         response = client.post(next_url, data=post_data)
         assertRedirects(response, reverse("dashboard:index"))
 
-    def test_verify_with_wrong_token_throttles_every_device(self, client, settings, caplog):
+    def test_verify_with_wrong_token_throttles_every_device(self, client, caplog):
         # `VerifyOTPForm` tries every enrolled device, so a single wrong code counts against each of them
-        settings.REQUIRE_MFA_FOR_PROS = True
         user = random_pro_user_factory()
         device_1 = ItouTOTPDeviceFactory(name="1", user=user)
         device_2 = ItouTOTPDeviceFactory(name="2", user=user)
@@ -551,10 +550,9 @@ class TestLogin:
             device.refresh_from_db()
             assert device.throttling_failure_count == 1
 
-    def test_verify_with_valid_token_logs_success(self, client, settings, caplog):
+    def test_verify_with_valid_token_logs_success(self, client, caplog):
         # Throttle-rollback behaviour is tested in tests/otp/test_utils.py, here we
         # cover the view wiring: a valid code verifies the user and logs the success
-        settings.REQUIRE_MFA_FOR_PROS = True
         user = random_pro_user_factory()
         device = ItouTOTPDeviceFactory(name="1", user=user)
         client.force_login(user)
@@ -565,8 +563,7 @@ class TestLogin:
         assert response.status_code == 302
         assert f"User {user.id} authenticated with 2FA" in caplog.messages
 
-    def test_login_with_backup_code(self, client, settings, mailoutbox, pro_connect):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    def test_login_with_backup_code(self, client, mailoutbox, pro_connect):
         user = random_pro_user_factory(email=pro_connect.oidc_userinfo["email"])
         device = ItouTOTPDeviceFactory(user=user)
         backup_code = create_otp_backup_code(user)
@@ -621,11 +618,10 @@ class TestLogin:
         [email] = mailoutbox
         assert "Utilisation d'un code de récupération" in email.subject
 
-    def test_login_with_backup_code_preserves_existing_disabled_at(self, client, settings):
+    def test_login_with_backup_code_preserves_existing_disabled_at(self, client):
         # Logging in with a backup code soft-deletes the user's *active* TOTP
         # devices, but must not overwrite the `disabled_at` of devices that were
         # already disabled earlier (see `purge_disabled_otp_devices`)
-        settings.REQUIRE_MFA_FOR_PROS = True
         user = random_pro_user_factory()
 
         with freeze_time("2025-01-01") as frozen_time:
@@ -649,7 +645,10 @@ class TestLogin:
         # The already-disabled device keeps its original timestamp
         assert old_disabled_device.disabled_at == already_disabled_at
 
-    def test_login_otp_not_required(self, client, pro_connect):
+    def test_login_otp_not_required(self, client, settings, pro_connect):
+        # Disable explicitly, since the test class has an automatic
+        # fixture that enables MFA.
+        settings.REQUIRE_MFA_FOR_PROS = False
         user = random_pro_user_factory(email=pro_connect.oidc_userinfo["email"], has_completed_welcoming_tour=True)
         response = pro_connect.mock_oauth_dance(client, expected_redirect_url=reverse("dashboard:index"))
         response = client.get(response.url, follow=True)
@@ -662,8 +661,7 @@ class TestLogin:
         response = client.get(response.url, follow=True)
         assert response.wsgi_request.path == "/dashboard/"  # Check the middleware doesn't send us elsewhere
 
-    def test_login_shows_list_of_devices(self, client, snapshot, settings, pro_connect):
-        settings.REQUIRE_MFA_FOR_PROS = True
+    def test_login_shows_list_of_devices(self, client, snapshot, pro_connect):
         user = random_pro_user_factory(email=pro_connect.oidc_userinfo["email"])
         ItouTOTPDeviceFactory(
             name="Mon appareil",
@@ -702,8 +700,8 @@ class TestConfirmTOTPDeviceForm:
         assert "name" not in form.errors
 
 
-def test_mfa_reset_full_process(client, settings, mailoutbox, django_capture_on_commit_callbacks):
-    settings.REQUIRE_OTP_FOR_STAFF = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_mfa_reset_full_process(client, mailoutbox, django_capture_on_commit_callbacks):
     user = ItouStaffFactory(with_verified_email=True)
     ItouTOTPDeviceFactory(name="1", user=user)
     create_otp_backup_code(user)
@@ -738,8 +736,8 @@ def test_mfa_reset_full_process(client, settings, mailoutbox, django_capture_on_
     assertContains(response, "Votre double authentification a été réinitialisée")
 
 
-def test_mfa_reset_mail_to_support_when_reset_request_submitted(client, settings, mailoutbox):
-    settings.REQUIRE_MFA_FOR_PROS = True
+@pytest.mark.usefixtures("require_mfa_for_pros")
+def test_mfa_reset_mail_to_support_when_reset_request_submitted(client, mailoutbox):
     org = PrescriberOrganizationWith2MembershipFactory(membership=True)
     user = org.members.filter(prescribermembership__is_admin=False).first()
     ItouTOTPDeviceFactory(name="1", user=user)
