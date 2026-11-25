@@ -635,3 +635,50 @@ def test_pro_support_report_not_found_for_a_prescriber_of_another_organization(
 
     response = client.get(report_url(report))
     assert response.status_code == 404
+
+
+class TestXpRefIae:
+    @pytest.fixture(autouse=True)
+    def setup_experiment(self, settings):
+        settings.XP_REF_IAE_DEPARTMENTS = {"06": ["06"], "83": ["83", "84"]}
+        settings.XP_REF_IAE_END_DATE = timezone.localdate()
+
+    def login_ft_agent(self, client, settings, department="83"):
+        membership = PrescriberMembershipFactory(
+            organization__france_travail=True, organization__department=department
+        )
+        settings.XP_REF_IAE_USER_PKS = [membership.user.pk]
+        client.force_login(membership.user)
+
+    @pytest.mark.parametrize(
+        "agency_department,company_department,status_code",
+        [("06", "06", 200), ("83", "84", 200), ("83", "06", 404), ("13", "13", 404)],
+        ids=["own_department", "associated_department", "other_department", "department_outside_experiment"],
+    )
+    def test_access(self, client, settings, agency_department, company_department, status_code):
+        report = ProSupportReportFactory(contract__company__department=company_department)
+        self.login_ft_agent(client, settings, department=agency_department)
+        assert client.get(report_url(report)).status_code == status_code
+
+    def test_no_access_for_an_agent_who_is_not_a_tester(self, client, settings):
+        report = ProSupportReportFactory(contract__company__department="83")
+        self.login_ft_agent(client, settings)
+        settings.XP_REF_IAE_USER_PKS = []
+        assert client.get(report_url(report)).status_code == 404
+
+    def test_no_access_to_a_report_of_a_deleted_company(self, client, settings):
+        report = ProSupportReportFactory(contract__company__department="83")
+        ProSupportReport.objects.filter(pk=report.pk).update(company=None)
+        self.login_ft_agent(client, settings)
+        assert client.get(report_url(report)).status_code == 404
+
+    def test_banner_on_job_seeker_card(self, client, settings):
+        report = ProSupportReportFactory(contract__company__department="84")
+        details_url = reverse("job_seekers_views:details", kwargs={"public_id": report.job_seeker.public_id})
+        report_link = f'href="{report_url(report)}?back_url={details_url}"'
+
+        self.login_ft_agent(client, settings)
+        assertContains(client.get(details_url), report_link)
+
+        settings.XP_REF_IAE_USER_PKS = []
+        assertNotContains(client.get(details_url), report_link)
