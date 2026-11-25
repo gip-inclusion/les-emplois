@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("users", "0069_user_email_tracking_consent"),
+        ("users", "0070_remove_user_inclusion_staff_user_inclusion_staff"),
     ]
 
     operations = [
