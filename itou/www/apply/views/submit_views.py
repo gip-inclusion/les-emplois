@@ -2,7 +2,6 @@ import enum
 import logging
 from datetime import timedelta
 
-from allauth.account.views import method_decorator
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -12,6 +11,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
 from itoutils.urls import add_url_params
 
