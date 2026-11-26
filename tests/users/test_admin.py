@@ -30,6 +30,39 @@ from tests.users.factories import (
 from tests.utils.testing import normalize_fields_history
 
 
+def base_profile_post_data(profile):
+    return {
+        "_continue": "Enregistrer+et+continuer+les+modifications",
+        "user": profile.user.pk,
+        "asp_uid": profile.asp_uid,
+        "birthdate": profile.birthdate.isoformat(),
+        "birth_place": "",
+        "birth_country": "",
+        "education_level": "",
+        "nir": profile.nir,
+        "lack_of_nir_reason": "",
+        "pole_emploi_id": "",
+        "lack_of_pole_emploi_id_reason": "",
+        "pole_emploi_since": "",
+        "unemployed_since": "",
+        "has_rsa_allocation": "NON",
+        "rsa_allocation_since": "",
+        "ass_allocation_since": "",
+        "aah_allocation_since": "",
+        "are_allocation_since": "",
+        "activity_bonus_since": "",
+        "actor_met_for_business_creation": "",
+        "mean_monthly_income_before_process": "",
+        "eiti_contributions": "",
+        "hexa_lane_number": "",
+        "hexa_std_extension": "",
+        "hexa_non_std_extension": "",
+        "hexa_lane_name": "",
+        "hexa_additional_address": "",
+        **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
+    }
+
+
 def test_search(admin_client):
     user = JobSeekerFactory()
     other_user = JobSeekerFactory()
@@ -394,6 +427,34 @@ def test_change_display_with_pii(admin_client):
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker.jobseeker_profile.pk})
     )
     assertContains(response, f"<h2>{job_seeker.display_with_pii}</h2>")
+
+
+@pytest.mark.parametrize(
+    "initial_birth_name,initial_last_name,expected_last_name",
+    [
+        ("Birth", "Birth", "New Birth"),
+        ("Birth", "Usage", "Usage"),
+        ("", "Usage", "Usage"),
+        ("", "NEW BIRTH", "New Birth"),
+    ],
+)
+def test_change_birth_name(
+    admin_client,
+    initial_birth_name,
+    initial_last_name,
+    expected_last_name,
+):
+    profile = JobSeekerFactory(
+        last_name=initial_last_name,
+        jobseeker_profile__birth_name=initial_birth_name,
+    ).jobseeker_profile
+    url = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk})
+    post_data = base_profile_post_data(profile) | {"birth_name": "New Birth"}
+    admin_client.post(url, post_data)
+    profile.refresh_from_db()
+    profile.user.refresh_from_db()
+    assert profile.birth_name == "New Birth"
+    assert profile.user.last_name == expected_last_name
 
 
 def test_change_birth_information(admin_client):

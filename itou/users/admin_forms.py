@@ -111,6 +111,33 @@ class JobSeekerProfileAdminForm(forms.ModelForm):
             return self.instance._default_asp_uid()
         return asp_uid.lower()
 
+    def is_valid(self):
+        # `is_valid()` indirectly calls `_post_clean()`, which updates
+        # the instance attributes. We must take over before that.
+        profile = self.instance
+        initial_birth_name = profile.birth_name
+        initial_last_name = profile.user.last_name
+        is_valid = super().is_valid()
+
+        if not is_valid:
+            return is_valid
+
+        updated_profile = self.instance
+        new_birth_name = updated_profile.birth_name
+        if new_birth_name != initial_birth_name:
+            if (
+                initial_birth_name.casefold() == initial_last_name.casefold()
+                or initial_last_name.casefold() == new_birth_name.casefold()
+            ):
+                new_last_name = new_birth_name
+            else:
+                new_last_name = initial_last_name
+            if new_last_name != initial_last_name:
+                profile.user.last_name = new_last_name
+                profile.user.save(update_fields=["last_name"])
+
+        return is_valid
+
 
 class SelectTargetUserForm(forms.Form):
     to_user = forms.ModelChoiceField(
