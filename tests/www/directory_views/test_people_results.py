@@ -244,7 +244,7 @@ def test_exclude_opted_out_email(client):
     response = client.get(reverse("directory:people_results"))
 
     assert response.context["results"].object_list == []
-    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', html=True, count=1)
+    assertContains(response, '<p class="mb-0">Aucun élément dans l’annuaire.</p>', html=True, count=1)
 
 
 def test_ignores_inactive_companies(client):
