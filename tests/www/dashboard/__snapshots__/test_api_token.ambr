@@ -147,11 +147,11 @@
                                   Connexion à l’API
                               </h3>
                               <p>
-                                  Pour vous connecter à l’API vous devez utiliser l’identifiant "
-                                  <strong>
-                                      __token__
-                                  </strong>
-                                  " et comme mot de passe votre token.
+                                  Pour vous connecter à l’API vous devez utiliser ajouter le header suivant à vos requêtes :
+                                  <br/>
+                                  <code>
+                                      Authorization: Token <votre_token>
+                                  </code>
                               </p>
                               <span class="d-block text-center mb-2">
                                   Votre token d’API est :
