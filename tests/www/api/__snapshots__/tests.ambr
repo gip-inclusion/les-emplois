@@ -33,10 +33,28 @@
               </div>
           </div>
           <div class="row mt-5">
-              <div class="col-md-12">
+              <div class="col-12">
+                  <h2>
+                      Documentation
+                  </h2>
                   <p>
-                      <a class="btn btn-primary" href="/api/v1/documentation/">
-                          Ouvrir la documentation
+                      <a class="btn btn-primary" href="/api/v1/documentation/employeurs/">
+                          API employeurs
+                      </a>
+                  </p>
+                  <p>
+                      <a class="btn btn-primary" href="/api/v1/documentation/conseils-departementaux/">
+                          API conseils départementaux
+                      </a>
+                  </p>
+                  <p>
+                      <a class="btn btn-primary" href="/api/v1/documentation/siae/">
+                          API publique
+                      </a>
+                  </p>
+                  <p>
+                      <a class="btn btn-primary" href="/api/v1/documentation/interne/">
+                          APIs internes
                       </a>
                   </p>
               </div>
@@ -87,7 +105,7 @@
                                   salarieLangueFrancaise
                               </code>
                               dans la
-                              <a href="/api/v1/documentation/#tag/employee-records">
+                              <a href="/api/v1/documentation/employeurs/#tag/employee-records">
                                   documentation de l'API fiches salarié
                               </a>
                               pour plus de détails.

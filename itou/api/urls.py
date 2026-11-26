@@ -19,7 +19,7 @@ from itou.api.nexus.views import (
     SyncStartView,
     UsersView,
 )
-from itou.api.scalar_views import ScalarView
+from itou.api.scalar_views import DocumentationSchemaView, ScalarView
 from itou.api.siae_api.viewsets import SiaeViewSet
 from itou.api.token_auth.views import ObtainAuthToken
 
@@ -42,12 +42,14 @@ urlpatterns = [
         login_not_required(SpectacularAPIView.as_view()),
         name="openapi_schema",
     ),
+    # OAS 3 schema restricted to the endpoints of one documentation
+    path("oas3/<slug:slug>/", DocumentationSchemaView.as_view(), name="documentation_schema"),
     # API Documentation
-    path("documentation/", ScalarView.as_view(), name="documentation"),
-    # Legacy URL of the documentation (rendered by Redoc), kept for existing links.
+    path("documentation/<slug:slug>/", ScalarView.as_view(), name="documentation"),
+    # Legacy URLs of the documentation, kept for existing links: the API index lists the documentations.
     path(
         "redoc/",
-        login_not_required(RedirectView.as_view(pattern_name="v1:documentation", permanent=True, query_string=True)),
+        login_not_required(RedirectView.as_view(pattern_name="api:index", permanent=True)),
         name="redoc",
     ),
     # TokenAuthentication endpoint to get token from login/password.

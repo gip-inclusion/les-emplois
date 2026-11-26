@@ -29,10 +29,15 @@
                 {% endfragment %}
             {% endcomponent_info %}
             <div class="row mt-5">
-                <div class="col-md-12">
-                    <p>
-                        <a href="{% url 'v1:documentation' %}" class="btn btn-primary">Ouvrir la documentation</a>
-                    </p>
+                <div class="col-12">
+                    <h2>Documentation</h2>
+                    {% for documentation in documentations %}
+                        <p>
+                            <a href="{% url 'v1:documentation' slug=documentation.slug %}" class="btn btn-primary">
+                                {{ documentation.title }}
+                            </a>
+                        </p>
+                    {% endfor %}
                 </div>
             </div>
             <div class="row mt-5">

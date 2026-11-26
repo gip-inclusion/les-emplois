@@ -96,7 +96,7 @@
                                   <li>
                                       <strong>
                                           Fiches salarié (
-                                          <a class="has-external-link" href="/api/v1/documentation/#tag/employee-records" rel="noopener" target="_blank">
+                                          <a class="has-external-link" href="/api/v1/documentation/employeurs/#tag/employee-records" rel="noopener" target="_blank">
                                               voir la documentation
                                           </a>
                                           )
@@ -116,7 +116,7 @@
                                   <li>
                                       <strong>
                                           Candidats (
-                                          <a class="has-external-link" href="/api/v1/documentation/#tag/candidats" rel="noopener" target="_blank">
+                                          <a class="has-external-link" href="/api/v1/documentation/employeurs/#tag/candidats" rel="noopener" target="_blank">
                                               voir la documentation
                                           </a>
                                           )

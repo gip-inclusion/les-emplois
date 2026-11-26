@@ -649,8 +649,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": f"API - {product_name()}",
-    "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
+    "TITLE": product_name(),
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
         "Civilite": "itou.users.enums.Title",
@@ -661,6 +660,10 @@ SPECTACULAR_SETTINGS = {
     # Allows to document the choices of a field even if the serializer has allow_null=True.
     # cf. https://github.com/tfranzel/drf-spectacular/issues/235
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
+    # Explicit, so that tags (the first path segment after the prefix) do not depend on the generated
+    # endpoints: the prefix is otherwise guessed from them, which fails for documentations with one view.
+    # Documentations are split by tag, see `itou.api.documentation`.
+    "SCHEMA_PATH_PREFIX": "/api/v1",
     "AUTHENTICATION_WHITELIST": [
         "rest_framework.authentication.TokenAuthentication",
     ],

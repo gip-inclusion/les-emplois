@@ -25,5 +25,5 @@
     éviter un changement incompatible.
 
     Cf. la note sur le champ `salarieLangueFrancaise` dans la
-    [documentation de l'API fiches salarié](/api/v1/documentation/#tag/employee-records)
+    [documentation de l'API fiches salarié](/api/v1/documentation/employeurs/#tag/employee-records)
     pour plus de détails.
