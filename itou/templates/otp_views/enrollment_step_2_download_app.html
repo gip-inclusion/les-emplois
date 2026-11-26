@@ -55,7 +55,7 @@
                                     <br>
                                     Pas de recherche à faire : la page propose des applications gratuites.
                                 </p>
-                                <a href="{{ link_to_list_of_apps }}">
+                                <a href="{{ link_to_list_of_apps }}" target="_blank">
                                     <img src="{{ qrcode }}"
                                          width="250"
                                          alt="QR code pour le téléchargement d’une application de génération de TOTP">
@@ -63,7 +63,10 @@
                                 <p>
                                     Ou ouvrez ce lien depuis votre téléphone :
                                     <br>
-                                    <a href="{{ link_to_list_of_apps }}" class="btn-link">{{ link_to_list_of_apps }}</a>
+                                    <a href="{{ link_to_list_of_apps }}"
+                                       class="btn-link has-external-link"
+                                       aria-label="Page de téléchargement d’une application de génération de TOTP (ouverture dans un nouvel onglet)"
+                                       target="_blank">{{ link_to_list_of_apps }}</a>
                                 </p>
                                 <div class="form-check">
                                     <input type="checkbox" id="confirmation-checkbox" class="form-check-input" required>
