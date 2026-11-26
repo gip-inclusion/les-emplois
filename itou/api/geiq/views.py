@@ -1,8 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Prefetch
 from django.db.models.functions import Substr
 from django.forms import ValidationError
-from drf_spectacular.utils import extend_schema
 from rest_framework import authentication, exceptions, generics, permissions, status
 
 from itou.api.geiq.serializers import GeiqJobApplicationSerializer
@@ -99,14 +99,17 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, ReadonlyViewMixin, gener
             )
         )
 
-    @extend_schema(operation_id="list")
-    def get(self, request, *args, **kwargs):
-        """
-        # Liste des embauches réalisées en GEIQ
 
-        Retourne la liste complète des embauches réalisées en GEIQ connues de La plateforme de l’inclusion.
-        Ces embauches représentent des candidatures acceptées.
+tag_description = f"""\
+# API embauches réalisées en GEIQ
 
-        Elles ne seront plus listées par l'API une fois le contrat terminé.
-        """
-        return self.list(request, *args, **kwargs)
+Cette API retourne la liste complète des embauches réalisées en GEIQ connues de La plateforme de l’inclusion.
+Ces embauches représentent des candidatures acceptées.
+
+Elles ne seront plus listées par l'API une fois le contrat terminé.
+
+# Permissions
+
+L'utilisation de cette API nécessite un token d'autorisation dédié.
+Si vous pensez en avoir besoin, [contactez nous](mailto:{settings.API_EMAIL_CONTACT}).
+"""

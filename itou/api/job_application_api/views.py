@@ -20,9 +20,17 @@ from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.readonly import ReadonlyViewMixin
 
 
-job_application_search_view_description = """
+tag_description = """
 # API de recherche de candidatures
 
+Cette API permet de rechercher des candidatures.
+
+# Permissions
+
+L’utilisation de cette API nécessite un token d’autorisation spécifique à chaque conseil départemental.
+"""
+
+job_application_search_view_description = """
 Cette API retourne la liste de candidatures correspondant à une recherche selon les 4 critères suivants :
 
 - Numéro de sécurité sociale du candidat
@@ -31,10 +39,6 @@ Cette API retourne la liste de candidatures correspondant à une recherche selon
 - Date de naissance du candidat
 
 Cette API est à l’usage exclusif des conseils départementaux.
-
-# Permissions
-
-L’utilisation de cette API nécessite un token d’autorisation spécifique à chaque conseil départemental.
 
 # Limitations
 

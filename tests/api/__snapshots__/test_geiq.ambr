@@ -70,7 +70,6 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -85,7 +84,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -355,7 +353,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -385,7 +382,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -406,7 +402,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -435,7 +430,6 @@
         'origin': list([
           'Paginator.count[<site-packages>/django/core/paginator.py]',
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -449,7 +443,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -718,7 +711,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -748,7 +740,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''
@@ -769,7 +760,6 @@
       dict({
         'origin': list([
           'GeiqJobApplicationListView.list[<site-packages>/rest_framework/mixins.py]',
-          'GeiqJobApplicationListView.get[api/geiq/views.py]',
           'wrapper[utils/readonly.py]',
         ]),
         'sql': '''

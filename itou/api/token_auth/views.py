@@ -48,10 +48,10 @@ class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken
         return super().post(request, *args, **kwargs)
 
 
-ObtainAuthToken.__doc__ = f"""\
 # XXX: only 227 admin company users left still using Django as on 2026-11-25
 # but we never set unusable_password on converted users to ProConnect.
 # Maybe check how many users still use login/password couples to log through here ?
+tag_description = f"""\
 **API Dépréciée**
 
 **Cette API était utilisée avant la mise en place des jeton d’accès.**
