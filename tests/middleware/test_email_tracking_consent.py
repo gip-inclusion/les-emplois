@@ -58,13 +58,6 @@ def test_middleware_allows_public_and_exempted_pages(client, url_name, expected_
     assertContains(response, f"<h1>{expected_content}</h1>", html=True)
 
 
-def test_middleware_allows_api(client):
-    client.force_login(EmployerFactory(email_tracking_consent_updated_at=None))
-    # DRF views don’t require a login, so they are let through anyway: this one is a plain Django view
-    response = client.get(reverse("v1:rest_framework:logout"))
-    assert response.status_code == 405
-
-
 def test_middleware_brings_job_seekers_back_to_the_apply_tunnel(client):
     company = CompanyFactory(with_jobs=True, with_membership=True)
     job_seeker = JobSeekerFactory(email_tracking_consent_updated_at=None)

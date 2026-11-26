@@ -114,11 +114,6 @@ L'utilisation externe de cette API nécessite un token d'autorisation :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
 
-L'API peut également être utilisée dans un navigateur :
-
-- seulement dans un environnement de développement
-- si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
-
 # Paramètres
 
 Les paramètres suivants sont :
