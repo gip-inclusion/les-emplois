@@ -144,8 +144,8 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
     def clean(self):
         super().clean()
         self.cleaned_data["last_name"] = guess_last_name(
-            self.cleaned_data["last_name"],
-            self.cleaned_data["birth_name"],
+            self.cleaned_data.get("last_name") or "",
+            self.cleaned_data.get("birth_name") or "",
             GuessLastNameMode.BEFORE_SAVE,
         )
 
