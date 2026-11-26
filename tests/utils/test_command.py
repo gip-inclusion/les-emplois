@@ -1,20 +1,11 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from unittest import mock
 
 from django.core.management import call_command
 from django.db import connection
 
 
-def test_simultaneous_run_is_aborted():
-    command_runs = []
-
-    timeout = 1
-
-    barrier = threading.Barrier(parties=2, timeout=timeout)
-    first_thread_started_command = threading.Event()
-    second_thread_ended_command = threading.Event()
-
+def test_simultaneous_run_is_aborted(mocker):
     def mocked_handle(*args, **kwargs):
         # Notify second thread that it can call `call_command`.
         first_thread_started_command.set()
@@ -23,6 +14,19 @@ def test_simultaneous_run_is_aborted():
         # the second thread ran `call_command` while the first thread
         # was still running it.
         assert second_thread_ended_command.wait(timeout)
+
+    mocker.patch(
+        "itou.users.management.commands.archive_old_assignments.Command.handle",
+        mocked_handle,
+    )
+
+    command_runs = []
+
+    timeout = 1
+
+    barrier = threading.Barrier(parties=2, timeout=timeout)
+    first_thread_started_command = threading.Event()
+    second_thread_ended_command = threading.Event()
 
     def run_command():
         thread_position = barrier.wait()
@@ -33,12 +37,8 @@ def test_simultaneous_run_is_aborted():
             if this_is_the_second_thread:
                 assert first_thread_started_command.wait(timeout)
 
-            with mock.patch(
-                "itou.users.management.commands.archive_old_assignments.Command.handle",
-                mocked_handle,
-            ):
-                # Any command would do, as long as it inherits from `BaseCommand`.
-                call_command("archive_old_assignments")
+            # Any command would do, as long as it inherits from `BaseCommand`.
+            call_command("archive_old_assignments")
         finally:
             if this_is_the_second_thread:
                 # Notify the first thread that it can exit from our
