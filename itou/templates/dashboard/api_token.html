@@ -156,12 +156,12 @@
                     <p>Cette action est irréversible.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Retour</button>
                     <form method="post">
                         {% csrf_token %}
 
                         <button type="submit"
-                                class="btn btn-sm btn-danger"
+                                class="btn btn-danger"
                                 aria-label="Regénérer le token"
                                 name="action"
                                 value="regenerate">Confirmer la regénération</button>

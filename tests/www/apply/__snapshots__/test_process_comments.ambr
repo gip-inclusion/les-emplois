@@ -747,10 +747,10 @@
                                                                   <form class="d-block js-prevent-multiple-submit" hx-indicator="#comments-list-tab" hx-post="/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete" hx-swap="outerHTML" hx-target="#comment-[Pk of JobApplicationComment]">
                                                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                                       <div class="text-end">
-                                                                          <button aria-label="Annuler la suppression du commentaire" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+                                                                          <button aria-label="Annuler la suppression du commentaire" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                                                                               Annuler
                                                                           </button>
-                                                                          <button aria-label="Supprimer le commentaire" class="btn btn-danger btn-sm" data-bs-dismiss="modal" type="button">
+                                                                          <button aria-label="Supprimer le commentaire" class="btn btn-danger" data-bs-dismiss="modal" type="button">
                                                                               <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
                                                                               </i>
                                                                               <span>

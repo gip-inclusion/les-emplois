@@ -282,11 +282,11 @@
                         Les montants et le commentaire saisis dans la rubrique “Décision” seront conservés, vous pourrez les modifier en cas de besoin.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Annuler</button>
                         <form method="post">
                             {% csrf_token %}
                             <button type="submit"
-                                    class="btn btn-sm btn-primary"
+                                    class="btn btn-primary"
                                     name="action"
                                     value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
                         </form>

@@ -26,13 +26,11 @@
                         {% bootstrap_form_errors send_email_form type="all" %}
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-outline-primary btn-sm"
+                        <button class="btn btn-outline-primary"
                                 data-bs-dismiss="modal"
                                 aria-label="Annuler l’envoi du mail"
                                 type="button">Annuler</button>
-                        <button class="btn btn-primary btn-sm"
-                                aria-label="Envoyer le mail"
-                                type="submit">Envoyer</button>
+                        <button class="btn btn-primary" aria-label="Envoyer le mail" type="submit">Envoyer</button>
                     </div>
                 </div>
             </form>
@@ -45,10 +43,7 @@
         {% partial service-send-email-modal-header %}
         <div class="modal-body">Le message a bien été envoyé.</div>
         <div class="modal-footer">
-            <button class="btn btn-primary btn-sm"
-                    data-bs-dismiss="modal"
-                    aria-label="Fermer"
-                    type="button">Fermer</button>
+            <button class="btn btn-primary" data-bs-dismiss="modal" aria-label="Fermer" type="button">Fermer</button>
         </div>
     </div>
 {% endpartialdef %}
