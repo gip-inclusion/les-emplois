@@ -17,7 +17,7 @@ gunicorn  # https://github.com/benoitc/gunicorn/
 # Django
 # ------------------------------------------------------------------------------
 
-django==6.0.*  # https://www.djangoproject.com/
+django==6.1.*  # https://www.djangoproject.com/
 
 # django-allauth
 django-allauth  # https://codeberg.org/allauth/django-allauth/
