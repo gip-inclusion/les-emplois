@@ -132,9 +132,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -161,15 +161,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -456,12 +456,12 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
-                           AND U0."user_id" = %s)
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND "U0"."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -526,45 +526,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."email_tracking_consent",
-                 T3."email_tracking_consent_updated_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
+                 "T3"."id",
+                 "T3"."password",
+                 "T3"."last_login",
+                 "T3"."is_superuser",
+                 "T3"."username",
+                 "T3"."first_name",
+                 "T3"."last_name",
+                 "T3"."is_staff",
+                 "T3"."is_active",
+                 "T3"."date_joined",
+                 "T3"."fields_history",
+                 "T3"."address_line_1",
+                 "T3"."address_line_2",
+                 "T3"."post_code",
+                 "T3"."city",
+                 "T3"."department",
+                 "T3"."coords",
+                 "T3"."geocoding_score",
+                 "T3"."geocoding_updated_at",
+                 "T3"."ban_api_resolved_address",
+                 "T3"."insee_city_id",
+                 "T3"."title",
+                 "T3"."full_name_search_vector",
+                 "T3"."email",
+                 "T3"."phone",
+                 "T3"."kind",
+                 "T3"."identity_provider",
+                 "T3"."has_completed_welcoming_tour",
+                 "T3"."created_by_id",
+                 "T3"."external_data_source_history",
+                 "T3"."last_checked_at",
+                 "T3"."terms_accepted_at",
+                 "T3"."email_tracking_consent",
+                 "T3"."email_tracking_consent_updated_at",
+                 "T3"."public_id",
+                 "T3"."address_filled_at",
+                 "T3"."first_login",
+                 "T3"."upcoming_deletion_notified_at",
+                 "T3"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -633,7 +633,7 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          INNER JOIN "users_user" "T3" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T3"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
@@ -793,12 +793,12 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U0."user_id" AS "user"
-               FROM "companies_companymembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."company_id" = %s))
+              (SELECT "U0"."user_id" AS "user"
+               FROM "companies_companymembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC,
                    "users_user"."id" ASC
@@ -876,12 +876,12 @@
         ]),
         'sql': '''
           SELECT %s AS "_check"
-          WHERE COALESCE((((%s IN (%s, %s)
-                            AND %s = %s
-                            AND %s > %s)
-                           OR (%s = %s
-                               AND %s > %s
-                               AND NOT (%s = %s)))), %s)
+          WHERE COALESCE(((%s IN (%s, %s)
+                           AND %s = %s
+                           AND %s > %s)
+                          OR (%s = %s
+                              AND %s > %s
+                              AND NOT (%s = %s))), %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -914,8 +914,8 @@
         ]),
         'sql': '''
           SELECT %s AS "_check"
-          WHERE COALESCE((NOT (%s = %s
-                               AND %s = %s)), %s)
+          WHERE COALESCE(NOT (%s = %s
+                              AND %s = %s), %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -973,14 +973,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1147,9 +1147,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -1176,15 +1176,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -1471,12 +1471,12 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
-                           AND U0."user_id" = %s)
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND "U0"."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -1541,45 +1541,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."email_tracking_consent",
-                 T3."email_tracking_consent_updated_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
+                 "T3"."id",
+                 "T3"."password",
+                 "T3"."last_login",
+                 "T3"."is_superuser",
+                 "T3"."username",
+                 "T3"."first_name",
+                 "T3"."last_name",
+                 "T3"."is_staff",
+                 "T3"."is_active",
+                 "T3"."date_joined",
+                 "T3"."fields_history",
+                 "T3"."address_line_1",
+                 "T3"."address_line_2",
+                 "T3"."post_code",
+                 "T3"."city",
+                 "T3"."department",
+                 "T3"."coords",
+                 "T3"."geocoding_score",
+                 "T3"."geocoding_updated_at",
+                 "T3"."ban_api_resolved_address",
+                 "T3"."insee_city_id",
+                 "T3"."title",
+                 "T3"."full_name_search_vector",
+                 "T3"."email",
+                 "T3"."phone",
+                 "T3"."kind",
+                 "T3"."identity_provider",
+                 "T3"."has_completed_welcoming_tour",
+                 "T3"."created_by_id",
+                 "T3"."external_data_source_history",
+                 "T3"."last_checked_at",
+                 "T3"."terms_accepted_at",
+                 "T3"."email_tracking_consent",
+                 "T3"."email_tracking_consent_updated_at",
+                 "T3"."public_id",
+                 "T3"."address_filled_at",
+                 "T3"."first_login",
+                 "T3"."upcoming_deletion_notified_at",
+                 "T3"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1648,7 +1648,7 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          INNER JOIN "users_user" "T3" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T3"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
@@ -1680,45 +1680,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T4."id",
-                 T4."password",
-                 T4."last_login",
-                 T4."is_superuser",
-                 T4."username",
-                 T4."first_name",
-                 T4."last_name",
-                 T4."is_staff",
-                 T4."is_active",
-                 T4."date_joined",
-                 T4."fields_history",
-                 T4."address_line_1",
-                 T4."address_line_2",
-                 T4."post_code",
-                 T4."city",
-                 T4."department",
-                 T4."coords",
-                 T4."geocoding_score",
-                 T4."geocoding_updated_at",
-                 T4."ban_api_resolved_address",
-                 T4."insee_city_id",
-                 T4."title",
-                 T4."full_name_search_vector",
-                 T4."email",
-                 T4."phone",
-                 T4."kind",
-                 T4."identity_provider",
-                 T4."has_completed_welcoming_tour",
-                 T4."created_by_id",
-                 T4."external_data_source_history",
-                 T4."last_checked_at",
-                 T4."terms_accepted_at",
-                 T4."email_tracking_consent",
-                 T4."email_tracking_consent_updated_at",
-                 T4."public_id",
-                 T4."address_filled_at",
-                 T4."first_login",
-                 T4."upcoming_deletion_notified_at",
-                 T4."allow_next_sso_sub_update",
+                 "T4"."id",
+                 "T4"."password",
+                 "T4"."last_login",
+                 "T4"."is_superuser",
+                 "T4"."username",
+                 "T4"."first_name",
+                 "T4"."last_name",
+                 "T4"."is_staff",
+                 "T4"."is_active",
+                 "T4"."date_joined",
+                 "T4"."fields_history",
+                 "T4"."address_line_1",
+                 "T4"."address_line_2",
+                 "T4"."post_code",
+                 "T4"."city",
+                 "T4"."department",
+                 "T4"."coords",
+                 "T4"."geocoding_score",
+                 "T4"."geocoding_updated_at",
+                 "T4"."ban_api_resolved_address",
+                 "T4"."insee_city_id",
+                 "T4"."title",
+                 "T4"."full_name_search_vector",
+                 "T4"."email",
+                 "T4"."phone",
+                 "T4"."kind",
+                 "T4"."identity_provider",
+                 "T4"."has_completed_welcoming_tour",
+                 "T4"."created_by_id",
+                 "T4"."external_data_source_history",
+                 "T4"."last_checked_at",
+                 "T4"."terms_accepted_at",
+                 "T4"."email_tracking_consent",
+                 "T4"."email_tracking_consent_updated_at",
+                 "T4"."public_id",
+                 "T4"."address_filled_at",
+                 "T4"."first_login",
+                 "T4"."upcoming_deletion_notified_at",
+                 "T4"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1788,7 +1788,7 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
-          INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
+          INNER JOIN "users_user" "T4" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T4"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
                   OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
@@ -1933,12 +1933,12 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U0."user_id" AS "user"
-               FROM "companies_companymembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."company_id" = %s))
+              (SELECT "U0"."user_id" AS "user"
+               FROM "companies_companymembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC,
                    "users_user"."id" ASC
@@ -2041,14 +2041,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -2271,9 +2271,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -2300,15 +2300,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -2595,12 +2595,12 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
-                           AND U0."user_id" = %s)
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND "U0"."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -2665,45 +2665,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."email_tracking_consent",
-                 T3."email_tracking_consent_updated_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
+                 "T3"."id",
+                 "T3"."password",
+                 "T3"."last_login",
+                 "T3"."is_superuser",
+                 "T3"."username",
+                 "T3"."first_name",
+                 "T3"."last_name",
+                 "T3"."is_staff",
+                 "T3"."is_active",
+                 "T3"."date_joined",
+                 "T3"."fields_history",
+                 "T3"."address_line_1",
+                 "T3"."address_line_2",
+                 "T3"."post_code",
+                 "T3"."city",
+                 "T3"."department",
+                 "T3"."coords",
+                 "T3"."geocoding_score",
+                 "T3"."geocoding_updated_at",
+                 "T3"."ban_api_resolved_address",
+                 "T3"."insee_city_id",
+                 "T3"."title",
+                 "T3"."full_name_search_vector",
+                 "T3"."email",
+                 "T3"."phone",
+                 "T3"."kind",
+                 "T3"."identity_provider",
+                 "T3"."has_completed_welcoming_tour",
+                 "T3"."created_by_id",
+                 "T3"."external_data_source_history",
+                 "T3"."last_checked_at",
+                 "T3"."terms_accepted_at",
+                 "T3"."email_tracking_consent",
+                 "T3"."email_tracking_consent_updated_at",
+                 "T3"."public_id",
+                 "T3"."address_filled_at",
+                 "T3"."first_login",
+                 "T3"."upcoming_deletion_notified_at",
+                 "T3"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2772,7 +2772,7 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          INNER JOIN "users_user" "T3" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T3"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
@@ -2804,45 +2804,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T4."id",
-                 T4."password",
-                 T4."last_login",
-                 T4."is_superuser",
-                 T4."username",
-                 T4."first_name",
-                 T4."last_name",
-                 T4."is_staff",
-                 T4."is_active",
-                 T4."date_joined",
-                 T4."fields_history",
-                 T4."address_line_1",
-                 T4."address_line_2",
-                 T4."post_code",
-                 T4."city",
-                 T4."department",
-                 T4."coords",
-                 T4."geocoding_score",
-                 T4."geocoding_updated_at",
-                 T4."ban_api_resolved_address",
-                 T4."insee_city_id",
-                 T4."title",
-                 T4."full_name_search_vector",
-                 T4."email",
-                 T4."phone",
-                 T4."kind",
-                 T4."identity_provider",
-                 T4."has_completed_welcoming_tour",
-                 T4."created_by_id",
-                 T4."external_data_source_history",
-                 T4."last_checked_at",
-                 T4."terms_accepted_at",
-                 T4."email_tracking_consent",
-                 T4."email_tracking_consent_updated_at",
-                 T4."public_id",
-                 T4."address_filled_at",
-                 T4."first_login",
-                 T4."upcoming_deletion_notified_at",
-                 T4."allow_next_sso_sub_update",
+                 "T4"."id",
+                 "T4"."password",
+                 "T4"."last_login",
+                 "T4"."is_superuser",
+                 "T4"."username",
+                 "T4"."first_name",
+                 "T4"."last_name",
+                 "T4"."is_staff",
+                 "T4"."is_active",
+                 "T4"."date_joined",
+                 "T4"."fields_history",
+                 "T4"."address_line_1",
+                 "T4"."address_line_2",
+                 "T4"."post_code",
+                 "T4"."city",
+                 "T4"."department",
+                 "T4"."coords",
+                 "T4"."geocoding_score",
+                 "T4"."geocoding_updated_at",
+                 "T4"."ban_api_resolved_address",
+                 "T4"."insee_city_id",
+                 "T4"."title",
+                 "T4"."full_name_search_vector",
+                 "T4"."email",
+                 "T4"."phone",
+                 "T4"."kind",
+                 "T4"."identity_provider",
+                 "T4"."has_completed_welcoming_tour",
+                 "T4"."created_by_id",
+                 "T4"."external_data_source_history",
+                 "T4"."last_checked_at",
+                 "T4"."terms_accepted_at",
+                 "T4"."email_tracking_consent",
+                 "T4"."email_tracking_consent_updated_at",
+                 "T4"."public_id",
+                 "T4"."address_filled_at",
+                 "T4"."first_login",
+                 "T4"."upcoming_deletion_notified_at",
+                 "T4"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2912,7 +2912,7 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
-          INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
+          INNER JOIN "users_user" "T4" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T4"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
                   OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
@@ -3081,9 +3081,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -3110,15 +3110,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -3406,12 +3406,12 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
-                           AND U0."user_id" = %s)
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND "U0"."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -3478,45 +3478,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."email_tracking_consent",
-                 T3."email_tracking_consent_updated_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
+                 "T3"."id",
+                 "T3"."password",
+                 "T3"."last_login",
+                 "T3"."is_superuser",
+                 "T3"."username",
+                 "T3"."first_name",
+                 "T3"."last_name",
+                 "T3"."is_staff",
+                 "T3"."is_active",
+                 "T3"."date_joined",
+                 "T3"."fields_history",
+                 "T3"."address_line_1",
+                 "T3"."address_line_2",
+                 "T3"."post_code",
+                 "T3"."city",
+                 "T3"."department",
+                 "T3"."coords",
+                 "T3"."geocoding_score",
+                 "T3"."geocoding_updated_at",
+                 "T3"."ban_api_resolved_address",
+                 "T3"."insee_city_id",
+                 "T3"."title",
+                 "T3"."full_name_search_vector",
+                 "T3"."email",
+                 "T3"."phone",
+                 "T3"."kind",
+                 "T3"."identity_provider",
+                 "T3"."has_completed_welcoming_tour",
+                 "T3"."created_by_id",
+                 "T3"."external_data_source_history",
+                 "T3"."last_checked_at",
+                 "T3"."terms_accepted_at",
+                 "T3"."email_tracking_consent",
+                 "T3"."email_tracking_consent_updated_at",
+                 "T3"."public_id",
+                 "T3"."address_filled_at",
+                 "T3"."first_login",
+                 "T3"."upcoming_deletion_notified_at",
+                 "T3"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3585,7 +3585,7 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          INNER JOIN "users_user" "T3" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T3"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
@@ -3618,45 +3618,45 @@
                      WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
                      ELSE %s
                  END AS "from_prescriber",
-                 T4."id",
-                 T4."password",
-                 T4."last_login",
-                 T4."is_superuser",
-                 T4."username",
-                 T4."first_name",
-                 T4."last_name",
-                 T4."is_staff",
-                 T4."is_active",
-                 T4."date_joined",
-                 T4."fields_history",
-                 T4."address_line_1",
-                 T4."address_line_2",
-                 T4."post_code",
-                 T4."city",
-                 T4."department",
-                 T4."coords",
-                 T4."geocoding_score",
-                 T4."geocoding_updated_at",
-                 T4."ban_api_resolved_address",
-                 T4."insee_city_id",
-                 T4."title",
-                 T4."full_name_search_vector",
-                 T4."email",
-                 T4."phone",
-                 T4."kind",
-                 T4."identity_provider",
-                 T4."has_completed_welcoming_tour",
-                 T4."created_by_id",
-                 T4."external_data_source_history",
-                 T4."last_checked_at",
-                 T4."terms_accepted_at",
-                 T4."email_tracking_consent",
-                 T4."email_tracking_consent_updated_at",
-                 T4."public_id",
-                 T4."address_filled_at",
-                 T4."first_login",
-                 T4."upcoming_deletion_notified_at",
-                 T4."allow_next_sso_sub_update",
+                 "T4"."id",
+                 "T4"."password",
+                 "T4"."last_login",
+                 "T4"."is_superuser",
+                 "T4"."username",
+                 "T4"."first_name",
+                 "T4"."last_name",
+                 "T4"."is_staff",
+                 "T4"."is_active",
+                 "T4"."date_joined",
+                 "T4"."fields_history",
+                 "T4"."address_line_1",
+                 "T4"."address_line_2",
+                 "T4"."post_code",
+                 "T4"."city",
+                 "T4"."department",
+                 "T4"."coords",
+                 "T4"."geocoding_score",
+                 "T4"."geocoding_updated_at",
+                 "T4"."ban_api_resolved_address",
+                 "T4"."insee_city_id",
+                 "T4"."title",
+                 "T4"."full_name_search_vector",
+                 "T4"."email",
+                 "T4"."phone",
+                 "T4"."kind",
+                 "T4"."identity_provider",
+                 "T4"."has_completed_welcoming_tour",
+                 "T4"."created_by_id",
+                 "T4"."external_data_source_history",
+                 "T4"."last_checked_at",
+                 "T4"."terms_accepted_at",
+                 "T4"."email_tracking_consent",
+                 "T4"."email_tracking_consent_updated_at",
+                 "T4"."public_id",
+                 "T4"."address_filled_at",
+                 "T4"."first_login",
+                 "T4"."upcoming_deletion_notified_at",
+                 "T4"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3726,7 +3726,7 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
-          INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
+          INNER JOIN "users_user" "T4" ON ("eligibility_eligibilitydiagnosis"."author_id" = "T4"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
                   OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
@@ -3845,12 +3845,12 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U0."user_id" AS "user"
-               FROM "companies_companymembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."company_id" = %s))
+              (SELECT "U0"."user_id" AS "user"
+               FROM "companies_companymembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."company_id" = %s))
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC,
                    "users_user"."id" ASC
@@ -4014,14 +4014,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',

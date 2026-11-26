@@ -287,15 +287,15 @@
                  "asp_country"."name",
                  "asp_country"."group",
                  "asp_country"."department",
-                 T7."id",
-                 T7."start_date",
-                 T7."end_date",
-                 T7."code",
-                 T7."name",
-                 T7."normalized_name",
-                 T7."created_at",
-                 T7."city_id",
-                 T7."ignore",
+                 "T7"."id",
+                 "T7"."start_date",
+                 "T7"."end_date",
+                 "T7"."code",
+                 "T7"."name",
+                 "T7"."normalized_name",
+                 "T7"."created_at",
+                 "T7"."city_id",
+                 "T7"."ignore",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -406,7 +406,7 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
-          LEFT OUTER JOIN "asp_commune" T7 ON ("users_jobseekerprofile"."hexa_commune_id" = T7."id")
+          LEFT OUTER JOIN "asp_commune" "T7" ON ("users_jobseekerprofile"."hexa_commune_id" = "T7"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
@@ -700,15 +700,15 @@
                  "asp_country"."name",
                  "asp_country"."group",
                  "asp_country"."department",
-                 T7."id",
-                 T7."start_date",
-                 T7."end_date",
-                 T7."code",
-                 T7."name",
-                 T7."normalized_name",
-                 T7."created_at",
-                 T7."city_id",
-                 T7."ignore",
+                 "T7"."id",
+                 "T7"."start_date",
+                 "T7"."end_date",
+                 "T7"."code",
+                 "T7"."name",
+                 "T7"."normalized_name",
+                 "T7"."created_at",
+                 "T7"."city_id",
+                 "T7"."ignore",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -819,7 +819,7 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
-          LEFT OUTER JOIN "asp_commune" T7 ON ("users_jobseekerprofile"."hexa_commune_id" = T7."id")
+          LEFT OUTER JOIN "asp_commune" "T7" ON ("users_jobseekerprofile"."hexa_commune_id" = "T7"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
@@ -1309,15 +1309,15 @@
                  "asp_country"."name",
                  "asp_country"."group",
                  "asp_country"."department",
-                 T7."id",
-                 T7."start_date",
-                 T7."end_date",
-                 T7."code",
-                 T7."name",
-                 T7."normalized_name",
-                 T7."created_at",
-                 T7."city_id",
-                 T7."ignore",
+                 "T7"."id",
+                 "T7"."start_date",
+                 "T7"."end_date",
+                 "T7"."code",
+                 "T7"."name",
+                 "T7"."normalized_name",
+                 "T7"."created_at",
+                 "T7"."city_id",
+                 "T7"."ignore",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1428,7 +1428,7 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
-          LEFT OUTER JOIN "asp_commune" T7 ON ("users_jobseekerprofile"."hexa_commune_id" = T7."id")
+          LEFT OUTER JOIN "asp_commune" "T7" ON ("users_jobseekerprofile"."hexa_commune_id" = "T7"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")

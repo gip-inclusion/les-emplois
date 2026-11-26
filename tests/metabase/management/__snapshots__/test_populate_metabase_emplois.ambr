@@ -747,34 +747,34 @@
                  "approvals_approval"."user_id",
                  "approvals_approval"."origin",
           
-            (SELECT V0."to_company_id" AS "to_company"
-             FROM "job_applications_jobapplication" V0
-             INNER JOIN "companies_company" V2 ON (V0."to_company_id" = V2."id")
-             WHERE (V0."state" = %s
-                    AND V0."job_seeker_id" = ("approvals_approval"."user_id")
-                    AND V2."kind" IN (%s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s))
+            (SELECT "V0"."to_company_id" AS "to_company"
+             FROM "job_applications_jobapplication" "V0"
+             INNER JOIN "companies_company" "V2" ON ("V0"."to_company_id" = "V2"."id")
+             WHERE ("V0"."state" = %s
+                    AND "V0"."job_seeker_id" = ("approvals_approval"."user_id")
+                    AND "V2"."kind" IN (%s,
+                                        %s,
+                                        %s,
+                                        %s,
+                                        %s))
              ORDER BY CASE
-                          WHEN (V0."origin" = %s) THEN V0."hiring_start_at"
-                          WHEN (V0."origin" = %s) THEN V0."created_at"
-                          WHEN (V0."state" = %s) THEN COALESCE(
-                                                                 (SELECT U0."timestamp" AS "timestamp"
-                                                                  FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                  WHERE (U0."job_application_id" = (V0."id")
-                                                                         AND U0."transition" = %s)
-                                                                  ORDER BY 1 DESC
-                                                                  LIMIT 1), V0."created_at")
+                          WHEN ("V0"."origin" = %s) THEN "V0"."hiring_start_at"
+                          WHEN ("V0"."origin" = %s) THEN "V0"."created_at"
+                          WHEN ("V0"."state" = %s) THEN COALESCE(
+                                                                   (SELECT "U0"."timestamp" AS "timestamp"
+                                                                    FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                    WHERE ("U0"."job_application_id" = ("V0"."id")
+                                                                           AND "U0"."transition" = %s)
+                                                                    ORDER BY 1 DESC
+                                                                    LIMIT 1), "V0"."created_at")
                           ELSE
-                                 (SELECT U0."timestamp" AS "timestamp"
-                                  FROM "job_applications_jobapplicationtransitionlog" U0
-                                  WHERE (U0."job_application_id" = (V0."id")
-                                         AND U0."transition" = %s)
+                                 (SELECT "U0"."timestamp" AS "timestamp"
+                                  FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                  WHERE ("U0"."job_application_id" = ("V0"."id")
+                                         AND "U0"."transition" = %s)
                                   ORDER BY 1 DESC
                                   LIMIT 1)
-                      END DESC, V0."hiring_start_at" DESC
+                      END DESC, "V0"."hiring_start_at" DESC
              LIMIT 1) AS "assigned_company",
                  "users_user"."id",
                  "users_user"."password",
@@ -953,50 +953,50 @@
           FROM
             (SELECT
                (SELECT COUNT(*) AS "count"
-                FROM "companies_companymembership" U0
-                INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                WHERE (U1."is_active"
-                       AND U0."is_active"
-                       AND U0."company_id" = ("companies_company"."id"))
-                GROUP BY U0."company_id"
+                FROM "companies_companymembership" "U0"
+                INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                WHERE ("U1"."is_active"
+                       AND "U0"."is_active"
+                       AND "U0"."company_id" = ("companies_company"."id"))
+                GROUP BY "U0"."company_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "active_memberships_count",
           
-               (SELECT MIN(U0."joined_at") AS "min"
-                FROM "companies_companymembership" U0
-                WHERE U0."company_id" = ("companies_company"."id")
-                GROUP BY U0."company_id"
+               (SELECT MIN("U0"."joined_at") AS "min"
+                FROM "companies_companymembership" "U0"
+                WHERE "U0"."company_id" = ("companies_company"."id")
+                GROUP BY "U0"."company_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "first_membership_join_date",
           
-               (SELECT MAX(U2."last_login") AS "max"
-                FROM "companies_companymembership" U0
-                INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                WHERE U0."company_id" = ("companies_company"."id")
-                GROUP BY U0."company_id"
+               (SELECT MAX("U2"."last_login") AS "max"
+                FROM "companies_companymembership" "U0"
+                INNER JOIN "users_user" "U2" ON ("U0"."user_id" = "U2"."id")
+                WHERE "U0"."company_id" = ("companies_company"."id")
+                GROUP BY "U0"."company_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "last_login_date",
           
                (SELECT COUNT(*) AS "count"
-                FROM "companies_jobdescription" U0
-                INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
-                INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                WHERE (NOT (U1."kind" IN (%s,
-                                          %s))
-                       AND U0."company_id" = ("companies_company"."id")
-                       AND U0."is_active")
-                GROUP BY U0."company_id"
+                FROM "companies_jobdescription" "U0"
+                INNER JOIN "companies_company" "U1" ON ("U0"."company_id" = "U1"."id")
+                INNER JOIN "jobs_appellation" ON ("U0"."appellation_id" = "jobs_appellation"."code")
+                WHERE (NOT ("U1"."kind" IN (%s,
+                                            %s))
+                       AND "U0"."company_id" = ("companies_company"."id")
+                       AND "U0"."is_active")
+                GROUP BY "U0"."company_id"
                 LIMIT 1) AS "job_descriptions_active_count",
           
                (SELECT COUNT(*) AS "count"
-                FROM "companies_jobdescription" U0
-                INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
-                INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-                WHERE (NOT (U1."kind" IN (%s,
-                                          %s))
-                       AND U0."company_id" = ("companies_company"."id")
-                       AND NOT U0."is_active")
-                GROUP BY U0."company_id"
+                FROM "companies_jobdescription" "U0"
+                INNER JOIN "companies_company" "U1" ON ("U0"."company_id" = "U1"."id")
+                INNER JOIN "jobs_appellation" ON ("U0"."appellation_id" = "jobs_appellation"."code")
+                WHERE (NOT ("U1"."kind" IN (%s,
+                                            %s))
+                       AND "U0"."company_id" = ("companies_company"."id")
+                       AND NOT "U0"."is_active")
+                GROUP BY "U0"."company_id"
                 LIMIT 1) AS "job_descriptions_inactive_count"
              FROM "companies_company"
              LEFT OUTER JOIN "job_applications_jobapplication" ON ("companies_company"."id" = "job_applications_jobapplication"."to_company_id")
@@ -1692,50 +1692,50 @@
                  "companies_company"."convention_id",
           
             (SELECT COUNT(*) AS "count"
-             FROM "companies_companymembership" U0
-             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-             WHERE (U1."is_active"
-                    AND U0."is_active"
-                    AND U0."company_id" = ("companies_company"."id"))
-             GROUP BY U0."company_id"
+             FROM "companies_companymembership" "U0"
+             INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+             WHERE ("U1"."is_active"
+                    AND "U0"."is_active"
+                    AND "U0"."company_id" = ("companies_company"."id"))
+             GROUP BY "U0"."company_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "active_memberships_count",
           
-            (SELECT MIN(U0."joined_at") AS "min"
-             FROM "companies_companymembership" U0
-             WHERE U0."company_id" = ("companies_company"."id")
-             GROUP BY U0."company_id"
+            (SELECT MIN("U0"."joined_at") AS "min"
+             FROM "companies_companymembership" "U0"
+             WHERE "U0"."company_id" = ("companies_company"."id")
+             GROUP BY "U0"."company_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "first_membership_join_date",
           
-            (SELECT MAX(U2."last_login") AS "max"
-             FROM "companies_companymembership" U0
-             INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-             WHERE U0."company_id" = ("companies_company"."id")
-             GROUP BY U0."company_id"
+            (SELECT MAX("U2"."last_login") AS "max"
+             FROM "companies_companymembership" "U0"
+             INNER JOIN "users_user" "U2" ON ("U0"."user_id" = "U2"."id")
+             WHERE "U0"."company_id" = ("companies_company"."id")
+             GROUP BY "U0"."company_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "last_login_date",
           
             (SELECT COUNT(*) AS "count"
-             FROM "companies_jobdescription" U0
-             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
-             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-             WHERE (NOT (U1."kind" IN (%s,
-                                       %s))
-                    AND U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             GROUP BY U0."company_id"
+             FROM "companies_jobdescription" "U0"
+             INNER JOIN "companies_company" "U1" ON ("U0"."company_id" = "U1"."id")
+             INNER JOIN "jobs_appellation" ON ("U0"."appellation_id" = "jobs_appellation"."code")
+             WHERE (NOT ("U1"."kind" IN (%s,
+                                         %s))
+                    AND "U0"."company_id" = ("companies_company"."id")
+                    AND "U0"."is_active")
+             GROUP BY "U0"."company_id"
              LIMIT 1) AS "job_descriptions_active_count",
           
             (SELECT COUNT(*) AS "count"
-             FROM "companies_jobdescription" U0
-             INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
-             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
-             WHERE (NOT (U1."kind" IN (%s,
-                                       %s))
-                    AND U0."company_id" = ("companies_company"."id")
-                    AND NOT U0."is_active")
-             GROUP BY U0."company_id"
+             FROM "companies_jobdescription" "U0"
+             INNER JOIN "companies_company" "U1" ON ("U0"."company_id" = "U1"."id")
+             INNER JOIN "jobs_appellation" ON ("U0"."appellation_id" = "jobs_appellation"."code")
+             WHERE (NOT ("U1"."kind" IN (%s,
+                                         %s))
+                    AND "U0"."company_id" = ("companies_company"."id")
+                    AND NOT "U0"."is_active")
+             GROUP BY "U0"."company_id"
              LIMIT 1) AS "job_descriptions_inactive_count",
                  MAX("job_applications_jobapplicationtransitionlog"."timestamp") FILTER (
                                                                                          WHERE NOT ("job_applications_jobapplicationtransitionlog"."to_state" = %s
@@ -4865,21 +4865,21 @@
           FROM "job_applications_jobapplication"
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id"
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))))
         ''',
       }),
@@ -5446,24 +5446,24 @@
                  "job_applications_jobapplication"."processed_at",
                  "job_applications_jobapplication"."contract_type",
           
-            (SELECT JSON_OBJECT(((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   WHERE (U0."to_state" = %s)), ((%s)::text) VALUE MIN(U0."timestamp") FILTER (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               WHERE (U0."transition" = %s)) RETURNING JSONB) AS "timestamps"
-             FROM "job_applications_jobapplicationtransitionlog" U0
-             WHERE U0."job_application_id" = ("job_applications_jobapplication"."id")
-             GROUP BY U0."job_application_id") AS "first_transition_timestamps",
+            (SELECT JSON_OBJECT(((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."to_state" = %s)), ((%s)::text) VALUE MIN("U0"."timestamp") FILTER (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 WHERE ("U0"."transition" = %s)) RETURNING JSONB) AS "timestamps"
+             FROM "job_applications_jobapplicationtransitionlog" "U0"
+             WHERE "U0"."job_application_id" = ("job_applications_jobapplication"."id")
+             GROUP BY "U0"."job_application_id") AS "first_transition_timestamps",
                  "users_user"."id",
                  "users_user"."first_name",
                  "users_user"."last_name",
-                 T4."id",
-                 T4."kind",
+                 "T4"."id",
+                 "T4"."kind",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."name",
                  "prescribers_prescriberorganization"."kind",
@@ -5477,25 +5477,25 @@
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          LEFT OUTER JOIN "companies_company" T4 ON ("job_applications_jobapplication"."sender_company_id" = T4."id")
+          LEFT OUTER JOIN "companies_company" "T4" ON ("job_applications_jobapplication"."sender_company_id" = "T4"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id"
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))))
           ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
@@ -5632,21 +5632,21 @@
           INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id"
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))))
         ''',
       }),
@@ -5733,21 +5733,21 @@
           INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id"
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -5849,21 +5849,21 @@
              WHERE (NOT ("companies_company"."kind" IN (%s,
                                                         %s))
                     AND "companies_jobdescription"."company_id" IN
-                      (SELECT V0."id"
-                       FROM "companies_company" V0
-                       WHERE (NOT (V0."siret" = %s)
-                              AND NOT (V0."kind" IN (%s,
-                                                     %s))
-                              AND (V0."kind" IN (%s,
-                                                 %s)
-                                   OR (V0."is_searchable"
-                                       AND V0."kind" = %s)
-                                   OR V0."source" = %s
+                      (SELECT "V0"."id"
+                       FROM "companies_company" "V0"
+                       WHERE (NOT ("V0"."siret" = %s)
+                              AND NOT ("V0"."kind" IN (%s,
+                                                       %s))
+                              AND ("V0"."kind" IN (%s,
+                                                   %s)
+                                   OR ("V0"."is_searchable"
+                                       AND "V0"."kind" = %s)
+                                   OR "V0"."source" = %s
                                    OR EXISTS
                                      (SELECT %s AS "a"
-                                      FROM "companies_siaeconvention" U0
-                                      WHERE (U0."id" = (V0."convention_id")
-                                             AND U0."is_active")
+                                      FROM "companies_siaeconvention" "U0"
+                                      WHERE ("U0"."id" = ("V0"."convention_id")
+                                             AND "U0"."is_active")
                                       LIMIT 1)))))
              GROUP BY 1) subquery
         ''',
@@ -6218,49 +6218,49 @@
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
                  "cities_city"."last_synced_at",
-                 T8."id",
-                 T8."name",
-                 T8."normalized_name",
-                 T8."slug",
-                 T8."department",
-                 T8."post_codes",
-                 T8."code_insee",
-                 T8."siren_epci",
-                 T8."coords",
-                 T8."edition_mode",
-                 T8."last_synced_at"
+                 "T8"."id",
+                 "T8"."name",
+                 "T8"."normalized_name",
+                 "T8"."slug",
+                 "T8"."department",
+                 "T8"."post_codes",
+                 "T8"."code_insee",
+                 "T8"."siren_epci",
+                 "T8"."coords",
+                 "T8"."edition_mode",
+                 "T8"."last_synced_at"
           FROM "companies_jobdescription"
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_company"."insee_city_id" = "cities_city"."id")
-          LEFT OUTER JOIN "cities_city" T8 ON ("companies_jobdescription"."location_id" = T8."id")
+          LEFT OUTER JOIN "cities_city" "T8" ON ("companies_jobdescription"."location_id" = "T8"."id")
           WHERE (NOT ("companies_company"."kind" IN (%s,
                                                      %s))
                  AND "companies_jobdescription"."company_id" IN
-                   (SELECT V0."id"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id"
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))))
           GROUP BY "companies_jobdescription"."id",
                    "jobs_appellation"."code",
                    "jobs_rome"."code",
                    "companies_company"."id",
                    "cities_city"."id",
-                   T8."id"
+                   "T8"."id"
         ''',
       }),
       dict({
@@ -6718,12 +6718,12 @@
           SELECT COUNT(*)
           FROM
             (SELECT
-               (SELECT U2."kind" AS "to_company__kind"
-                FROM "job_applications_jobapplication" U0
-                INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
-                WHERE (U0."state" = %s
-                       AND U0."job_seeker_id" = ("users_user"."id"))
-                ORDER BY U0."created_at" DESC
+               (SELECT "U2"."kind" AS "to_company__kind"
+                FROM "job_applications_jobapplication" "U0"
+                INNER JOIN "companies_company" "U2" ON ("U0"."to_company_id" = "U2"."id")
+                WHERE ("U0"."state" = %s
+                       AND "U0"."job_seeker_id" = ("users_user"."id"))
+                ORDER BY "U0"."created_at" DESC
                 LIMIT 1) AS "last_hiring_company_kind"
              FROM "users_user"
              LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."job_seeker_id")
@@ -7541,18 +7541,18 @@
                  COUNT(DISTINCT "job_applications_jobapplication"."id") FILTER (
                                                                                 WHERE "job_applications_jobapplication"."state" = %s) AS "accepted_job_applications_count",
           
-            (SELECT U2."kind" AS "to_company__kind"
-             FROM "job_applications_jobapplication" U0
-             INNER JOIN "companies_company" U2 ON (U0."to_company_id" = U2."id")
-             WHERE (U0."state" = %s
-                    AND U0."job_seeker_id" = ("users_user"."id"))
-             ORDER BY U0."created_at" DESC
+            (SELECT "U2"."kind" AS "to_company__kind"
+             FROM "job_applications_jobapplication" "U0"
+             INNER JOIN "companies_company" "U2" ON ("U0"."to_company_id" = "U2"."id")
+             WHERE ("U0"."state" = %s
+                    AND "U0"."job_seeker_id" = ("users_user"."id"))
+             ORDER BY "U0"."created_at" DESC
              LIMIT 1) AS "last_hiring_company_kind",
                  "cities_city"."id",
                  "cities_city"."code_insee",
-                 T5."id",
-                 T5."is_staff",
-                 T5."kind",
+                 "T5"."id",
+                 "T5"."is_staff",
+                 "T5"."kind",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."nir",
@@ -7561,12 +7561,12 @@
           LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."job_seeker_id")
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "cities_city" ON ("users_user"."insee_city_id" = "cities_city"."id")
-          LEFT OUTER JOIN "users_user" T5 ON ("users_user"."created_by_id" = T5."id")
+          LEFT OUTER JOIN "users_user" "T5" ON ("users_user"."created_by_id" = "T5"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE "users_user"."kind" = %s
           GROUP BY "users_user"."id",
                    "cities_city"."id",
-                   T5."id",
+                   "T5"."id",
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -9054,27 +9054,27 @@
           FROM
             (SELECT
                (SELECT COUNT(*) AS "count"
-                FROM "prescribers_prescribermembership" U0
-                INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                WHERE (U1."is_active"
-                       AND U0."is_active"
-                       AND U0."organization_id" = ("prescribers_prescriberorganization"."id"))
-                GROUP BY U0."organization_id"
+                FROM "prescribers_prescribermembership" "U0"
+                INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                WHERE ("U1"."is_active"
+                       AND "U0"."is_active"
+                       AND "U0"."organization_id" = ("prescribers_prescriberorganization"."id"))
+                GROUP BY "U0"."organization_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "active_memberships_count",
           
-               (SELECT MIN(U0."joined_at") AS "min"
-                FROM "prescribers_prescribermembership" U0
-                WHERE U0."organization_id" = ("prescribers_prescriberorganization"."id")
-                GROUP BY U0."organization_id"
+               (SELECT MIN("U0"."joined_at") AS "min"
+                FROM "prescribers_prescribermembership" "U0"
+                WHERE "U0"."organization_id" = ("prescribers_prescriberorganization"."id")
+                GROUP BY "U0"."organization_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "first_membership_join_date",
           
-               (SELECT MAX(U2."last_login") AS "max"
-                FROM "prescribers_prescribermembership" U0
-                INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                WHERE U0."organization_id" = ("prescribers_prescriberorganization"."id")
-                GROUP BY U0."organization_id"
+               (SELECT MAX("U2"."last_login") AS "max"
+                FROM "prescribers_prescribermembership" "U0"
+                INNER JOIN "users_user" "U2" ON ("U0"."user_id" = "U2"."id")
+                WHERE "U0"."organization_id" = ("prescribers_prescriberorganization"."id")
+                GROUP BY "U0"."organization_id"
                 ORDER BY RANDOM() ASC
                 LIMIT 1) AS "last_login_date"
              FROM "prescribers_prescriberorganization"
@@ -9465,80 +9465,80 @@
                                                                                 WHERE (NOT ("job_applications_jobapplication"."origin" = %s
                                                                                             AND "job_applications_jobapplication"."origin" IS NOT NULL)
                                                                                        AND "job_applications_jobapplication"."to_company_id" IN
-                                                                                         (SELECT V0."id"
-                                                                                          FROM "companies_company" V0
-                                                                                          WHERE (NOT (V0."siret" = %s)
-                                                                                                 AND NOT (V0."kind" IN (%s, %s))
-                                                                                                 AND (V0."kind" IN (%s, %s)
-                                                                                                      OR (V0."is_searchable"
-                                                                                                          AND V0."kind" = %s)
-                                                                                                      OR V0."source" = %s
+                                                                                         (SELECT "V0"."id"
+                                                                                          FROM "companies_company" "V0"
+                                                                                          WHERE (NOT ("V0"."siret" = %s)
+                                                                                                 AND NOT ("V0"."kind" IN (%s, %s))
+                                                                                                 AND ("V0"."kind" IN (%s, %s)
+                                                                                                      OR ("V0"."is_searchable"
+                                                                                                          AND "V0"."kind" = %s)
+                                                                                                      OR "V0"."source" = %s
                                                                                                       OR EXISTS
                                                                                                         (SELECT %s AS "a"
-                                                                                                         FROM "companies_siaeconvention" U0
-                                                                                                         WHERE (U0."id" = (V0."convention_id")
-                                                                                                                AND U0."is_active")
+                                                                                                         FROM "companies_siaeconvention" "U0"
+                                                                                                         WHERE ("U0"."id" = ("V0"."convention_id")
+                                                                                                                AND "U0"."is_active")
                                                                                                          LIMIT 1)))))) AS "job_applications_count",
                  COUNT(DISTINCT "job_applications_jobapplication"."id") FILTER (
                                                                                 WHERE (NOT ("job_applications_jobapplication"."origin" = %s
                                                                                             AND "job_applications_jobapplication"."origin" IS NOT NULL)
                                                                                        AND "job_applications_jobapplication"."to_company_id" IN
-                                                                                         (SELECT V0."id"
-                                                                                          FROM "companies_company" V0
-                                                                                          WHERE (NOT (V0."siret" = %s)
-                                                                                                 AND NOT (V0."kind" IN (%s, %s))
-                                                                                                 AND (V0."kind" IN (%s, %s)
-                                                                                                      OR (V0."is_searchable"
-                                                                                                          AND V0."kind" = %s)
-                                                                                                      OR V0."source" = %s
+                                                                                         (SELECT "V0"."id"
+                                                                                          FROM "companies_company" "V0"
+                                                                                          WHERE (NOT ("V0"."siret" = %s)
+                                                                                                 AND NOT ("V0"."kind" IN (%s, %s))
+                                                                                                 AND ("V0"."kind" IN (%s, %s)
+                                                                                                      OR ("V0"."is_searchable"
+                                                                                                          AND "V0"."kind" = %s)
+                                                                                                      OR "V0"."source" = %s
                                                                                                       OR EXISTS
                                                                                                         (SELECT %s AS "a"
-                                                                                                         FROM "companies_siaeconvention" U0
-                                                                                                         WHERE (U0."id" = (V0."convention_id")
-                                                                                                                AND U0."is_active")
+                                                                                                         FROM "companies_siaeconvention" "U0"
+                                                                                                         WHERE ("U0"."id" = ("V0"."convention_id")
+                                                                                                                AND "U0"."is_active")
                                                                                                          LIMIT 1))))
                                                                                        AND "job_applications_jobapplication"."state" = %s)) AS "accepted_job_applications_count",
                  MAX("job_applications_jobapplication"."created_at") FILTER (
                                                                              WHERE (NOT ("job_applications_jobapplication"."origin" = %s
                                                                                          AND "job_applications_jobapplication"."origin" IS NOT NULL)
                                                                                     AND "job_applications_jobapplication"."to_company_id" IN
-                                                                                      (SELECT V0."id"
-                                                                                       FROM "companies_company" V0
-                                                                                       WHERE (NOT (V0."siret" = %s)
-                                                                                              AND NOT (V0."kind" IN (%s, %s))
-                                                                                              AND (V0."kind" IN (%s, %s)
-                                                                                                   OR (V0."is_searchable"
-                                                                                                       AND V0."kind" = %s)
-                                                                                                   OR V0."source" = %s
+                                                                                      (SELECT "V0"."id"
+                                                                                       FROM "companies_company" "V0"
+                                                                                       WHERE (NOT ("V0"."siret" = %s)
+                                                                                              AND NOT ("V0"."kind" IN (%s, %s))
+                                                                                              AND ("V0"."kind" IN (%s, %s)
+                                                                                                   OR ("V0"."is_searchable"
+                                                                                                       AND "V0"."kind" = %s)
+                                                                                                   OR "V0"."source" = %s
                                                                                                    OR EXISTS
                                                                                                      (SELECT %s AS "a"
-                                                                                                      FROM "companies_siaeconvention" U0
-                                                                                                      WHERE (U0."id" = (V0."convention_id")
-                                                                                                             AND U0."is_active")
+                                                                                                      FROM "companies_siaeconvention" "U0"
+                                                                                                      WHERE ("U0"."id" = ("V0"."convention_id")
+                                                                                                             AND "U0"."is_active")
                                                                                                       LIMIT 1)))))) AS "last_job_application_creation_date",
           
             (SELECT COUNT(*) AS "count"
-             FROM "prescribers_prescribermembership" U0
-             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-             WHERE (U1."is_active"
-                    AND U0."is_active"
-                    AND U0."organization_id" = ("prescribers_prescriberorganization"."id"))
-             GROUP BY U0."organization_id"
+             FROM "prescribers_prescribermembership" "U0"
+             INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+             WHERE ("U1"."is_active"
+                    AND "U0"."is_active"
+                    AND "U0"."organization_id" = ("prescribers_prescriberorganization"."id"))
+             GROUP BY "U0"."organization_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "active_memberships_count",
           
-            (SELECT MIN(U0."joined_at") AS "min"
-             FROM "prescribers_prescribermembership" U0
-             WHERE U0."organization_id" = ("prescribers_prescriberorganization"."id")
-             GROUP BY U0."organization_id"
+            (SELECT MIN("U0"."joined_at") AS "min"
+             FROM "prescribers_prescribermembership" "U0"
+             WHERE "U0"."organization_id" = ("prescribers_prescriberorganization"."id")
+             GROUP BY "U0"."organization_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "first_membership_join_date",
           
-            (SELECT MAX(U2."last_login") AS "max"
-             FROM "prescribers_prescribermembership" U0
-             INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-             WHERE U0."organization_id" = ("prescribers_prescriberorganization"."id")
-             GROUP BY U0."organization_id"
+            (SELECT MAX("U2"."last_login") AS "max"
+             FROM "prescribers_prescribermembership" "U0"
+             INNER JOIN "users_user" "U2" ON ("U0"."user_id" = "U2"."id")
+             WHERE "U0"."organization_id" = ("prescribers_prescriberorganization"."id")
+             GROUP BY "U0"."organization_id"
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "last_login_date",
                  "cities_city"."id",
@@ -10020,45 +10020,45 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."fields_history",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."terms_accepted_at",
-                 T3."email_tracking_consent",
-                 T3."email_tracking_consent_updated_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 T3."upcoming_deletion_notified_at",
-                 T3."allow_next_sso_sub_update",
+                 "T3"."id",
+                 "T3"."password",
+                 "T3"."last_login",
+                 "T3"."is_superuser",
+                 "T3"."username",
+                 "T3"."first_name",
+                 "T3"."last_name",
+                 "T3"."is_staff",
+                 "T3"."is_active",
+                 "T3"."date_joined",
+                 "T3"."fields_history",
+                 "T3"."address_line_1",
+                 "T3"."address_line_2",
+                 "T3"."post_code",
+                 "T3"."city",
+                 "T3"."department",
+                 "T3"."coords",
+                 "T3"."geocoding_score",
+                 "T3"."geocoding_updated_at",
+                 "T3"."ban_api_resolved_address",
+                 "T3"."insee_city_id",
+                 "T3"."title",
+                 "T3"."full_name_search_vector",
+                 "T3"."email",
+                 "T3"."phone",
+                 "T3"."kind",
+                 "T3"."identity_provider",
+                 "T3"."has_completed_welcoming_tour",
+                 "T3"."created_by_id",
+                 "T3"."external_data_source_history",
+                 "T3"."last_checked_at",
+                 "T3"."terms_accepted_at",
+                 "T3"."email_tracking_consent",
+                 "T3"."email_tracking_consent_updated_at",
+                 "T3"."public_id",
+                 "T3"."address_filled_at",
+                 "T3"."first_login",
+                 "T3"."upcoming_deletion_notified_at",
+                 "T3"."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -10185,7 +10185,7 @@
                  "insertion_structure"."updated_at"
           FROM "insertion_orientation"
           INNER JOIN "users_user" ON ("insertion_orientation"."beneficiary_id" = "users_user"."id")
-          INNER JOIN "users_user" T3 ON ("insertion_orientation"."sender_id" = T3."id")
+          INNER JOIN "users_user" "T3" ON ("insertion_orientation"."sender_id" = "T3"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("insertion_orientation"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_company" ON ("insertion_orientation"."sender_company_id" = "companies_company"."id")
           INNER JOIN "insertion_service" ON ("insertion_orientation"."service_id" = "insertion_service"."id")

@@ -3372,8 +3372,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -3384,7 +3384,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -3474,10 +3474,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -3538,8 +3538,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -3550,7 +3550,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."campaign_id" IN (%s))
@@ -3854,8 +3854,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -3866,7 +3866,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -3956,10 +3956,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -4020,8 +4020,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -4032,7 +4032,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."label_geiq_id" = %s)
@@ -4336,8 +4336,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -4348,7 +4348,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -4440,10 +4440,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s, %s, %s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s, %s, %s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -4504,8 +4504,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -4516,7 +4516,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -6334,8 +6334,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -6346,7 +6346,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -6435,10 +6435,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -6499,8 +6499,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -6511,12 +6511,12 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
-          INNER JOIN "geiq_assessments_assessmentinstitutionlink" T8 ON ("geiq_assessments_assessment"."id" = T8."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" "T8" ON ("geiq_assessments_assessment"."id" = "T8"."assessment_id")
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
-                 AND T8."institution_id" IN (%s)
-                 AND T8."with_convention")
+                 AND "T8"."institution_id" IN (%s)
+                 AND "T8"."with_convention")
           GROUP BY "geiq_assessments_assessment"."id",
                    37,
                    38,
@@ -7197,8 +7197,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -7209,7 +7209,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -7299,10 +7299,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -7363,8 +7363,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -7375,13 +7375,13 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
-          INNER JOIN "geiq_assessments_assessmentinstitutionlink" T8 ON ("geiq_assessments_assessment"."id" = T8."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" "T8" ON ("geiq_assessments_assessment"."id" = "T8"."assessment_id")
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."campaign_id" IN (%s)
-                 AND T8."institution_id" IN (%s)
-                 AND T8."with_convention"
+                 AND "T8"."institution_id" IN (%s)
+                 AND "T8"."with_convention"
                  AND "geiq_assessments_assessment"."state" IN (%s)
                  AND "geiq_assessments_assessment"."label_geiq_id" = %s)
           GROUP BY "geiq_assessments_assessment"."id",
@@ -7709,8 +7709,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -7721,7 +7721,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
           GROUP BY "geiq_assessments_assessment"."id",
@@ -7812,10 +7812,10 @@
           FROM "institutions_institution"
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "geiq_assessments_assessmentinstitutionlink" U0
-               WHERE (U0."assessment_id" IN (%s, %s, %s, %s)
-                      AND U0."institution_id" = ("institutions_institution"."id")
-                      AND U0."with_convention")
+               FROM "geiq_assessments_assessmentinstitutionlink" "U0"
+               WHERE ("U0"."assessment_id" IN (%s, %s, %s, %s)
+                      AND "U0"."institution_id" = ("institutions_institution"."id")
+                      AND "U0"."with_convention")
                LIMIT 1)
           ORDER BY "institutions_institution"."name" ASC
         ''',
@@ -7876,8 +7876,8 @@
                      ELSE %s
                  END AS "state_order",
                  GREATEST("geiq_assessments_assessment"."created_at", "geiq_assessments_assessment"."decision_validated_at", "geiq_assessments_assessment"."grants_selection_validated_at", "geiq_assessments_assessment"."reviewed_at", "geiq_assessments_assessment"."final_reviewed_at") AS "last_updated_at",
-                 SUM(T6."allowance_amount") FILTER (
-                                                    WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 SUM("T6"."allowance_amount") FILTER (
+                                                      WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
                  "geiq_assessments_assessment"."reviewed_at" IS NOT NULL AS "can_view_amounts",
                                                                             "geiq_assessments_assessmentcampaign"."id",
                                                                             "geiq_assessments_assessmentcampaign"."year",
@@ -7888,7 +7888,7 @@
           INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
           LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
-          LEFT OUTER JOIN "geiq_assessments_employee" T6 ON ("geiq_assessments_employeecontract"."employee_id" = T6."id")
+          LEFT OUTER JOIN "geiq_assessments_employee" "T6" ON ("geiq_assessments_employeecontract"."employee_id" = "T6"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
                  AND "geiq_assessments_assessment"."state" IN (%s))

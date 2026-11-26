@@ -16,29 +16,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -59,29 +59,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -101,9 +101,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -231,9 +231,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -264,29 +264,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -307,29 +307,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -349,9 +349,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s, %s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s, %s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -479,9 +479,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s, %s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s, %s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -512,29 +512,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -555,29 +555,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -597,9 +597,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -625,29 +625,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -668,29 +668,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -710,9 +710,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s, %s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s, %s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -840,9 +840,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s, %s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s, %s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -873,29 +873,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -916,29 +916,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -958,9 +958,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -1088,9 +1088,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -1121,29 +1121,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -1164,29 +1164,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -1206,9 +1206,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -1336,9 +1336,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -1369,29 +1369,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -1412,29 +1412,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -1454,9 +1454,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s, %s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s, %s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -1584,9 +1584,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s, %s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s, %s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",
@@ -1617,29 +1617,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -1660,29 +1660,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -1725,29 +1725,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -1768,29 +1768,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -1833,29 +1833,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
@@ -1876,29 +1876,29 @@
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."company_id" IN
-                   (SELECT V0."id" AS "pk"
-                    FROM "companies_company" V0
-                    INNER JOIN "companies_companymembership" V1 ON (V0."id" = V1."company_id")
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s,
-                                                  %s))
-                           AND V1."user_id" = %s
-                           AND (V0."kind" IN (%s,
-                                              %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                   (SELECT "V0"."id" AS "pk"
+                    FROM "companies_company" "V0"
+                    INNER JOIN "companies_companymembership" "V1" ON ("V0"."id" = "V1"."company_id")
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s,
+                                                    %s))
+                           AND "V1"."user_id" = %s
+                           AND ("V0"."kind" IN (%s,
+                                                %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1)))))
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
@@ -1918,9 +1918,9 @@
              LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."job_seeker_id" = ("users_user"."id")
-                              AND U0."to_company_id" IN (%s))
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                              AND "U0"."to_company_id" IN (%s))
                        LIMIT 1)
                     AND "users_user"."kind" = %s)
              GROUP BY 1) subquery
@@ -2048,9 +2048,9 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."job_seeker_id" = ("users_user"."id")
-                           AND U0."to_company_id" IN (%s))
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."job_seeker_id" = ("users_user"."id")
+                           AND "U0"."to_company_id" IN (%s))
                     LIMIT 1)
                  AND "users_user"."kind" = %s)
           GROUP BY "users_user"."id",

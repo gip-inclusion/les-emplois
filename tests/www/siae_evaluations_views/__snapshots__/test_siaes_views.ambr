@@ -132,9 +132,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -161,15 +161,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -381,14 +381,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -869,9 +869,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -898,15 +898,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -1204,9 +1204,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -1233,15 +1233,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -1448,11 +1448,11 @@
           UPDATE "siae_evaluations_evaluatedadministrativecriteria"
           SET "submitted_at" = %s
           WHERE "siae_evaluations_evaluatedadministrativecriteria"."id" IN
-              (SELECT U0."id"
-               FROM "siae_evaluations_evaluatedadministrativecriteria" U0
-               INNER JOIN "siae_evaluations_evaluatedjobapplication" U1 ON (U0."evaluated_job_application_id" = U1."id")
-               WHERE (U1."evaluated_siae_id" = %s
-                      AND U0."review_state" = %s))
+              (SELECT "U0"."id"
+               FROM "siae_evaluations_evaluatedadministrativecriteria" "U0"
+               INNER JOIN "siae_evaluations_evaluatedjobapplication" "U1" ON ("U0"."evaluated_job_application_id" = "U1"."id")
+               WHERE ("U1"."evaluated_siae_id" = %s
+                      AND "U0"."review_state" = %s))
         ''',
       }),
       dict({
@@ -1554,12 +1554,12 @@
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN
-              (SELECT U0."id"
-               FROM "institutions_institutionmembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."institution_id" = %s))
+              (SELECT "U0"."id"
+               FROM "institutions_institutionmembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."institution_id" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),

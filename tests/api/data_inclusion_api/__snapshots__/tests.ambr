@@ -195,9 +195,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -255,9 +255,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
           ORDER BY "companies_company"."created_at" ASC,
                    "companies_company"."id" ASC
@@ -307,9 +307,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -367,9 +367,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
           ORDER BY "companies_company"."created_at" ASC,
                    "companies_company"."id" ASC
@@ -476,9 +476,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -536,9 +536,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
           ORDER BY "companies_company"."created_at" ASC,
                    "companies_company"."id" ASC
@@ -588,9 +588,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -648,9 +648,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
           ORDER BY "companies_company"."created_at" ASC,
                    "companies_company"."id" ASC
@@ -700,9 +700,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -749,9 +749,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
         ''',
       }),
@@ -809,9 +809,9 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)))
           ORDER BY "companies_company"."created_at" ASC,
                    "companies_company"."id" ASC
