@@ -21,7 +21,6 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 
-from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.companies.models import Company
@@ -568,7 +567,6 @@ def api_token(request, template_name="dashboard/api_token.html"):
         token_key = None
     context = {
         "back_url": reverse("dashboard:index"),
-        "login_string": TOKEN_ID_STR,
         "token_is_new": token_is_new,
         "token_key": token_key,
         "companies": request.user.companymembership_set.order_by("pk").values(

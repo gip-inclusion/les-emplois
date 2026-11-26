@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ title }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div id="scalar-app"></div>
+        {{ scalar_configuration|json_script:"scalar-configuration" }}
+        <script src="{% static 'vendor/scalar/standalone.js' %}"></script>
+        <script nonce="{{ csp_nonce }}">
+            Scalar.createApiReference(
+                "#scalar-app",
+                JSON.parse(document.getElementById("scalar-configuration").textContent),
+            );
+        </script>
+    </body>
+</html>

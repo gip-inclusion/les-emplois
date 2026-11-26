@@ -1,9 +1,8 @@
-from django.conf import settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
-def test_index(client):
+def test_index(client, snapshot):
     response = client.get(reverse("api:index"))
-    assertContains(response, reverse("v1:redoc"))
-    assertContains(response, f"mailto:{settings.API_EMAIL_CONTACT}")
+    assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot

@@ -57,7 +57,10 @@ class DatadogApiClient:
         data = {
             "compute": [{"metric": metric_kind, "aggregation": agregation_kind, "type": "total"}],
             "filter": {
-                "query": f"@http.url:/api/v1/{endpoint}* @logger.method_name:log_response -@http.url:/api/v1/redoc/* ",
+                "query": (
+                    f"@http.url:/api/v1/{endpoint}* @logger.method_name:log_response "
+                    "-@http.url:/api/v1/redoc/* -@http.url:/api/v1/documentation/* "
+                ),
                 "from": f"{start_ts}",
                 "to": f"{end_ts}",
                 "indexes": ["*"],

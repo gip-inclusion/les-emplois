@@ -17,7 +17,6 @@ from redis.backoff import ExponentialBackoff
 from redis.retry import Retry
 
 import itou
-import itou.api.changelog
 from config.sentry import sentry_init
 from itou.emails.markdown import markdown_url_trusted_location
 from itou.utils.brand import product_name
@@ -650,8 +649,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": f"API - {product_name()}",
-    "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**\n\n" + itou.api.changelog.CHANGELOG,
+    "TITLE": product_name(),
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
         "Civilite": "itou.users.enums.Title",
@@ -662,6 +660,10 @@ SPECTACULAR_SETTINGS = {
     # Allows to document the choices of a field even if the serializer has allow_null=True.
     # cf. https://github.com/tfranzel/drf-spectacular/issues/235
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
+    # Explicit, so that tags (the first path segment after the prefix) do not depend on the generated
+    # endpoints: the prefix is otherwise guessed from them, which fails for documentations with one view.
+    # Documentations are split by tag, see `itou.api.documentation`.
+    "SCHEMA_PATH_PREFIX": "/api/v1",
     "AUTHENTICATION_WHITELIST": [
         "rest_framework.authentication.TokenAuthentication",
     ],
@@ -692,6 +694,11 @@ MARKDOWNIFY = {
             "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
             "PARSE_EMAIL": True,
         },
+    },
+    # Trusted content from `itou/api/changelog.md`.
+    "api_changelog": {
+        "WHITELIST_TAGS": ["a", "p", "ul", "ol", "li", "em", "strong", "code", "h3", "h4"],
+        "MARKDOWN_EXTENSIONS": ["sane_lists"],
     },
     "email": {
         "WHITELIST_TAGS": ["a", "p", "ul", "ol", "li", "strong", "br", "b", "i", "h1", "h2", "h3", "h4", "h5", "h6"],
@@ -741,7 +748,6 @@ csp_img_src = [
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
     "https://*.tile.openstreetmap.org",
-    "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
     # Zendesk Web Widget assets (launcher icons, avatars).
     "https://*.zdassets.com",
@@ -809,10 +815,7 @@ SECURE_CSP = {
         # It would be better to whilelist styles hashes but it's to much work for now.
         CSP.UNSAFE_INLINE,
     ],
-    "worker-src": [
-        CSP.SELF,
-        "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
-    ],
+    "worker-src": [CSP.SELF],
 }
 
 BYPASS_TERMS_ACCEPTANCE = os.getenv("BYPASS_TERMS_ACCEPTANCE", "False") == "True"

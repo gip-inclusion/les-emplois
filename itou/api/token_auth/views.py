@@ -48,11 +48,15 @@ class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken
         return super().post(request, *args, **kwargs)
 
 
-ObtainAuthToken.__doc__ = f"""\
-**Route utilisée pour les comptes n’ayant pas activé ProConnect.**
+# XXX: only 227 admin company users left still using Django as on 2026-11-25
+# but we never set unusable_password on converted users to ProConnect.
+# Maybe check how many users still use login/password couples to log through here ?
+tag_description = f"""\
+**API Dépréciée**
 
-Si vous avez activé ProConnect pour votre compte, vous devez obtenir un jeton d’accès aux
-APIs depuis un **compte administrateur de la structure** de la manière suivante :
+**Cette API était utilisée avant la mise en place des jeton d’accès.**
+
+La procédure pour se connecter aux APIs est maintenant de :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
 """

@@ -95,21 +95,24 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         return self._filter_by_query_params(self.request, super().get_queryset())
 
 
-# Doc section is in French for Swagger / OAS auto doc generation
-EmployeeRecordViewSet.__doc__ = f"""\
+tag_description = f"""\
 # API fiches salarié
 
-Cette API retourne la liste des fiches salarié saisies par les SIAE :
-
-- dans l'état `PROCESSED` (par défaut)
-- pour toutes les embauches / candidatures des SIAE liées au token d'identification
-- classées par date de création (plus récent au plus ancien)
+Cette API retourne la liste des fiches salarié saisies par les SIAE pour toutes les
+embauches / candidatures des SIAE liées au token d'identification.
 
 # Permissions
 
 L'utilisation externe de cette API nécessite un token d'autorisation :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
+"""
+
+# Doc section is in French for Swagger / OAS auto doc generation
+EmployeeRecordViewSet.__doc__ = """\
+# Tri des données
+
+Les données sont classées par date de création (plus récent au plus ancien).
 
 # Paramètres
 

@@ -51,7 +51,7 @@
                             <p>En tant qu’administrateur de structures, vous avez accès aux API suivantes :</p>
                             <ul>
                                 <li>
-                                    <strong>Fiches salarié (<a href="{% url 'v1:redoc' %}#tag/employee-records"
+                                    <strong>Fiches salarié (<a href="{% url 'v1:documentation' slug="employeurs" %}#tag/employee-records"
                                                                target="_blank"
                                                                class="has-external-link"
                                                                rel="noopener">voir la documentation</a>)</strong>
@@ -66,7 +66,7 @@
                                     {% endcomponent_info %}
                                 </li>
                                 <li>
-                                    <strong>Candidats (<a href="{% url 'v1:redoc' %}#tag/candidats"
+                                    <strong>Candidats (<a href="{% url 'v1:documentation' slug="employeurs" %}#tag/candidats"
                                                           target="_blank"
                                                           class="has-external-link"
                                                           rel="noopener">voir la documentation</a>)</strong>
@@ -90,7 +90,9 @@
                         <div class="c-box mb-3 mb-md-4">
                             <h3>Connexion à l’API</h3>
                             <p>
-                                Pour vous connecter à l’API vous devez utiliser l’identifiant "<strong>{{ login_string }}</strong>" et comme mot de passe votre token.
+                                Pour vous connecter à l’API vous devez utiliser ajouter le header suivant à vos requêtes :
+                                <br>
+                                <code>Authorization: Token &lt;votre_token&gt;</code>
                             </p>
                             {% if not token_key %}
                                 <form method="post" action="{% url 'dashboard:api_token' %}">

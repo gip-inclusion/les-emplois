@@ -15,6 +15,23 @@ from itou.utils.brand import product_name
 from itou.utils.readonly import ReadonlyViewMixin
 
 
+tag_description = f"""\
+# Liste des candidats par structure
+
+Cette API retourne la liste de tous les demandeurs d'emploi liés aux candidatures reçues par
+la ou les structure(s) sélectionnée(s).
+
+# Permissions
+
+L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
+
+{AUTH_TOKEN_EXPLANATION_TEXT}
+
+Le compte administrateur utilisé doit être **administrateur de toutes les structures dont il est membre**.
+Par défaut, l'API renvoie les candidatures reçues par la première structure dont le compte est membre
+car la première version avait été pensée ainsi."""
+
+
 class ApplicantsView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = (ApplicantsAPIPermission,)
@@ -70,26 +87,10 @@ class ApplicantsView(LoginNotRequiredMixin, ReadonlyViewMixin, generics.ListAPIV
 
 
 ApplicantsView.__doc__ = f"""\
-# Liste des candidats par structure
-
-Cette API retourne la liste de tous les demandeurs d'emploi liés aux candidatures reçues par
-la ou les structure(s) sélectionnée(s).
+# Tri des données
 
 Les candidats sont triés par date de création dans la base {product_name("de")},
 du plus récent au plus ancien.
-
-**Note** : la clé `lien_cv` est dépréciée et associée à une valeur vide. Elle est conservée pour
-des raisons de compatibilité.
-
-# Permissions
-
-L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
-
-{AUTH_TOKEN_EXPLANATION_TEXT}
-
-Le compte administrateur utilisé doit être **administrateur de toutes les structures dont il est membre**.
-Par défaut, l'API renvoie les candidatures reçues par la première structure dont le compte est membre
-car la première version avait été pensée ainsi.
 
 # Paramètres
 
@@ -97,6 +98,11 @@ car la première version avait été pensée ainsi.
 - uid_structures : renvoie les candidats des structures demandées.
 
 Attention, le compte doit être administrateur de toutes les structures dont il est membre.
+
+# Champs dépréciés
+
+La clé `lien_cv` est dépréciée et associée à une valeur vide. Elle est conservée pour
+des raisons de compatibilité.
 
 # Exemples de requêtes
 
