@@ -82,7 +82,7 @@ LINK_RESET_MARKUP = """
         <span>Annuler</span>
     </a>
 """
-CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-danger">Confirmer l\'annulation</a>'
 CONFIRM_BUTTON_MARKUP = (
     '<button type="submit" class="btn btn-block btn-primary" aria-label="Confirmer l’embauche de %s">'
     "<span>Confirmer l’embauche</span>"

@@ -438,10 +438,10 @@
                                               Cette action est irréversible.
                                           </div>
                                           <div class="modal-footer">
-                                              <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                                                   Retour
                                               </button>
-                                              <a class="btn btn-sm btn-danger" href="company/[PK of Company]/card">
+                                              <a class="btn btn-danger" href="company/[PK of Company]/card">
                                                   Confirmer l'annulation
                                               </a>
                                           </div>
@@ -625,10 +625,10 @@
                       Cette action est irréversible.
                   </div>
                   <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                      <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                           Retour
                       </button>
-                      <a class="btn btn-sm btn-danger" href="/company/[PK of Company]/card">
+                      <a class="btn btn-danger" href="/company/[PK of Company]/card">
                           Confirmer l'annulation
                       </a>
                   </div>
@@ -711,10 +711,10 @@
                       Cette action est irréversible.
                   </div>
                   <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                      <button class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                           Retour
                       </button>
-                      <a class="btn btn-sm btn-danger" href="/company/[PK of Company]/card">
+                      <a class="btn btn-danger" href="/company/[PK of Company]/card">
                           Confirmer l'annulation
                       </a>
                   </div>

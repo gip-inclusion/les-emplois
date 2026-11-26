@@ -43,7 +43,7 @@
                   </ol>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
+                  <a class="btn btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
                       Voir toutes les nouveautés
                   </a>
               </div>
@@ -97,7 +97,7 @@
                   </ol>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
+                  <a class="btn btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
                       Voir toutes les nouveautés
                   </a>
               </div>
@@ -151,7 +151,7 @@
                   </ol>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
+                  <a class="btn btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
                       Voir toutes les nouveautés
                   </a>
               </div>

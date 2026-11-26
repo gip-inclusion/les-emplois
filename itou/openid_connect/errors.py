@@ -15,8 +15,8 @@ def format_error_modal_content(message_body, action_url, action_text, dismiss_te
         "{}"
         "</div>"
         '<div class="modal-footer">'
-        '<button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">{}</button>'
-        '<a href="{}" class="btn btn-sm btn-primary">{}</a>'
+        '<button type="button" class="btn btn-link" data-bs-dismiss="modal">{}</button>'
+        '<a href="{}" class="btn btn-primary">{}</a>'
         "</div>",
         message_body,
         dismiss_text,

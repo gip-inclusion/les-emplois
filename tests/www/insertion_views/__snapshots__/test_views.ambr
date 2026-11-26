@@ -4245,10 +4245,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4291,10 +4291,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4335,10 +4335,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4381,10 +4381,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4427,10 +4427,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4471,10 +4471,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4517,10 +4517,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4563,10 +4563,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4607,10 +4607,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4653,10 +4653,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4699,10 +4699,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4743,10 +4743,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4787,10 +4787,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4831,10 +4831,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4875,10 +4875,10 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                   Annuler
               </button>
-              <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                   Envoyer
               </button>
           </div>
@@ -4921,10 +4921,10 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+                      <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                           Annuler
                       </button>
-                      <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+                      <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                           Envoyer
                       </button>
                   </div>
@@ -4969,10 +4969,10 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+                      <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
                           Annuler
                       </button>
-                      <button aria-label="Envoyer le mail" class="btn btn-primary btn-sm" type="submit">
+                      <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
                           Envoyer
                       </button>
                   </div>

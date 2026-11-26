@@ -32,14 +32,14 @@
                         <form method="post" action="{% url 'apply:batch_process' %}?next_url={{ list_url|urlencode }}">
                             <div class="modal-footer">
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-secondary"
+                                        class="btn btn-outline-secondary"
                                         data-bs-dismiss="modal">Retour</button>
                                 {% csrf_token %}
                                 {% for application_id in selected_application_ids %}
                                     <input type="hidden" name="application_ids" value="{{ application_id }}" />
                                 {% endfor %}
                                 <button type="submit"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-primary"
                                         {% matomo_event "candidature" "submit" "batch-process-applications-submit" %}>Confirmer</button>
                             </div>
                         </form>
@@ -64,14 +64,14 @@
                             <div class="modal-body">{% bootstrap_form postpone_form alert_error_type="all" %}</div>
                             <div class="modal-footer">
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-secondary"
+                                        class="btn btn-outline-secondary"
                                         data-bs-dismiss="modal">Retour</button>
                                 {% csrf_token %}
                                 {% for application_id in selected_application_ids %}
                                     <input type="hidden" name="application_ids" value="{{ application_id }}" />
                                 {% endfor %}
                                 <button type="submit"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-primary"
                                         {% matomo_event "candidature" "submit" "batch-postpone-applications-submit" %}>Confirmer</button>
                             </div>
                         </form>
@@ -110,14 +110,14 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-secondary"
+                                        class="btn btn-outline-secondary"
                                         data-bs-dismiss="modal">Retour</button>
                                 {% csrf_token %}
                                 {% for application_id in selected_application_ids %}
                                     <input type="hidden" name="application_ids" value="{{ application_id }}" />
                                 {% endfor %}
                                 <button type="submit"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-primary"
                                         {% matomo_event "candidature" "submit" "batch-add_to_pool-applications-submit" %}>Confirmer</button>
                             </div>
                         </form>
@@ -151,7 +151,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-sm btn-outline-secondary"
+                                    class="btn btn-outline-secondary"
                                     data-bs-dismiss="modal">Retour</button>
                             <form method="post"
                                   action="{% url 'apply:batch_archive' %}?next_url={{ list_url|urlencode }}">
@@ -160,7 +160,7 @@
                                     <input type="hidden" name="application_ids" value="{{ application_id }}" />
                                 {% endfor %}
                                 <button type="submit"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-primary"
                                         {% matomo_event "candidature" "submit" "batch-archive-applications-submit" %}>Confirmer</button>
                             </form>
                         </div>
@@ -194,7 +194,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-sm btn-outline-secondary"
+                                    class="btn btn-outline-secondary"
                                     data-bs-dismiss="modal">Retour</button>
                             <form method="post"
                                   action="{% url 'apply:batch_unarchive' %}?next_url={{ list_url|urlencode }}">
@@ -203,7 +203,7 @@
                                     <input type="hidden" name="application_ids" value="{{ application_id }}" />
                                 {% endfor %}
                                 <button type="submit"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-primary"
                                         {% matomo_event "candidature" "submit" "batch-unarchive-applications-submit" %}>Confirmer</button>
                             </form>
                         </div>
@@ -240,19 +240,18 @@
                             {% endif %}
 
                             <div class="modal-footer">
-
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-primary me-auto"
+                                        class="btn btn-outline-primary me-auto"
                                         data-bs-dismiss="modal">Retour</button>
                                 {% if can_transfer_external %}
-                                    <a class="btn btn-sm btn-ico btn-outline-primary"
+                                    <a class="btn btn-ico btn-outline-primary"
                                        href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=selected_application_ids.0 %}">
                                         <i class="ri-home-smile-line" aria-hidden="true"></i>
                                         <strong>Une autre structure</strong>
                                     </a>
                                 {% else %}
                                     <button type="button"
-                                            class="btn btn-sm btn-ico btn-outline-primary"
+                                            class="btn btn-ico btn-outline-primary"
                                             disabled
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="top"
@@ -264,7 +263,7 @@
                                 {% endif %}
                                 {% if can_transfer_internal %}
                                     <button type="submit"
-                                            class="btn btn-sm btn-primary"
+                                            class="btn btn-primary"
                                             {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>Confirmer</button>
                                 {% endif %}
                             </div>

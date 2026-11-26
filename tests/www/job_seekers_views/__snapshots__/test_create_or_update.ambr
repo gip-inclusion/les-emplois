@@ -22,10 +22,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>
@@ -58,10 +58,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -94,10 +94,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>
@@ -130,10 +130,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -188,10 +188,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>
@@ -246,10 +246,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -304,10 +304,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>
@@ -362,10 +362,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -420,10 +420,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -480,10 +480,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -538,10 +538,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>
@@ -574,10 +574,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -612,10 +612,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Ajouter mon intervention
                   </button>
               </div>
@@ -648,10 +648,10 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
                       Retour
                   </button>
-                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
+                  <button class="btn btn-primary" name="confirm" type="submit" value="1">
                       Modifier mon intervention
                   </button>
               </div>

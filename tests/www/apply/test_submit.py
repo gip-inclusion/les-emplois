@@ -72,7 +72,7 @@ LINK_RESET_MARKUP = """
         <span>Annuler</span>
     </a>
 """
-CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-danger">Confirmer l\'annulation</a>'
 CONFIRM_BUTTON_MARKUP = (
     '<button type="submit" class="btn btn-block btn-primary" aria-label="Confirmer l’embauche de %s">'
     "<span>Confirmer l’embauche</span>"
@@ -107,9 +107,9 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
             </p>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
             Ce n’est pas mon usager</button>
-            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+            <button class="btn btn-primary" name="confirm" type="submit" value="1">Continuer</button>
         </div>
         """,
         html=True,
@@ -144,9 +144,9 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
             {add_nir_text}
         </div>
         <div class="modal-footer">
-            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            <button class="btn btn-outline-primary" name="cancel" type="submit" value="1">
             Ce n'est pas mon usager</button>
-            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+            <button class="btn btn-primary" name="confirm" type="submit" value="1">Continuer</button>
         </div>
         """,
         html=True,
@@ -4075,7 +4075,7 @@ def test_detect_existing_job_seeker(client):
     )
     assertContains(
         response,
-        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Renseigner l’adresse email</a>""",
+        f"""<a href="{check_email_url}" class="btn btn-primary">Renseigner l’adresse email</a>""",
         html=True,
     )
 
