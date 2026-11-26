@@ -13,6 +13,7 @@ from tests.cities.factories import create_city_guerande, create_city_vannes, cre
 from tests.companies.factories import JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 def test_create_test_cities():
@@ -85,7 +86,7 @@ def test_sync_cities(settings, caplog, respx_mock):
     City.objects.update(edition_mode=EditionModeChoices.AUTO)
 
     management.call_command("sync_cities", wet_run=True)
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
@@ -161,7 +162,7 @@ def test_sync_cities(settings, caplog, respx_mock):
     marseille_1er.save()
 
     management.call_command("sync_cities", wet_run=True)
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
@@ -322,7 +323,7 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
 
     management.call_command("sync_cities", wet_run=True)
     new_city = City.objects.get(code_insee="19248")
-    assert caplog.messages[:-1] == [
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
         (
             "HTTP Request: GET https://geo.foo/communes?fields="
             "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2Ccentre%2CcodeEpci&format=json"
@@ -431,7 +432,7 @@ def test_resolve_insee_cities(caplog, snapshot):
 
     # Dry run
     call_command("resolve_insee_cities", wet_run=False, mode="job_seekers")
-    assert caplog.messages[:-1] == snapshot(name="dry_run")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="dry_run")
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
     )
@@ -441,7 +442,7 @@ def test_resolve_insee_cities(caplog, snapshot):
 
     # Wet run
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
-    assert caplog.messages[:-1] == snapshot(name="first_pass")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="first_pass")
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
     )
@@ -455,7 +456,7 @@ def test_resolve_insee_cities(caplog, snapshot):
     caplog.clear()
     # no users selected: they either have a city or a low geocoding score.
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
-    assert caplog.messages[:-1] == snapshot(name="second_pass")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="second_pass")
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
     )

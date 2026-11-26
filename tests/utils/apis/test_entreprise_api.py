@@ -1,7 +1,6 @@
 import copy
 import json
 import logging
-from io import StringIO
 
 import httpx
 import pytest
@@ -255,15 +254,13 @@ class TestApiEntreprise:
         assert etablissement.department is None
 
     @respx.mock
-    def test_renew_password_command(self, settings):
+    def test_renew_password_command(self, settings, capsys):
         settings.API_INSEE_USERNAME = "baz"
         respx.post(f"{settings.API_INSEE_SIRENE_URL}/renouvellement").respond(200, json={})
-        out = StringIO()
 
-        call_command("renew_insee_api_password", stdout=out)
+        call_command("renew_insee_api_password")
 
-        out.seek(0)
         assert (
             "Mot de passe modifié. Mettez-le à jour dans settings et dans le gestionnaire de mot de passe."
-            in out.read()
+            in capsys.readouterr().out
         )

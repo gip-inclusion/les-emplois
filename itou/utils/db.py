@@ -1,10 +1,12 @@
 import binascii
 import contextlib
+import inspect
 import logging
 
 import psycopg.errors
 from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.db.models import Q
+from django.db.utils import OperationalError
 from psycopg import sql
 
 
@@ -49,15 +51,69 @@ def lock_timeout(timeout):
     return set_runtime_parameter("lock_timeout", timeout)
 
 
+def get_lock_id(name: str) -> int:
+    return binascii.crc32(name.encode())
+
+
+def check_connection_is_not_reused():
+    # When CONN_MAX_AGE is not zero, the connection is reused. So if
+    # the caller does not release a session-level lock, it will be
+    # held and will leak to other users of the same session, for
+    # example other HTTP requests. Let's not provide a tool that could
+    # shoot ourselves in the foot.
+    if connection.settings_dict.get("CONN_MAX_AGE") != 0:
+        caller = inspect.currentframe().f_back.f_code.co_name
+        raise ValueError(f"Cannot use `{caller}` with non-zero CONN_MAX_AGE")
+
+
+class CannotAcquireLock(Exception):
+    def __init__(self, lock_name, lock_id):
+        self.lock_name = lock_name
+        self.lock_id = lock_id
+        super().__init__()
+
+    def __str__(self):
+        return f"Cannot acquire lock for {self.lock_name} (lock id {self.lock_id})"
+
+
+def pg_try_advisory_lock(name: str):
+    check_connection_is_not_reused()
+    lock_id = get_lock_id(name)
+    logger.info("Trying to acquire advisory lock for %s (lock id %s).", name, lock_id)
+    with connection.cursor() as cursor:
+        result = cursor.execute("SELECT pg_try_advisory_lock(%s)", (lock_id,))
+        row = result.fetchone()
+        if not row[0]:
+            raise CannotAcquireLock(name, lock_id)
+    logger.info("Acquired advisory lock for %s (lock id %s).", name, lock_id)
+
+
 @contextlib.contextmanager
-def pg_advisory_lock(name):
-    lock_id = binascii.crc32(name.encode())
+def pg_advisory_lock(name: str):
+    check_connection_is_not_reused()
+    lock_id = get_lock_id(name)
     logger.info("Acquiring advisory lock for %s (lock id %s).", name, lock_id)
     with connection.cursor() as cursor:
-        cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
-        yield
-        cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-    logger.info("Releasing advisory lock for %s (lock id %s).", name, lock_id)
+        try:
+            cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
+        except OperationalError as exc:
+            if isinstance(exc.__cause__, psycopg.errors.LockNotAvailable):
+                raise CannotAcquireLock(name, lock_id) from exc
+            raise
+        try:
+            yield
+        finally:
+            try:
+                cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+            except Exception:
+                # Could happen if a previous PostgreSQL error caused
+                # the transaction to be aborted. We could try hard to
+                # unlock by issuing a ROLLBACK first, but we don't
+                # know what the caller wants, maybe there are
+                # savepoints, etc. So we keep the lock.
+                logger.error("Could not release advisory lock for %s (lock id %s)", name, lock_id)
+            else:
+                logger.info("Released advisory lock for %s (lock id %s).", name, lock_id)
 
 
 class ExclusionViolationError(IntegrityError):

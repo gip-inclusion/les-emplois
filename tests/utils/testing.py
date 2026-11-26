@@ -328,3 +328,12 @@ PAGINATION_PAGE_ONE_MARKUP = """
     <li class="page-item active">
         <a class="page-link" aria-label="Page 1" aria-current="page" href="%s">1</a>
     </li>"""
+
+
+def check_and_filter_out_advisory_lock_messages(messages) -> list[str]:
+    # These messages are emitted when a management command acquires
+    # its advisory lock.
+    m = re.match("^Trying to acquire advisory lock for command:(?P<rest>.*)", messages[0])
+    assert m is not None
+    assert messages[1] == f"Acquired advisory lock for command:{m.group('rest')}"
+    return messages[2:]

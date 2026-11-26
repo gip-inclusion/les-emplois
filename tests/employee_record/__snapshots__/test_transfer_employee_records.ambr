@@ -71,8 +71,15 @@
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -82,6 +89,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -96,6 +104,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -109,6 +118,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "employee_record_employeerecord"."id",
@@ -422,6 +432,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -442,6 +453,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "employee_record_employeerecord"
@@ -475,6 +487,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "employee_record_employeerecordtransitionlog" ("transition",
@@ -501,6 +514,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -518,6 +532,8 @@
     '[chan 0] sftp session closed.',
     'Employee records processing done!',
     'Management command itou.employee_record.management.commands.transfer_employee_records succeeded in 0.00 seconds',
+    'Trying to acquire advisory lock for command:itou.employee_record.management.commands.transfer_employee_records:425dcfd8c20a7fa4a0662a9de512709a (lock id 1207742362).',
+    'Acquired advisory lock for command:itou.employee_record.management.commands.transfer_employee_records:425dcfd8c20a7fa4a0662a9de512709a (lock id 1207742362).',
     '[chan 1] Opened sftp connection (server version 3)',
     'Connected to "0.0.0.0" as "django_tests"',
     'Current remote dir is "/"',
@@ -534,8 +550,15 @@
 # ---
 # name: test_upload_and_download[upload]
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -543,6 +566,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -553,6 +577,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "employee_record_employeerecord"."id",
@@ -864,6 +889,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -882,6 +908,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "employee_record_employeerecord"
@@ -914,6 +941,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "employee_record_employeerecordtransitionlog" ("transition",
@@ -938,6 +966,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

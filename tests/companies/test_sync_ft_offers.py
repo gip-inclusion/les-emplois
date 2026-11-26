@@ -12,6 +12,12 @@ from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
 from itou.utils.mocks.pole_emploi import API_OFFRES_RESPONSE_OK
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
+
+
+def process_output(caplog_messages):
+    caplog_messages = check_and_filter_out_advisory_lock_messages(caplog_messages)
+    return [m for m in caplog_messages if not m.startswith("HTTP Request")]
 
 
 @override_settings(
@@ -101,7 +107,7 @@ def test_sync_ft_offers(caplog, respx_mock):
                 + expected_logs
                 + ["Setting transaction to be rollback as wet_run=False"]
             )
-        assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == expected_logs
+        assert process_output(caplog.messages[:-1]) == expected_logs
         assert JobDescription.objects.count() == (2 if wet_run else 0)
 
     # Here the command has been run in wet mode, we can check the created objects
@@ -145,7 +151,7 @@ def test_sync_ft_offers(caplog, respx_mock):
     assert caplog.messages[-1].startswith(
         "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
-    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+    assert process_output(caplog.messages[:-1]) == [
         "retrieved count=2 offers from FT API",
         "retrieved count=2 PEC offers from FT API",
         "retrieved count=2 offers from FT API",
@@ -172,7 +178,7 @@ def test_sync_ft_offers(caplog, respx_mock):
     assert caplog.messages[-1].startswith(
         "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
-    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+    assert process_output(caplog.messages[:-1]) == [
         "retrieved count=0 offers from FT API",
         "retrieved count=0 PEC offers from FT API",
         "retrieved count=2 offers from FT API",

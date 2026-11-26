@@ -35,6 +35,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, ProfessionalFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -1031,7 +1032,7 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
     )
-    assert caplog.messages[:-1] == snapshot()
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot()
 
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
@@ -1052,7 +1053,7 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
     )
-    assert caplog.messages[:-1] == snapshot()
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot()
 
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
@@ -1093,7 +1094,7 @@ def test_pe_certify_users_dry_run(settings, respx_mock, caplog, snapshot):
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
     )
-    assert caplog.messages[:-1] == snapshot()
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot()
 
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
@@ -1141,7 +1142,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
     )
-    assert caplog.messages[:-1] == snapshot()
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 9, 13, 0, 0, tzinfo=datetime.UTC
@@ -1158,7 +1159,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     assert user.last_name == "Balthazar"
 
 
-def test_pe_certify_users_retry(caplog, snapshot):
+def test_pe_certify_users_retry():
     new_user = JobSeekerFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
     old_failure = JobSeekerFactory(
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
@@ -1219,6 +1220,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             yield
 
     def process_output(self, caplog_messages):
+        caplog_messages = check_and_filter_out_advisory_lock_messages(caplog_messages)
         assert caplog_messages[-1].startswith(
             "Management command itou.users.management.commands.send_check_authorized_members_email succeeded in "
         )
@@ -1619,11 +1621,12 @@ def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
     )
     del_count = 1 if is_after_cutoff else 0
     call_command("delete_old_nir_modification_requests", wet_run=False)
-    assert caplog.messages[1] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert caplog.messages[3] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1
 
+    caplog.clear()
     call_command("delete_old_nir_modification_requests", wet_run=True)
-    assert caplog.messages[4] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert caplog.messages[2] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
     assert NirModificationRequest.objects.count() == 1 - del_count
 
 

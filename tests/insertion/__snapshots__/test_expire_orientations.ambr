@@ -1,13 +1,21 @@
 # serializer version: 1
 # name: test_expire_orientations[sql]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
+      dict({
+        'origin': list([
+          'pg_try_advisory_lock[utils/db.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SELECT pg_try_advisory_lock(%s)',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -19,6 +27,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -29,6 +38,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "insertion_orientation"."id",
@@ -284,6 +294,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -300,6 +311,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationprocesslink" ("id",
@@ -319,6 +331,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -345,6 +358,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -371,6 +385,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -395,6 +410,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -421,6 +437,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -445,6 +462,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -469,6 +487,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "insertion_orientation"
@@ -510,6 +529,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationtransitionlog" ("transition",
@@ -529,6 +549,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -545,6 +566,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationprocesslink" ("id",
@@ -564,6 +586,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -590,6 +613,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -616,6 +640,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -640,6 +665,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -666,6 +692,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -690,6 +717,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -714,6 +742,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           UPDATE "insertion_orientation"
@@ -755,6 +784,7 @@
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           INSERT INTO "insertion_orientationtransitionlog" ("transition",
@@ -770,6 +800,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

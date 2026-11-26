@@ -5,9 +5,11 @@ from django.core.management import call_command
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 def process_output(caplog_messages):
+    caplog_messages = check_and_filter_out_advisory_lock_messages(caplog_messages)
     assert caplog_messages[-1].startswith(
         "Management command itou.employee_record.management.commands.archive_employee_records succeeded in "
     )

@@ -2,6 +2,7 @@ from django.core import management
 from django.test import override_settings
 
 from itou.jobs.models import Appellation, Rome
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @override_settings(
@@ -43,7 +44,7 @@ def test_sync_rome_appellation(caplog, respx_mock, snapshot):
     appellation0.save()
     appellation1.save()
     management.call_command("sync_romes_and_appellations", wet_run=True)
-    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot(name="logs")
     caplog.messages[-1].startswith(
         "Management command itou.jobs.management.commands.sync_romes_and_appellations succeeded in"
     )

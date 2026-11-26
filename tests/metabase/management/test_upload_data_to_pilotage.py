@@ -5,13 +5,14 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from itou.utils.storage.s3 import pilotage_s3_client
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.mark.usefixtures("temporary_bucket")
 def test_command_call(tmp_path, snapshot, caplog):
     tmp_path.joinpath("fluxIAE_ITOU_.tar.gz").write_bytes(b"Hello World")
     call_command("upload_data_to_pilotage", tmp_path.as_posix(), "--wet-run")
-    assert caplog.messages[:-1] == snapshot
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.upload_data_to_pilotage succeeded in"
     )
@@ -51,7 +52,7 @@ def test_command_check_content_length(caplog, snapshot, tmp_path, settings):
         client.get_object(Bucket=settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME, Key=f"flux-iae/{filename}")["Body"].read()
         == b"Hello World"
     )
-    assert caplog.messages[:-1] == snapshot
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.upload_data_to_pilotage succeeded in"
     )
@@ -63,7 +64,7 @@ def test_command_retries(caplog, snapshot, tmp_path, settings, mocker):
     mocker.patch("itou.metabase.management.commands.upload_data_to_pilotage.Command._upload_file", return_value=None)
 
     call_command("upload_data_to_pilotage", tmp_path.as_posix(), "--wet-run")
-    assert caplog.messages[:-1] == snapshot
+    assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == snapshot
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.upload_data_to_pilotage succeeded in"
     )

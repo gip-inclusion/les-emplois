@@ -1,7 +1,6 @@
 import csv
 import os
 import os.path
-from io import StringIO
 from urllib.parse import urljoin
 
 import pytest
@@ -28,27 +27,19 @@ def override_api_ban_base_url(settings):
     settings.API_GEOPF_BASE_URL = "https://foobar.com"
 
 
-def run_command(*args, **kwargs):
-    out = StringIO()
-    err = StringIO()
-
-    management.call_command("geolocate_jobseeker_addresses", *args, stdout=out, stderr=err, **kwargs)
-
-    return out.getvalue(), err.getvalue()
-
-
-def test_update_dry_run():
+def test_update_dry_run(capsys):
     JobSeekerFactory(is_active=True, with_address=True, without_geoloc=True)
 
-    out, _ = run_command("update")
+    management.call_command("geolocate_jobseeker_addresses", "update")
 
+    out = capsys.readouterr().out
     assert "Geolocation of active job seekers addresses (updating DB)" in out
     assert "+ NOT storing data" in out
     assert "+ NOT calling geo API" in out
 
 
 @respx.mock
-def test_update_wet_run():
+def test_update_wet_run(capsys):
     user = JobSeekerFactory(
         is_active=True,
         without_geoloc=True,
@@ -59,8 +50,9 @@ def test_update_wet_run():
 
     mock_ban_api(user.pk)
 
-    out, _ = run_command("update", wet_run=True)
+    management.call_command("geolocate_jobseeker_addresses", "update", wet_run=True)
 
+    out = capsys.readouterr().out
     assert "Geolocation of active job seekers addresses (updating DB)" in out
     assert "+ NOT storing data" not in out
     assert "+ NOT calling geo API" not in out
@@ -72,14 +64,15 @@ def test_update_wet_run():
     assert "+ updated: 1, errors: 0, total: 1" in out
 
 
-def test_export_dry_run():
-    out, _ = run_command("export")
+def test_export_dry_run(capsys):
+    management.call_command("geolocate_jobseeker_addresses", "export")
 
+    out = capsys.readouterr().out
     assert "Export job seeker geocoding data to file:" in out
     assert "+ implicit 'dry-run': NOT creating file" in out
 
 
-def test_export_wet_run():
+def test_export_wet_run(capsys):
     coords = "SRID=4326;POINT (-1.963752 48.658983)"
     score = 0.97
     JobSeekerFactory(
@@ -90,8 +83,9 @@ def test_export_wet_run():
     )
     path = os.path.join(django_settings.EXPORT_DIR, "export.csv")
 
-    out, _ = run_command("export", filename=path, wet_run=True)
+    management.call_command("geolocate_jobseeker_addresses", "export", filename=path, wet_run=True)
 
+    out = capsys.readouterr().out
     assert "+ found 1 geocoding entries with score > 0.0" in out
 
     # Could not find an elegant way to mock file creation
@@ -103,14 +97,15 @@ def test_export_wet_run():
         assert str(score) in row
 
 
-def test_import_dry_run():
-    out, _ = run_command("import", filename="foo")
+def test_import_dry_run(capsys):
+    management.call_command("geolocate_jobseeker_addresses", "import", filename="foo")
 
+    out = capsys.readouterr().out
     assert "Import job seeker geocoding data from file:" in out
     assert "+ implicit `dry-run`: reading file but NOT writing into DB" in out
 
 
-def test_import_wet_run():
+def test_import_wet_run(capsys):
     user = JobSeekerFactory(is_active=True, with_address=True)
     path = os.path.join(django_settings.IMPORT_DIR, "sample_user_geoloc.csv")
 
@@ -118,8 +113,9 @@ def test_import_wet_run():
         f.write("id;coords;geocoding_score\n")
         f.write(f"""{user.pk};"SRID=4326;POINT (-1.963752 48.658983)";0.97""")
 
-    out, _ = run_command("import", filename=path, wet_run=True)
+    management.call_command("geolocate_jobseeker_addresses", "import", filename=path, wet_run=True)
 
+    out = capsys.readouterr().out
     assert "Import job seeker geocoding data from file:" in out
 
     user.refresh_from_db()

@@ -27,6 +27,7 @@ from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import check_and_filter_out_advisory_lock_messages
 
 
 @pytest.fixture(autouse=True)
@@ -605,7 +606,7 @@ class TestApprovalsSendToPeManagement:
             wet_run=True,
             delay=3,
         )
-        assert caplog.messages[:-1] == [
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
             "approvals needing to be sent count=3, batch count=10",
             f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
             "pe_state=notification_ready",
@@ -657,7 +658,7 @@ class TestApprovalsSendToPeManagement:
             wet_run=True,
             delay=3,
         )
-        assert caplog.messages[:-1] == [
+        assert check_and_filter_out_advisory_lock_messages(caplog.messages[:-1]) == [
             "approvals needing to be sent count=1, batch count=1",
             f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
             "pe_state=notification_should_retry",
