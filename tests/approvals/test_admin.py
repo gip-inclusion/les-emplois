@@ -992,7 +992,6 @@ class TestAutomaticApprovalAdminViews:
 
 
 class TestCustomApprovalAdminViews:
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_manually_add_approval(self, client, mailoutbox):
         MANUALLY_DELIVER_BUTTON_TEXT = "Enregistrer et envoyer par email"
 
@@ -1113,7 +1112,6 @@ class TestCustomApprovalAdminViews:
         email = mailoutbox[0]
         assert approval.number_with_spaces in email.body
 
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_manually_refuse_approval(self, client, mailoutbox, snapshot):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
@@ -1276,7 +1274,6 @@ class TestProlongationDerogation:
         client.force_login(staff_user)
         assert client.get(self.url).status_code == 403
 
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_generate_link(self, admin_client, caplog):
         response = admin_client.get(self.url)
         assertContains(response, "Générer le lien")
@@ -1302,7 +1299,6 @@ class TestProlongationDerogation:
             f"for approval={self.approval.pk} company={self.company.pk}." in caplog.messages
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_company_defaults_to_the_latest_company(self, admin_client):
         response = admin_client.get(self.url)
         assertContains(response, f'value="{self.company.pk}"')
@@ -1319,14 +1315,12 @@ class TestProlongationDerogation:
         response = admin_client.get(self.url)
         assertContains(response, f'value="{new_company.pk}"')
 
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_company_without_accepted_job_application(self, admin_client):
         other_company = CompanyFactory(subject_to_iae_rules=True)
         response = admin_client.post(self.url, data={"company": other_company.pk})
         assertContains(response, "Cette entreprise n’a pas de candidature acceptée liée à ce PASS IAE.")
         assert not PkSupportRemark.objects.exists()
 
-    @pytest.mark.ignore_unknown_variable_template_error("change")
     def test_company_not_subject_to_iae_rules(self, admin_client):
         geiq = CompanyFactory(kind=CompanyKind.GEIQ)
         JobApplicationFactory(
