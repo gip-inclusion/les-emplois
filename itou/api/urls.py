@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_not_required
-from django.urls import include, path
+from django.urls import path
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
 
@@ -35,8 +35,6 @@ router.register(r"siaes", SiaeViewSet, basename="siaes")
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
     path("token-auth/", ObtainAuthToken.as_view(), name="token-auth"),
-    # Needed for Browsable API (dev)
-    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("embauches-geiq/", GeiqJobApplicationListView.as_view(), name="geiq_jobapplication_list"),
     # OpenAPI
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
