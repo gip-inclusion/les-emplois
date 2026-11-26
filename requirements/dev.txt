@@ -725,9 +725,9 @@ data-inclusion-schema==1.0.11 \
     --hash=sha256:50efbc5e99591b2de8ce7b63d3b5ce5c28b86d4e8e8caf81f28dfa6baae409d9 \
     --hash=sha256:d66478c130f77181082d993bee8441368f21665fd4595c882860ef650edbcbf6
     # via -r test.txt
-decorator==5.3.1 \
-    --hash=sha256:4cbcdd55a6efadb9dbea26b858f4fb3264567b52d69ca0d25b721b553f60ea82 \
-    --hash=sha256:f47fe6fdbd2edd623ecfe36875d37aba411624e2670dd395dddae1358689bb3c
+decorator==5.3.2 \
+    --hash=sha256:d3fb2a434ac31e231d14175ecbda823d83f26b7e45270cd7cd4d0350264b79e2 \
+    --hash=sha256:d9883f1b8259e3bfc42565d0bc6fdc760012008552aa449f75efd2d48319b82b
     # via ipdb
 distlib==0.4.4 \
     --hash=sha256:ca4175b4ac7f71223cc30ed7248c45d2b38c2439d8ee6e498ab67ed63cf3508d \
