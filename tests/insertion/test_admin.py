@@ -99,12 +99,10 @@ def test_structure_admin_shows_geolocation(admin_client):
         response,
         f"""
         <div class="form-row field-insee_city">
-            <div>
-                <div class="flex-container">
-                    <label>Insee city&nbsp;:</label>
-                    <div class="readonly">
-                        <a href="/admin/cities/city/{vannes.pk}/change/">Vannes (56)</a>
-                    </div>
+            <div class="flex-container">
+                <label>Insee city&nbsp;:</label>
+                <div class="readonly">
+                    <a href="/admin/cities/city/{vannes.pk}/change/">Vannes (56)</a>
                 </div>
             </div>
         </div>

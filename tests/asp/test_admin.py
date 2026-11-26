@@ -18,11 +18,9 @@ def test_access_to_ignored_communes(admin_client):
         str(soup),
         """\
         <div class="field-ignore form-row">
-          <div>
-            <div class="flex-container">
-              <label>Commune désactivée :</label>
-              <div class="readonly"><img src="/static/admin/img/icon-yes.svg" alt="True"></div>
-            </div>
+          <div class="flex-container">
+            <label>Commune désactivée :</label>
+            <div class="readonly"><img src="/static/admin/img/icon-yes.svg" alt="True"></div>
           </div>
         </div>""",
     )
