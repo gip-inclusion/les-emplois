@@ -13,7 +13,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.users.enums import ActionKind, LackOfPoleEmploiId, Nationality, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
-from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
@@ -470,15 +469,12 @@ class TestGetOrCreateForSender:
         )
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestStandaloneCreateAsPrescriber:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self, settings):
         [self.city] = create_test_cities(["67"], num_per_department=1)
         settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
 
     @freeze_time("2024-08-30")
     @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])

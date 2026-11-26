@@ -31,9 +31,10 @@ DIRECTORY_OPT_OUT_FIELD_ID = "id_is_directory_opted_out"
 EMAIL_TRACKING_CONSENT_TITLE = '<h2 class="h3" id="email-tracking-consent">Suivi de l’ouverture de vos e-mails</h2>'
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestEditUserInfoView:
     @pytest.fixture(autouse=True)
-    def setup_method(self, mocker):
+    def setup_method(self):
         self.city = City.objects.create(
             name="Geispolsheim",
             slug="geispolsheim-67",
@@ -41,10 +42,6 @@ class TestEditUserInfoView:
             coords=Point(7.644817, 48.515883),
             post_codes=["67118"],
             code_insee="67152",
-        )
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
     def address_form_fields(self, fill_mode=""):

@@ -150,11 +150,8 @@ class TestEditJobSeekerInfo:
         assert job_seeker.email_tracking_consent_updated_at == answered_at
 
     @pytest.mark.parametrize("born_in_france", [True, False])
-    def test_display_modal_when_form_changed(self, client, mocker, snapshot, born_in_france):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_display_modal_when_form_changed(self, client, snapshot, born_in_france, mocker):
         birthdate = datetime.date(1990, 1, 1)
         job_seeker = JobSeekerFactory(
             public_id="7614fc4b-aef9-4694-ab17-12324300180a",
@@ -314,11 +311,8 @@ class TestEditJobSeekerInfo:
         assert job_seeker.email in email.body
         assert reverse("dashboard:edit_user_info") in email.body
 
-    def test_edit_by_company_with_nir(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_edit_by_company_with_nir(self, client, snapshot):
         job_application = JobApplicationFactory(
             for_snapshot=True,
             sent_by_prescriber_alone=True,
@@ -397,11 +391,8 @@ class TestEditJobSeekerInfo:
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_company_with_lack_of_nir_reason(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_edit_by_company_with_lack_of_nir_reason(self, client, snapshot):
         job_application = JobApplicationFactory(
             for_snapshot=True,
             sent_by_prescriber_alone=True,
@@ -461,11 +452,8 @@ class TestEditJobSeekerInfo:
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_company_without_nir_information(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_edit_by_company_without_nir_information(self, client, snapshot):
         job_application = JobApplicationFactory(
             for_snapshot=True,
             sent_by_prescriber_alone=True,
@@ -680,11 +668,8 @@ class TestEditJobSeekerInfo:
             count=1,
         )
 
-    def test_edit_email_when_unconfirmed(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_edit_email_when_unconfirmed(self, client, snapshot):
         """
         The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
         """
@@ -745,11 +730,8 @@ class TestEditJobSeekerInfo:
         assert job_seeker.phone == post_data["phone"]
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
-    def test_edit_email_when_confirmed(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_edit_email_when_confirmed(self, client, snapshot):
         new_email = "bidou@yopmail.com"
         job_application = JobApplicationFactory(
             for_snapshot=True,
@@ -838,11 +820,8 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
-    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker, snapshot):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, snapshot):
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
             eligibility_diagnosis__certifiable=True,
@@ -900,12 +879,9 @@ class TestEditJobSeekerInfo:
         for attr in ["birthdate", "birth_place", "birth_country", "pole_emploi_id"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
     @pytest.mark.parametrize("identity_provider", [IdentityProvider.FRANCE_CONNECT, IdentityProvider.FT_CONNECT])
-    def test_sso_fields_readonly(self, client, identity_provider, mocker):
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
+    def test_sso_fields_readonly(self, client, identity_provider):
         org = prescribers_factories.PrescriberOrganizationFactory()
         member = prescribers_factories.PrescriberMembershipFactory(organization=org).user
         job_seeker = JobSeekerFactory(identity_provider=identity_provider, created_by=member)
