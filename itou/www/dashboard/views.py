@@ -32,6 +32,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.openid_connect.utils import IdentityProviderToOIDCUserData
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -215,7 +216,21 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
-        if not request.user.jobseeker_profile.birth_name:
+        # A user who used France Connect and has authentified before
+        # the deployment of the new "birth_name" field should not be
+        # redirected to the profile edit form: they cannot edit their
+        # birth name, since it's provided by France Connect.
+        #
+        # FIXME (dbaty, 2026-11-26): remove the second part of the
+        # condition (and `test_job_seeker_with_idp_without_birth_name_redirection`)
+        # after the first Monday following the deployment, once we're
+        # sure that the session of previously connected users have
+        # expired (which will force users to login again through
+        # France Connect, which will set their birth name).
+        if not request.user.jobseeker_profile.birth_name and not hasattr(
+            IdentityProviderToOIDCUserData[request.user.identity_provider],
+            "birth_name",
+        ):
             return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
         iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
