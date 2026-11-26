@@ -5,7 +5,6 @@ import random
 import re
 from contextlib import nullcontext
 from datetime import timedelta
-from unittest import mock
 
 import pgtrigger
 import pytest
@@ -32,7 +31,6 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import Title
 from itou.utils import triggers
 from itou.utils.admin import get_admin_url
-from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import (
@@ -115,11 +113,8 @@ class TestEmployeeRecordModel:
         employee_record = EmployeeRecord.from_job_application(job_application)
         assert employee_record is not None
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_prepare_successful(self, _mock):
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_prepare_successful(self):
         """
         Mainly format the job seeker address to Hexa format
         """
@@ -476,17 +471,14 @@ class TestEmployeeRecordBatch:
         )
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data")
 class TestEmployeeRecordLifeCycle:
     """
     Note: employee records status is never changed manually
     """
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    def setup_method(self):
         job_application = JobApplicationFactory(
             sent_by_prescriber_alone=True,
             for_employee_record=True,
@@ -871,16 +863,13 @@ class TestEmployeeRecordLifeCycle:
             )
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data")
 class TestEmployeeRecordJobApplicationConstraints:
     """
     Check constraints between job applications and employee records
     """
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def setUp(self, _mock):
+    def setUp(self):
         super().setUp()
         # Make job application cancellable
         hiring_date = timezone.localdate() + timedelta(days=7)

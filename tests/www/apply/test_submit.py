@@ -34,7 +34,6 @@ from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import ActionKind, LackOfNIRReason, LackOfPoleEmploiId, Nationality
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import constants as global_constants, triggers
-from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
@@ -922,15 +921,11 @@ class TestApplyAsJobSeeker:
         assert JobApplication.objects.exists() is False
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestApplyAsAuthorizedPrescriber:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_prescriber_with_pending_authorization(self, client, pdf_file):
@@ -1742,15 +1737,11 @@ class TestApplyAsAuthorizedPrescriber:
         assert get_session_name(client.session, APPLY_SESSION_KIND) is None
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestApplyAsPrescriber:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
 
     def test_apply_as_prescriber_with_suspension_sanction(self, client):
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
@@ -2476,15 +2467,11 @@ class TestApplyAsPrescriberNirExceptions:
         assert job_seeker.jobseeker_profile.lack_of_nir_reason == ""
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestApplyAsCompany:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
 
     def test_perms_for_company(self, client):
         """A company can postulate only for itself."""
@@ -3570,9 +3557,10 @@ class TestLastCheckedAtView:
         self._check_last_checked_at(client, prescriber, sees_warning=True, sees_verify_link=True)
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_first")
 class UpdateJobSeekerTestMixin:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker, client):
+    def setup_method(self, client):
         self.company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         self.job_seeker = JobSeekerFactory(
             with_ban_geoloc_address=True,
@@ -3591,13 +3579,6 @@ class UpdateJobSeekerTestMixin:
 
         self.INFO_MODIFIABLE_PAR_USAGER_UNIQUEMENT = "Informations modifiables par l’usager uniquement"
         self.job_seeker_session_key = f"job_seeker-{self.job_seeker.public_id}"
-
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
-
         params = {
             "job_seeker_public_id": self.job_seeker.public_id,
             "from_url": from_url,

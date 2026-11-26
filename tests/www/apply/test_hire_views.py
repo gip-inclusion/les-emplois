@@ -46,7 +46,6 @@ from itou.users.enums import (
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import constants as global_constants, triggers
-from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import HiringStartAtErrorCode
@@ -244,14 +243,6 @@ class TestHire:
 
 
 class TestDirectHireFullProcess:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
-
     def test_perms_for_company(self, client):
         """A company can hire only for itself."""
         company_1 = CompanyFactory(with_membership=True)
@@ -374,9 +365,9 @@ class TestDirectHireFullProcess:
         )
 
     @freeze_time("2025-08-22")
+    @pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
     def test_hire_as_company(self, client, snapshot):
         """Apply as company (and create new job seeker)"""
-
         company = CompanyFactory(
             romes=("N1101", "N1105"), with_membership=True, with_jobs=True, subject_to_iae_rules=True
         )
@@ -754,18 +745,13 @@ class TestDirectHireFullProcess:
         ).exists()
 
     @freeze_time()
-    def test_hire_as_geiq(self, client, mocker, settings):
+    @pytest.mark.usefixtures("mock_get_geocoding_data_first")
+    def test_hire_as_geiq(self, client):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
         job_seeker = JobSeekerFactory(born_outside_france=True)
         geispolsheim = create_city_geispolsheim()
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
-
         user = company.members.first()
         client.force_login(user)
 
@@ -1821,9 +1807,10 @@ class TestGEIQEligibilityForHire:
         )
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_first")
 class TestFillJobSeekerInfosForHire:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self):
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
@@ -1838,12 +1825,6 @@ class TestFillJobSeekerInfosForHire:
             IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         elif self.company.kind == CompanyKind.GEIQ:
             GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
 
     def accept_contract(self, client, session_uuid):
         accept_contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
@@ -2344,9 +2325,10 @@ class TestFillJobSeekerInfosForHire:
         assert selected_option.text == "BORA-BORA"
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_first")
 class TestHireContract:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self):
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
@@ -2356,12 +2338,6 @@ class TestHireContract:
         )
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
-
-        settings.API_GEOPF_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
 
     def test_as_company(self, client, snapshot):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -2734,9 +2710,10 @@ class TestHireContract:
             raise ValueError(f"Unknown {result=}")
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_first")
 class TestHireConfirmation:
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self, settings):
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
@@ -2746,12 +2723,6 @@ class TestHireConfirmation:
         )
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
-
-        settings.API_BAN_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
 
     def test_as_iae(self, client, snapshot):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)

@@ -1,6 +1,9 @@
 import random
+from random import choice
 
-from itou.utils.apis.exceptions import AddressLookupError
+from django.contrib.gis.geos import GEOSGeometry
+
+from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
 
 
 # https://data.geopf.fr/geocodage/search/?q=42+Rue+du+clos+de+la+Grange%2C+58160+Sauvigny-les-Bois&limit=1
@@ -313,6 +316,8 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
 # Revert lookup
 RESULTS_BY_BAN_API_RESOLVED_ADDRESS = {}
 for elt in BAN_GEOCODING_API_RESULTS_MOCK:
+    elt["coords"] = GEOSGeometry(f"POINT({elt['longitude']} {elt['latitude']})")
+
     if "ban_api_resolved_address" in elt:
         RESULTS_BY_BAN_API_RESOLVED_ADDRESS[elt["ban_api_resolved_address"]] = elt
 
@@ -329,7 +334,13 @@ def mock_get_geocoding_data(address, **_):
 
 
 def mock_get_geocoding_data_by_ban_api_resolved(address, **_):
-    return RESULTS_BY_BAN_API_RESOLVED_ADDRESS.get(address)
+    try:
+        return RESULTS_BY_BAN_API_RESOLVED_ADDRESS[address]
+    except KeyError as err:
+        # get_geocoding_data can raise GeocodingDataError or AddressLookupError
+        raise choice((GeocodingDataError, AddressLookupError))(
+            "The mock data does not have the address.", address
+        ) from err
 
 
 def get_random_geocoding_api_result():

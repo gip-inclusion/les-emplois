@@ -43,6 +43,11 @@ from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 
 import itou.emails.utils
+from itou.utils.mocks.address_format import (
+    mock_get_first_geocoding_data,
+    mock_get_geocoding_data,
+    mock_get_geocoding_data_by_ban_api_resolved,
+)
 from tests.openid_connect.pro_connect.testing import ProConnectSetup
 
 
@@ -1064,3 +1069,43 @@ def short_circuit_accept_domain_based_on_mx_function(request, monkeypatch):
     if "do_not_patch_accept_domain_based_on_mx" in request.keywords:
         return
     monkeypatch.setattr(itou.emails.utils, "_accept_domain_based_on_mx", lambda _email: True)
+
+
+@pytest.fixture(name="mock_get_geocoding_data")
+def _mock_get_geocoding_data(mocker):
+    mocker.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    mocker.patch(
+        "itou.common_apps.address.models.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    mocker.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+
+
+@pytest.fixture()
+def mock_get_geocoding_data_resolved(mocker):
+    mocker.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    mocker.patch(
+        "itou.common_apps.address.models.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+
+
+@pytest.fixture()
+def mock_get_geocoding_data_first(mocker):
+    mocker.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    mocker.patch(
+        "itou.common_apps.address.models.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )

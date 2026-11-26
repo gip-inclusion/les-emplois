@@ -40,7 +40,7 @@ from itou.users.enums import (
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import triggers
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import (
@@ -835,11 +835,8 @@ class TestJobSeekerProfileModel:
         # Won't raise exception
         self.profile.clean_model()
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_update_hexa_address(self, _mock):
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_update_hexa_address(self):
         """
         Check creation of an HEXA address from job seeker address
         """
@@ -847,11 +844,8 @@ class TestJobSeekerProfileModel:
         self.profile.update_hexa_address()
         self.profile.clean_model()
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_job_seeker_hexa_address_complete(self, _mock):
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_job_seeker_hexa_address_complete(self):
         # Nothing to validate if no address is given
         self.profile._clean_job_seeker_hexa_address()
 
@@ -877,11 +871,8 @@ class TestJobSeekerProfileModel:
         self.profile.hexa_commune = Commune.objects.order_by("?").first()
         self.profile._clean_job_seeker_hexa_address()
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_job_seeker_hexa_address_with_unknown_lane_type(self, _mock):
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_job_seeker_hexa_address_with_unknown_lane_type(self):
         self.profile._clean_job_seeker_hexa_address()
         user = self.profile.user
         user.address_line_1 = "8 la boutrie - caillot"

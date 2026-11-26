@@ -42,7 +42,7 @@ from itou.users.enums import (
 )
 from itou.users.models import IdentityCertification, JobSeekerAssignment, User
 from itou.utils import constants as global_constants, triggers
-from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.mocks.address_format import mock_get_first_geocoding_data
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.badges import job_application_state_badge
@@ -107,6 +107,7 @@ def test_start_accept_with_other_company(client):
     assert response.status_code == 302
 
 
+@pytest.mark.usefixtures("mock_get_geocoding_data_resolved")
 class TestProcessAcceptViewsInWizard:
     BIRTH_COUNTRY_LABEL = "Pays de naissance"
     BIRTH_PLACE_LABEL = "Commune de naissance"
@@ -115,7 +116,7 @@ class TestProcessAcceptViewsInWizard:
     SPECIFY_JOB_TEXT = "Préciser le nom du poste (code ROME)"
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
+    def setup_method(self, settings):
         self.company = CompanyFactory(
             with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut", subject_to_iae_rules=True
         )
@@ -126,10 +127,6 @@ class TestProcessAcceptViewsInWizard:
 
         settings.API_GEOPF_BASE_URL = "http://ban-api"
         settings.TALLY_URL = "https://tally.so"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-        )
 
     def create_job_application(self, **kwargs):
         kwargs = {

@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
@@ -8,7 +9,6 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
-from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import HASHED_DEFAULT_PASSWORD, ProfessionalFactory
@@ -77,14 +77,11 @@ class TestEmployeeRecordAPIFetchList:
         self.employer = self.siae.members.first()
         self.user = job_application.job_seeker
 
-    def test_fetch_employee_record_list(self, api_client, mocker, faker):
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_fetch_employee_record_list(self, api_client, faker):
         """
         Fetch list of employee records with and without `status` query param
         """
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
         # Using session auth (same as token but less steps)
         api_client.force_authenticate(self.employer)
 
@@ -177,11 +174,8 @@ class TestEmployeeRecordAPIFetchList:
         with assertSnapshotQueries(snapshot):
             api_client.get(self.endpoint_url, data={"status": list(Status)}, format="json")
 
-    def test_show_phone_email_api(self, api_client, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_show_phone_email_api(self, api_client):
         # BUGFIX:
         # Test that employee phone number and email address are passed
         # to API serializer.
@@ -232,11 +226,8 @@ class TestEmployeeRecordAPIFetchList:
 class TestEmployeeRecordAPIParameters:
     endpoint_url = reverse("v1:employee-records-list")
 
-    def test_status_parameter(self, api_client, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_status_parameter(self, api_client):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.ready()
@@ -257,11 +248,8 @@ class TestEmployeeRecordAPIParameters:
 
         assert result.get("personnePhysique", {}).get("passIae") == job_application.approval.number
 
-    def test_status_array_parameter(self, api_client, mocker, faker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_status_array_parameter(self, api_client, faker):
         job_application_1 = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application_1)
         employee_record.ready()
@@ -295,11 +283,8 @@ class TestEmployeeRecordAPIParameters:
         assert result_1.get("personnePhysique", {}).get("passIae") == job_application_2.approval.number
         assert result_2.get("personnePhysique", {}).get("passIae") == job_application_1.approval.number
 
-    def test_created_parameter(self, api_client, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_created_parameter(self, api_client):
         job_application = JobApplicationFactory(sent_by_prescriber_alone=True, for_employee_record=True)
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.status = Status.PROCESSED  # Default status if no `status` params present
@@ -325,11 +310,8 @@ class TestEmployeeRecordAPIParameters:
         assert response.status_code == 200
         assert not results.get("results")
 
-    def test_since_parameter(self, api_client, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_since_parameter(self, api_client):
         today = f"{timezone.localdate():%Y-%m-%d}"
         sooner_ts = timezone.localtime() - relativedelta(days=3)
         sooner = f"{sooner_ts:%Y-%m-%d}"
@@ -372,11 +354,8 @@ class TestEmployeeRecordAPIParameters:
         results = response.json().get("results")
         assert len(results) == 2
 
-    def test_chain_parameters(self, api_client, mocker):
-        mocker.patch(
-            "itou.common_apps.address.format.get_geocoding_data",
-            side_effect=mock_get_geocoding_data,
-        )
+    @pytest.mark.usefixtures("mock_get_geocoding_data")
+    def test_chain_parameters(self, api_client):
         sooner_ts = timezone.localtime() - relativedelta(days=3)
         sooner = f"{sooner_ts:%Y-%m-%d}"
         ancient_ts = timezone.localtime() - relativedelta(months=2)
