@@ -555,6 +555,7 @@ class Command(BaseCommand):
                 "approval_delivery_mode",
                 "contract_type",
                 "resume_id",
+                "message",
             )
         )
 
@@ -615,9 +616,11 @@ class Command(BaseCommand):
         )
 
     def populate_evaluated_siaes(self):
-        queryset = EvaluatedSiae.objects.prefetch_related(
-            "evaluated_job_applications__evaluated_administrative_criteria"
-        ).all()
+        queryset = (
+            EvaluatedSiae.objects.select_related("evaluation_campaign")
+            .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+            .all()
+        )
         metabase_db.populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_evaluated_job_applications(self):
@@ -697,7 +700,7 @@ class Command(BaseCommand):
             store_df(df=df, table_name=table_name, schema="raw_emplois")
 
     def populate_services(self):
-        queryset = Service.include_inactive.all().select_related("structure", "source", "kind")
+        queryset = Service.include_inactive.all().select_related("structure", "source", "insee_city")
         metabase_db.populate_table(services.TABLE, batch_size=100_000, querysets=[queryset], schema="raw_emplois")
 
     def populate_mobilization_emails(self):
