@@ -28,6 +28,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
+from itou.utils import triggers
 from itou.utils.models import PkSupportRemark
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
 from tests.approvals.factories import (
@@ -510,8 +511,9 @@ class TestMergeUsers:
         assert not User.objects.filter(pk=professional_2.pk).exists()
 
         # reset accounts
-        professional_1.save()
-        professional_2.save()
+        with triggers.fake_context():
+            professional_1.save()
+            professional_2.save()
 
         url = reverse(
             "itou_staff_views:merge_users_confirm", args=(professional_2.public_id, professional_1.public_id)
@@ -564,8 +566,9 @@ class TestMergeUsers:
         admin_remark.delete()
 
         caplog.clear()
-        prescriber_1.save()
-        prescriber_2.save()
+        with triggers.fake_context():
+            prescriber_1.save()
+            prescriber_2.save()
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))
         client.post(url, data={"user_to_keep": "to_user"})
         merged_user = User.objects.get(pk=prescriber_1.pk)
