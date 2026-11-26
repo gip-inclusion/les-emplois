@@ -74,7 +74,7 @@
                     </div>
                 {% endif %}
 
-                {% if not service.lien_mobilisation and service.from_non_orientable_di_source and not service.contact_full_name and not service.contact_email and not service.contact_phone %}
+                {% if not service.lien_mobilisation and not has_contact_to_display %}
                     <div class="form-group col-12 col-lg">
                         <p class="mb-0 fst-italic text-white">
                             <i class="ri-information-line fw-normal me-1" aria-hidden="true"></i>

@@ -793,6 +793,25 @@ class TestServices:
         assertNotContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, self.MISSING_CONTACT_LABEL)
 
+    def test_detail_dora_service_with_no_contact_info_has_missing_contact_label(self, client, settings):
+        user = PrescriberFactory()
+        blacklisted_source = "blacklisted-source"
+        settings.NON_ORIENTABLE_DI_SOURCES = [blacklisted_source]
+        service = ServiceFactory(
+            uid="test-orientable-uid",
+            name="Service non orientable",
+            updated_on="2025-01-15",
+            source__value="dora",
+            contact_full_name="",
+            contact_email="",
+            contact_phone="",
+        )
+
+        client.force_login(user)
+        response = client.get(self.get_service_url(service))
+
+        assertContains(response, self.MISSING_CONTACT_LABEL)
+
     def test_detail_non_orientable_di_sources_with_external_link(self, client, settings):
         user = PrescriberFactory()
         blacklisted_source = "blacklisted-source"
@@ -825,7 +844,7 @@ class TestServices:
         response = client.get(self.get_service_url(service))
         assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
         assertNotContains(response, self.ORIENT_BTN_LABEL)
-        assertNotContains(response, self.MISSING_CONTACT_LABEL)
+        assertContains(response, self.MISSING_CONTACT_LABEL)
 
     def test_detail_contact_button_shown_when_authenticated(self, client):
         user = PrescriberFactory()
