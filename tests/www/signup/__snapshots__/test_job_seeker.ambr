@@ -59,7 +59,7 @@
           </label>
           <select class="form-select" id="id_birth_country" name="birth_country">
               <option selected="" value="">
-                  ---------
+                  - Choisir une option -
               </option>
               <option value="152">
                   AFGHANISTAN
@@ -302,7 +302,7 @@
           </label>
           <select class="form-select is-valid" disabled="" id="id_birth_place" name="birth_place">
               <option value="">
-                  ---------
+                  - Choisir une option -
               </option>
               <option selected="" value="57089">
                   GEISPOLSHEIM
@@ -315,7 +315,7 @@
           </label>
           <select class="form-select is-valid" disabled="" id="id_birth_country" name="birth_country">
               <option value="">
-                  ---------
+                  - Choisir une option -
               </option>
               <option selected="" value="91">
                   FRANCE

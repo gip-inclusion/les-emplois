@@ -2643,14 +2643,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   
@@ -2761,14 +2761,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   
@@ -2900,14 +2900,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   

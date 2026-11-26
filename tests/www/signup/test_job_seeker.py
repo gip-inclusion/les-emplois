@@ -349,14 +349,14 @@ class TestJobSeekerSignup:
             <div class="form-group">
             <label class="form-label" for="id_birth_place">Commune de naissance</label>
             <select name="birth_place" class="form-select" disabled id="id_birth_place">
-                <option value="">---------</option>
+                <option value="">- Choisir une option -</option>
                 <option value="57089" selected>GEISPOLSHEIM</option>
             </select>
             </div>
             <div class="form-group">
             <label class="form-label" for="id_birth_country">Pays de naissance</label>
             <select name="birth_country" class="form-select" disabled id="id_birth_country">
-                <option value="">---------</option>
+                <option value="">- Choisir une option -</option>
                 <option value="91" selected>FRANCE</option>
             </select>
             </div>
