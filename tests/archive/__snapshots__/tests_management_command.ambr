@@ -981,7 +981,7 @@
         ]),
         'sql': '''
           UPDATE "users_user"
-          SET "upcoming_deletion_notified_at" = NULL
+          SET "upcoming_deletion_notified_at" = %s
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."last_login" >= ("users_user"."upcoming_deletion_notified_at")
                  AND "users_user"."upcoming_deletion_notified_at" IS NOT NULL)
@@ -3717,7 +3717,7 @@
         ]),
         'sql': '''
           UPDATE "audit_trail_audittrail"
-          SET "user_id" = NULL
+          SET "user_id" = %s
           WHERE "audit_trail_audittrail"."user_id" IN (%s,
                                                        %s,
                                                        %s,
@@ -3741,7 +3741,7 @@
         ]),
         'sql': '''
           UPDATE "companies_contract"
-          SET "job_seeker_id" = NULL
+          SET "job_seeker_id" = %s
           WHERE "companies_contract"."job_seeker_id" IN (%s,
                                                          %s,
                                                          %s,
@@ -3765,7 +3765,7 @@
         ]),
         'sql': '''
           UPDATE "companies_prosupportreport"
-          SET "notified_prescriber_id" = NULL
+          SET "notified_prescriber_id" = %s
           WHERE "companies_prosupportreport"."notified_prescriber_id" IN (%s,
                                                                           %s,
                                                                           %s,

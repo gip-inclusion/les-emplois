@@ -265,7 +265,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),

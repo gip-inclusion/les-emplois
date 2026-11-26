@@ -540,7 +540,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -588,7 +588,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -777,7 +777,7 @@
         ]),
         'sql': '''
           UPDATE "companies_company"
-          SET "spontaneous_applications_open_since" = NULL
+          SET "spontaneous_applications_open_since" = %s
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
@@ -1071,7 +1071,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -1119,7 +1119,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
