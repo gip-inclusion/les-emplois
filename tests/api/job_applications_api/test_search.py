@@ -110,8 +110,7 @@ class TestJobApplicationSearchApi:
 
     def test_match_birth_name(self, api_client):
         api_client.force_authenticate(ServiceAccount(), self.token)
-        payload = VALID_SEARCH_DATA
-        payload["nom"] = self.job_seeker_1.jobseeker_profile.birth_name
+        payload = VALID_SEARCH_DATA | {"nom": self.job_seeker_1.jobseeker_profile.birth_name}
         response = api_client.post(self.ENDPOINT_URL, payload, format="json")
         assert response.status_code == 200
         assert len(response.json()["results"]) == 3
