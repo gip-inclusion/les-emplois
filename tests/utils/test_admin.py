@@ -252,8 +252,9 @@ class TestEfficientDateHierarchy:
             ("year", {}, [2022, 2024, 2025, 2026]),
             ("month", {"year": 2026}, [1, 7, 10]),
             ("day", {"year": 2026, "month": 7}, [8, 16]),
+            ("month", {"year": 2022}, [6]),
         ],
-        ids=["year", "month", "day"],
+        ids=["year", "month", "day", "single_period"],
     )
     @pytest.mark.parametrize(
         "method,field_name", [("datetimes", "created_at"), ("dates", "start_at")], ids=["datetimes", "dates"]

@@ -427,6 +427,11 @@ class EfficientDateHierarchyQuerySetMixin:
             periods.append(start)
             start += step
 
+        if len(periods) == 1:
+            # Both bounds are in it, so it is not empty
+            # (and order_by() fails on the union() of a single sliced queryset)
+            return periods
+
         existence_checks = [
             self.filter(**{f"{field_name}__gte": period, f"{field_name}__lt": period + step})
             .order_by()
@@ -434,7 +439,9 @@ class EfficientDateHierarchyQuerySetMixin:
             .values_list("period_index", flat=True)[:1]
             for index, period in enumerate(periods)
         ]
-        non_empty_indexes = set(existence_checks[0].union(*existence_checks[1:], all=True))
+        # Drop the model's default ordering with order_by()
+        # (Django sets it to combined querysets while its columns aren't selected)
+        non_empty_indexes = set(existence_checks[0].union(*existence_checks[1:], all=True).order_by())
         periods = [period for index, period in enumerate(periods) if index in non_empty_indexes]
         return periods[::-1] if order == "DESC" else periods
 
