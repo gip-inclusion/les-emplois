@@ -3110,7 +3110,7 @@
 # ---
 # name: test_populate_evaluated_siaes
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3263,8 +3263,21 @@
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
                  "siae_evaluations_evaluatedsiae"."final_state",
-                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb"
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
           FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3286,37 +3299,6 @@
           FROM "siae_evaluations_evaluatedjobapplication"
           WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EvaluatedSiae.evaluation_is_final[siae_evaluations/models.py]',
-          'EvaluatedSiae.state[siae_evaluations/models.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluationcampaign"."id",
-                 "siae_evaluations_evaluationcampaign"."name",
-                 "siae_evaluations_evaluationcampaign"."created_at",
-                 "siae_evaluations_evaluationcampaign"."percent_set_at",
-                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
-                 "siae_evaluations_evaluationcampaign"."ended_at",
-                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
-                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
-                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
-                 "siae_evaluations_evaluationcampaign"."institution_id",
-                 "siae_evaluations_evaluationcampaign"."chosen_percent",
-                 "siae_evaluations_evaluationcampaign"."calendar_id"
-          FROM "siae_evaluations_evaluationcampaign"
-          WHERE "siae_evaluations_evaluationcampaign"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
@@ -4866,7 +4848,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 52,
+    'num_queries': 51,
     'queries': list([
       dict({
         'origin': list([
@@ -5455,6 +5437,7 @@
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
                  "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."message",
                  "job_applications_jobapplication"."refusal_reason",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."origin",
@@ -5515,26 +5498,6 @@
                                           AND U0."is_active")
                                    LIMIT 1)))))
           ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          '<lambda>[metabase/tables/job_applications.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id",
-                 "job_applications_jobapplication"."message"
-          FROM "job_applications_jobapplication"
-          WHERE "job_applications_jobapplication"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
@@ -11981,7 +11944,7 @@
 # ---
 # name: test_populate_services
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -12214,6 +12177,17 @@
                  "insertion_service"."updated_at",
                  "insertion_service"."search_vector",
                  "insertion_service"."extra",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."siren_epci",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at",
                  "insertion_genericreferenceitem"."id",
                  "insertion_genericreferenceitem"."source",
                  "insertion_genericreferenceitem"."kind",
@@ -12243,49 +12217,12 @@
                  "insertion_structure"."updated_on",
                  "insertion_structure"."is_active",
                  "insertion_structure"."created_at",
-                 "insertion_structure"."updated_at",
-                 T4."id",
-                 T4."source",
-                 T4."kind",
-                 T4."value",
-                 T4."label",
-                 T4."description",
-                 T4."created_at",
-                 T4."updated_at"
+                 "insertion_structure"."updated_at"
           FROM "insertion_service"
+          LEFT OUTER JOIN "cities_city" ON ("insertion_service"."insee_city_id" = "cities_city"."id")
           INNER JOIN "insertion_genericreferenceitem" ON ("insertion_service"."source_id" = "insertion_genericreferenceitem"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
-          LEFT OUTER JOIN "insertion_genericreferenceitem" T4 ON ("insertion_service"."kind_id" = T4."id")
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          '<lambda>[metabase/tables/services.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_services[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.populate[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[itoutils/django/commands.py]',
-          'Command.execute[itoutils/django/commands.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."normalized_name",
-                 "cities_city"."slug",
-                 "cities_city"."department",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee",
-                 "cities_city"."siren_epci",
-                 "cities_city"."coords",
-                 "cities_city"."edition_mode",
-                 "cities_city"."last_synced_at"
-          FROM "cities_city"
-          WHERE "cities_city"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
