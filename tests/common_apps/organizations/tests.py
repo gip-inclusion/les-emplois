@@ -22,6 +22,7 @@ from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
 from itou.prescribers import models as prescribers_models
 from itou.rdv_insertion import models as rdv_insertion_models
+from itou.rdv_service_public import models as rdv_service_public_models
 from itou.users import enums as users_enums, models as users_models
 from tests.approvals import factories as approvals_factories
 from tests.companies import factories as companies_factories
@@ -138,6 +139,7 @@ class TestOrganizationTransfer:
                 (job_applications_models.JobApplicationTransitionLog, "target_company"),
                 (rdv_insertion_models.Appointment, "company"),
                 (rdv_insertion_models.InvitationRequest, "company"),
+                (rdv_service_public_models.AppointmentProposal, "company"),
                 (users_models.User, "created_company_set"),
                 (users_models.User, "company"),  # handled through `CompanyMembership`
                 (City, "company"),

@@ -355,6 +355,12 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
         help_text="Permet d'initier la prise de RDV via RDV-Insertion lorsque renseigné.",
         error_messages={"unique": "Une entreprise avec cet ID d'organisation RDV-Solidarités existe déjà."},
     )
+    allow_rdv_service_public = models.BooleanField(
+        verbose_name="prise de RDV via RDV Service Public",
+        default=False,
+        db_default=False,
+        help_text="Autoriser les employeurs à proposer un RDV via RDV Service Public (phase pilote).",
+    )
 
     # Use the generic relation to let NotificationSettings being collected on deletion
     notification_settings = GenericRelation(
@@ -560,6 +566,13 @@ class Company(AddressMixin, OrganizationAbstract, AbstractFieldsHistoryModel):
         Check if this SIAE can use the employee record app
         """
         return self.kind in self.ASP_EMPLOYEE_RECORD_KINDS and self.convention_id
+
+    @property
+    def can_use_rdv_service_public(self):
+        # `rdv_solidarites_id` is only filled for the companies of the RDV-Insertion experiment.
+        # Temporary: they keep proposing appointments through RDV-Insertion (see the `rdv_insertion_invite`
+        # view) until they switch to RDV Service Public.
+        return self.allow_rdv_service_public and not self.rdv_solidarites_id
 
     @property
     def can_upload_prolongation_report(self):

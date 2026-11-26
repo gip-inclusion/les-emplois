@@ -161,6 +161,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -489,6 +490,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -725,6 +727,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -892,6 +895,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -942,8 +946,8 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 40 DESC,
-                   39 DESC,
+          ORDER BY 41 DESC,
+                   40 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 1
@@ -1035,6 +1039,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -1155,6 +1160,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -1321,6 +1327,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1370,8 +1377,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 40 DESC,
-                   39 DESC,
+          ORDER BY 41 DESC,
+                   40 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 3
@@ -1463,6 +1470,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -1584,6 +1592,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -1750,6 +1759,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1799,8 +1809,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 40 DESC,
-                   39 DESC,
+          ORDER BY 41 DESC,
+                   40 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 2
@@ -1892,6 +1902,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -2047,6 +2058,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -2213,6 +2225,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2262,8 +2275,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 40 DESC,
-                   39 DESC,
+          ORDER BY 41 DESC,
+                   40 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 5
@@ -2355,6 +2368,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",

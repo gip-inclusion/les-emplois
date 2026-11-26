@@ -16,6 +16,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
+from itou.rdv_service_public.models import OAuthToken
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.utils import merge_job_seeker_assignments
 from itou.utils.admin import add_support_remark_to_obj
@@ -117,6 +118,12 @@ def handle_token(model, from_user, to_user):
     Token.objects.filter(user=from_user).update(user=to_user)
 
 
+def handle_rdv_service_public_token(model, from_user, to_user):
+    # The merge can change the email of to_user: both users link their RDV Service Public account again,
+    # so that the email of the agent is checked against the final account
+    OAuthToken.objects.filter(user__in=[from_user, to_user]).delete()
+
+
 def noop(*args):
     return 0
 
@@ -128,6 +135,7 @@ MODEL_MAPPING = {
     (EmailAddress, "user"): noop,
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
+    (OAuthToken, "user"): handle_rdv_service_public_token,
     (JobSeekerAssignment, "professional"): handle_job_seeker_assignment,
     (User._meta.get_field("groups").remote_field.through, "user"): noop,  # type: ignore
     (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,  # type: ignore

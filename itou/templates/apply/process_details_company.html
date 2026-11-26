@@ -29,7 +29,7 @@
                aria-selected="true"
                {% matomo_event "candidature" "clic-onglet" "informations-generales" %}>Informations générales</a>
         </li>
-        {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id %}
+        {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id or job_application.to_company.can_use_rdv_service_public %}
             <li class="nav-item" role="presentation">
                 <a class="nav-link"
                    id="appointments-tab"
@@ -162,7 +162,7 @@
                     </div>
                 </div>
 
-                {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id %}
+                {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id or job_application.to_company.can_use_rdv_service_public %}
                     <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
                         <div class="s-section__row row">
                             <div class="s-section__col col-12">

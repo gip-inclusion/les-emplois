@@ -155,6 +155,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                     "spontaneous_applications_open_since",
                     "approvals_list",
                     "rdv_solidarites_id",
+                    "allow_rdv_service_public",
                 )
             },
         ),

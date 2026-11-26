@@ -1,9 +1,24 @@
 {% load badges %}
+{% load components %}
 {% load datetime_filters %}
 {% load matomo %}
 
 {% if request.from_employer %}
-    {% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
+    {% if job_application.to_company.can_use_rdv_service_public %}
+        <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
+            <h2 class="mb-0">Rendez-vous</h2>
+            <div class="d-flex flex-column flex-md-row gap-2">
+                {% include "apply/includes/buttons/rdv_service_public_propose_appointment.html" with job_application=job_application location="tab" csrf_token=csrf_token only %}
+            </div>
+        </div>
+        {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+            {% fragment as c_info__summary %}
+                Cette candidature vous intéresse ? Proposez un entretien ou une réunion d’information.
+            {% endfragment %}
+        {% endcomponent_info %}
+    {% else %}
+        {% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
+    {% endif %}
 {% endif %}
 
 {% if participations %}

@@ -45,7 +45,8 @@
                              "companies_company"."convention_id" AS "col33",
                              "companies_company"."job_app_score" AS "col34",
                              "companies_company"."is_searchable" AS "col35",
-                             "companies_company"."rdv_solidarites_id" AS "col36"
+                             "companies_company"."rdv_solidarites_id" AS "col36",
+                             "companies_company"."allow_rdv_service_public" AS "col37"
              FROM "companies_company"
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,
@@ -108,7 +109,8 @@
                              "companies_company"."convention_id" AS "col33",
                              "companies_company"."job_app_score" AS "col34",
                              "companies_company"."is_searchable" AS "col35",
-                             "companies_company"."rdv_solidarites_id" AS "col36"
+                             "companies_company"."rdv_solidarites_id" AS "col36",
+                             "companies_company"."allow_rdv_service_public" AS "col37"
              FROM "companies_company"
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,
@@ -171,7 +173,8 @@
                              "companies_company"."convention_id" AS "col33",
                              "companies_company"."job_app_score" AS "col34",
                              "companies_company"."is_searchable" AS "col35",
-                             "companies_company"."rdv_solidarites_id" AS "col36"
+                             "companies_company"."rdv_solidarites_id" AS "col36",
+                             "companies_company"."allow_rdv_service_public" AS "col37"
              FROM "companies_company"
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,
@@ -234,7 +237,8 @@
                              "companies_company"."convention_id" AS "col33",
                              "companies_company"."job_app_score" AS "col34",
                              "companies_company"."is_searchable" AS "col35",
-                             "companies_company"."rdv_solidarites_id" AS "col36"
+                             "companies_company"."rdv_solidarites_id" AS "col36",
+                             "companies_company"."allow_rdv_service_public" AS "col37"
              FROM "companies_company"
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,
@@ -297,7 +301,8 @@
                              "companies_company"."convention_id" AS "col33",
                              "companies_company"."job_app_score" AS "col34",
                              "companies_company"."is_searchable" AS "col35",
-                             "companies_company"."rdv_solidarites_id" AS "col36"
+                             "companies_company"."rdv_solidarites_id" AS "col36",
+                             "companies_company"."allow_rdv_service_public" AS "col37"
              FROM "companies_company"
              WHERE (NOT ("companies_company"."siret" = %s)
                     AND NOT ("companies_company"."kind" IN (%s,

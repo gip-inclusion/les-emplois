@@ -269,6 +269,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."allow_rdv_service_public",
                  "insertion_service"."id",
                  "insertion_service"."address_line_1",
                  "insertion_service"."address_line_2",

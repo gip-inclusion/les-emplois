@@ -217,6 +217,11 @@
       'model': 'prescribers.PrescriberOrganization',
     }),
     dict({
+      'field': 'created_by',
+      'hidden': True,
+      'model': 'rdv_service_public.AppointmentProposal',
+    }),
+    dict({
       'field': 'professional',
       'hidden': False,
       'model': 'users.JobSeekerAssignment',
@@ -344,6 +349,16 @@
       'field': 'job_seeker',
       'hidden': False,
       'model': 'rdv_insertion.Participation',
+    }),
+    dict({
+      'field': 'job_seeker',
+      'hidden': False,
+      'model': 'rdv_service_public.AppointmentProposal',
+    }),
+    dict({
+      'field': 'user',
+      'hidden': False,
+      'model': 'rdv_service_public.OAuthToken',
     }),
     dict({
       'field': 'user',

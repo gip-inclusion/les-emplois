@@ -1,0 +1,30 @@
+{% load matomo %}
+
+{% comment %}
+    location: "actions" for the actions bar, "tab" for the appointments tab
+{% endcomment %}
+{% if job_application.job_seeker.email %}
+    <form method="post"
+          action="{% url "rdv_service_public:propose_appointment" job_application_id=job_application.pk %}"
+          class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        <button type="submit"
+                class="btn btn-ico {% if location == "actions" %}btn-lg btn-link-white btn-block{% else %}btn-secondary w-100 w-md-auto{% endif %}"
+                aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_inverted_full_name }}"
+                {% matomo_event "candidature" "clic" "proposer-rdv-service-public" %}>
+            <i class="ri-calendar-line fw-medium" aria-hidden="true"></i>
+            <span>Proposer un RDV</span>
+        </button>
+    </form>
+{% else %}
+    <button type="button"
+            class="btn btn-ico {% if location == "actions" %}btn-lg btn-link-white btn-block{% else %}btn-secondary w-100 w-md-auto{% endif %}"
+            disabled
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            {% if location == "actions" %}data-bs-custom-class="c-box--action-tooltip"{% endif %}
+            data-bs-title="Aucun moyen de contacter ce candidat. Complétez ses informations via Modifier.">
+        <i class="ri-calendar-line fw-medium" aria-hidden="true"></i>
+        <span>Proposer un RDV</span>
+    </button>
+{% endif %}
