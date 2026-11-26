@@ -188,8 +188,8 @@ class OIDConnectUserData:
 
         if is_jobseeker and "birth_name" in jobseeker_data_dict:
             user_data_dict["last_name"] = guess_last_name(
-                user_data_dict["last_name"],
-                jobseeker_data_dict["birth_name"],
+                user_data_dict.get("last_name") or "",
+                jobseeker_data_dict.get("birth_name") or "",
                 GuessLastNameMode.BEFORE_SAVE,
             )
 
