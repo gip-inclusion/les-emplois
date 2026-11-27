@@ -20,12 +20,12 @@ DIRECTORY_RADIUS_KM = 20
 
 class MembershipKind(enum.StrEnum):
     COMPANY = "company"
-    PRESCRIBER_ORG = "prescriber_org"
+    PRESCRIBER = "prescriber"
 
 
 MEMBERSHIP_TO_KIND = {
     CompanyMembership: MembershipKind.COMPANY,
-    PrescriberMembership: MembershipKind.PRESCRIBER_ORG,
+    PrescriberMembership: MembershipKind.PRESCRIBER,
 }
 
 
@@ -46,7 +46,7 @@ def directory_membership_qs(membership_kind, origin):
         case MembershipKind.COMPANY:
             base_queryset = CompanyMembership.objects.filter(company__in=Company.objects.active())
             org_fieldname = "company"
-        case MembershipKind.PRESCRIBER_ORG:
+        case MembershipKind.PRESCRIBER:
             base_queryset = PrescriberMembership.objects.all()
             org_fieldname = "organization"
         case _:
@@ -78,7 +78,7 @@ def people_results(request, template_name="directory/people_results.html"):
     company_membership_qs = directory_membership_qs(MembershipKind.COMPANY, origin).values_list(
         *MEMBERSHIP_SORT_COLUMNS, named=True
     )
-    prescriber_membership_qs = directory_membership_qs(MembershipKind.PRESCRIBER_ORG, origin).values_list(
+    prescriber_membership_qs = directory_membership_qs(MembershipKind.PRESCRIBER, origin).values_list(
         *MEMBERSHIP_SORT_COLUMNS, named=True
     )
     memberships = company_membership_qs.union(prescriber_membership_qs).order_by(*MEMBERSHIP_SORT_COLUMNS)
@@ -87,25 +87,25 @@ def people_results(request, template_name="directory/people_results.html"):
 
     # Hydrate page memberships.
     company_membership_ids = []
-    prescriber_org_membership_ids = []
+    prescriber_membership_ids = []
     page_index = {}
     for i, membership in enumerate(memberships_page):
         match membership.kind:
             case MembershipKind.COMPANY:
                 company_membership_ids.append(membership.pk)
-            case MembershipKind.PRESCRIBER_ORG:
-                prescriber_org_membership_ids.append(membership.pk)
+            case MembershipKind.PRESCRIBER:
+                prescriber_membership_ids.append(membership.pk)
             case _:
                 raise ValueError(membership.kind)
         page_index[(membership.kind, membership.pk)] = i
     company_memberships = CompanyMembership.objects.filter(
         pk__in=company_membership_ids,
     ).select_related("user", "company")
-    prescriber_org_memberships = PrescriberMembership.objects.filter(
-        pk__in=prescriber_org_membership_ids
-    ).select_related("user", "organization")
+    prescriber_memberships = PrescriberMembership.objects.filter(pk__in=prescriber_membership_ids).select_related(
+        "user", "organization"
+    )
 
-    results = list(itertools.chain(company_memberships, prescriber_org_memberships))
+    results = list(itertools.chain(company_memberships, prescriber_memberships))
     results.sort(key=lambda m: page_index[(MEMBERSHIP_TO_KIND[m._meta.model], m.pk)])
 
     memberships_page.object_list = results
