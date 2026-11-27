@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
+from django.contrib.admin.options import ActionLocation
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
@@ -122,6 +123,7 @@ class InconsistencyCheckMixin:
                 inconsistencies.setdefault(item, []).append(title)
         return inconsistencies
 
+    @admin.action(description="Vérifier la cohérence des objets")
     def check_inconsistencies(self, request, queryset, message_when_no_inconsistency=True):
         inconsistencies = self.compute_inconsistencies(queryset)
         if inconsistencies:
@@ -149,14 +151,11 @@ class InconsistencyCheckMixin:
         elif message_when_no_inconsistency:
             self.message_user(request, "Aucune incohérence trouvée")
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if self.INCONSISTENCY_CHECKS:
-            actions["check_inconsistencies"] = (
-                InconsistencyCheckMixin.check_inconsistencies,
-                "check_inconsistencies",
-                "Vérifier la cohérence des objets",
-            )
+    def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
+        actions = super().get_actions(request, action_location=action_location)
+        # @admin.action limits the action to the change list by default: get_action() returns None elsewhere
+        if self.INCONSISTENCY_CHECKS and (action := self.get_action("check_inconsistencies", action_location)):
+            actions[action.name] = action
         return actions
 
     def save_model(self, request, obj, form, change):

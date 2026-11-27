@@ -53,7 +53,6 @@ filterwarnings = [
     "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
     "ignore:The EMAIL_BACKEND setting is deprecated:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:The default argument for algorithm in salted_hmac:django.utils.deprecation.RemovedInDjango2028Warning",
-    "ignore:Overriding get_actions\\(\\) without the 'action_location' parameter:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:Calling select_related\\(\\) with no arguments is deprecated.:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:get_connection\\(\\) is deprecated.:django.utils.deprecation.RemovedInDjango2028Warning",
 ]
