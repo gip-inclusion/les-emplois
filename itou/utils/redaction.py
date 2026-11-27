@@ -15,6 +15,14 @@ ANONYMOUS_USER_ID = "anonymous"
 # alone: knowing that we sent an empty first name is what makes a 422 debuggable.
 QUERY_PARAM_RE = re.compile(r"(?P<separator>^|[?&])(?P<key>[^&=\s'\"]+)=(?P<value>[^&\s'\"]+)")
 
+# A `"key": "value"` pair of a JSON document, or a `'key': 'value'` pair of a dict repr, found in a
+# string: a request body, the repr the SDK made of a mapping, a log message. The value is a quoted
+# string or a bare number, and a blank one is left alone, as for query strings.
+KEYED_VALUE_RE = re.compile(
+    r"""(?P<key_part>(?P<quote>['"])(?P<key>[^'"\\]+)(?P=quote):\s*)"""
+    r"""(?P<value>'(?:[^'\\]|\\.)+'|"(?:[^"\\]|\\.)+"|-?\d[\d.]*)"""
+)
+
 # Query parameters kept readable by `redact_query_values_by_default`: which page, in which order, of
 # which fields was asked for is what makes an outgoing call identifiable. For example,
 # ?page=2&per_page=50&fields=id,name shows what was requested without saying about whom. Keep this
@@ -47,6 +55,8 @@ _URL_WITH_QUERY_RE = re.compile(r"(?P<base>https?://[^\s'\"?]+\?)(?P<query>[^\s'
 # Wherever it appears: in a log message, in the path of a URL (Brevo addresses a contact as
 # /v3/contacts/someone@example.com), percent-encoded or not
 _EMAIL_RE = re.compile(r"[\w.+%-]+(?:@|%40)(?:[\w-]+\.)+[A-Za-z]{2,}")
+# Every pattern of this module needs one of these to match, so a text holding none is left as is
+_REDACTABLE_RE = re.compile(r"""[=@]|%40|['"]:""")
 
 
 def redact_query_params(url):
@@ -63,7 +73,7 @@ def redact_query_values(text, is_sensitive):
     """Replace the value of every query parameter whose key `is_sensitive`, keeping the keys.
 
     Works on a bare query string as well as on free text holding a URL, so that one rule covers
-    the Sentry event, its breadcrumbs, and the log records.
+    the Sentry event, its breadcrumbs and span data, and the log records.
 
     Example:
         With `is_sensitive` true for `nom` only:
@@ -77,6 +87,37 @@ def redact_query_values(text, is_sensitive):
         return match[0]
 
     return QUERY_PARAM_RE.sub(redact, text)
+
+
+def redact_keyed_values(text, is_sensitive):
+    """Replace the value of every keyed pair of `text` whose key `is_sensitive`, keeping the keys.
+
+    What a mapping looks like once it became a string, which no rule on query parameters reaches:
+    the JSON body httpx holds while it sends a request, or the repr of a dict.
+
+    Example:
+        With `is_sensitive` true for `email` only:
+        `{"email": "jean@example.com", "id": 42}` ➜ `{"email": "_REDACTED_", "id": 42}`
+    """
+
+    def redact(match):
+        if is_sensitive(match["key"]):
+            quote = match["value"][0] if match["value"][0] in "'\"" else ""
+            return f"{match['key_part']}{quote}{REDACTED}{quote}"
+        return match[0]
+
+    return KEYED_VALUE_RE.sub(redact, text)
+
+
+def can_hold_personal_data(text):
+    """Whether `text` holds a character that one of the patterns of this module needs.
+
+    A cheap test, which lets a caller scrubbing many strings skip most of them.
+
+    Example:
+        `GET /api/v1/jobs` ➜ `False`, `nom=Dupont` ➜ `True`
+    """
+    return bool(_REDACTABLE_RE.search(text))
 
 
 def redact_query_values_by_default(query_string):

@@ -23,6 +23,9 @@ from config.sentry import (
     SENSITIVE_KEY_FRAGMENTS,
     _is_sensitive_key,
     scrub_sensitive_data,
+    scrubbed_repr,
+    strip_sentry_sensitive_data,
+    strip_sentry_sensitive_data_from_transaction,
 )
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.models import ServiceToken
@@ -306,6 +309,46 @@ def test_no_pii_in_event_when_france_travail_user_data_fails(captured_event):
     )
 
 
+def test_no_pii_in_a_mapping_nested_deeper_than_the_sdk_serializes(captured_event):
+    """Past 5 levels, the SDK serializes a mapping as its repr: a string, where keys are text.
+
+    The value of a sensitive key can be a mapping itself, whose own keys name nobody, so it is
+    only redacted as long as the keys are keys.
+    """
+    response = {
+        "data": {"individu": {"etatCivil": {"identite": {"nom": "TARDIVEAU", "adresse": {"ligne": "Croix-Nivert"}}}}}
+    }
+
+    try:
+        response["data"]["individu"]["statut"]
+    except KeyError:
+        sentry_sdk.capture_exception()
+
+    payload = event_payload(captured_event())
+    assert "{'nom': " in payload  # guard against a false negative: the mapping did become a string
+    assert_no_pii(payload, "TARDIVEAU", "Croix-Nivert")
+
+
+def test_no_credential_in_a_json_body_held_as_a_string(respx_mock, captured_event):
+    """httpx holds the body it sends as a string, which no key based scrubbing reads.
+
+    Such as the old and new passwords of `itou.utils.apis.api_entreprise.renew_password`.
+    """
+    respx_mock.post("https://api.insee.fake/renew").mock(side_effect=httpx.ConnectTimeout("timed out"))
+
+    try:
+        httpx.post(
+            "https://api.insee.fake/renew",
+            content=json.dumps({"oldPassword": "0ld-s3cr3t", "newPassword": "n3w-s3cr3t"}),
+        )
+    except httpx.ConnectTimeout:
+        sentry_sdk.capture_exception()
+
+    payload = event_payload(captured_event())
+    assert "oldPassword" in payload  # guard against a false negative
+    assert_no_pii(payload, "0ld-s3cr3t", "n3w-s3cr3t")
+
+
 def test_no_pii_in_event_when_geocoding_fails(respx_mock, settings, captured_event):
     """The home address of the job seeker travels in the query string of the geocoding call.
 
@@ -547,6 +590,49 @@ def test_failing_task_reports_its_arguments_without_the_personal_ones(
         breadcrumb_messages = [breadcrumb["message"] for breadcrumb in event["breadcrumbs"]["values"]]
         assert f"Attempting to delete email {REDACTED}, remaining 0 retries" in breadcrumb_messages
         assert email.upper() not in event_payload(event).upper()
+
+
+def test_transaction_spans_are_scrubbed():
+    """Span data carries the query string of outgoing requests, and has its own callback."""
+    transaction = {
+        "type": "transaction",
+        "user": {"email": "someone@example.com", "id": 1},
+        "spans": [
+            {
+                "op": "http.client",
+                "data": {
+                    "http.query": "nomNaissance=TARDIVEAU&prenoms%5B%5D=JEAN-MICHEL&recipient=13003013300016",
+                },
+            }
+        ],
+    }
+
+    scrubbed = strip_sentry_sensitive_data_from_transaction(transaction, {})
+
+    assert scrubbed["spans"][0]["data"]["http.query"] == (
+        f"nomNaissance={REDACTED}&prenoms%5B%5D={REDACTED}&recipient={REDACTED}"
+    )
+    assert scrubbed["user"] == {"id": 1}
+
+
+def test_transaction_is_dropped_when_scrubbing_fails(mocker, caplog):
+    """Losing a transaction loses no alert, but why it was lost must be told somewhere."""
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
+
+    assert strip_sentry_sensitive_data_from_transaction({"type": "transaction", "spans": []}, {}) is None
+
+    [record] = caplog.records
+    assert record.name == "config.sentry"
+    assert record.getMessage().startswith("Dropped a transaction, scrubbing it raised RuntimeError at sentry.py:")
+    assert "jean-michel" not in caplog.text
+
+
+def test_scrubbing_hooks_are_registered():
+    """The tests above call the hooks directly or go through the client: this ties both together."""
+    options = sentry_sdk.get_client().options
+    assert options["before_send"] is strip_sentry_sensitive_data
+    assert options["before_send_transaction"] is strip_sentry_sensitive_data_from_transaction
+    assert options["custom_repr"] is scrubbed_repr
 
 
 def test_log_event_keeps_its_message_template(captured_event):

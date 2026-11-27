@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import re
@@ -14,11 +15,15 @@ from sentry_sdk.scrubber import DEFAULT_DENYLIST, DEFAULT_PII_DENYLIST
 from itou.utils.redaction import (
     ANONYMOUS_USER_ID,
     REDACTED,
+    can_hold_personal_data,
+    redact_keyed_values,
     redact_personal_data,
     redact_query_values,
     redact_query_values_by_default,
 )
 
+
+logger = logging.getLogger(__name__)
 
 # A key holding one of these is sensitive whatever is spelled around it: `birth_place`,
 # `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `date_naissance`…
@@ -133,7 +138,9 @@ _SENSITIVE_NAMES = (
     SENSITIVE_API_PARAMETERS | SENSITIVE_API_RESPONSE_FIELDS | SENSITIVE_VARIABLE_NAMES | SENSITIVE_CREDENTIAL_NAMES
 )
 _SENSITIVE_NAMES_LOWER = frozenset(name.lower() for name in _SENSITIVE_NAMES)
-_SENSITIVE_FRAGMENTS = SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS
+_SENSITIVE_FRAGMENTS_RE = re.compile(
+    "|".join(re.escape(fragment) for fragment in sorted(SENSITIVE_KEY_FRAGMENTS | SENSITIVE_CREDENTIAL_FRAGMENTS))
+)
 # What `EventScrubber` used to match before `data_collection` disabled it, whole keys only
 _SDK_DENYLIST = frozenset(key.lower() for key in DEFAULT_DENYLIST + DEFAULT_PII_DENYLIST)
 
@@ -174,6 +181,8 @@ EVENT_PII_FREE_KEYS = [
 ]
 
 
+# The keys repeat heavily, from one span or one frame to the next
+@functools.lru_cache(maxsize=4096)
 def _is_sensitive_key(key):
     """Whether a mapping key, a variable name or a query parameter names something private.
 
@@ -186,11 +195,7 @@ def _is_sensitive_key(key):
     key = key.lower()
     if key in NON_SENSITIVE_KEYS:
         return False
-    return (
-        key in _SENSITIVE_NAMES_LOWER
-        or key in _SDK_DENYLIST
-        or any(fragment in key for fragment in _SENSITIVE_FRAGMENTS)
-    )
+    return key in _SENSITIVE_NAMES_LOWER or key in _SDK_DENYLIST or bool(_SENSITIVE_FRAGMENTS_RE.search(key))
 
 
 def _scrub_dict_value(key, value):
@@ -207,7 +212,7 @@ def _scrub_dict_value(key, value):
 def scrub_sensitive_data(value):
     """Redact personal data anywhere in a Sentry event.
 
-    This includes: the message of an exception, the log entry, breadcrumbs, and
+    This includes: the message of an exception, the log entry, breadcrumbs, span data, and
     the local variables of the stack frames.
 
     It is the only layer to do so: `data_collection` disables the SDK's `EventScrubber`, so
@@ -215,11 +220,14 @@ def scrub_sensitive_data(value):
     """
     match value:
         case str():
+            if not can_hold_personal_data(value):
+                return value
             value = redact_personal_data(value)
             # Catches the query strings that `redact_personal_data` misses because no `https://host`
             # precedes them, such as our own request's `query_string` or a relative
             # `next=/path?nir=...`.
-            return redact_query_values(value, _is_sensitive_key)
+            value = redact_query_values(value, _is_sensitive_key)
+            return redact_keyed_values(value, _is_sensitive_key)
         case dict():
             return {key: _scrub_dict_value(key, item) for key, item in value.items()}
         case list():
@@ -227,6 +235,18 @@ def scrub_sensitive_data(value):
         case tuple():
             return tuple(scrub_sensitive_data(item) for item in value)
     return value
+
+
+def scrubbed_repr(value):
+    """`custom_repr` hook to scrub a container before the SDK turns it into a string.
+
+    The SDK serializes a mapping nested deeper than `MAX_DATABAG_DEPTH` (5) as its repr, which
+    `scrub_sensitive_data` could only read as text. Scrubbing it first keeps a sensitive key
+    redacted whatever its value holds. Anything else gets the SDK's own repr.
+    """
+    if isinstance(value, (dict, list, tuple)):
+        return repr(scrub_sensitive_data(value))
+    return None
 
 
 def scrub_request_data(event):
@@ -302,6 +322,13 @@ def degraded_event(event, exc):
     return degraded
 
 
+def scrub_event(event):
+    """Remove personal data from an event, whether an error or a transaction."""
+    anonymize_user(event)
+    scrub_request_data(event)
+    return scrub_sensitive_data(event)
+
+
 def strip_sentry_sensitive_data(event, _hint):
     """`before_send` hook to remove personal data from Sentry events.
 
@@ -313,9 +340,7 @@ def strip_sentry_sensitive_data(event, _hint):
     debugger here.
     """
     try:
-        anonymize_user(event)
-        scrub_request_data(event)
-        return scrub_sensitive_data(event)
+        return scrub_event(event)
     except Exception as exc:
         try:
             return degraded_event(event, exc)
@@ -323,6 +348,26 @@ def strip_sentry_sensitive_data(event, _hint):
             # The fallback itself must not raise: the SDK would drop the event, leaving nothing
             # but a `callback_error` in the client reports of the project.
             return {"event_id": event["event_id"], "level": "error", **_failed_scrubbing_event()}
+
+
+def strip_sentry_sensitive_data_from_transaction(event, _hint):
+    """`before_send_transaction` hook to remove personal data from Sentry transactions.
+
+    Spans carry the query string of outgoing HTTP requests. The user is anonymized as for
+    errors, which the performance product did not use to get.
+
+    On failure the transaction is dropped: unlike an error, losing it loses no alert, and
+    the degraded shape above is not a valid transaction anyway. Why it failed is logged, which
+    Sentry ignores: the client reports would otherwise be the only trace of it.
+    """
+    try:
+        return scrub_event(event)
+    except Exception as exc:
+        logger.warning(
+            "Dropped a transaction, scrubbing it raised %(pii_scrubbing_error)s at %(pii_scrubbing_location)s",
+            _scrubbing_failure(exc),
+        )
+        return None
 
 
 def sentry_init():
@@ -349,9 +394,7 @@ def sentry_init():
             # Hardcoded CACHES.*.KEY_PREFIX to not depend on Django being setup
             RedisIntegration(cache_prefixes=["django:"]),
         ],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
+        # https://docs.sentry.io/platforms/python/sampling/
         traces_sample_rate=traces_sample_rate,
         # What the integrations are allowed to collect, category by category. It replaces
         # `send_default_pii`, deprecated since sentry-sdk 2.72.0, which must stay unset, and it
@@ -391,7 +434,12 @@ def sentry_init():
         # https://docs.sentry.io/platforms/python/data-management/sensitive-data/#before-send-before-send-transaction--before-send-span
         # https://docs.sentry.io/platforms/python/configuration/filtering/
         before_send=strip_sentry_sensitive_data,
+        before_send_transaction=strip_sentry_sensitive_data_from_transaction,
+        # https://docs.sentry.io/platforms/python/configuration/options/#custom_repr
+        custom_repr=scrubbed_repr,
         **shutdown_timeout_option,
     )
     ignore_logger("django.security.DisallowedHost")
     ignore_logger("django_datadog_logger.middleware.request_log")
+    # Its warnings are about the scrubbing itself, which they would only go through again
+    ignore_logger(__name__)
