@@ -7,8 +7,10 @@ Arguments:
 - id_suffix: When the field is present multiple times on the page, use the
     suffix to make its input id unique.
 - matomo_category: When given, a matomo click event is set for each choice of this field.
+- nouveau: When truthy, displays a "new" badge next to the label.
+- wide: When truthy, adds the `dropdown-wide` class to the dropdown (wider dropdown menu).
 {% endcomment %}
-<div class="dropdown">
+<div class="dropdown{% if wide|default:False %} dropdown-wide{% endif %}">
     <button type="button"
             class="btn btn-dropdown-filter dropdown-toggle"
             data-bs-toggle="dropdown"
