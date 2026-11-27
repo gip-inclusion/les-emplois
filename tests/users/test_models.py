@@ -63,6 +63,7 @@ from tests.users.factories import (
     PrescriberFactory,
     ProfessionalFactory,
     UserFactory,
+    random_user_kind_factory,
 )
 from tests.utils.testing import email_tracking_consent_url, normalize_fields_history
 
@@ -520,10 +521,11 @@ class TestModel:
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
-    def test_email_already_exists(self):
-        JobSeekerFactory(email="foo@bar.com")
-        assert User.email_already_exists("foo@bar.com")
-        assert User.email_already_exists("FOO@bar.com")
+    def test_clean_doesnt_change_null_email(self):
+        user = random_user_kind_factory(email=None)
+        user.clean()
+        # normalize_email should not set it to ""
+        assert user.email is None
 
     def test_save_for_unique_email_on_create_and_update(self):
         """
@@ -1337,6 +1339,14 @@ def test_user_invalid_kind():
         match="Le type d’utilisateur est incorrect.",
     ):
         UserFactory(kind="")
+
+
+def test_user_disallowed_empty_email():
+    with pytest.raises(
+        ValidationError,
+        match="L’email ne doit pas être vide.",
+    ):
+        random_user_kind_factory(email="")
 
 
 @pytest.mark.parametrize(

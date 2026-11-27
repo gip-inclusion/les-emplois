@@ -60,19 +60,16 @@ class UserAdminForm(EnforceStaffEmailDomainMixin, UserChangeForm):
             "fields_history",
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.email is None and (email_field := self.fields.get("email")):
+            # If the user doesn't have an email and the email field is present
+            # (i.e. if it isn't readonly due to SSO), allow the edition of the other fields
+            email_field.required = False
+
     def clean(self):
         super().clean()
         self.cleaned_data["is_staff"] = self.instance.kind == UserKind.ITOU_STAFF
-
-        # smart warning if email already exist
-        try:
-            email = self.cleaned_data["email"]
-        except KeyError:
-            # Email already registered, e.g. comes from SSO.
-            pass
-        else:
-            if self.instance.email_already_exists(email, exclude_pk=self.instance.pk):
-                raise ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
 
         if self.instance.is_job_seeker:
             # Update job seeker geolocation

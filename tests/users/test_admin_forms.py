@@ -1,5 +1,6 @@
 import pytest
 from django.forms.models import model_to_dict
+from pytest_django.asserts import assertFormError
 
 from itou.users.admin_forms import UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind
@@ -46,7 +47,7 @@ def test_email_already_exists():
 
     form = UserAdminForm(data_new_user)
     assert not form.is_valid()
-    assert "Cet e-mail existe déjà." in form.errors["__all__"]
+    assertFormError(form, "email", "Un objet Utilisateur avec ce champ Adresse e-mail existe déjà.")
 
     # updating user - email not modified
     form = UserAdminForm(data=data_user, instance=user)
@@ -61,4 +62,4 @@ def test_email_already_exists():
     data_user["email"] = email
     form = UserAdminForm(data=data_user, instance=user)
     assert not form.is_valid()
-    assert "Cet e-mail existe déjà." in form.errors["__all__"]
+    assertFormError(form, "email", "Un objet Utilisateur avec ce champ Adresse e-mail existe déjà.")

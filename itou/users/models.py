@@ -218,6 +218,12 @@ class UserQuerySet(models.QuerySet):
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
+    @classmethod
+    def normalize_email(cls, email):
+        if email is None:
+            return None
+        return super().normalize_email(email)
+
     def get_duplicated_pole_emploi_ids(self):
         """
         Returns an array of `pole_emploi_id` used more than once:
@@ -515,6 +521,11 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
                 condition=models.Q(
                     ~models.Q(is_staff=True, is_active=True) | models.Q(email__endswith="@inclusion.gouv.fr")
                 ),
+            ),
+            models.CheckConstraint(
+                name="no_empty_string_email",
+                violation_error_message="L’email ne doit pas être vide.",
+                condition=~models.Q(email=""),
             ),
         ]
         permissions = [
@@ -865,18 +876,6 @@ class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
         We now use a UUID4.
         """
         return uuid.uuid4().hex
-
-    @classmethod
-    def email_already_exists(cls, email, exclude_pk=None):
-        """
-        RFC 5321 Part 2.4 states that only the domain portion of an email
-        is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
-        the same email.
-        """
-        queryset = cls.objects.filter(email__iexact=email)
-        if exclude_pk:
-            queryset = queryset.exclude(pk=exclude_pk)
-        return queryset.exists()
 
     def get_kind_display(self):
         return UserKind(self.kind).label
