@@ -9,22 +9,35 @@ import pytest
 import respx
 import sentry_sdk
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
+from django.http import HttpResponseServerError
+from django.urls import include, path
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.test import APIClient
+from rest_framework.views import APIView
 from sentry_sdk.utils import AnnotatedValue, iter_event_frames
 
 from config.sentry import (
     PII_SCRUBBING_FAILED,
     SENSITIVE_API_PARAMETERS,
+    SENSITIVE_KEY_FRAGMENTS,
     _is_sensitive_key,
     scrub_sensitive_data,
 )
+from itou.api.auth import ServiceTokenAuthentication
+from itou.api.models import ServiceToken
+from itou.archive.tasks import async_delete_contact
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
+from itou.nexus.enums import Service
+from itou.users.enums import UserKind
 from itou.utils.apis import api_particulier
 from itou.utils.apis.france_travail_agent import get_user_data
 from itou.utils.apis.geocoding import call_ban_geocoding_api
 from itou.utils.apis.pole_emploi import Endpoints, PoleEmploiAPIException, PoleEmploiRoyaumePartenaireApiClient
 from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
-from itou.utils.redaction import REDACTED
+from itou.utils.redaction import ANONYMOUS_USER_ID, REDACTED
+from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -45,7 +58,7 @@ API_PARAMETER_SPELLINGS = frozenset(
 
 @pytest.fixture(name="clean_sentry_scope")
 def clean_sentry_scope_fixture():
-    """Isolate the test from the breadcrumbs left behind by the previous ones.
+    """Isolate the test from the breadcrumbs and event processors left behind by the previous ones.
 
     The SDK keeps its scopes for the whole process, and an event is built from the
     breadcrumbs of the isolation scope *and* of the current one. Without forking
@@ -56,6 +69,9 @@ def clean_sentry_scope_fixture():
     with sentry_sdk.isolation_scope() as isolation_scope, sentry_sdk.new_scope() as scope:
         for forked_scope in (isolation_scope, scope):
             forked_scope.clear()  # clear the entire scope, including breadcrumbs, tags, extras, etc.
+            # `clear()` keeps the event processors. The test client bypasses the per-request fork
+            # of the SDK, so those added by `sentry_user_id` in earlier tests are still there
+            forked_scope._event_processors.clear()
         yield
 
 
@@ -360,6 +376,22 @@ def test_contact_details_are_scrubbed_wherever_they_are_keyed():
     }
 
 
+def test_credentials_are_scrubbed():
+    """The OIDC token exchanges keep their `client_secret` in a frame local while they raise.
+
+    A leaked secret is a rotation incident rather than a privacy one, but it reaches Sentry the
+    same way. `DEFAULT_DENYLIST` matches keys exactly, so its `secret` never covered this one.
+    """
+    data = {"client_id": "itou", "client_secret": "s3cr3t", "code": "abc", "grant_type": "authorization_code"}
+
+    assert scrub_sensitive_data(data) == {
+        "client_id": "itou",
+        "client_secret": REDACTED,
+        "code": "abc",
+        "grant_type": "authorization_code",
+    }
+
+
 def test_degraded_event_when_scrubbing_fails(mocker, captured_event):
     """A crash in the scrubber must not leak the event, nor silence the alert."""
     mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
@@ -407,6 +439,21 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
     assert transport.capture_envelope.call_count == 1
 
 
+def test_scrubbing_reaches_nested_frame_variables():
+    """`before_send` is the only scrubbing layer, so it has to reach every depth on its own.
+
+    Setting `data_collection` disables the SDK's `EventScrubber`, which used to run first and
+    which this asserted on. Nothing else looks inside the params dict a frame holds.
+    """
+    assert sentry_sdk.get_client().options["event_scrubber"] is None
+    frame = {"vars": {"nir": "180081380021", "params": {"nomNaissance": "TARDIVEAU"}}}
+
+    scrubbed = scrub_sensitive_data({"exception": {"values": [{"stacktrace": {"frames": [frame]}}]}})
+
+    scrubbed_frame = scrubbed["exception"]["values"][0]["stacktrace"]["frames"][0]
+    assert scrubbed_frame["vars"] == {"nir": REDACTED, "params": {"nomNaissance": REDACTED}}
+
+
 @pytest.mark.parametrize(
     "key,expected",
     [
@@ -419,14 +466,25 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
         ("numeroTelephone", True),
         ("address_line_1", True),
         ("contact_phone", True),
+        ("client_secret", True),
         # The France Travail identifier, under each of its names
         ("pole_emploi_id", True),
         ("job_seeker_france_travail_id", True),
         ("ft_id", True),
+        # Credentials, which `data_collection` stopped the SDK from scrubbing for us
+        ("password", True),
+        ("authorization", True),
+        ("sessionid", True),
+        ("x_forwarded_for", True),
+        ("key", True),  # the TOTP secret of the OTP views
+        ("sid", True),
         # Ordinary words a fragment must not swallow, and the exceptions to it
         ("template_name", False),
         ("model_name", False),
+        ("cache_key", False),
+        ("residence", False),
         ("draft_id", False),
+        ("author", False),
         ("denominationUniteLegale", False),
         ("siret", False),
         ("email_id", False),
@@ -438,6 +496,57 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
 )
 def test_is_sensitive_key(key, expected):
     assert _is_sensitive_key(key) is expected
+
+
+def test_data_collection_leaves_no_category_to_its_default():
+    """Opting into `data_collection` makes every field left out fall back to collecting.
+
+    Asserting the whole resolved mapping is what stops a later edit, or an SDK upgrade adding a
+    category, from quietly turning collection back on.
+    """
+    assert sentry_sdk.get_client().options["data_collection"] == {
+        "provided_by_user": True,
+        "user_info": False,
+        "cookies": {"mode": "off"},
+        "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
+        "http_bodies": ["incoming_request"],
+        "url_query_params": {"mode": "denylist", "terms": sorted(SENSITIVE_KEY_FRAGMENTS)},
+        "graphql": {"document": False, "variables": False},
+        "gen_ai": {"inputs": False, "outputs": False},
+        "database_query_data": False,
+        "stack_frame_variables": True,
+        "frame_context_lines": 5,
+        "queues": True,
+    }
+
+
+def test_failing_task_reports_its_arguments_without_the_personal_ones(
+    respx_mock, django_capture_on_commit_callbacks, brevo_client, prepare_event_spy
+):
+    """Which record a task was working on is the first thing to know when it fails.
+
+    `data_collection["queues"]` is what puts the arguments back, and passing the personal ones
+    by keyword is what lets the scrubbing reach them: `args` is a bare list of values. The last
+    attempt also logs the email, which rides along as a breadcrumb, where no key protects it.
+    """
+    email = "jean-michel@example.com"
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        side_effect=httpx.ConnectTimeout("timed out")
+    )
+
+    with django_capture_on_commit_callbacks(execute=True):
+        async_delete_contact(email=email, retries=0)
+
+    # Every event captured while the task runs carries its arguments, dropped ones excepted
+    events = [event for event in prepare_event_spy.spy_return_list if event]
+    assert events  # guard against a false negative
+    for event in events:
+        huey_job = event["extra"]["huey-job"]
+        assert huey_job["task"] == "async_delete_contact"
+        assert huey_job["kwargs"]["email"] == REDACTED
+        breadcrumb_messages = [breadcrumb["message"] for breadcrumb in event["breadcrumbs"]["values"]]
+        assert f"Attempting to delete email {REDACTED}, remaining 0 retries" in breadcrumb_messages
+        assert email.upper() not in event_payload(event).upper()
 
 
 def test_log_event_keeps_its_message_template(captured_event):
@@ -454,3 +563,140 @@ def test_log_event_keeps_its_message_template(captured_event):
     event = captured_event()
     assert event["logentry"]["message"] == "Request failed for %s"
     assert "TARDIVEAU" not in event_payload(event)
+
+
+@login_not_required
+def boom_view(request):
+    raise RuntimeError("boom")
+
+
+class BoomAPIView(APIView):
+    authentication_classes = [ServiceTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        raise RuntimeError("boom")
+
+
+@login_not_required
+def boom_error_view(request):
+    # The real 500 page renders `layout/base.html`, which this URLconf has no context for.
+    return HttpResponseServerError("boom")
+
+
+# `ROOT_URLCONF` points at this module in the tests below, which need a view that fails. The real
+# URLs are included as well: some middlewares reverse them on every request, such as
+# `itou.audit_trail.middleware.browser_id_cookie`.
+urlpatterns = [
+    path("boom", boom_view),
+    path("boom-api", BoomAPIView.as_view()),
+    path("", include("config.urls")),
+]
+handler500 = boom_error_view
+
+
+@pytest.fixture(name="failing_urlconf")
+def failing_urlconf_fixture(settings, client):
+    settings.ROOT_URLCONF = __name__
+    # Without this, the test client re-raises the exception before the assertions run
+    client.raise_request_exception = False
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_only_the_user_id_is_reported_for_an_authenticated_user(client, captured_event):
+    """An error names the user by ID, never by identity."""
+    job_seeker = JobSeekerFactory(first_name="Jean-Michel", last_name="Tardiveau")
+    client.force_login(job_seeker)
+
+    client.get("/boom")
+
+    event = captured_event()
+    assert event["user"] == {"id": str(job_seeker.pk)}
+    payload = event_payload(event)
+    for pii in [job_seeker.email, job_seeker.first_name, job_seeker.last_name]:
+        assert pii.upper() not in payload.upper()
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_user_kind_and_organization_are_reported_as_tags(client, captured_event):
+    """They say who ran into the error without naming anyone, as the logs already do."""
+    membership = CompanyMembershipFactory()
+    client.force_login(membership.user)
+
+    client.get("/boom")
+
+    event = captured_event()
+    assert event["user"] == {"id": str(membership.user.pk)}
+    assert event["tags"]["user_kind"] == UserKind.PROFESSIONAL
+    assert event["tags"]["organization_type"] == "companies.Company"
+    assert event["tags"]["organization_id"] == str(membership.company_id)
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_anonymous_user_is_reported_as_anonymous(client, captured_event):
+    client.get("/boom")
+
+    assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+def test_error_raised_before_authentication_reports_a_user(client, mocker, captured_event):
+    """The health check answers before `AuthenticationMiddleware` runs, and reports its own errors."""
+    mocker.patch("itou.www.middleware.default_storage").exists.side_effect = OSError("S3 is down")
+
+    response = client.get("/check-health")
+
+    assert response.status_code == 500
+    assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_token_authenticated_request_is_reported_as_an_api_service_account(captured_event):
+    """The API authenticates inside the view: the user is only known once the event is built."""
+    token = ServiceToken.objects.create(service=Service.DATA_INCLUSION)
+    api_client = APIClient(headers={"Authorization": f"Token {token.key}"}, raise_request_exception=False)
+
+    api_client.get("/boom-api")
+
+    assert captured_event()["user"] == {"id": "api_service_account"}
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_submitted_form_values_are_allowlisted(client, captured_event):
+    """The body of a submission is attached to the event whatever `data_collection` says.
+
+    Its field names are ours, and they carry an identity far more often than not, so this is the
+    one channel where the values are redacted unless the field is known to name nobody. The names
+    all survive: which fields were submitted, and which were left blank, is the debuggable part.
+    """
+    client.post(
+        "/boom",
+        {
+            "email": "jean-michel@example.com",
+            "nir": "180081380021",
+            "birth_place": "75056",
+            "city": "Paris",
+            "company_id": "42",
+            "pole_emploi_id": "12345678901",  # an `_id`, yet no foreign key
+            "kind": "employer",
+        },
+    )
+
+    assert captured_event()["request"]["data"] == {
+        "email": REDACTED,
+        "nir": REDACTED,
+        "birth_place": REDACTED,
+        "city": REDACTED,
+        "company_id": "42",
+        "pole_emploi_id": REDACTED,
+        "kind": "employer",
+    }
+
+
+@pytest.mark.usefixtures("failing_urlconf")
+def test_cookies_are_not_collected(client, captured_event):
+    """`data_collection["cookies"]` gates the cookies of the request, session included."""
+    client.force_login(JobSeekerFactory())
+
+    client.get("/boom")
+
+    assert "cookies" not in captured_event()["request"]

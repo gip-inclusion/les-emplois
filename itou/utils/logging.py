@@ -12,6 +12,16 @@ logger = logging.getLogger(__name__)
 NO_RECURSIVE_LOG_FLAG = "_no_recursive_log_flag"
 
 
+def current_organization_info(request):
+    """Describe the organization the user acts for by its type and its ID, which name no one.
+
+    Shared by the logs and the Sentry events, so that both report the same facts.
+    """
+    if organization := getattr(request, "current_organization", None):
+        return {"organization_type": organization._meta.label, "organization_id": organization.pk}
+    return {}
+
+
 class ItouDataDogJSONFormatter(DataDogJSONFormatter):
     # The entries most likely to quote an outgoing URL or an email address. Not exhaustive, but much
     # cheaper than redacting every nested string of the entry
@@ -26,9 +36,8 @@ class ItouDataDogJSONFormatter(DataDogJSONFormatter):
         log_entry_dict = super().json_record(message, extra, record)
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
-            if current_org := getattr(wsgi_request, "current_organization", None):
-                log_entry_dict["usr.organization_type"] = current_org._meta.label
-                log_entry_dict["usr.organization_id"] = current_org.pk
+            for key, value in current_organization_info(wsgi_request).items():
+                log_entry_dict[f"usr.{key}"] = value
             user = get_wsgi_request_user(wsgi_request)
             if token := getattr(wsgi_request, "auth", None):
                 if hasattr(token, "datadog_info"):

@@ -141,6 +141,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # First, so that the errors of the middlewares below report a user too
+    "itou.www.middleware.sentry_user_id",
     # Generate request Id
     "django_datadog_logger.middleware.request_id.RequestIdMiddleware",
     # Itou health check for Clever Cloud, don’t require requests to match ALLOWED_HOSTS

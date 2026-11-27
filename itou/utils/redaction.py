@@ -9,6 +9,7 @@ import urllib.parse
 
 
 REDACTED = "_REDACTED_"
+ANONYMOUS_USER_ID = "anonymous"
 
 # A whole `key=value` pair, so that the key can be tested on its own. A blank value is left
 # alone: knowing that we sent an empty first name is what makes a 422 debuggable.
