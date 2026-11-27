@@ -13,7 +13,7 @@ from django.db.models import Count, DateTimeField, Exists, F, IntegerField, Oute
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.db.models.query import Prefetch
 from django.forms import ValidationError
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -21,6 +21,7 @@ from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, View
+from django_htmx.http import HttpResponseClientRefresh
 
 from itou.approvals.constants import APPROVAL_ENDING_SOON_DAYS
 from itou.approvals.enums import ProlongationRequestStatus
@@ -73,6 +74,7 @@ from itou.www.job_seekers_views.forms import (
     JobSeekerExistsForm,
     NirModificationRequestForm,
     ProSupportReportForm,
+    ProSupportReportIntroductionForm,
     SwitchStalledStatusForm,
 )
 
@@ -648,7 +650,9 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
 @check_request(lambda request: request.from_prescriber or request.from_employer)
 def pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report.html"):
     report = get_object_or_404(
-        ProSupportReport.objects.select_related("job_seeker", "company", "author", "notified_prescriber_organization"),
+        ProSupportReport.objects.select_related(
+            "job_seeker", "company", "author", "notified_prescriber_organization", "introduction_email_recipient"
+        ),
         public_id=public_id,
     )
     if not can_view_pro_support_report(request, report):
@@ -667,9 +671,17 @@ def pro_support_report(request, public_id, template_name="job_seekers_views/pro_
                 },
             )
         raise Http404
+    introduction_contact = report.get_introduction_contact() if request.from_authorized_prescriber else None
     context = {
         "report": report,
         "contract_has_ended": report.contract_end_date < timezone.localdate(),
+        "introduction_contact": introduction_contact,
+        "introduction_form": (
+            ProSupportReportIntroductionForm(instance=request.user)
+            if introduction_contact and report.introduction_email_sent_at is None
+            else None
+        ),
+        "record_first_read": report.first_read_at is None and report.notified_prescriber_id == request.user.pk,
         "back_url": get_safe_url(
             request,
             "back_url",
@@ -678,6 +690,59 @@ def pro_support_report(request, public_id, template_name="job_seekers_views/pro_
         "matomo_custom_title": "Bilan d’accompagnement",
     }
     return render(request, template_name, context)
+
+
+@http_methods(db_write=["POST"])
+@check_request(lambda request: request.from_authorized_prescriber)
+@with_triggers_context
+def send_pro_support_report_introduction(
+    request, public_id, template_name="job_seekers_views/includes/pro_support_report_introduction_modal.html"
+):
+    # Two readers sending at the same time (two tabs, two coworkers) send a single email:
+    # once the lock is released, the second request no longer finds the report.
+    report = get_object_or_404(
+        ProSupportReport.objects.select_related("job_seeker", "company", "author").select_for_update(
+            of=("self",), no_key=True
+        ),
+        public_id=public_id,
+        introduction_email_sent_at=None,
+    )
+    if not can_view_pro_support_report(request, report):
+        raise Http404
+    contact = report.get_introduction_contact()
+    if contact is None:
+        raise Http404
+
+    form = ProSupportReportIntroductionForm(instance=request.user, data=request.POST)
+    if form.is_valid():
+        prescriber = form.save(commit=False)
+        if form.cleaned_data["save_phone"] and prescriber.phone:
+            prescriber.save()
+        report.introduction_email_sent_at = timezone.now()
+        report.introduction_email_recipient = contact
+        report.save(update_fields=["introduction_email_sent_at", "introduction_email_recipient"])
+        report.introduction_email(contact, prescriber, request.current_organization).send()
+        messages.success(
+            request,
+            "Demande de contact envoyée||Vous venez de recevoir un e-mail de mise en relation. "
+            f"N’hésitez pas à prendre contact rapidement avec {contact.get_full_name()}.",
+            extra_tags="toast",
+        )
+        # Reloads the page with its back_url.
+        return HttpResponseClientRefresh()
+    context = {"form": form, "report": report, "contact": contact}
+    return render(request, template_name + "#pro-support-report-introduction-form", context)
+
+
+# Called by the report page once loaded, which stays readonly.
+# Nothing to record is not an error: the page may be open twice, and htmx shows an alert on errors.
+@http_methods(db_write=["POST"])
+@check_request(lambda request: request.from_authorized_prescriber)
+def record_pro_support_report_first_read(request, public_id):
+    ProSupportReport.objects.filter(public_id=public_id, notified_prescriber=request.user, first_read_at=None).update(
+        first_read_at=timezone.now()
+    )
+    return HttpResponse()
 
 
 @http_methods(db_write=["POST"])

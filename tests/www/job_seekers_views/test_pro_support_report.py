@@ -682,3 +682,235 @@ class TestXpRefIae:
 
         settings.XP_REF_IAE_USER_PKS = []
         assertNotContains(client.get(details_url), report_link)
+
+
+def introduction_url(report):
+    return reverse("job_seekers_views:send_pro_support_report_introduction", kwargs={"public_id": report.public_id})
+
+
+class TestSendProSupportReportIntroduction:
+    @freeze_time("2026-01-15 10:00")
+    def test_send(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        prescriber = PrescriberMembershipFactory(organization=organization, user__phone="").user
+        client.force_login(prescriber)
+
+        response = client.get(report_url(report))
+        assertContains(response, "Auteur du bilan")
+        assertNotContains(response, "A quitté")
+        assertContains(response, f"<span>Contacter {report.author.get_full_name()}</span>", html=True)
+        assertContains(
+            response,
+            f"Votre demande de contact sera envoyée par e-mail à {report.author.get_full_name()}, avec vous en copie.",
+        )
+        # The phone is saved in the profile unless the prescriber unchecks the box.
+        assert response.context["introduction_form"]["save_phone"].value() is True
+
+        response = client.post(
+            introduction_url(report), {"phone": "06 12 34 56 78", "save_phone": "on"}, headers={"HX-Request": "true"}
+        )
+        assert response.headers["HX-Refresh"] == "true"
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "06 12 34 56 78"
+        report.refresh_from_db()
+        assert report.introduction_email_sent_at == timezone.now()
+        assert report.introduction_email_recipient == report.author
+        [email] = mailoutbox
+        assert email.to == [report.author.email]
+        assert email.cc == [prescriber.email]
+
+        response = client.get(report_url(report))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "Demande de contact envoyée||Vous venez de recevoir un e-mail de mise en relation. "
+                    f"N’hésitez pas à prendre contact rapidement avec {report.author.get_full_name()}.",
+                    extra_tags="toast",
+                )
+            ],
+        )
+        assertContains(response, "Demande de contact envoyée le 15/01/2026")
+        assertNotContains(response, f"<span>Contacter {report.author.get_full_name()}</span>", html=True)
+
+        # Any authorized prescriber who reads the report sees the contact details.
+        client.force_login(PrescriberMembershipFactory(organization=organization).user)
+        response = client.get(report_url(report))
+        assertContains(response, "Demande de contact envoyée le 15/01/2026")
+        assertContains(response, report.author.email)
+
+        # The SIAE does not see the contact details given to the prescriber.
+        client.force_login(CompanyMembershipFactory(company=report.company, is_admin=False).user)
+        response = client.get(report_url(report))
+        assertNotContains(response, "Auteur du bilan")
+        assertNotContains(response, "Demande de contact envoyée")
+
+    def test_phone_not_saved(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        prescriber = PrescriberMembershipFactory(
+            organization=advisor_organization(report), user__phone="04 94 00 00 00"
+        ).user
+        client.force_login(prescriber)
+
+        # The box to save the phone is unchecked.
+        client.post(introduction_url(report), {"phone": "06 12 34 56 78"}, headers={"HX-Request": "true"})
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "04 94 00 00 00"
+        [email] = mailoutbox
+        assert f"Téléphone\xa0: 06 12 34 56 78\nAdresse e-mail\xa0: {prescriber.email}" in email.body
+
+    def test_without_phone(self, client, mailoutbox):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        prescriber = PrescriberMembershipFactory(organization=organization, user__phone="04 94 00 00 00").user
+        client.force_login(prescriber)
+
+        # The prescriber empties the field: the email gives no phone, the profile keeps it.
+        client.post(introduction_url(report), {"phone": "", "save_phone": "on"}, headers={"HX-Request": "true"})
+        prescriber.refresh_from_db()
+        assert prescriber.phone == "04 94 00 00 00"
+        [email] = mailoutbox
+        assert f"{organization.display_name}\nAdresse e-mail\xa0: {prescriber.email}" in email.body
+
+    def test_already_sent(self, client, mailoutbox):
+        report = ProSupportReportFactory(introduction_email_sent_at=timezone.now())
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == 404
+        assert mailoutbox == []
+
+    def test_author_left(self, client, mailoutbox):
+        report = ProSupportReportFactory(author__membership=False)
+        admin = CompanyMembershipFactory(company=report.company).user
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.get(report_url(report))
+        # The admin is unknown to the prescriber: the author's departure explains why they get the email.
+        assertContains(response, f"par {report.author.get_full_name()} (a quitté la structure)")
+        assertContains(response, f"A quitté {report.company.display_name}")
+        assertContains(response, "<span>Contacter l’employeur</span>", html=True)
+        assertNotContains(response, f"<span>Contacter {admin.get_full_name()}</span>", html=True)
+        assertContains(response, f"Contacter {report.company.display_name}")
+        assertContains(
+            response,
+            f"Votre demande de contact sera envoyée par e-mail à {admin.get_full_name()}, qui administre le compte",
+        )
+
+        client.post(
+            introduction_url(report), {"phone": "06 12 34 56 78", "save_phone": "on"}, headers={"HX-Request": "true"}
+        )
+        [email] = mailoutbox
+        assert email.to == [admin.email]
+        report.refresh_from_db()
+        assert report.introduction_email_recipient == admin
+
+        response = client.get(report_url(report))
+        assertContains(response, f"N’hésitez pas à prendre contact rapidement avec {admin.get_full_name()}.")
+        assertContains(response, admin.email)
+
+        # The contact details stay those of the admin who received the email.
+        other_admin = CompanyMembershipFactory(company=report.company, user__last_login=timezone.now()).user
+        response = client.get(report_url(report))
+        assertContains(response, admin.email)
+        assertNotContains(response, other_admin.get_full_name())
+
+    @pytest.mark.parametrize(
+        "report_factory",
+        [
+            lambda: ProSupportReportFactory(company=None),
+            # The author is not a member of the company, which has no admin left.
+            lambda: ProSupportReportFactory(author__membership=False),
+        ],
+        ids=["company_deleted", "author_left_without_admin"],
+    )
+    def test_without_contact(self, client, mailoutbox, report_factory):
+        report = report_factory()
+        client.force_login(advisor_organization(report).members.get())
+
+        response = client.get(report_url(report))
+        assertContains(response, '<h2 class="h3">Contenu du bilan</h2>', html=True)
+        assertNotContains(response, "Auteur du bilan")
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == 404
+        assert mailoutbox == []
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (lambda report: CompanyMembershipFactory(company=report.company, is_admin=False).user, 403),
+            (lambda report: advisor_organization(report, authorized=False).members.get(), 403),
+            (lambda report: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(), 404),
+        ],
+        ids=["employer_of_the_report", "prescriber_advisor_not_authorized", "authorized_prescriber_not_advisor"],
+    )
+    def test_access(self, client, mailoutbox, user_factory, status_code):
+        report = ProSupportReportFactory()
+        client.force_login(user_factory(report))
+
+        response = client.post(introduction_url(report), {"phone": "06 12 34 56 78"})
+        assert response.status_code == status_code
+        assert mailoutbox == []
+        report.refresh_from_db()
+        assert report.introduction_email_sent_at is None
+
+
+def first_read_url(report):
+    return reverse("job_seekers_views:record_pro_support_report_first_read", kwargs={"public_id": report.public_id})
+
+
+class TestRecordProSupportReportFirstRead:
+    @freeze_time("2026-01-15 10:00")
+    def test_record(self, client):
+        report = ProSupportReportFactory()
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.get(report_url(report))
+        assertContains(response, f'hx-post="{first_read_url(report)}"')
+        report.refresh_from_db()
+        assert report.first_read_at is None
+
+        client.post(first_read_url(report))
+        report.refresh_from_db()
+        assert report.first_read_at == timezone.now()
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+    def test_already_read(self, client):
+        report = ProSupportReportFactory(first_read_at=timezone.now() - datetime.timedelta(days=1))
+        report.notified_prescriber = advisor_organization(report).members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(report.notified_prescriber)
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == 200
+        assert ProSupportReport.objects.get().first_read_at == report.first_read_at
+
+    @pytest.mark.parametrize(
+        "user_factory,status_code",
+        [
+            (lambda report, organization: PrescriberMembershipFactory(organization=organization).user, 200),
+            (lambda report, organization: CompanyMembershipFactory(company=report.company).user, 403),
+        ],
+        ids=["coworker_of_the_recipient", "employer_of_the_report"],
+    )
+    def test_read_by_someone_else(self, client, user_factory, status_code):
+        report = ProSupportReportFactory()
+        organization = advisor_organization(report)
+        report.notified_prescriber = organization.members.get()
+        report.save(update_fields=["notified_prescriber"])
+        client.force_login(user_factory(report, organization))
+
+        response = client.get(report_url(report))
+        assertNotContains(response, first_read_url(report))
+
+        response = client.post(first_read_url(report))
+        assert response.status_code == status_code
+        report.refresh_from_db()
+        assert report.first_read_at is None

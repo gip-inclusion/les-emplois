@@ -736,3 +736,13 @@ class ProSupportReportForm(forms.ModelForm):
             self.cleaned_data["orientation"] = ""
         else:
             self.cleaned_data["solution"] = ""
+
+
+class ProSupportReportIntroductionForm(forms.ModelForm):
+    save_phone = forms.BooleanField(label="Enregistrer ce numéro dans mon profil", required=False, initial=True)
+
+    class Meta:
+        model = User
+        fields = ["phone"]
+        labels = {"phone": "Téléphone professionnel"}
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
