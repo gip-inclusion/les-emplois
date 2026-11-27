@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "itou.utils",
     "itou.tasks",
     "itou.cities",
+    "itou.cnav",
     "itou.companies",
     "itou.directory",
     "itou.emails",
