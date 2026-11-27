@@ -179,7 +179,7 @@
   Pour des raisons de sécurité nous vous invitons à vérifier que cette demande émane bien de Jean MICHEL.
   
   Cliquez sur le lien suivant pour attribuer le statut d'administrateur à Jean MICHEL - jean.michel@test.local :
-  http://localhost:8000/company/confirm_admin_role/1000/d2f6o0-d1d01e00e170c0d5fd20
+  http://localhost:8000/company/confirm_admin_role/1000/d2f6o0-aed2448662bdb378efaf75f3da4d2ac971db1ca900edbd05a613f212b1922fa6
   
   Si vous ne souhaitez pas donner suite à cette demande, merci de ne pas prendre en compte ce message.
   

@@ -1467,7 +1467,7 @@ class JobSeekerProfile(AbstractFieldsHistoryModel):
         self.rsa_last_certification_attempt_at = None
 
     def _default_asp_uid(self):
-        return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
+        return salted_hmac(key_salt="job_seeker.id", value=self.user_id, algorithm="sha1").hexdigest()[:30]
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.asp_uid:
