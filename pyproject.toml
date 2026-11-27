@@ -54,7 +54,6 @@ filterwarnings = [
     "ignore:The EMAIL_BACKEND setting is deprecated:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:The default argument for algorithm in salted_hmac:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:Overriding get_actions\\(\\) without the 'action_location' parameter:django.utils.deprecation.RemovedInDjango2028Warning",
-    "ignore:.*must accept a fetch_mode keyword argument:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:savepoint\\(\\) is deprecated. Use savepoint_create\\(\\) instead.:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:Calling select_related\\(\\) with no arguments is deprecated.:django.utils.deprecation.RemovedInDjango2028Warning",
     "ignore:get_connection\\(\\) is deprecated.:django.utils.deprecation.RemovedInDjango2028Warning",
