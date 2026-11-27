@@ -41,6 +41,7 @@ from itou.companies.enums import (
     ProSupportReportSolution,
 )
 from itou.emails.utils import get_email_message
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.enums import UserKind
 from itou.utils.models import AbstractFieldsHistoryModel
 from itou.utils.tokens import admin_request_token_generator, company_signup_token_generator
@@ -1308,6 +1309,9 @@ class ProSupportReport(models.Model):
     The pro support report filled by a SIAE at the end of the journey of an employee, for their advisors.
     """
 
+    # Leaves the prescriber time to get in touch first: no read email then.
+    READ_EMAIL_DELAY = timedelta(hours=1)
+
     public_id = models.UUIDField(verbose_name="identifiant public", default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     job_seeker = models.ForeignKey(
@@ -1394,6 +1398,9 @@ class ProSupportReport(models.Model):
         related_name="+",
     )
     first_read_at = models.DateTimeField(verbose_name="date de première lecture", null=True, blank=True)
+    read_email_sent_at = models.DateTimeField(
+        verbose_name="date de l’e-mail signalant la lecture du bilan", null=True, blank=True
+    )
 
     objects = ProSupportReportQuerySet.as_manager()
 
@@ -1458,6 +1465,30 @@ class ProSupportReport(models.Model):
             # The person who received the email, even if someone else would be chosen today.
             return self.introduction_email_recipient
         return self.get_company_contact()
+
+    def notify_read(self, contact):
+        from itou.companies.notifications import ProSupportReportReadNotification
+        from itou.users.models import JobSeekerAssignment
+
+        # Ended assignments included: the prescriber may have closed the follow-up.
+        # Without an organization: it may have lost its authorization since the report was sent.
+        assignment = (
+            JobSeekerAssignment.objects.filter(
+                job_seeker_id=self.job_seeker_id,
+                professional_id=self.notified_prescriber_id,
+                prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
+            .select_related("prescriber_organization")
+            .order_by("-last_action_at")
+            .first()
+        )
+        ProSupportReportReadNotification(
+            contact,
+            self.company,
+            report=self,
+            prescriber=self.notified_prescriber,
+            prescriber_organization=assignment and assignment.prescriber_organization,
+        ).send()
 
     def introduction_email(self, contact, prescriber, prescriber_organization):
         to = [contact.email]
