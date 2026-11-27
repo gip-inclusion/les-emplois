@@ -454,6 +454,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             eiti_contributions=factory.fuzzy.FuzzyChoice(EITIContributions.values),
         )
         for_snapshot = factory.Trait(
+            birth_name="Smith",
             birthdate=datetime.date(1990, 1, 1),
             nir="290010101010125",
             asp_uid="a08dbdb523633cfc59dfdb297307a1",
@@ -465,6 +466,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
+    birth_name = factory.Faker("last_name")
     # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 

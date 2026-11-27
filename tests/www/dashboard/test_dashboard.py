@@ -21,11 +21,12 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibi
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
+from itou.openid_connect.utils import IdentityProviderToOIDCUserData
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import Title
+from itou.users.enums import IdentityProvider, Title
 from itou.utils import constants as global_constants, triggers
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
@@ -1143,22 +1144,61 @@ class TestDashboardView:
             pytest.param("address_line_1", "1 rue du bac", id="address_line_1"),
             pytest.param("post_code", "59140", id="post_code"),
             pytest.param("city", "Dunkerque", id="city"),
+            pytest.param("jobseeker_profile__birth_name", "Doe", id="birth_name"),
         ],
     )
     def test_job_seeker_without_required_field_redirected(self, client, field, data):
-        empty_field = {field: ""}
-        user = JobSeekerFactory(with_address=True, **empty_field)
+        kwargs = {"last_name": "Doe", "jobseeker_profile__birth_name": "Smith"} | {field: ""}
+        user = JobSeekerFactory(with_address=True, **kwargs)
         client.force_login(user)
 
         response = client.get(reverse("dashboard:index"))
         assertRedirects(response, reverse("dashboard:edit_user_info"))
 
-        setattr(user, field, data)
-        with triggers.fake_context():
-            user.save(update_fields=(field,))
+        if field.startswith("jobseeker_profile__"):
+            profile_field_name = field[len("jobseeker_profile__") :]
+            setattr(user.jobseeker_profile, profile_field_name, data)
+            with triggers.fake_context():
+                user.jobseeker_profile.save(update_fields=(profile_field_name,))
+        else:
+            setattr(user, field, data)
+            with triggers.fake_context():
+                user.save(update_fields=(field,))
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        "identity_provider,should_be_redirected",
+        (
+            (IdentityProvider.DJANGO, True),
+            (IdentityProvider.FRANCE_CONNECT, False),
+            (IdentityProvider.FT_CONNECT, True),
+        ),
+    )
+    def test_job_seeker_with_idp_without_birth_name_redirection(
+        self,
+        client,
+        identity_provider,
+        should_be_redirected,
+    ):
+        identity_provider_controls_birth_name = hasattr(
+            IdentityProviderToOIDCUserData[identity_provider],
+            "birth_name",
+        )
+        assert should_be_redirected == (not identity_provider_controls_birth_name)
+
+        user = JobSeekerFactory(
+            with_address=True,
+            jobseeker_profile__birth_name="",
+            identity_provider=identity_provider,
+        )
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"))
+        if should_be_redirected:
+            assertRedirects(response, reverse("dashboard:edit_user_info"))
+        else:
+            assert response.status_code == 200
 
     def test_staff_users(self, client, snapshot):
         # Not superuser, not in itou-admin

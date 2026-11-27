@@ -13,7 +13,15 @@
                 <strong>{{ employee.first_name }}</strong>
             </li>
             <li>
-                <small>Nom</small>
+                <small>Nom de naissance</small>
+                {% if profile.birth_name %}
+                    <strong>{{ profile.birth_name }}</strong>
+                {% else %}
+                    <i class="text-warning">À renseigner</i>
+                {% endif %}
+            </li>
+            <li>
+                <small>Nom d’usage</small>
                 <strong>{{ employee.last_name }}</strong>
             </li>
             <li>

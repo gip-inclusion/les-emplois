@@ -1083,7 +1083,12 @@ def test_zendesk_widget_registered_on_every_orientation_tunnel_page(client):
             "job_seekers_views:create_job_seeker_step_1_for_orientation",
             kwargs={"session_uuid": job_seeker_session_name},
         ),
-        data={"first_name": "Michel", "last_name": "Durant", "birthdate": datetime.date(1978, 12, 20)},
+        data={
+            "first_name": "Michel",
+            "birth_name": "Durand",
+            "last_name": "",
+            "birthdate": datetime.date(1978, 12, 20),
+        },
         follow=True,
     )
     assert response.request["PATH_INFO"] == reverse(

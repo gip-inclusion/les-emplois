@@ -40,7 +40,8 @@ FC_USERINFO = {
     "gender": "female",
     "given_name": "Angela Claire Louise",
     "given_name_array": ["Angela", "Claire", "Louise"],
-    "family_name": "DUBOIS",
+    "family_name": "DUBOIS",  # birth name
+    "preferred_username": "MARTIN",  # last name
     "email": "wossewodda-3728@yopmail.com",
     "birthdate": "1962-08-24",
     "sub": "d303068c700ea93405ae193550a7d99be03744c08be08901e8e1c180869b2f54v1",
@@ -184,8 +185,9 @@ class TestFranceConnect:
         with triggers.fake_context():
             user, created = fc_user_data.create_or_update_user()
         assert created
-        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.last_name == FC_USERINFO["preferred_username"]
         assert user.first_name == FC_USERINFO["given_name"]
+        assert user.jobseeker_profile.birth_name == FC_USERINFO["family_name"]
         assert user.jobseeker_profile.birthdate == datetime.date.fromisoformat(FC_USERINFO["birthdate"])
 
         assert user.external_data_source_history[0]["source"] == "FC"
@@ -207,6 +209,7 @@ class TestFranceConnect:
         fc_info = FC_USERINFO | {
             "given_name": "",
             "family_name": "",
+            "preferred_username": "",
             "birthdate": "",
             "gender": "",
         }
@@ -215,6 +218,7 @@ class TestFranceConnect:
         assert created
         assert not user.first_name
         assert not user.title
+        assert not user.jobseeker_profile.birth_name
         assert not user.jobseeker_profile.birthdate
 
     def test_create_django_user_with_already_existing_fc_id(self):
@@ -225,14 +229,16 @@ class TestFranceConnect:
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         JobSeekerFactory(
             username=fc_user_data.username,
-            last_name="will_be_forgotten",
+            last_name="will be overwritten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             title=Title.M,
+            jobseeker_profile__birth_name="will be overwritten",
         )
         with triggers.fake_context():
             user, created = fc_user_data.create_or_update_user()
         assert not created
-        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.jobseeker_profile.birth_name == FC_USERINFO["family_name"]
+        assert user.last_name == FC_USERINFO["preferred_username"]
         assert user.first_name == FC_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
@@ -262,12 +268,29 @@ class TestFranceConnect:
 
         user.delete()
 
+    def test_update_last_name_from_birth_name(self):
+        JobSeekerFactory(
+            username=FC_USERINFO["sub"],
+            identity_provider=IdentityProvider.FRANCE_CONNECT,
+            born_in_france=True,
+            title=Title.M,
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
+        )
+        user_info = FC_USERINFO | {"family_name": "Smith", "preferred_username": "SMITH"}
+        fc_user_data = FranceConnectUserData.from_user_info(user_info)
+        with triggers.fake_context():
+            user, _ = fc_user_data.create_or_update_user()
+        assert user.last_name == user.jobseeker_profile.birth_name == "Smith"
+
     def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
+            last_name="Initial",
+            jobseeker_profile__birth_name="Initial",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -278,14 +301,18 @@ class TestFranceConnect:
         with triggers.fake_context():
             user, created = fc_user_data.create_or_update_user()
         assert created is False
-        assert user.last_name == job_seeker.last_name
+        assert user.jobseeker_profile.birth_name == job_seeker.jobseeker_profile.birth_name
+        assert user.last_name == "MARTIN"
         assert user.first_name == job_seeker.first_name
         assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
+        not_updated_fields = "birth_name, birthdate, first_name, title"
+
         assert (
-            f"Not updating fields birthdate, first_name, last_name, title on job seeker pk={job_seeker.pk} "
+            f"Not updating fields {not_updated_fields} "
+            f"on job seeker pk={job_seeker.pk} "
             "because their identity has been certified." in caplog.messages
         )
 
@@ -430,9 +457,10 @@ class TestFranceConnect:
         response = answer_email_tracking_consent(client, response)
         assertRedirects(response, reverse("dashboard:edit_user_info"))
         assert User.objects.count() == 1
-        user = User.objects.get(email=FC_USERINFO["email"])
+        user = User.objects.select_related("jobseeker_profile").get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
-        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.last_name == FC_USERINFO["preferred_username"]
+        assert user.jobseeker_profile.birth_name == FC_USERINFO["family_name"]
         assert user.username == FC_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT

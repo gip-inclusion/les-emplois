@@ -2,6 +2,9 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 
+from itou.openid_connect.utils import IdentityProviderToOIDCUserData
+from itou.users.enums import IdentityProvider
+
 
 @pytest.mark.parametrize("idp", ["france_connect", "pro_connect", "ft_connect"])
 def test_callback_sets_browser_id(client, idp):
@@ -14,3 +17,7 @@ def test_callback_sets_browser_id(client, idp):
     url = reverse(f"{idp}:callback")
     response = client.get(url)
     assert response.cookies[settings.BROWSER_ID_COOKIE_NAME]
+
+
+def test_completeness_of_IdentityProviderToOIDCUserData():
+    assert set(IdentityProviderToOIDCUserData) == set(IdentityProvider.values)

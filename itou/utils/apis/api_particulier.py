@@ -39,7 +39,8 @@ def client(timeout: httpx.Timeout | float = DEFAULT_TIMEOUT) -> httpx.Client:
 def _build_params_from(job_seeker):
     jobseeker_profile = job_seeker.jobseeker_profile
     params = {
-        "nomNaissance": job_seeker.last_name.upper(),
+        # `birth_name` is new and may be empty.
+        "nomNaissance": (jobseeker_profile.birth_name or job_seeker.last_name).upper(),
         "prenoms[]": job_seeker.first_name.upper().split(" "),
         "anneeDateNaissance": jobseeker_profile.birthdate.year,
         "moisDateNaissance": jobseeker_profile.birthdate.month,
@@ -66,6 +67,9 @@ def _request(client, endpoint, job_seeker):
 
 
 USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
+# `birth_name` is not required because it is empty for users who
+# registered before the field was added (and were never updated
+# afterwards).
 JOBSEEKER_PROFILE_REQUIRED_FIELDS = ["birthdate", "birth_country", "birth_place"]
 
 

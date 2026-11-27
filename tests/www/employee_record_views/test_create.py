@@ -41,6 +41,7 @@ def _get_user_form_data(user):
         "title": user.title,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "birth_name": user.jobseeker_profile.birth_name,
         "birthdate": user.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         "nir": user.jobseeker_profile.nir,
     }
@@ -334,6 +335,12 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             criteria_certified=True,
             certifiable_by_api_particulier=True,
         )
+        with triggers.fake_context():
+            self.job_seeker.jobseeker_profile.birth_name = "Durand"
+            self.job_seeker.jobseeker_profile.save()
+            self.job_seeker.last_name = "Durand"
+            self.job_seeker.save()
+
         client.force_login(self.user)
         response = client.get(self.url)
         assertContains(
@@ -349,24 +356,24 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             ),
             count=1,
         )
-        response = client.post(
-            self.url,
-            data={
-                "title": Title.M if self.job_seeker.title == Title.MME else Title.MME,
-                "first_name": "Léon",
-                "last_name": "Munitionette",
-                "birth_place": Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1)).pk,
-                "birthdate": "1990-01-01",
-            },
-        )
+        post_data = {
+            "title": Title.M if self.job_seeker.title == Title.MME else Title.MME,
+            "first_name": "Léon",
+            "last_name": "Munitionette",
+            "birth_name": "Blop",
+            "birth_place": Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1)).pk,
+            "birthdate": "1990-01-01",
+        }
+        response = client.post(self.url, data=post_data)
         assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=self.job_seeker.pk)
-        for attr in ["title", "first_name", "last_name"]:
+        for attr in ["title", "first_name"]:
             assert getattr(refreshed_job_seeker, attr) == getattr(self.job_seeker, attr)
-        for attr in ["birthdate", "birth_place", "birth_country"]:
+        for attr in ["birth_name", "birthdate", "birth_place", "birth_country"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(
                 self.job_seeker.jobseeker_profile, attr
             )
+        assert refreshed_job_seeker.last_name == post_data["last_name"]
 
     def test_pass_step_1_without_geolocated_address(self, client):
         # Do not mess with job seeker profile and geolocation at step 1

@@ -41,7 +41,7 @@ class OrientationSelectJobSeekerForm(forms.Form):
                 pk__in=job_seekers_ids,
             )
             .exclude(
-                # FIXME: will be fixed when last_name (soon: birth_name)
+                # FIXME: will be fixed when last_name
                 # and first_name are enforced by a SQL constraint
                 last_name="",
                 first_name="",

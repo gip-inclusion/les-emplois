@@ -1,4 +1,5 @@
 import datetime
+import enum
 import logging
 import re
 from json import JSONDecodeError
@@ -34,6 +35,11 @@ NIR_RE = re.compile(
     $""",
     re.IGNORECASE | re.VERBOSE,
 )
+
+
+class GuessLastNameMode(enum.StrEnum):
+    BEFORE_SAVE = "before-save"
+    BEFORE_DISPLAY = "before-display"
 
 
 def merge_job_seeker_assignments(*, assignment_to_delete, assignment_to_keep):
@@ -183,3 +189,20 @@ def refresh_rsa_certification(job_seeker: User) -> None:
             "rsa_certification_checked_at",
         ]
     )
+
+
+def guess_last_name(last_name, birth_name, mode: GuessLastNameMode):
+    if mode == GuessLastNameMode.BEFORE_DISPLAY:
+        # When displaying the edit form, empty the last name field
+        # unless it's different from the birth_name.
+        if last_name.casefold() == birth_name.casefold():
+            return ""
+        return last_name
+    if mode == GuessLastNameMode.BEFORE_SAVE:
+        # Before saving to `User` model, store the birth name as the
+        # last name unless the last name is filled and different from
+        # the birth name.
+        if last_name and last_name.casefold() != birth_name.casefold():
+            return last_name
+        return birth_name
+    raise ValueError(f"Unexpected mode: {mode}")
