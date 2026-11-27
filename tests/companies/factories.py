@@ -242,10 +242,33 @@ class ContractFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Contract
 
+    class Params:
+        exit_reason = None
+
     job_seeker = factory.SubFactory(JobSeekerFactory)
     company = factory.SubFactory(CompanyFactory, subject_to_iae_rules=True)
     start_date = factory.Faker("date_between", start_date="-1y", end_date="-1m")
     end_date = factory.Faker("date_between", start_date="-1m", end_date="+1m")
+    details = factory.LazyAttribute(
+        lambda o: (
+            [
+                {
+                    "Contrat Date Sortie Definitive": o.end_date.isoformat(),
+                    "Motif Sortie": o.exit_reason,
+                }
+            ]
+            if o.exit_reason
+            else []
+        )
+    )
+
+
+class ContractExitFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.ContractExit
+
+    contract = factory.SubFactory(ContractFactory)
+    exit_date = factory.SelfAttribute("contract.end_date")
 
 
 class ProSupportReportFactory(factory.django.DjangoModelFactory):
