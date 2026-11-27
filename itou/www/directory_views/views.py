@@ -5,13 +5,16 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 
 from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.readonly import readonly_view
+from itou.utils.urls import get_safe_url
 from itou.www.directory_views.perms import can_access_directory
 
 
@@ -113,5 +116,26 @@ def people_results(request, template_name="directory/people_results.html"):
     context = {
         "results": memberships_page,
         "matomo_custom_title": "Annuaire pro - Personnes",
+    }
+    return render(request, template_name, context)
+
+
+@check_request(can_access_directory)
+@readonly_view
+def membership_detail(request, membership_kind, membership_id, template_name="directory/membership_detail.html"):
+    if membership_kind not in (MembershipKind.COMPANY, MembershipKind.PRESCRIBER):
+        raise Http404
+
+    origin = request.current_organization.coords
+    membership = get_object_or_404(directory_membership_qs(membership_kind, origin), id=membership_id)
+
+    context = {
+        "membership": membership,
+        "back_url": get_safe_url(
+            request,
+            param_name="back_url",
+            fallback_url=reverse("directory:people_results"),
+        ),
+        "matomo_custom_title": "Annuaire pro - Fiche personne",
     }
     return render(request, template_name, context)

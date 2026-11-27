@@ -1,0 +1,117 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}{{ membership.user.get_inverted_full_name }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ membership.user.get_inverted_full_name }}</h1>
+            <p>{{ membership.function|default:membership.get_organization.member_kind_display|capfirst }} - {{ membership.get_organization.display_name }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h3>Coordonnées</h3>
+                        <ul class="fs-sm list-unstyled mb-0">
+                            <li>
+                                <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                {% if membership.user.email %}
+                                    <a href="mailto:{{ membership.user.email }}"
+                                       aria-label="Contact par mail"
+                                       class="text-truncate">{{ membership.user.email }}</a>
+                                    {% include "includes/copy_to_clipboard.html" with content=membership.user.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                {% if membership.user.phone %}
+                                    <a href="tel:{{ membership.user.phone|cut:" " }}"
+                                       class="text-break">{{ membership.user.phone }}</a>
+                                    {% include "includes/copy_to_clipboard.html" with content=membership.user.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                {% else %}
+                                    <i class="text-disabled">Non renseigné</i>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    {% with organization=membership.get_organization %}
+                        <div class="c-box c-box--organization mb-3 mb-md-4">
+                            <div class="c-box--organization__summary">
+                                <i class="ri-community-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ organization.get_kind_display }}</span>
+                                    <span class="d-block h3">{{ organization.display_name }}</span>
+                                </div>
+                            </div>
+                            <div class="c-box--organization__detail">
+                                <hr class="my-4">
+                                <ul class="c-box--organization__list-contact">
+                                    {% if organization.address_on_one_line %}
+                                        <li>
+                                            <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
+                                            <address class="m-0">{{ organization.address_on_one_line }}</address>
+                                            {% include "includes/copy_to_clipboard.html" with content=organization.address_on_one_line css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <i class="ri-mail-line fw-normal me-2" aria-hidden="true"></i>
+                                        {% if organization.email %}
+                                            <a href="mailto:{{ organization.email }}"
+                                               aria-label="Contact par mail"
+                                               class="text-truncate">{{ organization.email }}</a>
+                                            {% include "includes/copy_to_clipboard.html" with content=organization.email css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
+                                        {% if organization.phone %}
+                                            <a href="tel:{{ organization.phone|cut:" " }}"
+                                               class="text-break">{{ organization.phone }}</a>
+                                            {% include "includes/copy_to_clipboard.html" with content=organization.phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True only %}
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                    {% if organization.website %}
+                                        <li>
+                                            <i class="ri-global-line fw-normal me-2" aria-hidden="true"></i>
+                                            <a href="{{ organization.website }}"
+                                               rel="noopener"
+                                               target="_blank"
+                                               class="btn-link fw-medium has-external-link"
+                                               aria-label="Site web (ouverture dans un nouvel onglet)">
+                                                {{ organization.website }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                                {% with card_url=organization.get_card_url %}
+                                    {% if card_url %}
+                                        <a href="{{ card_url }}"
+                                           class="btn btn-secondary btn-block mt-3">Voir la fiche structure</a>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
