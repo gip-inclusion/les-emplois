@@ -50,7 +50,7 @@
                           hx-swap="outerHTML"
                           hx-push-url="true"
                           hx-indicator="#people-search-results">
-                        <div class="c-search mb-3 mb-md-4">
+                        <div class="c-search mb-3">
                             <div class="c-search__bar">
                                 <div class="c-search__bar__grid">
                                     <div class="input-group input-group-search">
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="s-section__row row">
-                <div class="s-section__col col-12 mb-3 mb-md-4">
+                <div class="s-section__col col-12 mb-3 mb-md-4" role="status" aria-atomic="true">
                     {% include "directory/includes/people_counter.html" with results=results request=request only %}
                 </div>
             </div>
