@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.contrib.gis.geos import Point
 
@@ -169,9 +171,10 @@ class TestServiceKeywordSearch:
 
         service.refresh_from_db()
         assert service.search_vector == (
-            "'agefiph':11B 'decouvr':1A 'emploi':22C 'franc':9B 'garag':5A 'handicape':18B 'insert':15B 'jeun':19C "
-            "'meti':3A 'person':17B,20C 'reconvers':4A 'repar':12B 'san':21C 'solidair':6A 'travail':10B "
-            "'vehicul':14B 'zzdecouvertemetier':7A 'zzforummetiers':8A"
+            "'agefiph':15B 'btp':4A 'decouvr':1A 'emploi':26C 'franc':13B 'garag':6A 'handicape':22B 'insert':19B "
+            "'jeun':23C 'meti':3A 'person':21B,24C 'reconvers':5A 'repar':16B 'san':25C 'solidair':7A 'travail':14B "
+            "'vehicul':18B 'zzdecouvertemetier':8A 'zzespacesverts':10A 'zzespacevert':9A 'zzforummetiers':11A "
+            "'zzorientationprofessionnelle':12A"
         )
 
     def test_update_search_index_without_thematics_nor_publics(self):
@@ -310,6 +313,34 @@ class TestServiceKeywordSearch:
         Service.include_inactive.update_search_index()
 
         assert Service.objects.keyword_search(q).exists() is expected
+
+    @pytest.mark.parametrize("q,expected", [("mobilité", True), ("santé", False)])
+    def test_keyword_search_category_aliases(self, q, expected):
+        ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", value="mobilite--preparer-un-permis", label="Code")
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        assert Service.objects.keyword_search(q).exists() is expected
+
+    def test_update_search_index_category_aliases_once_per_service(self):
+        service = ServiceFactory(
+            thematics=[
+                GenericReferenceItemFactory(kind="THEMATIC", value="mobilite--preparer-un-permis", label="Code"),
+                GenericReferenceItemFactory(
+                    kind="THEMATIC", value="mobilite--entretenir-reparer-son-vehicule", label="Garage"
+                ),
+            ],
+        )
+        Service.include_inactive.update_search_index()
+
+        service.refresh_from_db()
+        positions_by_lexeme = dict(re.findall(r"'(\S+)':(\S+)", service.search_vector))
+        # "mobilité" and "mobilités" share the "mobilit" stem, "mobilte" is a typo with its own stem.
+        assert len(positions_by_lexeme["mobilit"].split(",")) == 2
+        assert len(positions_by_lexeme["mobilt"].split(",")) == 1
 
     def test_keyword_search_ranks_multi_word_aliases_as_thematics(self):
         in_publics_details = ServiceFactory(publics_details="Titre de séjour")
