@@ -671,11 +671,11 @@
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
-                   (SELECT U0."id"
-                    FROM "siae_evaluations_evaluationcampaign" U0
-                    WHERE ((U0."ended_at" IS NULL
-                            OR U0."ended_at" >= %s)
-                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                   (SELECT "U0"."id"
+                    FROM "siae_evaluations_evaluationcampaign" "U0"
+                    WHERE (("U0"."ended_at" IS NULL
+                            OR "U0"."ended_at" >= %s)
+                           AND NOT ("U0"."evaluated_period_end_at" < %s)))
                  AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
                  AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
           ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
@@ -1503,11 +1503,11 @@
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
-                   (SELECT U0."id"
-                    FROM "siae_evaluations_evaluationcampaign" U0
-                    WHERE ((U0."ended_at" IS NULL
-                            OR U0."ended_at" >= %s)
-                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                   (SELECT "U0"."id"
+                    FROM "siae_evaluations_evaluationcampaign" "U0"
+                    WHERE (("U0"."ended_at" IS NULL
+                            OR "U0"."ended_at" >= %s)
+                           AND NOT ("U0"."evaluated_period_end_at" < %s)))
                  AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
                  AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
           ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
@@ -2158,11 +2158,11 @@
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
-                   (SELECT U0."id"
-                    FROM "siae_evaluations_evaluationcampaign" U0
-                    WHERE ((U0."ended_at" IS NULL
-                            OR U0."ended_at" >= %s)
-                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                   (SELECT "U0"."id"
+                    FROM "siae_evaluations_evaluationcampaign" "U0"
+                    WHERE (("U0"."ended_at" IS NULL
+                            OR "U0"."ended_at" >= %s)
+                           AND NOT ("U0"."evaluated_period_end_at" < %s)))
                  AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
                  AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
           ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC

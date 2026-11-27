@@ -132,9 +132,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -161,15 +161,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -349,10 +349,10 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_suspension"."approval_id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND "approvals_suspension"."id" = %s)
           LIMIT 21
@@ -441,17 +441,17 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp" AS "timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
+                                                                                         (SELECT "U0"."timestamp" AS "timestamp"
+                                                                                          FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                                          WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                                                                                 AND "U0"."transition" = %s)
                                                                                           ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp" AS "timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
+                            (SELECT "U0"."timestamp" AS "timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" "U0"
+                             WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                    AND "U0"."transition" = %s)
                              ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
@@ -507,14 +507,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -681,9 +681,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -710,15 +710,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -898,10 +898,10 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_suspension"."approval_id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND "approvals_suspension"."id" = %s)
           LIMIT 21
@@ -990,17 +990,17 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp" AS "timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
+                                                                                         (SELECT "U0"."timestamp" AS "timestamp"
+                                                                                          FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                                          WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                                                                                 AND "U0"."transition" = %s)
                                                                                           ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp" AS "timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
+                            (SELECT "U0"."timestamp" AS "timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" "U0"
+                             WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                    AND "U0"."transition" = %s)
                              ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
@@ -1056,14 +1056,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1331,9 +1331,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -1360,15 +1360,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -1553,10 +1553,10 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_suspension"."approval_id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND "approvals_suspension"."id" = %s)
           LIMIT 21
@@ -1643,17 +1643,17 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp" AS "timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
+                                                                                         (SELECT "U0"."timestamp" AS "timestamp"
+                                                                                          FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                                          WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                                                                                 AND "U0"."transition" = %s)
                                                                                           ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp" AS "timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
+                            (SELECT "U0"."timestamp" AS "timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" "U0"
+                             WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                    AND "U0"."transition" = %s)
                              ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
@@ -1707,14 +1707,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1887,9 +1887,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -1916,15 +1916,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -2104,10 +2104,10 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_suspension"."approval_id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_suspension"."approval_id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND "approvals_suspension"."id" = %s)
           LIMIT 21
@@ -2196,17 +2196,17 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp" AS "timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
+                                                                                         (SELECT "U0"."timestamp" AS "timestamp"
+                                                                                          FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                                          WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                                                                                 AND "U0"."transition" = %s)
                                                                                           ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp" AS "timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
+                            (SELECT "U0"."timestamp" AS "timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" "U0"
+                             WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                    AND "U0"."transition" = %s)
                              ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
@@ -2282,17 +2282,17 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp" AS "timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
+                                                                                         (SELECT "U0"."timestamp" AS "timestamp"
+                                                                                          FROM "job_applications_jobapplicationtransitionlog" "U0"
+                                                                                          WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                                                                                 AND "U0"."transition" = %s)
                                                                                           ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp" AS "timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
+                            (SELECT "U0"."timestamp" AS "timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" "U0"
+                             WHERE ("U0"."job_application_id" = ("job_applications_jobapplication"."id")
+                                    AND "U0"."transition" = %s)
                              ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
@@ -2351,20 +2351,20 @@
                   OR "companies_contract"."end_date" >= %s)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s, %s))
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s, %s))
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1))
-                           AND V0."id" = ("companies_contract"."company_id"))
+                           AND "V0"."id" = ("companies_contract"."company_id"))
                     LIMIT 1)
                  AND "companies_contract"."job_seeker_id" = %s)
           LIMIT 1
@@ -2408,14 +2408,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',

@@ -53,9 +53,9 @@
                     AND "companies_company"."auth_email" = %s
                     AND NOT (EXISTS
                                (SELECT %s AS "a"
-                                FROM "companies_companymembership" U1
-                                WHERE (U1."is_active"
-                                       AND U1."company_id" = ("companies_company"."id"))
+                                FROM "companies_companymembership" "U1"
+                                WHERE ("U1"."is_active"
+                                       AND "U1"."company_id" = ("companies_company"."id"))
                                 LIMIT 1)))) subquery
         ''',
       }),
@@ -116,9 +116,9 @@
                     AND "companies_company"."auth_email" = %s
                     AND NOT (EXISTS
                                (SELECT %s AS "a"
-                                FROM "companies_companymembership" U1
-                                WHERE (U1."is_active"
-                                       AND U1."company_id" = ("companies_company"."id"))
+                                FROM "companies_companymembership" "U1"
+                                WHERE ("U1"."is_active"
+                                       AND "U1"."company_id" = ("companies_company"."id"))
                                 LIMIT 1)))) subquery
         ''',
       }),
@@ -179,9 +179,9 @@
                     AND "companies_company"."auth_email" = %s
                     AND NOT (EXISTS
                                (SELECT %s AS "a"
-                                FROM "companies_companymembership" U1
-                                WHERE (U1."is_active"
-                                       AND U1."company_id" = ("companies_company"."id"))
+                                FROM "companies_companymembership" "U1"
+                                WHERE ("U1"."is_active"
+                                       AND "U1"."company_id" = ("companies_company"."id"))
                                 LIMIT 1)))) subquery
         ''',
       }),
@@ -242,9 +242,9 @@
                     AND "companies_company"."auth_email" = %s
                     AND NOT (EXISTS
                                (SELECT %s AS "a"
-                                FROM "companies_companymembership" U1
-                                WHERE (U1."is_active"
-                                       AND U1."company_id" = ("companies_company"."id"))
+                                FROM "companies_companymembership" "U1"
+                                WHERE ("U1"."is_active"
+                                       AND "U1"."company_id" = ("companies_company"."id"))
                                 LIMIT 1)))) subquery
         ''',
       }),
@@ -305,9 +305,9 @@
                     AND "companies_company"."auth_email" = %s
                     AND NOT (EXISTS
                                (SELECT %s AS "a"
-                                FROM "companies_companymembership" U1
-                                WHERE (U1."is_active"
-                                       AND U1."company_id" = ("companies_company"."id"))
+                                FROM "companies_companymembership" "U1"
+                                WHERE ("U1"."is_active"
+                                       AND "U1"."company_id" = ("companies_company"."id"))
                                 LIMIT 1)))) subquery
         ''',
       }),

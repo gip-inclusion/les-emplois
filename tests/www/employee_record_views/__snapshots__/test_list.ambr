@@ -198,9 +198,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -227,15 +227,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -381,11 +381,11 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U1."job_seeker_id" AS "job_application__job_seeker"
-               FROM "employee_record_employeerecord" U0
-               INNER JOIN "job_applications_jobapplication" U1 ON (U0."job_application_id" = U1."id")
-               WHERE (U1."to_company_id" = %s
-                      AND NOT (U0."status" = %s)))
+              (SELECT "U1"."job_seeker_id" AS "job_application__job_seeker"
+               FROM "employee_record_employeerecord" "U0"
+               INNER JOIN "job_applications_jobapplication" "U1" ON ("U0"."job_application_id" = "U1"."id")
+               WHERE ("U1"."to_company_id" = %s
+                      AND NOT ("U0"."status" = %s)))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -416,13 +416,13 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "employee_record_employeerecord"."status" = %s
                  AND NOT ("employee_record_employeerecord"."siret" =
-                            (SELECT U0."siret" AS "siret"
-                             FROM "companies_company" U0
-                             WHERE (NOT (U0."siret" = %s)
-                                    AND NOT (U0."kind" IN (%s,
-                                                           %s))
-                                    AND U0."convention_id" = ("companies_company"."convention_id")
-                                    AND U0."source" = %s)
+                            (SELECT "U0"."siret" AS "siret"
+                             FROM "companies_company" "U0"
+                             WHERE (NOT ("U0"."siret" = %s)
+                                    AND NOT ("U0"."kind" IN (%s,
+                                                             %s))
+                                    AND "U0"."convention_id" = ("companies_company"."convention_id")
+                                    AND "U0"."source" = %s)
                              ORDER BY RANDOM() ASC
                              LIMIT 1)))
           LIMIT 1
@@ -444,9 +444,9 @@
                  AND "employee_record_employeerecord"."id" IS NULL
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
-                            (SELECT U0."approval_number" AS "approval_number"
-                             FROM "employee_record_employeerecord" U0
-                             WHERE U0."siret" = %s))
+                            (SELECT "U0"."approval_number" AS "approval_number"
+                             FROM "employee_record_employeerecord" "U0"
+                             WHERE "U0"."siret" = %s))
                  AND "job_applications_jobapplication"."hiring_start_at" >= %s)
           ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC NULLS LAST
         ''',
@@ -505,14 +505,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -546,19 +546,19 @@
                  "employee_record_employeerecord"."siret",
                  "employee_record_employeerecord"."processed_as_duplicate",
           
-            (SELECT U0."timestamp" AS "timestamp"
-             FROM "employee_record_employeerecordtransitionlog" U0
-             WHERE U0."employee_record_id" = ("employee_record_employeerecord"."id")
+            (SELECT "U0"."timestamp" AS "timestamp"
+             FROM "employee_record_employeerecordtransitionlog" "U0"
+             WHERE "U0"."employee_record_id" = ("employee_record_employeerecord"."id")
              ORDER BY 1 DESC
              LIMIT 1) AS "last_transition_timestamp",
           
-            (SELECT U0."siret" AS "siret"
-             FROM "companies_company" U0
-             WHERE (NOT (U0."siret" = %s)
-                    AND NOT (U0."kind" IN (%s,
-                                           %s))
-                    AND U0."convention_id" = ("companies_company"."convention_id")
-                    AND U0."source" = %s)
+            (SELECT "U0"."siret" AS "siret"
+             FROM "companies_company" "U0"
+             WHERE (NOT ("U0"."siret" = %s)
+                    AND NOT ("U0"."kind" IN (%s,
+                                             %s))
+                    AND "U0"."convention_id" = ("companies_company"."convention_id")
+                    AND "U0"."source" = %s)
              ORDER BY RANDOM() ASC
              LIMIT 1) AS "siret_from_asp_source",
                  "job_applications_jobapplication"."id",
@@ -710,15 +710,15 @@
                  "asp_country"."name",
                  "asp_country"."group",
                  "asp_country"."department",
-                 T9."id",
-                 T9."start_date",
-                 T9."end_date",
-                 T9."code",
-                 T9."name",
-                 T9."normalized_name",
-                 T9."created_at",
-                 T9."city_id",
-                 T9."ignore",
+                 "T9"."id",
+                 "T9"."start_date",
+                 "T9"."end_date",
+                 "T9"."code",
+                 "T9"."name",
+                 "T9"."normalized_name",
+                 "T9"."created_at",
+                 "T9"."city_id",
+                 "T9"."ignore",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -831,7 +831,7 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
-          LEFT OUTER JOIN "asp_commune" T9 ON ("users_jobseekerprofile"."hexa_commune_id" = T9."id")
+          LEFT OUTER JOIN "asp_commune" "T9" ON ("users_jobseekerprofile"."hexa_commune_id" = "T9"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")

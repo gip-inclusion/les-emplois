@@ -76,7 +76,7 @@ def send_email_messages(email_messages, connection=None):
     if connection:
         connection.send_messages(email_messages)
     else:
-        with mail.get_connection() as connection:
+        with mail.mailers.default as connection:
             connection.send_messages(email_messages)
 
 

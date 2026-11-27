@@ -415,11 +415,11 @@ def django_loaddata_fixture(django_db_setup, django_db_blocker):
 
 @pytest.fixture(autouse=True)
 def django_test_environment_email_fixup(django_test_environment, settings) -> None:
-    # Django forcefully sets the EMAIL_BACKEND to
+    # Django forcefully sets the MAILERS backends to
     # "django.core.mail.backends.locmem.EmailBackend" in
     # django.test.utils.setup_test_environment.
-    settings.EMAIL_BACKEND = "itou.emails.tasks.AsyncEmailBackend"
-    settings.ASYNC_EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    settings.MAILERS["default"]["BACKEND"] = "itou.emails.tasks.AsyncEmailBackend"
+    settings.MAILERS["async"]["BACKEND"] = "django.core.mail.backends.locmem.EmailBackend"
 
 
 @pytest.fixture(autouse=True, scope="session")

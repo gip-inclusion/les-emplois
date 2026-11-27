@@ -132,9 +132,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -161,15 +161,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -317,14 +317,14 @@
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
           WHERE ("approvals_approval"."id" IN
-                   (SELECT V0."id"
-                    FROM "approvals_approval" V0
+                   (SELECT "V0"."id"
+                    FROM "approvals_approval" "V0"
                     WHERE EXISTS
                         (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (U0."approval_id" = (V0."id")
-                                AND U0."state" = %s
-                                AND U0."to_company_id" = %s)
+                         FROM "job_applications_jobapplication" "U0"
+                         WHERE ("U0"."approval_id" = ("V0"."id")
+                                AND "U0"."state" = %s
+                                AND "U0"."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
           ORDER BY "users_user"."last_name" ASC,
@@ -361,43 +361,43 @@
                              "approvals_approval"."origin_prescriber_organization_kind" AS "col18",
                              "approvals_approval"."public_id" AS "col19",
                              COALESCE(
-                                        (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                         FROM "companies_contract" U0
-                                         WHERE (U0."company_id" = %s
-                                                AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                                AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                                AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                        (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                         FROM "companies_contract" "U0"
+                                         WHERE ("U0"."company_id" = %s
+                                                AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                                AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                                AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                          ORDER BY 1 DESC
                                          LIMIT 1),
-                                        (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                         FROM "job_applications_jobapplication" U0
-                                         WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                                AND U0."state" = %s
-                                                AND U0."to_company_id" = %s)
+                                        (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                         FROM "job_applications_jobapplication" "U0"
+                                         WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                                AND "U0"."state" = %s
+                                                AND "U0"."to_company_id" = %s)
                                          ORDER BY 1 DESC
                                          LIMIT 1), "approvals_approval"."end_at") AS "contract_end_at"
              FROM "approvals_approval"
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."approval_id" = ("approvals_approval"."id")
-                              AND U0."state" = %s
-                              AND U0."to_company_id" = %s)
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                              AND "U0"."state" = %s
+                              AND "U0"."to_company_id" = %s)
                        LIMIT 1)
                     AND COALESCE(
-                                   (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                    FROM "companies_contract" U0
-                                    WHERE (U0."company_id" = %s
-                                           AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                           AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                           AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                   (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                    FROM "companies_contract" "U0"
+                                    WHERE ("U0"."company_id" = %s
+                                           AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                           AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                           AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                     ORDER BY 1 DESC
                                     LIMIT 1),
-                                   (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                    FROM "job_applications_jobapplication" U0
-                                    WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                           AND U0."state" = %s
-                                           AND U0."to_company_id" = %s)
+                                   (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                    FROM "job_applications_jobapplication" "U0"
+                                    WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                           AND "U0"."state" = %s
+                                           AND "U0"."to_company_id" = %s)
                                     ORDER BY 1 DESC
                                     LIMIT 1), "approvals_approval"."end_at") < %s)) subquery
         ''',
@@ -449,14 +449,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -489,19 +489,19 @@
                           "approvals_approval"."origin_prescriber_organization_kind",
                           "approvals_approval"."public_id",
                           COALESCE(
-                                     (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                      FROM "companies_contract" U0
-                                      WHERE (U0."company_id" = %s
-                                             AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                             AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                             AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                     (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                      FROM "companies_contract" "U0"
+                                      WHERE ("U0"."company_id" = %s
+                                             AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                             AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                             AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                       ORDER BY 1 DESC
                                       LIMIT 1),
-                                     (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                      FROM "job_applications_jobapplication" U0
-                                      WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                             AND U0."state" = %s
-                                             AND U0."to_company_id" = %s)
+                                     (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                      FROM "job_applications_jobapplication" "U0"
+                                      WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                             AND "U0"."state" = %s
+                                             AND "U0"."to_company_id" = %s)
                                       ORDER BY 1 DESC
                                       LIMIT 1), "approvals_approval"."end_at") AS "contract_end_at",
                           "users_user"."id",
@@ -547,25 +547,25 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_approval"."id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND COALESCE(
-                                (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                 FROM "companies_contract" U0
-                                 WHERE (U0."company_id" = %s
-                                        AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                        AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                        AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                 FROM "companies_contract" "U0"
+                                 WHERE ("U0"."company_id" = %s
+                                        AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                        AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                        AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                  ORDER BY 1 DESC
                                  LIMIT 1),
-                                (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                 FROM "job_applications_jobapplication" U0
-                                 WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                        AND U0."state" = %s
-                                        AND U0."to_company_id" = %s)
+                                (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                 FROM "job_applications_jobapplication" "U0"
+                                 WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                        AND "U0"."state" = %s
+                                        AND "U0"."to_company_id" = %s)
                                  ORDER BY 1 DESC
                                  LIMIT 1), "approvals_approval"."end_at") < %s)
           ORDER BY "approvals_approval"."id" DESC
@@ -738,9 +738,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -767,15 +767,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -923,14 +923,14 @@
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
           WHERE ("approvals_approval"."id" IN
-                   (SELECT V0."id"
-                    FROM "approvals_approval" V0
+                   (SELECT "V0"."id"
+                    FROM "approvals_approval" "V0"
                     WHERE EXISTS
                         (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (U0."approval_id" = (V0."id")
-                                AND U0."state" = %s
-                                AND U0."to_company_id" = %s)
+                         FROM "job_applications_jobapplication" "U0"
+                         WHERE ("U0"."approval_id" = ("V0"."id")
+                                AND "U0"."state" = %s
+                                AND "U0"."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
           ORDER BY "users_user"."last_name" ASC,
@@ -967,43 +967,43 @@
                              "approvals_approval"."origin_prescriber_organization_kind" AS "col18",
                              "approvals_approval"."public_id" AS "col19",
                              COALESCE(
-                                        (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                         FROM "companies_contract" U0
-                                         WHERE (U0."company_id" = %s
-                                                AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                                AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                                AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                        (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                         FROM "companies_contract" "U0"
+                                         WHERE ("U0"."company_id" = %s
+                                                AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                                AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                                AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                          ORDER BY 1 DESC
                                          LIMIT 1),
-                                        (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                         FROM "job_applications_jobapplication" U0
-                                         WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                                AND U0."state" = %s
-                                                AND U0."to_company_id" = %s)
+                                        (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                         FROM "job_applications_jobapplication" "U0"
+                                         WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                                AND "U0"."state" = %s
+                                                AND "U0"."to_company_id" = %s)
                                          ORDER BY 1 DESC
                                          LIMIT 1), "approvals_approval"."end_at") AS "contract_end_at"
              FROM "approvals_approval"
              WHERE (EXISTS
                       (SELECT %s AS "a"
-                       FROM "job_applications_jobapplication" U0
-                       WHERE (U0."approval_id" = ("approvals_approval"."id")
-                              AND U0."state" = %s
-                              AND U0."to_company_id" = %s)
+                       FROM "job_applications_jobapplication" "U0"
+                       WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                              AND "U0"."state" = %s
+                              AND "U0"."to_company_id" = %s)
                        LIMIT 1)
                     AND COALESCE(
-                                   (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                    FROM "companies_contract" U0
-                                    WHERE (U0."company_id" = %s
-                                           AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                           AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                           AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                   (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                    FROM "companies_contract" "U0"
+                                    WHERE ("U0"."company_id" = %s
+                                           AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                           AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                           AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                     ORDER BY 1 DESC
                                     LIMIT 1),
-                                   (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                    FROM "job_applications_jobapplication" U0
-                                    WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                           AND U0."state" = %s
-                                           AND U0."to_company_id" = %s)
+                                   (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                    FROM "job_applications_jobapplication" "U0"
+                                    WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                           AND "U0"."state" = %s
+                                           AND "U0"."to_company_id" = %s)
                                     ORDER BY 1 DESC
                                     LIMIT 1), "approvals_approval"."end_at") >= %s)) subquery
         ''',
@@ -1055,14 +1055,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1095,19 +1095,19 @@
                           "approvals_approval"."origin_prescriber_organization_kind",
                           "approvals_approval"."public_id",
                           COALESCE(
-                                     (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                      FROM "companies_contract" U0
-                                      WHERE (U0."company_id" = %s
-                                             AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                             AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                             AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                     (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                      FROM "companies_contract" "U0"
+                                      WHERE ("U0"."company_id" = %s
+                                             AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                             AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                             AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                       ORDER BY 1 DESC
                                       LIMIT 1),
-                                     (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                      FROM "job_applications_jobapplication" U0
-                                      WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                             AND U0."state" = %s
-                                             AND U0."to_company_id" = %s)
+                                     (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                      FROM "job_applications_jobapplication" "U0"
+                                      WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                             AND "U0"."state" = %s
+                                             AND "U0"."to_company_id" = %s)
                                       ORDER BY 1 DESC
                                       LIMIT 1), "approvals_approval"."end_at") AS "contract_end_at",
                           "users_user"."id",
@@ -1153,25 +1153,25 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE (EXISTS
                    (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (U0."approval_id" = ("approvals_approval"."id")
-                           AND U0."state" = %s
-                           AND U0."to_company_id" = %s)
+                    FROM "job_applications_jobapplication" "U0"
+                    WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                           AND "U0"."state" = %s
+                           AND "U0"."to_company_id" = %s)
                     LIMIT 1)
                  AND COALESCE(
-                                (SELECT COALESCE(U0."end_date", %s) AS "end_date_or_today"
-                                 FROM "companies_contract" U0
-                                 WHERE (U0."company_id" = %s
-                                        AND U0."job_seeker_id" = ("approvals_approval"."user_id")
-                                        AND NOT (COALESCE(U0."end_date", %s) < ("approvals_approval"."start_at"))
-                                        AND NOT (U0."start_date" > ("approvals_approval"."end_at")))
+                                (SELECT COALESCE("U0"."end_date", %s) AS "end_date_or_today"
+                                 FROM "companies_contract" "U0"
+                                 WHERE ("U0"."company_id" = %s
+                                        AND "U0"."job_seeker_id" = ("approvals_approval"."user_id")
+                                        AND NOT (COALESCE("U0"."end_date", %s) < ("approvals_approval"."start_at"))
+                                        AND NOT ("U0"."start_date" > ("approvals_approval"."end_at")))
                                  ORDER BY 1 DESC
                                  LIMIT 1),
-                                (SELECT U0."hiring_end_at" AS "hiring_end_at"
-                                 FROM "job_applications_jobapplication" U0
-                                 WHERE (U0."approval_id" = ("approvals_approval"."id")
-                                        AND U0."state" = %s
-                                        AND U0."to_company_id" = %s)
+                                (SELECT "U0"."hiring_end_at" AS "hiring_end_at"
+                                 FROM "job_applications_jobapplication" "U0"
+                                 WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                                        AND "U0"."state" = %s
+                                        AND "U0"."to_company_id" = %s)
                                  ORDER BY 1 DESC
                                  LIMIT 1), "approvals_approval"."end_at") >= %s)
           ORDER BY "approvals_approval"."id" DESC
@@ -1347,9 +1347,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -1376,15 +1376,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -1532,14 +1532,14 @@
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
           WHERE ("approvals_approval"."id" IN
-                   (SELECT V0."id"
-                    FROM "approvals_approval" V0
+                   (SELECT "V0"."id"
+                    FROM "approvals_approval" "V0"
                     WHERE EXISTS
                         (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (U0."approval_id" = (V0."id")
-                                AND U0."state" = %s
-                                AND U0."to_company_id" = %s)
+                         FROM "job_applications_jobapplication" "U0"
+                         WHERE ("U0"."approval_id" = ("V0"."id")
+                                AND "U0"."state" = %s
+                                AND "U0"."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
           ORDER BY "users_user"."last_name" ASC,
@@ -1578,10 +1578,10 @@
              FROM "approvals_approval"
              WHERE EXISTS
                  (SELECT %s AS "a"
-                  FROM "job_applications_jobapplication" U0
-                  WHERE (U0."approval_id" = ("approvals_approval"."id")
-                         AND U0."state" = %s
-                         AND U0."to_company_id" = %s)
+                  FROM "job_applications_jobapplication" "U0"
+                  WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                         AND "U0"."state" = %s
+                         AND "U0"."to_company_id" = %s)
                   LIMIT 1)) subquery
         ''',
       }),
@@ -1632,14 +1632,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1714,10 +1714,10 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE EXISTS
               (SELECT %s AS "a"
-               FROM "job_applications_jobapplication" U0
-               WHERE (U0."approval_id" = ("approvals_approval"."id")
-                      AND U0."state" = %s
-                      AND U0."to_company_id" = %s)
+               FROM "job_applications_jobapplication" "U0"
+               WHERE ("U0"."approval_id" = ("approvals_approval"."id")
+                      AND "U0"."state" = %s
+                      AND "U0"."to_company_id" = %s)
                LIMIT 1)
           ORDER BY "approvals_approval"."id" DESC
           LIMIT 2

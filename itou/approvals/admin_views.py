@@ -51,6 +51,7 @@ def _admin_context(request, model_admin, *, title, **extra):
         "opts": opts,
         "subtitle": None,
         "title": title,
+        "change": False,  # We are not editing an object from the database, no need for the history button
         **extra,
     }
 

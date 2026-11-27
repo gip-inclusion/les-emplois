@@ -31,16 +31,24 @@ class TokenGenerator:
             timestamp = base36_to_int(timestamp_b36)
         except ValueError:
             return False
-        if not constant_time_compare(self._make_token_with_timestamp(timestamp, **kwargs), token):
+        if not constant_time_compare(self._make_token_with_timestamp(timestamp, **kwargs), token) and (
+            # FIXME: Remove in 3 months (mars 2027)
+            # backward compatibility until all token were used
+            # ProlongationDerogationTokenGenerator.timeout is 3 months
+            not constant_time_compare(self._make_token_with_timestamp(timestamp, algorithm="sha1", **kwargs), token)
+        ):
             return False
         if (self._num_seconds(self._now()) - timestamp) > self.timeout:
             return False
         return True
 
-    def _make_token_with_timestamp(self, timestamp, **kwargs):
+    def _make_token_with_timestamp(self, timestamp, algorithm="sha512", **kwargs):
         timestamp_b36 = int_to_base36(timestamp)
         hash_string = salted_hmac(
-            self.key_salt, self._make_hash_value(timestamp, **kwargs), secret=self.secret
+            self.key_salt,
+            self._make_hash_value(timestamp, **kwargs),
+            secret=self.secret,
+            algorithm=algorithm,
         ).hexdigest()[::2]
         return f"{timestamp_b36}-{hash_string}"
 

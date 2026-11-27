@@ -96,7 +96,7 @@ class TestAsyncEmailBackend:
 
 @pytest.fixture
 def anymail_mailjet_settings(settings):
-    settings.ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+    settings.MAILERS["async"]["BACKEND"] = "anymail.backends.mailjet.EmailBackend"
     settings.ANYMAIL = {
         "MAILJET_API_URL": settings.ANYMAIL["MAILJET_API_URL"],
         "MAILJET_API_KEY": "MAILJET_API_SECRET",

@@ -132,9 +132,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -161,15 +161,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -304,26 +304,25 @@
                    WHERE ("users_user"."is_active"
                           AND "companies_companymembership"."is_active"
                           AND "companies_companymembership"."company_id" IN
-                            (SELECT V0."id"
-                             FROM "companies_company" V0
-                             WHERE (NOT (V0."siret" = %s)
-                                    AND NOT (V0."kind" IN (%s,
-                                                           %s))
-                                    AND (V0."kind" IN (%s,
-                                                       %s)
-                                         OR (V0."is_searchable"
-                                             AND V0."kind" = %s)
-                                         OR V0."source" = %s
+                            (SELECT "V0"."id"
+                             FROM "companies_company" "V0"
+                             WHERE (NOT ("V0"."siret" = %s)
+                                    AND NOT ("V0"."kind" IN (%s,
+                                                             %s))
+                                    AND ("V0"."kind" IN (%s,
+                                                         %s)
+                                         OR ("V0"."is_searchable"
+                                             AND "V0"."kind" = %s)
+                                         OR "V0"."source" = %s
                                          OR EXISTS
                                            (SELECT %s AS "a"
-                                            FROM "companies_siaeconvention" U0
-                                            WHERE (U0."id" = (V0."convention_id")
-                                                   AND U0."is_active")
+                                            FROM "companies_siaeconvention" "U0"
+                                            WHERE ("U0"."id" = ("V0"."convention_id")
+                                                   AND "U0"."is_active")
                                             LIMIT 1))))
                           AND ST_DWithin("companies_company"."coords", %s, %s)
                           AND NOT ("directory_directoryprofile"."is_opted_out"
-                                   AND "directory_directoryprofile"."is_opted_out" IS NOT NULL))
-                   ORDER BY RANDOM() ASC)
+                                   AND "directory_directoryprofile"."is_opted_out" IS NOT NULL)))
                 UNION
                   (SELECT "users_user"."last_name" AS "user__last_name",
                           "users_user"."first_name" AS "user__first_name",
@@ -339,8 +338,7 @@
                           AND "prescribers_prescribermembership"."is_active"
                           AND ST_DWithin("prescribers_prescriberorganization"."coords", %s, %s)
                           AND NOT ("directory_directoryprofile"."is_opted_out"
-                                   AND "directory_directoryprofile"."is_opted_out" IS NOT NULL))
-                   ORDER BY RANDOM() ASC)) subquery
+                                   AND "directory_directoryprofile"."is_opted_out" IS NOT NULL)))) subquery
         ''',
       }),
       dict({
@@ -364,21 +362,21 @@
              WHERE ("users_user"."is_active"
                     AND "companies_companymembership"."is_active"
                     AND "companies_companymembership"."company_id" IN
-                      (SELECT V0."id"
-                       FROM "companies_company" V0
-                       WHERE (NOT (V0."siret" = %s)
-                              AND NOT (V0."kind" IN (%s,
-                                                     %s))
-                              AND (V0."kind" IN (%s,
-                                                 %s)
-                                   OR (V0."is_searchable"
-                                       AND V0."kind" = %s)
-                                   OR V0."source" = %s
+                      (SELECT "V0"."id"
+                       FROM "companies_company" "V0"
+                       WHERE (NOT ("V0"."siret" = %s)
+                              AND NOT ("V0"."kind" IN (%s,
+                                                       %s))
+                              AND ("V0"."kind" IN (%s,
+                                                   %s)
+                                   OR ("V0"."is_searchable"
+                                       AND "V0"."kind" = %s)
+                                   OR "V0"."source" = %s
                                    OR EXISTS
                                      (SELECT %s AS "a"
-                                      FROM "companies_siaeconvention" U0
-                                      WHERE (U0."id" = (V0."convention_id")
-                                             AND U0."is_active")
+                                      FROM "companies_siaeconvention" "U0"
+                                      WHERE ("U0"."id" = ("V0"."convention_id")
+                                             AND "U0"."is_active")
                                       LIMIT 1))))
                     AND ST_DWithin("companies_company"."coords", %s, %s)
                     AND NOT ("directory_directoryprofile"."is_opted_out"
@@ -651,14 +649,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',

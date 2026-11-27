@@ -493,9 +493,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -522,15 +522,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -760,14 +760,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -827,12 +827,12 @@
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN
-              (SELECT U0."id"
-               FROM "institutions_institutionmembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."institution_id" = %s))
+              (SELECT "U0"."id"
+               FROM "institutions_institutionmembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."institution_id" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -891,12 +891,12 @@
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN
-              (SELECT U0."id"
-               FROM "institutions_institutionmembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."institution_id" = %s))
+              (SELECT "U0"."id"
+               FROM "institutions_institutionmembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."institution_id" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2643,14 +2643,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   
@@ -2761,14 +2761,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   
@@ -2900,14 +2900,14 @@
                                       <legend class="h3">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
                                       <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
-    <option selected="" value="">---------</option>
+    <option selected="" value="">- Choisir une option -</option>
   
     <option value="2">DREETS BRET</option>
   
@@ -3138,9 +3138,9 @@
                  "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_siaeconvention" U0
-             WHERE (U0."deactivated_at" >= %s
-                    AND U0."id" = ("companies_company"."convention_id"))
+             FROM "companies_siaeconvention" "U0"
+             WHERE ("U0"."deactivated_at" >= %s
+                    AND "U0"."id" = ("companies_company"."convention_id"))
              LIMIT 1) AS "has_convention_in_grace_period",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
@@ -3167,15 +3167,15 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1)
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."deactivated_at" >= %s
-                                AND U0."id" = ("companies_company"."convention_id"))
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."deactivated_at" >= %s
+                                AND "U0"."id" = ("companies_company"."convention_id"))
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
@@ -3332,14 +3332,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
+                   (SELECT "U0"."id"
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = %s
+                           AND "U0"."is_admin"
+                           AND "U1"."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',

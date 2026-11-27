@@ -40,7 +40,7 @@
               </label>
               <select class="form-select" disabled="" id="id_department" name="department" required="">
                   <option value="">
-                      ---------
+                      - Choisir une option -
                   </option>
                   <option value="01">
                       01 - Ain

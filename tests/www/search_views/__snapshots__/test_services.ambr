@@ -142,9 +142,9 @@
                  AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "insertion_service_thematics" U0
-                    WHERE (U0."genericreferenceitem_id" IN (%s)
-                           AND U0."service_id" = ("insertion_service"."id"))
+                    FROM "insertion_service_thematics" "U0"
+                    WHERE ("U0"."genericreferenceitem_id" IN (%s)
+                           AND "U0"."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (
@@ -200,9 +200,9 @@
                  AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "insertion_service_thematics" U0
-                    WHERE (U0."genericreferenceitem_id" IN (%s)
-                           AND U0."service_id" = ("insertion_service"."id"))
+                    FROM "insertion_service_thematics" "U0"
+                    WHERE ("U0"."genericreferenceitem_id" IN (%s)
+                           AND "U0"."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (
@@ -297,9 +297,9 @@
                  "insertion_service"."extra",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "insertion_service_thematics" U0
-             WHERE (U0."genericreferenceitem_id" IN (%s)
-                    AND U0."service_id" = ("insertion_service"."id"))
+             FROM "insertion_service_thematics" "U0"
+             WHERE ("U0"."genericreferenceitem_id" IN (%s)
+                    AND "U0"."service_id" = ("insertion_service"."id"))
              LIMIT 1) AS "has_thematic",
                  (ST_Distance("insertion_service"."coordinates", %s) / %s) AS "distance",
                  (%s - ((ST_Distance("insertion_service"."coordinates", %s) / %s) / %s)) AS "distance_score",
@@ -335,14 +335,14 @@
                                                                                                                                                                                                  AND stem %% lexeme
                                                                                                                                                                                                ORDER BY similarity(stem, lexeme) + 0.05 * ln(service_count + 1) DESC
                                                                                                                                                                                                LIMIT 4) AS closest) AS expansion))), %s))::numeric(1000, 15), %s) * %s)) AS "total_score",
-                 T4."id",
-                 T4."source",
-                 T4."kind",
-                 T4."value",
-                 T4."label",
-                 T4."description",
-                 T4."created_at",
-                 T4."updated_at",
+                 "T4"."id",
+                 "T4"."source",
+                 "T4"."kind",
+                 "T4"."value",
+                 "T4"."label",
+                 "T4"."description",
+                 "T4"."created_at",
+                 "T4"."updated_at",
                  "insertion_structure"."id",
                  "insertion_structure"."address_line_1",
                  "insertion_structure"."address_line_2",
@@ -367,7 +367,7 @@
                  "insertion_structure"."updated_at"
           FROM "insertion_service"
           INNER JOIN "insertion_service_receptions" ON ("insertion_service"."id" = "insertion_service_receptions"."service_id")
-          INNER JOIN "insertion_genericreferenceitem" T4 ON ("insertion_service"."source_id" = T4."id")
+          INNER JOIN "insertion_genericreferenceitem" "T4" ON ("insertion_service"."source_id" = "T4"."id")
           INNER JOIN "insertion_structure" ON ("insertion_service"."structure_id" = "insertion_structure"."id")
           WHERE ("insertion_service"."is_active"
                  AND "insertion_service"."coordinates" IS NOT NULL
@@ -379,9 +379,9 @@
                  AND ST_DWithin("insertion_service"."coordinates", %s, %s)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "insertion_service_thematics" U0
-                    WHERE (U0."genericreferenceitem_id" IN (%s)
-                           AND U0."service_id" = ("insertion_service"."id"))
+                    FROM "insertion_service_thematics" "U0"
+                    WHERE ("U0"."genericreferenceitem_id" IN (%s)
+                           AND "U0"."service_id" = ("insertion_service"."id"))
                     LIMIT 1)
                  AND NOT ("insertion_service"."city" = %s)
                  AND "insertion_service"."search_vector" @@ (to_tsquery(%s::regconfig, (

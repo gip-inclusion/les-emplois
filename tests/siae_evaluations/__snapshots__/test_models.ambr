@@ -247,26 +247,26 @@
              WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
                     AND EXISTS
                       (SELECT %s AS "a"
-                       FROM "companies_company" V0
-                       WHERE (NOT (V0."siret" = %s)
-                              AND NOT (V0."kind" IN (%s, %s))
-                              AND (V0."kind" IN (%s, %s)
-                                   OR (V0."is_searchable"
-                                       AND V0."kind" = %s)
-                                   OR V0."source" = %s
+                       FROM "companies_company" "V0"
+                       WHERE (NOT ("V0"."siret" = %s)
+                              AND NOT ("V0"."kind" IN (%s, %s))
+                              AND ("V0"."kind" IN (%s, %s)
+                                   OR ("V0"."is_searchable"
+                                       AND "V0"."kind" = %s)
+                                   OR "V0"."source" = %s
                                    OR EXISTS
                                      (SELECT %s AS "a"
-                                      FROM "companies_siaeconvention" U0
-                                      WHERE (U0."id" = (V0."convention_id")
-                                             AND U0."is_active")
+                                      FROM "companies_siaeconvention" "U0"
+                                      WHERE ("U0"."id" = ("V0"."convention_id")
+                                             AND "U0"."is_active")
                                       LIMIT 1)
                                    OR EXISTS
                                      (SELECT %s AS "a"
-                                      FROM "companies_siaeconvention" U0
-                                      WHERE (U0."deactivated_at" >= %s
-                                             AND U0."id" = (V0."convention_id"))
+                                      FROM "companies_siaeconvention" "U0"
+                                      WHERE ("U0"."deactivated_at" >= %s
+                                             AND "U0"."id" = ("V0"."convention_id"))
                                       LIMIT 1))
-                              AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                              AND "V0"."id" = ("job_applications_jobapplication"."to_company_id"))
                        LIMIT 1)
                     AND "approvals_approval"."number"::text LIKE %s
                     AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
@@ -297,26 +297,26 @@
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s, %s))
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s, %s))
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1))
-                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                           AND "V0"."id" = ("job_applications_jobapplication"."to_company_id"))
                     LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
@@ -369,26 +369,26 @@
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s, %s))
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s, %s))
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1))
-                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                           AND "V0"."id" = ("job_applications_jobapplication"."to_company_id"))
                     LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
@@ -463,43 +463,43 @@
                  "eligibility_eligibilitydiagnosis"."expires_at",
                  "eligibility_eligibilitydiagnosis"."job_seeker_id",
                  "eligibility_eligibilitydiagnosis"."author_siae_id",
-                 T5."id",
-                 T5."fields_history",
-                 T5."address_line_1",
-                 T5."address_line_2",
-                 T5."post_code",
-                 T5."city",
-                 T5."department",
-                 T5."coords",
-                 T5."geocoding_score",
-                 T5."geocoding_updated_at",
-                 T5."ban_api_resolved_address",
-                 T5."insee_city_id",
-                 T5."name",
-                 T5."created_at",
-                 T5."updated_at",
-                 T5."uid",
-                 T5."active_members_email_reminder_last_sent_at",
-                 T5."automatic_geocoding_update",
-                 T5."siret",
-                 T5."naf",
-                 T5."kind",
-                 T5."brand",
-                 T5."phone",
-                 T5."email",
-                 T5."auth_email",
-                 T5."website",
-                 T5."description",
-                 T5."provided_support",
-                 T5."source",
-                 T5."created_by_id",
-                 T5."block_job_applications",
-                 T5."job_applications_blocked_at",
-                 T5."spontaneous_applications_open_since",
-                 T5."convention_id",
-                 T5."job_app_score",
-                 T5."is_searchable",
-                 T5."rdv_solidarites_id",
+                 "T5"."id",
+                 "T5"."fields_history",
+                 "T5"."address_line_1",
+                 "T5"."address_line_2",
+                 "T5"."post_code",
+                 "T5"."city",
+                 "T5"."department",
+                 "T5"."coords",
+                 "T5"."geocoding_score",
+                 "T5"."geocoding_updated_at",
+                 "T5"."ban_api_resolved_address",
+                 "T5"."insee_city_id",
+                 "T5"."name",
+                 "T5"."created_at",
+                 "T5"."updated_at",
+                 "T5"."uid",
+                 "T5"."active_members_email_reminder_last_sent_at",
+                 "T5"."automatic_geocoding_update",
+                 "T5"."siret",
+                 "T5"."naf",
+                 "T5"."kind",
+                 "T5"."brand",
+                 "T5"."phone",
+                 "T5"."email",
+                 "T5"."auth_email",
+                 "T5"."website",
+                 "T5"."description",
+                 "T5"."provided_support",
+                 "T5"."source",
+                 "T5"."created_by_id",
+                 "T5"."block_job_applications",
+                 "T5"."job_applications_blocked_at",
+                 "T5"."spontaneous_applications_open_since",
+                 "T5"."convention_id",
+                 "T5"."job_app_score",
+                 "T5"."is_searchable",
+                 "T5"."rdv_solidarites_id",
                  "companies_company"."id",
                  "companies_company"."fields_history",
                  "companies_company"."address_line_1",
@@ -560,30 +560,30 @@
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
-          INNER JOIN "companies_company" T5 ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = T5."id")
+          INNER JOIN "companies_company" "T5" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "T5"."id")
           WHERE (NOT ("job_applications_jobapplication"."approval_id" IS NULL)
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (NOT (V0."siret" = %s)
-                           AND NOT (V0."kind" IN (%s, %s))
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE (NOT ("V0"."siret" = %s)
+                           AND NOT ("V0"."kind" IN (%s, %s))
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."deactivated_at" >= %s
-                                          AND U0."id" = (V0."convention_id"))
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."deactivated_at" >= %s
+                                          AND "U0"."id" = ("V0"."convention_id"))
                                    LIMIT 1))
-                           AND V0."id" = ("job_applications_jobapplication"."to_company_id"))
+                           AND "V0"."id" = ("job_applications_jobapplication"."to_company_id"))
                     LIMIT 1)
                  AND "approvals_approval"."number"::text LIKE %s
                  AND "approvals_approval"."start_at" = ("job_applications_jobapplication"."hiring_start_at")
@@ -826,14 +826,14 @@
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE "companies_companymembership"."id" IN
-              (SELECT U0."id"
-               FROM "companies_companymembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."company_id" = %s
-                      AND U0."is_admin"
-                      AND U1."is_active"))
+              (SELECT "U0"."id"
+               FROM "companies_companymembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."company_id" = %s
+                      AND "U0"."is_admin"
+                      AND "U1"."is_active"))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -848,12 +848,12 @@
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN
-              (SELECT U0."id"
-               FROM "institutions_institutionmembership" U0
-               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-               WHERE (U1."is_active"
-                      AND U0."is_active"
-                      AND U0."institution_id" = %s))
+              (SELECT "U0"."id"
+               FROM "institutions_institutionmembership" "U0"
+               INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+               WHERE ("U1"."is_active"
+                      AND "U0"."is_active"
+                      AND "U0"."institution_id" = %s))
           ORDER BY RANDOM() ASC
         ''',
       }),

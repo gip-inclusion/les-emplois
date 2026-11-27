@@ -882,11 +882,11 @@ class JobDescription(models.Model):
             )
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         # this is close to the code we have in itou.users.User.from_db() but we
         # don't want full genericity yet. We could be DRYer by using a mixin later,
         # but we'd need to handle some extra edge cases.
-        instance = super().from_db(db, field_names, values)
+        instance = super().from_db(db, field_names, values, fetch_mode=fetch_mode)
         setattr(instance, "_old_is_active", instance.is_active)
         return instance
 

@@ -233,11 +233,11 @@
                              "companies_company"."rdv_solidarites_id",
                              EXISTS
             (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-             WHERE (U1."is_active"
-                    AND U0."is_active"
-                    AND U0."company_id" = ("companies_company"."id"))
+             FROM "companies_companymembership" "U0"
+             INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+             WHERE ("U1"."is_active"
+                    AND "U0"."is_active"
+                    AND "U0"."company_id" = ("companies_company"."id"))
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -250,18 +250,18 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
                  AND NOT EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("companies_company"."id"))
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("companies_company"."id"))
                     LIMIT 1))
         ''',
       }),
@@ -311,11 +311,11 @@
                              "companies_company"."rdv_solidarites_id",
                              EXISTS
             (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-             WHERE (U1."is_active"
-                    AND U0."is_active"
-                    AND U0."company_id" = ("companies_company"."id"))
+             FROM "companies_companymembership" "U0"
+             INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+             WHERE ("U1"."is_active"
+                    AND "U0"."is_active"
+                    AND "U0"."company_id" = ("companies_company"."id"))
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -328,18 +328,18 @@
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
+                         FROM "companies_siaeconvention" "U0"
+                         WHERE ("U0"."id" = ("companies_company"."convention_id")
+                                AND "U0"."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = ("companies_company"."id"))
+                    FROM "companies_companymembership" "U0"
+                    INNER JOIN "users_user" "U1" ON ("U0"."user_id" = "U1"."id")
+                    WHERE ("U1"."is_active"
+                           AND "U0"."is_active"
+                           AND "U0"."company_id" = ("companies_company"."id"))
                     LIMIT 1))
         ''',
       }),

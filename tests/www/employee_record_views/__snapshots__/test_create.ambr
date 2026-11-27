@@ -104,7 +104,7 @@
               </label>
               <select class="form-select" id="id_hexa_std_extension" name="hexa_std_extension">
                   <option selected="" value="">
-                      ---------
+                      - Choisir une option -
                   </option>
                   <option value="B">
                       Bis
@@ -126,7 +126,7 @@
               </label>
               <select class="form-select" id="id_hexa_lane_type" name="hexa_lane_type" required="">
                   <option value="">
-                      ---------
+                      - Choisir une option -
                   </option>
                   <option value="AER">
                       Aérodrome

@@ -110,14 +110,12 @@
 # name: TestCompanyAdmin.test_display_for_new_company[approvals list]
   '''
   <div class="form-row field-approvals_list">
-      <div>
-          <div class="flex-container">
-              <label>
-                  Liste des PASS IAE pour cette entreprise :
-              </label>
-              <div class="readonly">
-                  -
-              </div>
+      <div class="flex-container">
+          <label>
+              Liste des PASS IAE pour cette entreprise :
+          </label>
+          <div class="readonly">
+              -
           </div>
       </div>
   </div>

@@ -53,7 +53,11 @@ from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.templatetags import badges, dict_filters, format_filters, job_seekers
 from itou.utils.templatetags.datetime_filters import duration, naturaldate
-from itou.utils.tokens import CompanySignupTokenGenerator
+from itou.utils.tokens import (
+    CompanySignupTokenGenerator,
+    admin_request_token_generator,
+    prolongation_derogation_token_generator,
+)
 from itou.utils.urls import (
     get_absolute_url,
     get_external_link_markup,
@@ -1019,6 +1023,33 @@ class TestUtilsUrls:
 )
 def test_get_url_param_value(url, expected_value):
     assert get_url_param_value(url, "channel") == expected_value
+
+
+# FIXME: Remove in 3 months (mars 2027)
+class TestTokenGeneratorAlgorithmBackwardCompatibility:
+    def test_company_signup_token_generator(self):
+        company = CompanyFactory()
+        p0 = CompanySignupTokenGenerator()
+        tk1 = p0._make_token_with_timestamp(p0._num_seconds(p0._now()), algorithm="sha1", company=company)
+        assert p0.check_token(tk1, company=company) is True
+
+    def test_admin_request_token_generator(self):
+        company = CompanyFactory()
+        user = ProfessionalFactory()
+        CompanyMembershipFactory(company=company, user=user)
+        p0 = admin_request_token_generator
+        tk1 = p0._make_token_with_timestamp(p0._num_seconds(p0._now()), algorithm="sha1", company=company, user=user)
+        assert p0.check_token(tk1, company=company, user=user) is True
+
+    def test_prolongation_derogation_token_generator(self):
+        self.job_application = JobApplicationFactory(sent_by_prescriber_alone=True, with_approval=True)
+        company = self.job_application.to_company
+        approval = self.job_application.approval
+        p0 = prolongation_derogation_token_generator
+        tk1 = p0._make_token_with_timestamp(
+            p0._num_seconds(p0._now()), algorithm="sha1", approval=approval, company=company
+        )
+        assert p0.check_token(tk1, approval=approval, company=company) is True
 
 
 class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):

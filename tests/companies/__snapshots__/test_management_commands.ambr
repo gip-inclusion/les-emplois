@@ -56,17 +56,17 @@
                  "companies_jobdescription"."creation_source",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "companies_company" V0
-             WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (V0."kind" IN (%s, %s)
-                         OR (V0."is_searchable"
-                             AND V0."kind" = %s)
-                         OR V0."source" = %s
+             FROM "companies_company" "V0"
+             WHERE ("V0"."id" = ("companies_jobdescription"."company_id")
+                    AND ("V0"."kind" IN (%s, %s)
+                         OR ("V0"."is_searchable"
+                             AND "V0"."kind" = %s)
+                         OR "V0"."source" = %s
                          OR EXISTS
                            (SELECT %s AS "a"
-                            FROM "companies_siaeconvention" U0
-                            WHERE (U0."id" = (V0."convention_id")
-                                   AND U0."is_active")
+                            FROM "companies_siaeconvention" "U0"
+                            WHERE ("U0"."id" = ("V0"."convention_id")
+                                   AND "U0"."is_active")
                             LIMIT 1)))
              LIMIT 1) AS "is_siae_active",
                  "jobs_appellation"."updated_at",
@@ -131,17 +131,17 @@
                  AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE ("V0"."id" = ("companies_jobdescription"."company_id")
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
                  AND "companies_jobdescription"."source_kind" IS NULL
@@ -228,13 +228,13 @@
           UPDATE "companies_jobdescription"
           SET "is_active" = %s
           WHERE "companies_jobdescription"."id" IN
-              (SELECT U0."id"
-               FROM "companies_jobdescription" U0
-               INNER JOIN "companies_company" U1 ON (U0."company_id" = U1."id")
-               WHERE (NOT (U1."kind" IN (%s,
-                                         %s))
-                      AND U0."id" IN (%s,
-                                      %s)))
+              (SELECT "U0"."id"
+               FROM "companies_jobdescription" "U0"
+               INNER JOIN "companies_company" "U1" ON ("U0"."company_id" = "U1"."id")
+               WHERE (NOT ("U1"."kind" IN (%s,
+                                           %s))
+                      AND "U0"."id" IN (%s,
+                                        %s)))
         ''',
       }),
       dict({
@@ -477,17 +477,17 @@
                  AND "companies_jobdescription"."is_active"
                  AND EXISTS
                    (SELECT %s AS "a"
-                    FROM "companies_company" V0
-                    WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (V0."kind" IN (%s, %s)
-                                OR (V0."is_searchable"
-                                    AND V0."kind" = %s)
-                                OR V0."source" = %s
+                    FROM "companies_company" "V0"
+                    WHERE ("V0"."id" = ("companies_jobdescription"."company_id")
+                           AND ("V0"."kind" IN (%s, %s)
+                                OR ("V0"."is_searchable"
+                                    AND "V0"."kind" = %s)
+                                OR "V0"."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
-                                   FROM "companies_siaeconvention" U0
-                                   WHERE (U0."id" = (V0."convention_id")
-                                          AND U0."is_active")
+                                   FROM "companies_siaeconvention" "U0"
+                                   WHERE ("U0"."id" = ("V0"."convention_id")
+                                          AND "U0"."is_active")
                                    LIMIT 1)))
                     LIMIT 1)
                  AND "companies_jobdescription"."source_kind" IS NULL
@@ -540,7 +540,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -588,7 +588,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -777,7 +777,7 @@
         ]),
         'sql': '''
           UPDATE "companies_company"
-          SET "spontaneous_applications_open_since" = NULL
+          SET "spontaneous_applications_open_since" = %s
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND NOT ("companies_company"."kind" IN (%s,
                                                          %s))
@@ -1071,7 +1071,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),
@@ -1119,7 +1119,7 @@
         ]),
         'sql': '''
           UPDATE "emails_email"
-          SET "esp_response" = NULL
+          SET "esp_response" = %s
           WHERE "emails_email"."id" = %s
         ''',
       }),

@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
+from django.contrib.admin.options import ActionLocation
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
@@ -100,12 +101,10 @@ class ItouTabularInline(TabularInline):
             else:
                 select_related_fields.add(field.name)
 
-        return (
-            super()
-            .get_queryset(request)
-            .select_related(*select_related_fields)
-            .prefetch_related(*prefetch_related_fields)
-        )
+        queryset = super().get_queryset(request)
+        if select_related_fields:
+            queryset = queryset.select_related(*select_related_fields)
+        return queryset.prefetch_related(*prefetch_related_fields)
 
 
 class ItouStackedInline(StackedInline, ItouTabularInline):
@@ -122,6 +121,7 @@ class InconsistencyCheckMixin:
                 inconsistencies.setdefault(item, []).append(title)
         return inconsistencies
 
+    @admin.action(description="Vérifier la cohérence des objets")
     def check_inconsistencies(self, request, queryset, message_when_no_inconsistency=True):
         inconsistencies = self.compute_inconsistencies(queryset)
         if inconsistencies:
@@ -149,14 +149,11 @@ class InconsistencyCheckMixin:
         elif message_when_no_inconsistency:
             self.message_user(request, "Aucune incohérence trouvée")
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if self.INCONSISTENCY_CHECKS:
-            actions["check_inconsistencies"] = (
-                InconsistencyCheckMixin.check_inconsistencies,
-                "check_inconsistencies",
-                "Vérifier la cohérence des objets",
-            )
+    def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
+        actions = super().get_actions(request, action_location=action_location)
+        # @admin.action limits the action to the change list by default: get_action() returns None elsewhere
+        if self.INCONSISTENCY_CHECKS and (action := self.get_action("check_inconsistencies", action_location)):
+            actions[action.name] = action
         return actions
 
     def save_model(self, request, obj, form, change):
@@ -224,12 +221,10 @@ class ItouModelMixin:
 
         prefetch_related_fields -= self.get_object_ignored_prefetch_related_fields
         select_related_fields |= self.get_object_extra_select_related_fields
-        return (
-            self.get_queryset(request)
-            .select_related(*select_related_fields)
-            .prefetch_related(*prefetch_related_fields)
-            .defer(None)  # Clear possible deferred fields
-        )
+        queryset = self.get_queryset(request)
+        if select_related_fields:
+            queryset = queryset.select_related(*select_related_fields)
+        return queryset.prefetch_related(*prefetch_related_fields).defer(None)  # Clear possible deferred fields
 
     def get_object(self, request, object_id, from_field=None):
         """Return the object matching the given id, with all relations eagerly loaded.
@@ -427,6 +422,11 @@ class EfficientDateHierarchyQuerySetMixin:
             periods.append(start)
             start += step
 
+        if len(periods) == 1:
+            # Both bounds are in it, so it is not empty
+            # (and order_by() fails on the union() of a single sliced queryset)
+            return periods
+
         existence_checks = [
             self.filter(**{f"{field_name}__gte": period, f"{field_name}__lt": period + step})
             .order_by()
@@ -434,7 +434,9 @@ class EfficientDateHierarchyQuerySetMixin:
             .values_list("period_index", flat=True)[:1]
             for index, period in enumerate(periods)
         ]
-        non_empty_indexes = set(existence_checks[0].union(*existence_checks[1:], all=True))
+        # Drop the model's default ordering with order_by()
+        # (Django sets it to combined querysets while its columns aren't selected)
+        non_empty_indexes = set(existence_checks[0].union(*existence_checks[1:], all=True).order_by())
         periods = [period for index, period in enumerate(periods) if index in non_empty_indexes]
         return periods[::-1] if order == "DESC" else periods
 

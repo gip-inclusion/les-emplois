@@ -981,7 +981,7 @@
         ]),
         'sql': '''
           UPDATE "users_user"
-          SET "upcoming_deletion_notified_at" = NULL
+          SET "upcoming_deletion_notified_at" = %s
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."last_login" >= ("users_user"."upcoming_deletion_notified_at")
                  AND "users_user"."upcoming_deletion_notified_at" IS NOT NULL)
@@ -1099,10 +1099,10 @@
                  "users_user"."allow_next_sso_sub_update",
                  EXISTS
             (SELECT %s AS "a"
-             FROM "prescribers_prescribermembership" U0
-             INNER JOIN "prescribers_prescriberorganization" U1 ON (U0."organization_id" = U1."id")
-             WHERE (U1."authorization_status" = %s
-                    AND U0."user_id" = ("users_user"."id"))
+             FROM "prescribers_prescribermembership" "U0"
+             INNER JOIN "prescribers_prescriberorganization" "U1" ON ("U0"."organization_id" = "U1"."id")
+             WHERE ("U1"."authorization_status" = %s
+                    AND "U0"."user_id" = ("users_user"."id"))
              LIMIT 1) AS "has_membership_in_authorized_organization"
           FROM "users_user"
           WHERE ("users_user"."id" IN (%s,
@@ -1116,233 +1116,233 @@
                                        %s)
                  AND NOT ((EXISTS
                              (SELECT %s AS "a"
-                              FROM "audit_trail_audittrail" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "audit_trail_audittrail" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_company" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "companies_company" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_companymembership" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "companies_companymembership" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_siaeconvention" U0
-                              WHERE U0."reactivated_by_id" = ("users_user"."id")
+                              FROM "companies_siaeconvention" "U0"
+                              WHERE "U0"."reactivated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_contract" U0
-                              WHERE U0."job_seeker_id" = ("users_user"."id")
+                              FROM "companies_contract" "U0"
+                              WHERE "U0"."job_seeker_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_prosupportreport" U0
-                              WHERE U0."author_id" = ("users_user"."id")
+                              FROM "companies_prosupportreport" "U0"
+                              WHERE "U0"."author_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "companies_prosupportreport" U0
-                              WHERE U0."notified_prescriber_id" = ("users_user"."id")
+                              FROM "companies_prosupportreport" "U0"
+                              WHERE "U0"."notified_prescriber_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "users_user" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "users_user" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "users_nirmodificationrequest" U0
-                              WHERE U0."requested_by_id" = ("users_user"."id")
+                              FROM "users_nirmodificationrequest" "U0"
+                              WHERE "U0"."requested_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "users_jobseekerassignment" U0
-                              WHERE U0."professional_id" = ("users_user"."id")
+                              FROM "users_jobseekerassignment" "U0"
+                              WHERE "U0"."professional_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "prescribers_prescriberorganization" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "prescribers_prescriberorganization" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "prescribers_prescriberorganization" U0
-                              WHERE U0."authorization_updated_by_id" = ("users_user"."id")
+                              FROM "prescribers_prescriberorganization" "U0"
+                              WHERE "U0"."authorization_updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "prescribers_prescribermembership" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "prescribers_prescribermembership" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "institutions_institutionmembership" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "institutions_institutionmembership" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."job_seeker_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."job_seeker_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."sender_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."sender_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."archived_by_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."archived_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."approval_manually_delivered_by_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."approval_manually_delivered_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."approval_manually_refused_by_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."approval_manually_refused_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplication" U0
-                              WHERE U0."transferred_by_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplication" "U0"
+                              WHERE "U0"."transferred_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplicationtransitionlog" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplicationtransitionlog" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "job_applications_jobapplicationcomment" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "job_applications_jobapplicationcomment" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_approval" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "approvals_approval" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_approval" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "approvals_approval" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_suspension" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "approvals_suspension" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_suspension" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "approvals_suspension" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongationrequest" U0
-                              WHERE U0."declared_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongationrequest" "U0"
+                              WHERE "U0"."declared_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongationrequest" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongationrequest" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongationrequest" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongationrequest" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongationrequest" U0
-                              WHERE U0."assigned_to_id" = ("users_user"."id")
+                              FROM "approvals_prolongationrequest" "U0"
+                              WHERE "U0"."assigned_to_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongationrequest" U0
-                              WHERE U0."processed_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongationrequest" "U0"
+                              WHERE "U0"."processed_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongation" U0
-                              WHERE U0."declared_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongation" "U0"
+                              WHERE "U0"."declared_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongation" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongation" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongation" U0
-                              WHERE U0."updated_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongation" "U0"
+                              WHERE "U0"."updated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "approvals_prolongation" U0
-                              WHERE U0."validated_by_id" = ("users_user"."id")
+                              FROM "approvals_prolongation" "U0"
+                              WHERE "U0"."validated_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "eligibility_geiqeligibilitydiagnosis" U0
-                              WHERE U0."author_id" = ("users_user"."id")
+                              FROM "eligibility_geiqeligibilitydiagnosis" "U0"
+                              WHERE "U0"."author_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "eligibility_eligibilitydiagnosis" U0
-                              WHERE U0."author_id" = ("users_user"."id")
+                              FROM "eligibility_eligibilitydiagnosis" "U0"
+                              WHERE "U0"."author_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "otp_resetrequesttransitionlog" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "otp_resetrequesttransitionlog" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "employee_record_employeerecordtransitionlog" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "employee_record_employeerecordtransitionlog" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "geiq_assessments_assessment" U0
-                              WHERE U0."created_by_id" = ("users_user"."id")
+                              FROM "geiq_assessments_assessment" "U0"
+                              WHERE "U0"."created_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "geiq_assessments_assessment" U0
-                              WHERE U0."submitted_by_id" = ("users_user"."id")
+                              FROM "geiq_assessments_assessment" "U0"
+                              WHERE "U0"."submitted_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "geiq_assessments_assessment" U0
-                              WHERE U0."reviewed_by_id" = ("users_user"."id")
+                              FROM "geiq_assessments_assessment" "U0"
+                              WHERE "U0"."reviewed_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "geiq_assessments_assessment" U0
-                              WHERE U0."final_reviewed_by_id" = ("users_user"."id")
+                              FROM "geiq_assessments_assessment" "U0"
+                              WHERE "U0"."final_reviewed_by_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "geiq_assessments_assessmenttransitionlog" U0
-                              WHERE U0."user_id" = ("users_user"."id")
+                              FROM "geiq_assessments_assessmenttransitionlog" "U0"
+                              WHERE "U0"."user_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "insertion_orientation" U0
-                              WHERE U0."beneficiary_id" = ("users_user"."id")
+                              FROM "insertion_orientation" "U0"
+                              WHERE "U0"."beneficiary_id" = ("users_user"."id")
                               LIMIT 1)
                            OR EXISTS
                              (SELECT %s AS "a"
-                              FROM "insertion_orientation" U0
-                              WHERE U0."sender_id" = ("users_user"."id")
+                              FROM "insertion_orientation" "U0"
+                              WHERE "U0"."sender_id" = ("users_user"."id")
                               LIMIT 1))))
           ORDER BY RANDOM() ASC
         ''',
@@ -3717,7 +3717,7 @@
         ]),
         'sql': '''
           UPDATE "audit_trail_audittrail"
-          SET "user_id" = NULL
+          SET "user_id" = %s
           WHERE "audit_trail_audittrail"."user_id" IN (%s,
                                                        %s,
                                                        %s,
@@ -3741,7 +3741,7 @@
         ]),
         'sql': '''
           UPDATE "companies_contract"
-          SET "job_seeker_id" = NULL
+          SET "job_seeker_id" = %s
           WHERE "companies_contract"."job_seeker_id" IN (%s,
                                                          %s,
                                                          %s,
@@ -3765,7 +3765,7 @@
         ]),
         'sql': '''
           UPDATE "companies_prosupportreport"
-          SET "notified_prescriber_id" = NULL
+          SET "notified_prescriber_id" = %s
           WHERE "companies_prosupportreport"."notified_prescriber_id" IN (%s,
                                                                           %s,
                                                                           %s,
