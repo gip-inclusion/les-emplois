@@ -22,6 +22,7 @@ from itou.otp.emails import notify_backup_code_has_been_used, notify_mfa_reset_r
 from itou.otp.models import ItouStaticDevice, ItouTOTPDevice, ResetRequest
 from itou.otp.signals import user_logged_in_with_2fa
 from itou.otp.utils import (
+    JUST_ENROLLED_DEVICE_NAME_SESSION_KEY,
     create_otp_backup_code,
     get_user_devices,
     user_can_enroll_otp_device,
@@ -263,6 +264,8 @@ def enrollment_step_3_and_4_confirm_device(
                 # User added their _only_ device (required to use the
                 # application), they want to use the app.
                 post_save_url = reverse("dashboard:index")
+                # Suggest them to log out and in again to try the 2FA login flow.
+                request.session[JUST_ENROLLED_DEVICE_NAME_SESSION_KEY] = device.name
 
     context = {
         "previous_step_url": previous_step_url,

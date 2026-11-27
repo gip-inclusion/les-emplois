@@ -21,7 +21,12 @@ from pytest_django.asserts import (
 
 from itou.otp.enums import ResetRequestState
 from itou.otp.models import ItouStaticDevice, ItouStaticToken, ItouTOTPDevice, ResetRequest
-from itou.otp.utils import create_otp_backup_code, create_placeholder_for_external_totp_device, get_user_devices
+from itou.otp.utils import (
+    JUST_ENROLLED_DEVICE_NAME_SESSION_KEY,
+    create_otp_backup_code,
+    create_placeholder_for_external_totp_device,
+    get_user_devices,
+)
 from itou.www.otp_views.enums import DeviceType
 from itou.www.otp_views.forms import ConfirmTOTPDeviceForm
 from tests.otp.factories import ItouTOTPDeviceFactory, ResetRequestFactory
@@ -296,6 +301,8 @@ def test_enrollment_step_1_choose_device_type(client):
 
 @pytest.mark.usefixtures("require_mfa_for_pros")
 class TestEnrollmentSteps3And4ConfirmDevice:
+    ALERT_TITLE = "La double authentification est activée"
+
     @pytest.mark.parametrize(
         "device_type,should_show_qr_code",
         (
@@ -344,6 +351,64 @@ class TestEnrollmentSteps3And4ConfirmDevice:
         assert client.session[DEVICE_ID_SESSION_KEY] == device.persistent_id
         backup_token = ItouStaticToken.objects.get()
         assert backup_token.check_token("secret-backup-code")
+        assert client.session[JUST_ENROLLED_DEVICE_NAME_SESSION_KEY] == "My Apploogle IPixel 34"
+
+        # Until dismissed, the dashboard alert suggests to log out to try the 2FA login flow.
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, self.ALERT_TITLE)
+        assertContains(response, "«&nbsp;My Apploogle IPixel 34&nbsp;»", html=False)
+        assertContains(response, f'<form method="post" action="{reverse("account_logout")}">', html=False)
+        # Dismissal is stored in the browser's localStorage, keyed by the device.
+        assertContains(response, f'id="otp-enrollment-alert-{device.pk}"', html=False)
+        assertContains(response, "alert-dismissible-once")
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, self.ALERT_TITLE)
+
+    def _enroll_first_device(self, client):
+        user = random_pro_user_factory()
+        client.force_login(user)
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+        client.post(
+            reverse("otp_views:enrollment_step_3_and_4_confirm_device"),
+            {
+                "name": "My device",
+                "device_type": "smartphone",
+                "key": "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR",
+                "otp_token": TOTP(fake_device.bin_key).token(),
+            },
+        )
+        assert client.session[JUST_ENROLLED_DEVICE_NAME_SESSION_KEY] == "My device"
+        return user
+
+    def test_enrollment_alert_hidden_after_logout(self, client):
+        user = self._enroll_first_device(client)
+
+        client.post(reverse("account_logout"))
+        client.force_login(user)
+        attach_device_to_user_session(client, user.itou_totp_devices.get())
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, self.ALERT_TITLE)
+
+    def test_post_valid_totp_for_another_device(self, client):
+        user = random_pro_user_factory()
+        existing_device = ItouTOTPDeviceFactory(user=user)
+        client.force_login(user)
+        attach_device_to_user_session(client, existing_device)
+        url = reverse("otp_views:enrollment_step_3_and_4_confirm_device")
+        fake_device = ItouTOTPDevice(key="8fe0a9983c7dddb4acb0146c5507553371e9f211")
+
+        data = {
+            "name": "My second device",
+            "device_type": "smartphone",
+            "key": "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR",
+            "otp_token": TOTP(fake_device.bin_key).token(),
+        }
+        client.post(url, data)
+
+        assert user.itou_totp_devices.count() == 2
+        assert JUST_ENROLLED_DEVICE_NAME_SESSION_KEY not in client.session
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, self.ALERT_TITLE)
 
     def test_unverified_user_with_device_cannot_enroll_another(self, client):
         # Security regression (2FA bypass): a user who knows the password (first factor) but has

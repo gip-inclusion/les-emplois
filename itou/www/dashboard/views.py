@@ -32,6 +32,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.otp.utils import JUST_ENROLLED_DEVICE_NAME_SESSION_KEY
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -179,7 +180,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "siae_suspension_text_with_dates": None,
         "company_search_form": CompanySearchForm(),
         "stalled_job_seekers_count": None,
+        "just_enrolled_otp_device_name": None,
+        "just_enrolled_otp_alert_id": None,
     }
+    # Displayed until the user logs out (the session is flushed) or dismisses it (a variable stored in the browser).
+    if just_enrolled_otp_device_name := request.session.get(JUST_ENROLLED_DEVICE_NAME_SESSION_KEY):
+        context["just_enrolled_otp_device_name"] = just_enrolled_otp_device_name
+        context["just_enrolled_otp_alert_id"] = f"otp-enrollment-alert-{request.user.otp_device.pk}"
 
     if request.from_employer:
         context.update(_employer_dashboard_context(request))
