@@ -101,12 +101,10 @@ class ItouTabularInline(TabularInline):
             else:
                 select_related_fields.add(field.name)
 
-        return (
-            super()
-            .get_queryset(request)
-            .select_related(*select_related_fields)
-            .prefetch_related(*prefetch_related_fields)
-        )
+        queryset = super().get_queryset(request)
+        if select_related_fields:
+            queryset = queryset.select_related(*select_related_fields)
+        return queryset.prefetch_related(*prefetch_related_fields)
 
 
 class ItouStackedInline(StackedInline, ItouTabularInline):
@@ -223,12 +221,10 @@ class ItouModelMixin:
 
         prefetch_related_fields -= self.get_object_ignored_prefetch_related_fields
         select_related_fields |= self.get_object_extra_select_related_fields
-        return (
-            self.get_queryset(request)
-            .select_related(*select_related_fields)
-            .prefetch_related(*prefetch_related_fields)
-            .defer(None)  # Clear possible deferred fields
-        )
+        queryset = self.get_queryset(request)
+        if select_related_fields:
+            queryset = queryset.select_related(*select_related_fields)
+        return queryset.prefetch_related(*prefetch_related_fields).defer(None)  # Clear possible deferred fields
 
     def get_object(self, request, object_id, from_field=None):
         """Return the object matching the given id, with all relations eagerly loaded.

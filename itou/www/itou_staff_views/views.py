@@ -347,10 +347,10 @@ def merge_users_confirm(
 
         for model, field_name in merge_utils.get_users_relations():
             repr_func, related = merge_utils.MODEL_REPR_MAPPING.get(model, (repr, []))
-            data = [
-                (repr_func(obj), merge_utils.admin_url(obj))
-                for obj in model.objects.filter(**{field_name: from_user}).select_related(*related).iterator()
-            ]
+            queryset = model.objects.filter(**{field_name: from_user})
+            if related:
+                queryset = queryset.select_related(*related)
+            data = [(repr_func(obj), merge_utils.admin_url(obj)) for obj in queryset.iterator()]
             if data:
                 transfer_data.append((f"{model.__name__}.{field_name}", f"{model.__module__}.{model.__name__}", data))
 

@@ -52,7 +52,6 @@ filterwarnings = [
     "error",
     "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
     "ignore:The default argument for algorithm in salted_hmac:django.utils.deprecation.RemovedInDjango2028Warning",
-    "ignore:Calling select_related\\(\\) with no arguments is deprecated.:django.utils.deprecation.RemovedInDjango2028Warning",
 ]
 addopts = [
     "--reuse-db",
