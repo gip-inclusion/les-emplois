@@ -21,8 +21,8 @@
 ASP_COMMUNES_AS_COUNTRIES = {
     "ALO": "611",
     "ANAA": "711",
-    "ARCHIPEL DES CROZET": "413",
-    "ARCHIPEL DES KERGUELEN": "412",
+    "ARCHIPEL-DES-CROZET": "413",  # [1]
+    "ARCHIPEL-DES-KERGUELEN": "412",  # [1]
     "ARUE": "712",
     "ARUTUA": "713",
     "BELEP": "801",
@@ -44,16 +44,17 @@ ASP_COMMUNES_AS_COUNTRIES = {
     "HIVA OA": "723",  # [1]
     "HOUAILOU": "808",
     "HUAHINE": "724",
-    "ILE DE CLIPPERTON": "901",
-    "ILE-DES-PINS (L')": "809",
-    "ILES EPARSES DE L'OCEAN INDIEN": "415",
-    "ILES SAINT-PAUL ET NOUVELLE-AMSTERDAM": "411",
+    "ILE DE CLIPERTON": "901",  # Country is spelled ILE DE CLIPPERTON
+    "ILE DES PINS": "809",  # Country is spelled ILE-DES-PINS (L')
+    "ILES EPARSES": "415",  # Country is spelled ILES EPARSES DE L'OCEAN INDIEN
+    "ILES-EPARSES-DE-L'OCEAN-IN": "415",  # Country is spelled ILES EPARSES DE L'OCEAN INDIEN
+    "ILES-SAINT-PAUL-ET-NOUVELL": "411",  # Country is spelled ILES SAINT-PAUL ET NOUVELLE-AMSTERDAM
     "KAALA GOMEN": "810",  # [1]
     "KONE": "811",
     "KOUAOUA": "833",
     "KOUMAC": "812",
     "LA FOA": "813",
-    "LA TERRE-ADELIE": "414",
+    "LA-TERRE-ADELIE": "414",  # Country is spelled LA TERRE-ADELIE
     "LIFOU": "814",
     "MAHINA": "725",
     "MAKEMO": "726",

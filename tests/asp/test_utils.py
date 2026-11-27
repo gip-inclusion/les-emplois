@@ -50,11 +50,9 @@ class TestAspCommunesAsCountries(TestCase):
         # have a corresponding commune. Hopefully, nobody was born
         # there.
         assert diff == {
-            "ARCHIPEL DES CROZET",
-            "ARCHIPEL DES KERGUELEN",
-            "ILE DE CLIPPERTON",
-            "ILE-DES-PINS (L')",
-            "ILES EPARSES DE L'OCEAN INDIEN",
-            "ILES SAINT-PAUL ET NOUVELLE-AMSTERDAM",
-            "LA TERRE-ADELIE",
+            "ARCHIPEL-DES-CROZET",
+            "ARCHIPEL-DES-KERGUELEN",
+            "ILES-EPARSES-DE-L'OCEAN-IN",
+            "ILES-SAINT-PAUL-ET-NOUVELL",
+            "LA-TERRE-ADELIE",
         }
