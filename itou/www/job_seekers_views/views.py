@@ -578,19 +578,44 @@ def create_or_edit_assignment(
 
 
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
-@check_request(can_fill_pro_support_report)
+@check_request(lambda request: request.from_employer)
 def create_pro_support_report(request, public_id, template_name="job_seekers_views/pro_support_report_create.html"):
-    job_seeker = get_object_or_404(
-        User.objects.at_end_of_journey(siae=request.current_organization),
-        public_id=public_id,
-        kind=UserKind.JOB_SEEKER,
+    job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    # Members of several companies may follow a link about another one of them, from an email or a coworker.
+    company = next(
+        (
+            org
+            for org in sorted(request.organizations, key=lambda org: org != request.current_organization)
+            if isinstance(org, Company) and User.objects.filter(pk=job_seeker.pk).at_end_of_journey(siae=org).exists()
+        ),
+        None,
     )
-    last_contract = (
-        job_seeker.contracts.filter(company=request.current_organization).order_by("-start_date", "-pk").first()
-    )
-    if last_contract.pro_support_reports.covering_contract_end_date().exists():
+    if company is None:
         raise Http404
+    other_company = company if company != request.current_organization else None
+    last_contract = job_seeker.contracts.filter(company=company).order_by("-start_date", "-pk").first()
+    pro_support_report = None
+    if other_company is None:
+        # Several reports cover a contract whose renewal was cancelled: the latest one is shown.
+        pro_support_report = (
+            last_contract.pro_support_reports.covering_contract_end_date()
+            .select_related("author")
+            .order_by("-contract_end_date")
+            .first()
+        )
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:details", args=(public_id,)))
+    context = {
+        "other_company": other_company,
+        "pro_support_report": pro_support_report,
+        "job_seeker": job_seeker,
+        "last_contract": last_contract,
+        "back_url": back_url,
+        "can_view_personal_information": can_view_personal_information(request, job_seeker),
+        "services_search_url": build_services_search_url(request, job_seeker),
+        "matomo_custom_title": "Bilan d’accompagnement",
+    }
+    if other_company or pro_support_report:
+        return render(request, template_name, context)
 
     form = ProSupportReportForm(
         request.path,
@@ -631,17 +656,7 @@ def create_pro_support_report(request, public_id, template_name="job_seekers_vie
             )
         return HttpResponseRedirect(back_url)
 
-    context = {
-        "form": form,
-        "job_seeker": job_seeker,
-        "last_contract": last_contract,
-        "recipient": recipient,
-        "back_url": back_url,
-        "can_view_personal_information": can_view_personal_information(request, job_seeker),
-        "services_search_url": build_services_search_url(request, job_seeker),
-        "matomo_custom_title": "Bilan d’accompagnement",
-    }
-    return render(request, template_name, context)
+    return render(request, template_name, context | {"form": form, "recipient": recipient})
 
 
 @readonly_view
