@@ -15,13 +15,13 @@ function noJobSeekerResults() {
   );
 }
 
-function customizeJobSeekerSelect2() {
-  const jobSeekerSelect = $("#id_job_seeker");
-  const select2 = jobSeekerSelect.data("select2");
-  if (!select2) {
-    return;
+// Patched when the dropdown opens, not on page load: the select2 instance may not exist yet
+// by the time this script runs, and `window.load` waits for every subresource (Matomo included).
+// select2 relays its events on the original <select> with a bubbling jQuery event, so a delegated
+// handler catches them whatever initializes the widget, and after an htmx swap.
+$(document).on("select2:opening", "#id_job_seeker", function() {
+  const select2 = $(this).data("select2");
+  if (select2) {
+    select2.options.get("translations").dict.noResults = noJobSeekerResults;
   }
-  select2.options.get("translations").dict.noResults = noJobSeekerResults;
-}
-
-window.addEventListener("load", customizeJobSeekerSelect2, { once: true });
+});
