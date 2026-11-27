@@ -39,21 +39,15 @@ def sentry_user_id(get_response):
             request = weak_request()
             if request is None:
                 return event
-            user = getattr(request, "user", None)
-            if user is None or not user.is_authenticated:
-                user_id = ANONYMOUS_USER_ID
-            elif user.pk is None:
-                # itou.api.auth.ServiceAccount is authenticated by token, without a database row
-                user_id = "api_service_account"
-            else:
-                user_id = str(user.pk)
+            try:
+                user_id, tags = _sentry_user_id_and_tags(request)
+            except Exception:
+                # An event processor that raises drops the event, since sentry-sdk 3.0. Reading the
+                # user can raise (the DB being down, for instance), and the event is better sent
+                # without the user, as sentry-sdk 2.x did, than lost
+                return event
             event["user"] = {"id": user_id}
-            # The facts `ItouDataDogJSONFormatter` already records as `usr.kind` and
-            # `usr.organization_id`: they say who ran into the error without naming anyone
-            tags = event.setdefault("tags", {})
-            if kind := getattr(user, "kind", None):
-                tags["user_kind"] = kind
-            tags.update({key: str(value) for key, value in current_organization_info(request).items()})
+            event.setdefault("tags", {}).update(tags)
             return event
 
         # The isolation scope is forked for each request by the SDK's WSGI middleware,
@@ -63,6 +57,24 @@ def sentry_user_id(get_response):
         return get_response(request)
 
     return middleware
+
+
+def _sentry_user_id_and_tags(request):
+    """Describe the user of `request` by an ID and tags that name no one."""
+    user = getattr(request, "user", None)
+    if user is None or not user.is_authenticated:
+        user_id = ANONYMOUS_USER_ID
+    elif user.pk is None:
+        # itou.api.auth.ServiceAccount is authenticated by token, without a database row
+        user_id = "api_service_account"
+    else:
+        user_id = str(user.pk)
+    # The facts `ItouDataDogJSONFormatter` already records as `usr.kind` and
+    # `usr.organization_id`: they say who ran into the error without naming anyone
+    tags = {key: str(value) for key, value in current_organization_info(request).items()}
+    if kind := getattr(user, "kind", None):
+        tags["user_kind"] = kind
+    return user_id, tags
 
 
 def never_cache(get_response):

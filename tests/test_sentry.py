@@ -11,12 +11,15 @@ import sentry_sdk
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
+from django.db import DatabaseError
 from django.http import HttpResponseServerError
 from django.urls import include, path
+from django.utils.functional import SimpleLazyObject
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient
 from rest_framework.views import APIView
-from sentry_sdk.utils import AnnotatedValue, iter_event_frames
+from sentry_sdk._types import SENSITIVE_DATA_SUBSTITUTE, AnnotatedValue
+from sentry_sdk.utils import iter_event_stacktraces
 
 from config.sentry import (
     PII_SCRUBBING_FAILED,
@@ -25,8 +28,9 @@ from config.sentry import (
     _is_sensitive_key,
     scrub_sensitive_data,
     scrubbed_repr,
+    sentry_init,
     strip_sentry_sensitive_data,
-    strip_sentry_sensitive_data_from_transaction,
+    strip_sentry_sensitive_data_from_span,
 )
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.models import ServiceToken
@@ -41,6 +45,7 @@ from itou.utils.apis.geocoding import call_ban_geocoding_api
 from itou.utils.apis.pole_emploi import Endpoints, PoleEmploiAPIException, PoleEmploiRoyaumePartenaireApiClient
 from itou.utils.mocks.pole_emploi import RESPONSES, ResponseKind
 from itou.utils.redaction import ANONYMOUS_USER_ID, REDACTED
+from itou.www.middleware import sentry_user_id
 from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
@@ -48,10 +53,8 @@ from tests.users.factories import JobSeekerFactory
 
 pytestmark = pytest.mark.usefixtures("sentry", "clean_sentry_scope")
 
-SDK_FILTERED = AnnotatedValue.substituted_because_contains_sensitive_data().value
-
-# The SDK's EventScrubber substitutes its own placeholder, before_send substitutes ours.
-REDACTION_MARKERS = (REDACTED, SDK_FILTERED)
+# What `data_collection` makes the SDK substitute, before_send substitutes ours
+REDACTION_MARKERS = (REDACTED, SENSITIVE_DATA_SUBSTITUTE)
 
 # An API parameter reaches the event raw, in a request kwarg or an exception message (`prenoms[]`),
 # or percent-encoded, in the query string of a URL (`prenoms%5B%5D`)
@@ -107,9 +110,10 @@ def event_payload(event):
     assertion below could tell from a leak.
     """
     event = copy.deepcopy(event)
-    for frame in iter_event_frames(event):
-        for source_key in ["pre_context", "context_line", "post_context"]:
-            frame.pop(source_key, None)
+    for stacktrace in iter_event_stacktraces(event):
+        for frame in stacktrace.get("frames", []):
+            for source_key in ["pre_context", "context_line", "post_context"]:
+                frame.pop(source_key, None)
     # `ensure_ascii` would escape the accents of a French name, hiding it from the scans below.
     return json.dumps(
         event,
@@ -486,10 +490,9 @@ def test_last_resort_event_when_the_degraded_event_fails_too(mocker, captured_ev
 def test_scrubbing_reaches_nested_frame_variables():
     """`before_send` is the only scrubbing layer, so it has to reach every depth on its own.
 
-    Setting `data_collection` disables the SDK's `EventScrubber`, which used to run first and
-    which this asserted on. Nothing else looks inside the params dict a frame holds.
+    sentry-sdk 3.0 removed the SDK's `EventScrubber`, which used to run first and which this
+    asserted on. Nothing else looks inside the params dict a frame holds.
     """
-    assert sentry_sdk.get_client().options["event_scrubber"] is None
     frame = {"vars": {"nir": "180081380021", "params": {"nomNaissance": "TARDIVEAU"}}}
 
     scrubbed = scrub_sensitive_data({"exception": {"values": [{"stacktrace": {"frames": [frame]}}]}})
@@ -529,8 +532,13 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("proxy_authorization", True),
         ("sessionid", True),
         ("x_forwarded_for", True),
+        ("x_real_ip", True),
+        ("remote_addr", True),
         ("key", True),  # the TOTP secret of the OTP views
         ("sid", True),
+        ("auth", True),
+        ("cookie", True),
+        ("private_key", True),
         # Ordinary words a fragment must not swallow, and the exceptions to it
         ("template_name", False),
         ("model_name", False),
@@ -565,7 +573,6 @@ def test_data_collection_leaves_no_category_to_its_default():
     category, from quietly turning collection back on.
     """
     assert sentry_sdk.get_client().options["data_collection"] == {
-        "provided_by_user": True,
         "user_info": False,
         "cookies": {"mode": "off"},
         "http_headers": {"request": {"mode": "denylist", "terms": ["forwarded", "-ip", "remote-", "via", "-user"]}},
@@ -573,6 +580,7 @@ def test_data_collection_leaves_no_category_to_its_default():
         "url_query_params": {"mode": "denylist", "terms": sorted(SENSITIVE_KEY_FRAGMENTS)},
         "graphql": {"document": False, "variables": False},
         "gen_ai": {"inputs": False, "outputs": False},
+        "mcp": {"inputs": False, "outputs": False},
         "database_query_data": False,
         "stack_frame_variables": True,
         "frame_context_lines": 5,
@@ -609,46 +617,168 @@ def test_failing_task_reports_its_arguments_without_the_personal_ones(
         assert email.upper() not in event_payload(event).upper()
 
 
-def test_transaction_spans_are_scrubbed():
-    """Span data carries the query string of outgoing requests, and has its own callback."""
-    transaction = {
-        "type": "transaction",
-        "user": {"email": "someone@example.com", "id": 1},
-        "spans": [
-            {
-                "op": "http.client",
-                "data": {
-                    "http.query": "nomNaissance=TARDIVEAU&prenoms%5B%5D=JEAN-MICHEL&recipient=13003013300016",
-                },
-            }
-        ],
+@pytest.fixture(name="sent_spans")
+def sent_spans_fixture(monkeypatch, mocker):
+    """Sample every span, and return the spans as the SDK queues them for sending."""
+    monkeypatch.setenv("SENTRY_TRACES_SAMPLE_RATE", "1")
+    sentry_init()
+    add = mocker.patch.object(sentry_sdk.get_client().span_batcher, "add")
+
+    def sent_spans():
+        return [call.args[0] for call in add.call_args_list]
+
+    return sent_spans
+
+
+def test_span_name_and_attributes_are_scrubbed():
+    """Spans carry the URL of outgoing requests, and the URL and the headers of our own."""
+    span = {
+        "trace_id": "4b0e4f7d9c0e4a3f8a1b2c3d4e5f6a7b",
+        "span_id": "8a1b2c3d4e5f6a7b",
+        "name": "GET https://api.brevo.com/v3/contacts/jean-michel@example.com",
+        "status": "ok",
+        "is_segment": False,
+        "start_timestamp": 1764000000.0,
+        "attributes": {
+            "sentry.op": "http.client",
+            "url.query": "nomNaissance=TARDIVEAU&q=112+rue+de+la+Croix-Nivert&page=2",
+            # The value of a header is a list since sentry-sdk 3.0
+            "http.request.header.referer": ["https://emplois.inclusion.gouv.fr/?email=jean-michel@example.com"],
+            "user.id": "42",
+            "user.email": "jean-michel@example.com",
+            "user.name": "jean-michel",
+        },
     }
 
-    scrubbed = strip_sentry_sensitive_data_from_transaction(transaction, {})
+    scrubbed = strip_sentry_sensitive_data_from_span(span, {})
 
-    assert scrubbed["spans"][0]["data"]["http.query"] == (
-        f"nomNaissance={REDACTED}&prenoms%5B%5D={REDACTED}&recipient={REDACTED}"
-    )
-    assert scrubbed["user"] == {"id": 1}
+    assert scrubbed["name"] == f"GET https://api.brevo.com/v3/contacts/{REDACTED}"
+    assert scrubbed["attributes"] == {
+        "sentry.op": "http.client",
+        # An outgoing query string is redacted whatever its parameters are, as in a breadcrumb
+        "url.query": f"nomNaissance={REDACTED}&q={REDACTED}&page=2",
+        "http.request.header.referer": [f"https://emplois.inclusion.gouv.fr/?email={REDACTED}"],
+        "user.id": "42",
+    }
 
 
-def test_transaction_is_dropped_when_scrubbing_fails(mocker, caplog):
-    """Losing a transaction loses no alert, but why it was lost must be told somewhere."""
+def test_sent_spans_are_scrubbed(respx_mock, sent_spans):
+    """The SDK only reads back the name and the attributes of what `before_send_span` returns."""
+    url = "https://api.brevo.com/v3/contacts/jean-michel@example.com"
+    params = {"q": "112 rue de la Croix-Nivert", "page": 2}
+    respx_mock.get(url, params=params).respond(200)
+
+    with sentry_sdk.start_span(name="sync"):
+        httpx.get(url, params=params)
+
+    [http_span] = [span for span in sent_spans() if span["attributes"].get("sentry.op") == "http.client"]
+    assert http_span["attributes"]["http.response.status_code"] == 200  # guard against a false negative
+    assert http_span["name"] == f"GET https://api.brevo.com/v3/contacts/{REDACTED}"
+    assert http_span["attributes"]["url.query"] == f"q={REDACTED}&page=2"
+    payload = repr([(span["name"], span["attributes"]) for span in sent_spans()])
+    for pii in ["jean-michel", "Croix"]:
+        assert pii not in payload
+
+
+def test_span_is_degraded_when_scrubbing_fails(mocker, caplog):
+    """A span can't be dropped any more, and the SDK sends it as it was if the hook raises."""
     mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom for jean-michel@example.com"))
+    span = {
+        "name": "GET https://api.brevo.com/v3/contacts/jean-michel@example.com",
+        "attributes": {
+            "sentry.op": "http.client",
+            "http.response.status_code": 404,
+            "url.full": "https://api.brevo.com/v3/contacts/jean-michel@example.com",
+        },
+    }
 
-    assert strip_sentry_sensitive_data_from_transaction({"type": "transaction", "spans": []}, {}) is None
+    degraded = strip_sentry_sensitive_data_from_span(span, {})
 
+    assert degraded["name"] == PII_SCRUBBING_FAILED
+    assert degraded["attributes"].pop("pii_scrubbing_location").startswith("sentry.py:")
+    assert degraded["attributes"] == {
+        "sentry.op": "http.client",
+        "http.response.status_code": 404,
+        "pii_scrubbing": "failed",
+        "pii_scrubbing_error": "RuntimeError",
+    }
+    # Why it failed must be told somewhere
     [record] = caplog.records
     assert record.name == "config.sentry"
-    assert record.getMessage().startswith("Dropped a transaction, scrubbing it raised RuntimeError at sentry.py:")
+    assert record.getMessage().startswith("Degraded a span, scrubbing it raised RuntimeError at sentry.py:")
     assert "jean-michel" not in caplog.text
+
+
+def test_last_resort_span_when_the_degraded_span_fails_too(mocker):
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom"))
+    mocker.patch("config.sentry.degraded_span", side_effect=RuntimeError("boom too"))
+    span = {"name": "GET https://api.brevo.com/v3/contacts/jean-michel@example.com", "attributes": {}}
+
+    assert strip_sentry_sensitive_data_from_span(span, {}) == {
+        "name": PII_SCRUBBING_FAILED,
+        "attributes": {"pii_scrubbing": "failed"},
+    }
+
+
+def test_sent_span_is_degraded_when_scrubbing_fails(mocker, respx_mock, sent_spans):
+    """What the SDK sends is what the hook returned, not the span it was given."""
+    mocker.patch("config.sentry.scrub_sensitive_data", side_effect=RuntimeError("boom"))
+    url = "https://api.brevo.com/v3/contacts/jean-michel@example.com"
+    respx_mock.get(url).respond(200)
+
+    with sentry_sdk.start_span(name="sync"):
+        httpx.get(url)
+
+    spans = [(span["name"], span["attributes"]) for span in sent_spans()]
+    assert len(spans) == 2  # guard against a false negative
+    assert {name for name, _attributes in spans} == {PII_SCRUBBING_FAILED}
+    assert "jean-michel" not in repr(spans)
+
+
+def test_logs_are_breadcrumbs_and_not_sentry_logs(mocker, captured_event):
+    """Since sentry-sdk 3.0, the `level` of `LoggingIntegration` sends the records as Sentry logs.
+
+    Those go through `before_send_log`, never through `before_send`, so nothing would scrub them.
+    """
+    capture_log = mocker.spy(sentry_sdk.client._Client, "_capture_log")
+
+    logging.getLogger("itou").warning("Sync of %s failed", "jean-michel@example.com")
+    sentry_sdk.capture_message("Test message")
+
+    assert capture_log.call_count == 0
+    breadcrumb_messages = [breadcrumb["message"] for breadcrumb in captured_event()["breadcrumbs"]["values"]]
+    assert f"Sync of {REDACTED} failed" in breadcrumb_messages
+
+
+@pytest.mark.parametrize(
+    "logger_name", ["django.security.DisallowedHost", "django_datadog_logger.middleware.request_log", "config.sentry"]
+)
+def test_ignored_loggers_send_no_event(logger_name, prepare_event_spy):
+    """sentry-sdk 3.0 renamed `ignore_logger` to `ignore_logger_for_events`, and gave its name to Sentry logs."""
+    logging.getLogger(logger_name).error("Boom")
+
+    assert prepare_event_spy.call_count == 0
+
+
+@pytest.mark.parametrize(
+    "capture",
+    [
+        pytest.param(lambda: sentry_sdk.capture_message("Boom"), id="message"),
+        pytest.param(lambda: logging.getLogger("itou").error("Boom"), id="error_log"),
+    ],
+)
+def test_events_without_an_exception_carry_no_stack(capture, captured_event):
+    """Since sentry-sdk 3.0, the SDK attaches the stack to them by default, local variables included."""
+    capture()
+
+    assert "threads" not in captured_event()
 
 
 def test_scrubbing_hooks_are_registered():
     """The tests above call the hooks directly or go through the client: this ties both together."""
     options = sentry_sdk.get_client().options
     assert options["before_send"] is strip_sentry_sensitive_data
-    assert options["before_send_transaction"] is strip_sentry_sensitive_data_from_transaction
+    assert options["before_send_span"] is strip_sentry_sensitive_data_from_span
     assert options["custom_repr"] is scrubbed_repr
 
 
@@ -750,6 +880,26 @@ def test_error_raised_before_authentication_reports_a_user(client, mocker, captu
 
     assert response.status_code == 500
     assert captured_event()["user"] == {"id": ANONYMOUS_USER_ID}
+
+
+def test_event_is_kept_when_the_user_cannot_be_read(rf, captured_event):
+    """Since sentry-sdk 3.0, an event processor that raises drops the event it was given."""
+
+    def load_user():
+        raise DatabaseError("the database is down")
+
+    def get_response(request):
+        sentry_sdk.capture_message("Test message")
+
+    request = rf.get("/")
+    # As `AuthenticationMiddleware` does, the user is only loaded from the database when read
+    request.user = SimpleLazyObject(load_user)
+
+    sentry_user_id(get_response)(request)
+
+    event = captured_event()
+    assert event["message"] == "Test message"
+    assert "user" not in event
 
 
 @pytest.mark.usefixtures("failing_urlconf")
