@@ -10,5 +10,7 @@ Vous recevez cet e-mail parce que l'utilisateur {{ forward_from_user.get_full_na
 
 {% block body %}{% endblock %}
 
+{% block signature %}
 {% include "layout/includes/base_email_signature.txt" with itou_environment=itou_environment base_url=base_url only %}
+{% endblock %}
 {% endautoescape %}

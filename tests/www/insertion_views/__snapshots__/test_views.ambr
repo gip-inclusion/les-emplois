@@ -4235,7 +4235,6 @@
   Celui-ci a 26 ans.
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4281,8 +4280,49 @@
   Celui-ci a 26 ans.
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
+  
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+  
+  Cordialement,
+  Jean MICHEL</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
+                  Annuler
+              </button>
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
+                  Envoyer
+              </button>
+          </div>
+      </div>
+  </form>
+  
+  '''
+# ---
+# name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_age_only-employer_no_phone][send-email-content]
+  '''
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="service-send-email-modal-label">
+                  Contacter le service par mail contact@email.fake
+              </h3>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+          </div>
+          <div class="modal-body">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_body">
+                      Contenu de l’email
+                  </label>
+                  <textarea class="form-control" cols="40" id="id_body" name="body" required="" rows="12">Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "Sers-vis".
+  
+  Celui-ci a 26 ans.
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
   
@@ -4325,7 +4365,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4371,7 +4410,6 @@
   Celui-ci habite à Vannes (56).
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4417,8 +4455,49 @@
   Celui-ci habite à Vannes (56).
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
+  
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+  
+  Cordialement,
+  Jean MICHEL</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
+                  Annuler
+              </button>
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
+                  Envoyer
+              </button>
+          </div>
+      </div>
+  </form>
+  
+  '''
+# ---
+# name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_and_dept-employer_no_phone][send-email-content]
+  '''
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="service-send-email-modal-label">
+                  Contacter le service par mail contact@email.fake
+              </h3>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+          </div>
+          <div class="modal-body">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_body">
+                      Contenu de l’email
+                  </label>
+                  <textarea class="form-control" cols="40" id="id_body" name="body" required="" rows="12">Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "Sers-vis".
+  
+  Celui-ci habite à Vannes (56).
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
   
@@ -4461,7 +4540,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4507,7 +4585,6 @@
   Celui-ci habite à Vannes.
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4553,8 +4630,49 @@
   Celui-ci habite à Vannes.
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
+  
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+  
+  Cordialement,
+  Jean MICHEL</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
+                  Annuler
+              </button>
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
+                  Envoyer
+              </button>
+          </div>
+      </div>
+  </form>
+  
+  '''
+# ---
+# name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_city_only-employer_no_phone][send-email-content]
+  '''
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="service-send-email-modal-label">
+                  Contacter le service par mail contact@email.fake
+              </h3>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+          </div>
+          <div class="modal-body">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_body">
+                      Contenu de l’email
+                  </label>
+                  <textarea class="form-control" cols="40" id="id_body" name="body" required="" rows="12">Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "Sers-vis".
+  
+  Celui-ci habite à Vannes.
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
   
@@ -4597,7 +4715,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4643,7 +4760,6 @@
   Celui-ci a 36 ans et habite à Rennes (35).
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4689,8 +4805,49 @@
   Celui-ci a 36 ans et habite à Rennes (35).
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
+  
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+  
+  Cordialement,
+  Jean MICHEL</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
+                  Annuler
+              </button>
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
+                  Envoyer
+              </button>
+          </div>
+      </div>
+  </form>
+  
+  '''
+# ---
+# name: TestServices.test_prefilled_email_sent_to_service_provider[job_seeker_full_info-employer_no_phone][send-email-content]
+  '''
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="service-send-email-modal-label">
+                  Contacter le service par mail contact@email.fake
+              </h3>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+          </div>
+          <div class="modal-body">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_body">
+                      Contenu de l’email
+                  </label>
+                  <textarea class="form-control" cols="40" id="id_body" name="body" required="" rows="12">Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "Sers-vis".
+  
+  Celui-ci a 36 ans et habite à Rennes (35).
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
   
@@ -4733,7 +4890,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4777,7 +4933,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4821,8 +4976,47 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
+  
+  Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
+  
+  Cordialement,
+  Jean MICHEL</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button aria-label="Annuler l’envoi du mail" class="btn btn-outline-primary" data-bs-dismiss="modal" type="button">
+                  Annuler
+              </button>
+              <button aria-label="Envoyer le mail" class="btn btn-primary" type="submit">
+                  Envoyer
+              </button>
+          </div>
+      </div>
+  </form>
+  
+  '''
+# ---
+# name: TestServices.test_prefilled_email_sent_to_service_provider[no_job_seeker-employer_no_phone][send-email-content]
+  '''
+  <form class="js-prevent-multiple-submit" hx-post="/insertion/services/service-uid-1/" hx-swap="outerHTML" hx-target="#service-send-email-content" id="service-send-email-content">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="service-send-email-modal-label">
+                  Contacter le service par mail contact@email.fake
+              </h3>
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+          </div>
+          <div class="modal-body">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="form-group form-group-required">
+                  <label class="form-label" for="id_body">
+                      Contenu de l’email
+                  </label>
+                  <textarea class="form-control" cols="40" id="id_body" name="body" required="" rows="12">Bonjour,
+  
+  Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
   
@@ -4865,7 +5059,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4911,7 +5104,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : jean.michel@test.local
   - Téléphone : 07 01 02 03 04
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
@@ -4959,7 +5151,6 @@
   Je souhaiterais orienter un usager vers votre service "Sers-vis".
   
   Mes coordonnées :
-  - Email : pierre.dupont@test.local
   - Téléphone : 06 12 34 56 78
   
   Veuillez m’indiquer les prochaines étapes du parcours d’orientation par retour de mail.
