@@ -52,7 +52,7 @@ def test_build_params_from(snapshot):
 )
 @pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
 @freeze_time("2025-01-06")
-def test_not_certified(criteria_kind, factory, respx_mock, caplog):
+def test_not_certified(criteria_kind, factory, respx_mock, console_log):
     eligibility_diagnosis = factory(
         certifiable=True,
         criteria_kinds=[criteria_kind],
@@ -76,11 +76,11 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == response["json"]
     assert criterion.certification_period.isempty is True
-    assert "https://fake-api-particulier.com/v3" in caplog.text
-    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
+    assert "https://fake-api-particulier.com/v3" in console_log.getvalue()
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in console_log.getvalue()
 
 
-def test_not_found(respx_mock, caplog):
+def test_not_found(respx_mock, console_log):
     response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
         response["status_code"], json=response["json"]
@@ -96,8 +96,8 @@ def test_not_found(respx_mock, caplog):
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == response["json"]
     assert crit.certification_period == InclusiveDateRange(empty=True)
-    assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
-    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
+    assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in console_log.getvalue()
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in console_log.getvalue()
 
 
 def test_http_status_error_does_not_leak_pii(respx_mock):
@@ -148,7 +148,7 @@ def test_fetch_rsa_situation(response_kind, expected, respx_mock):
     assert len(respx_mock.calls) == 1
 
 
-def test_fetch_rsa_situation_does_not_leak_pii(respx_mock, caplog):
+def test_fetch_rsa_situation_does_not_leak_pii(respx_mock, console_log):
     response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
         response["status_code"], json=response["json"]
@@ -163,4 +163,5 @@ def test_fetch_rsa_situation_does_not_leak_pii(respx_mock, caplog):
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in str(exception)
     assert last_name.upper() not in str(exception).upper()
     assert last_name.upper() not in repr(exception.request).upper()
-    assert last_name.upper() not in caplog.text.upper()
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in console_log.getvalue()
+    assert last_name.upper() not in console_log.getvalue().upper()

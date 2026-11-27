@@ -8,6 +8,7 @@ import fcntl
 import inspect
 import io
 import json
+import logging
 import os
 import socket
 import sys
@@ -955,6 +956,20 @@ def api_particulier_settings(settings):
 def brevo_client_fixture(settings):
     settings.BREVO_API_KEY = "BREVO_API_KEY"
     return BrevoClient()
+
+
+@pytest.fixture(name="console_log")
+def console_log_fixture(mocker):
+    """Capture what the `console` handler writes: the log output that leaves the process.
+
+    Unlike `capture_stream_handler_log`, it leaves out the handlers pytest adds to the root logger,
+    which write the record as it is, before `ItouDataDogJSONFormatter` redacts it.
+
+    In other terms, this fixture captures what really leaves the process, unlike `caplog`, which sees
+    the record before the formatter redacts it.
+    """
+    [handler] = [handler for handler in logging.getLogger().handlers if handler.get_name() == "console"]
+    return mocker.patch.object(handler, "stream", io.StringIO())
 
 
 @pytest.fixture(name="pro_connect")
