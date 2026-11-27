@@ -9,9 +9,12 @@ from django.shortcuts import render
 
 from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.models import PrescriberMembership
+from itou.users.enums import UserKind
+from itou.users.models import User
 from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.readonly import readonly_view
+from itou.www.directory_views.forms import PeopleSearchForm
 from itou.www.directory_views.perms import can_access_directory
 
 
@@ -29,7 +32,7 @@ MEMBERSHIP_TO_KIND = {
 }
 
 
-def directory_membership_qs(membership_kind, origin):
+def directory_membership_qs(membership_kind, origin, organization_kinds=None, user_name=None):
     within = (origin, D(km=DIRECTORY_RADIUS_KM))
 
     def membership_qs(base_queryset, org_fieldname):
@@ -51,6 +54,12 @@ def directory_membership_qs(membership_kind, origin):
             org_fieldname = "organization"
         case _:
             raise ValueError(membership_kind)
+    if organization_kinds:
+        base_queryset = base_queryset.filter(**{f"{org_fieldname}__kind__in": organization_kinds})
+    if user_name:
+        base_queryset = base_queryset.filter(
+            user__in=User.objects.filter(kind=UserKind.PROFESSIONAL).search_by_full_name(user_name)
+        )
 
     return membership_qs(base_queryset, org_fieldname)
 
@@ -75,13 +84,23 @@ def people_results(request, template_name="directory/people_results.html"):
     ]
 
     origin = request.current_organization.coords
-    company_membership_qs = directory_membership_qs(MembershipKind.COMPANY, origin).values_list(
-        *MEMBERSHIP_SORT_COLUMNS, named=True
-    )
-    prescriber_membership_qs = directory_membership_qs(MembershipKind.PRESCRIBER_ORG, origin).values_list(
-        *MEMBERSHIP_SORT_COLUMNS, named=True
-    )
-    memberships = company_membership_qs.union(prescriber_membership_qs).order_by(*MEMBERSHIP_SORT_COLUMNS)
+    form = PeopleSearchForm(request.GET)
+    if form.is_valid():
+        filter_args = [
+            origin,
+            form.cleaned_data["kind"],
+            form.cleaned_data["q"],
+        ]
+        company_membership_qs = directory_membership_qs(MembershipKind.COMPANY, *filter_args).values_list(
+            *MEMBERSHIP_SORT_COLUMNS, named=True
+        )
+        prescriber_membership_qs = directory_membership_qs(MembershipKind.PRESCRIBER_ORG, *filter_args).values_list(
+            *MEMBERSHIP_SORT_COLUMNS, named=True
+        )
+        memberships = company_membership_qs.union(prescriber_membership_qs).order_by(*MEMBERSHIP_SORT_COLUMNS)
+    else:
+        # Type doesn’t matter, none are returned.
+        memberships = CompanyMembership.objects.none()
 
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
 
@@ -111,7 +130,12 @@ def people_results(request, template_name="directory/people_results.html"):
     memberships_page.object_list = results
 
     context = {
+        "form": form,
         "results": memberships_page,
         "matomo_custom_title": "Annuaire pro - Personnes",
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "directory/includes/people_results.html" if request.htmx else template_name,
+        context,
+    )

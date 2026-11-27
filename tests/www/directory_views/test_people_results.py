@@ -1,5 +1,7 @@
 import random
+from collections import Counter
 
+import pytest
 from django.contrib.gis.geos import Point
 from django.urls import reverse
 from itoutils.django.testing import assertSnapshotQueries
@@ -14,6 +16,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import ProfessionalFactory
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup
 from tests.www.directory_views.utils import KM
 
@@ -241,7 +244,7 @@ def test_exclude_opted_out_email(client):
     response = client.get(reverse("directory:people_results"))
 
     assert response.context["results"].object_list == []
-    assertContains(response, '<p class="mb-0">Annuaire vide.</p>', count=1)
+    assertContains(response, '<p class="mb-0">Aucun élément dans l’annuaire.</p>', html=True, count=1)
 
 
 def test_ignores_inactive_companies(client):
@@ -294,3 +297,165 @@ def test_includes_nearby_other_city(client):
     response = client.get(reverse("directory:people_results"))
 
     assert response.context["results"].object_list == [prescriber_membership, company_membership]
+
+
+def test_search_htmx(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        user__first_name="Manuel",
+        user__last_name="Calavera",
+    ).user
+    membership_julie = CompanyMembershipFactory(
+        user__first_name="Julie",
+        user__last_name="Durand",
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+    )
+
+    search_string = "julie"
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"))
+    page = parse_response_to_soup(response)
+
+    response = client.get(
+        reverse("directory:people_results"),
+        {"q": search_string},
+        headers={"HX-Request": "true"},
+    )
+    update_page_with_htmx(page, "#people-search-form", response)
+    assert response.context["results"].object_list == [membership_julie]
+
+    # Simulate page state after user interactions.
+    [q_input] = page.select("#id_q")
+    q_input["value"] = search_string
+    assertSoupEqual(
+        page,
+        parse_response_to_soup(client.get(reverse("directory:people_results"), {"q": search_string})),
+    )
+
+
+@pytest.mark.parametrize(
+    "q,found",
+    [
+        pytest.param("Loic", False, id="other-name"),
+        pytest.param("ierre", False, id="contains"),
+        pytest.param("lEO", True, id="case-sensitivity-partial"),
+        pytest.param("lÈoN", True, id="case-sensitivity-accent-full"),
+        pytest.param("Léon", True, id="full"),
+        pytest.param("pierre leon", True, id="no-dash"),
+        pytest.param("de la joie", True, id="spaces"),
+        pytest.param("joufflue", True, id="spaces"),
+    ],
+)
+def test_search_q(client, q, found):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    membership = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        user__first_name="Pierre-Léon",
+        user__last_name="De la joie Joufflue",
+    )
+
+    client.force_login(membership.user)
+    response = client.get(reverse("directory:people_results"), {"q": q})
+
+    expected = [membership] if found else []
+    assert response.context["results"].object_list == expected
+
+
+def test_search_kind(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    ai = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+    )
+    ei = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.EI,
+    )
+    cada = PrescriberMembershipFactory(
+        organization__coords=vannes.coords,
+        organization__insee_city=vannes,
+        organization__kind=PrescriberOrganizationKind.CADA,
+    )
+
+    client.force_login(ai.user)
+    response = client.get(reverse("directory:people_results"), {"kind": CompanyKind.AI})
+    assert response.context["results"].object_list == [ai]
+    response = client.get(reverse("directory:people_results"), {"kind": CompanyKind.EI})
+    assert response.context["results"].object_list == [ei]
+    response = client.get(reverse("directory:people_results"), {"kind": PrescriberOrganizationKind.CADA})
+    assert response.context["results"].object_list == [cada]
+    response = client.get(
+        reverse("directory:people_results"), {"kind": [PrescriberOrganizationKind.CADA, CompanyKind.EI]}
+    )
+    assert Counter(response.context["results"].object_list) == Counter([cada, ei])
+
+
+def test_search_filters_combined_with_and(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    ai = CompanyMembershipFactory(
+        user__first_name="Jules",
+        user__last_name="Després",
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+    )
+    CompanyMembershipFactory(
+        user__first_name="Kévin",
+        user__last_name="Taillefer",
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.EI,
+    )
+
+    client.force_login(ai.user)
+
+    response = client.get(reverse("directory:people_results"), {"kind": CompanyKind.AI, "q": "Kevin"})
+    assert response.context["results"].object_list == []
+
+
+def test_empty_results_message(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+    ).user
+
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"), {"kind": CompanyKind.EI})
+
+    assertContains(response, '<p class="mb-0">Aucun résultat avec les filtres actuels.</p>', html=True, count=1)
+
+
+def test_invalid_form_data(client):
+    vannes = create_city_vannes()
+    DirectoryActiveCity.objects.create(city=vannes)
+    user = CompanyMembershipFactory(
+        company__coords=vannes.coords,
+        company__insee_city=vannes,
+        company__kind=CompanyKind.AI,
+        user__first_name="Manuel",
+        user__last_name="Calavera",
+    ).user
+
+    client.force_login(user)
+    response = client.get(reverse("directory:people_results"), {"kind": "INVALID"})
+
+    assertContains(
+        response,
+        "Sélectionnez un choix valide. INVALID n’en fait pas partie.",
+        html=True,
+        count=1,
+    )
+    assertContains(response, '<p class="mb-0">Aucun résultat avec les filtres actuels.</p>', html=True, count=1)
