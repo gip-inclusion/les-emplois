@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Exists, OuterRef, Q, Subquery, TextChoices, Value
 from django.forms import ValidationError
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget, Select2Widget
@@ -19,10 +20,12 @@ from itou.companies.enums import (
     ProSupportReportAutonomy,
     ProSupportReportBarrier,
     ProSupportReportOrientation,
+    ProSupportReportRecipientSource,
     ProSupportReportSolution,
 )
 from itou.companies.models import ProSupportReport
 from itou.emails.utils import redact_email_address, validate_email_address
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import AssignmentEndReason, LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import (
@@ -33,6 +36,7 @@ from itou.users.models import (
     User,
 )
 from itou.utils import constants as global_constants
+from itou.utils.brand import product_name
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
@@ -697,6 +701,19 @@ class ProSupportReportForm(forms.ModelForm):
         required=False,
         widget=forms.RadioSelect,
     )
+    prescriber_email = forms.EmailField(
+        label="Adresse e-mail du prescripteur habilité",
+        required=False,
+    )
+    # Only when the authorized prescriber is a member of several authorized organizations.
+    prescriber_organization = None
+    # Only when no authorized prescriber is suggested.
+    no_known_prescriber = None
+    # The suggested recipient the employer saw, nothing is sent if it changed since.
+    # Hidden, so that its error is only displayed in the recipient block, not among the form errors.
+    displayed_recipient = forms.ModelChoiceField(
+        queryset=JobSeekerAssignment.objects.none(), required=False, widget=forms.HiddenInput
+    )
 
     class Meta:
         model = ProSupportReport
@@ -730,9 +747,92 @@ class ProSupportReportForm(forms.ModelForm):
             }
         )
 
+        self.suggested_recipient = self.instance.get_job_seeker_prescriber_assignment_to_notify()
+        # Its prescriber is named to the employer if it changed: only one of the job seeker can be posted.
+        self.fields["displayed_recipient"].queryset = JobSeekerAssignment.objects.filter(
+            job_seeker_id=self.instance.job_seeker_id
+        )
+        self.previous_recipient = None
+        job_seeker_name = self.instance.job_seeker.get_full_name()
+        email_help_text = f"Celle du prescripteur qui accompagne {job_seeker_name}."
+        if self.suggested_recipient:
+            email_help_text += f" {self.suggested_recipient.professional.get_full_name()} ne recevra pas le bilan."
+        self.fields["prescriber_email"].help_text = email_help_text
+        if self.suggested_recipient is None:
+            self.fields["no_known_prescriber"] = forms.BooleanField(
+                label=f"Je ne connais pas le prescripteur qui accompagne {job_seeker_name}",
+                help_text="Le bilan sera enregistré sans être envoyé.",
+                required=False,
+            )
+            # The email is put aside, not cleared: unchecking the box by mistake gives it back.
+            self.fields["prescriber_email"].widget.attrs["data-emplois-elements-visibility-on-selection"] = "disabled"
+            if self["no_known_prescriber"].value():
+                self.fields["prescriber_email"].widget.attrs["disabled"] = True
+
+        # The organizations are looked up again on each POST: an employer cannot open the report to another one.
+        self.prescriber_from_email = None
+        self.organizations_from_email = PrescriberOrganization.objects.none()
+        if email := self.data.get("prescriber_email"):
+            self.organizations_from_email = PrescriberOrganization.objects.authorized_for_member_email(email)
+            if self.organizations_from_email:
+                self.prescriber_from_email = User.objects.get(email=email)
+            if len(self.organizations_from_email) > 1:
+                self.fields["prescriber_organization"] = forms.ModelChoiceField(
+                    label=f"Organisation de {self.prescriber_from_email.get_full_name()} qui recevra le bilan",
+                    queryset=self.organizations_from_email,
+                )
+
     def clean(self):
         super().clean()
         if self.cleaned_data.get("has_solution") == "True":
             self.cleaned_data["orientation"] = ""
         else:
             self.cleaned_data["solution"] = ""
+
+        if self.cleaned_data.get("no_known_prescriber"):
+            # The box prevails: without JavaScript, the email field is not disabled when it is checked.
+            self.cleaned_data["prescriber_email"] = ""
+        prescriber = organization = None
+        if self.cleaned_data.get("prescriber_email"):
+            if self.prescriber_from_email is None:
+                self.add_error(
+                    "prescriber_email",
+                    format_html(
+                        "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur {}, "
+                        'vous pouvez <a href="{}" class="has-external-link" rel="noopener" target="_blank" '
+                        'aria-label="Rechercher des prescripteurs (ouverture dans un nouvel onglet)">retrouver ici'
+                        "</a> des prescripteurs habilités autour de chez vous.",
+                        product_name(),
+                        reverse("search:prescribers_home"),
+                    ),
+                )
+            else:
+                prescriber = self.prescriber_from_email
+                if len(self.organizations_from_email) == 1:
+                    [organization] = self.organizations_from_email
+                else:
+                    organization = self.cleaned_data.get("prescriber_organization")
+        elif (displayed_recipient := self.cleaned_data.get("displayed_recipient")) != self.suggested_recipient:
+            # Named to the employer: the error removes it from cleaned_data.
+            self.previous_recipient = displayed_recipient
+            self.add_error("displayed_recipient", "Le prescripteur à prévenir a changé entre-temps.")
+        elif self.suggested_recipient:
+            prescriber = self.suggested_recipient.professional
+            organization = self.suggested_recipient.prescriber_organization
+        elif not self.cleaned_data.get("no_known_prescriber"):
+            self.add_error(
+                "no_known_prescriber", "Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."
+            )
+
+        if prescriber is None:
+            source = ""
+        elif self.suggested_recipient is None:
+            source = ProSupportReportRecipientSource.ADDED
+        elif (prescriber, organization) == (
+            self.suggested_recipient.professional,
+            self.suggested_recipient.prescriber_organization,
+        ):
+            source = ProSupportReportRecipientSource.SUGGESTED
+        else:
+            source = ProSupportReportRecipientSource.CHOSEN
+        self.cleaned_data |= {"prescriber": prescriber, "organization": organization, "source": source}

@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import pytest
 from django.contrib import messages
@@ -25,9 +26,13 @@ from tests.companies.factories import (
 )
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerAssignmentFactory, JobSeekerFactory, PrescriberFactory
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 NO_RECIPIENT = "Aucun prescripteur habilité n’est rattaché à"
+RECIPIENT_BLOCK = "#pro-support-report-recipient"
+REPORT_DATA = {"autonomy": "3", "has_solution": "True", "solution": ProSupportReportSolution.TRAINING}
+UNKNOWN_AUTHORIZED_PRESCRIBER = "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité"
 SWITCH_ORGANIZATION = "Me connecter à cette structure"
 
 
@@ -36,8 +41,10 @@ def membership():
     return CompanyMembershipFactory(company__subject_to_iae_rules=True)
 
 
-def end_of_journey_contract(company, end_date):
-    contract = ContractFactory(company=company, start_date=end_date - datetime.timedelta(days=200), end_date=end_date)
+def end_of_journey_contract(company, end_date, **kwargs):
+    contract = ContractFactory(
+        company=company, start_date=end_date - datetime.timedelta(days=200), end_date=end_date, **kwargs
+    )
     ApprovalFactory(user=contract.job_seeker, start_at=contract.start_date, end_at=timezone.localdate())
     return contract
 
@@ -85,7 +92,7 @@ def test_create_pro_support_report_for_employer(
     if hired_elsewhere:
         ContractFactory(job_seeker=contract.job_seeker, start_date=timezone.localdate())
     advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
-    JobSeekerAssignmentFactory(
+    assignment = JobSeekerAssignmentFactory(
         job_seeker=contract.job_seeker,
         professional=advisor_membership.user,
         prescriber_organization=advisor_membership.organization,
@@ -105,6 +112,9 @@ def test_create_pro_support_report_for_employer(
             "has_solution": has_solution,
             "solution": ProSupportReportSolution.RENEWAL,
             "orientation": ProSupportReportOrientation.PROFESSIONAL,
+            # Only offered when no authorized prescriber is suggested.
+            "no_known_prescriber": "on",
+            "displayed_recipient": assignment.pk,
         }
         | answer,
     )
@@ -118,8 +128,8 @@ def test_create_pro_support_report_for_employer(
         [
             messages.Message(
                 messages.SUCCESS,
-                f"Bilan envoyé à {advisor_membership.user.get_full_name()}, "
-                f"de {advisor_membership.organization.display_name}",
+                f"Bilan envoyé||Bilan envoyé à {advisor_membership.user.get_full_name()}, "
+                f"de {advisor_membership.organization.display_name}.",
             )
         ],
     )
@@ -172,6 +182,7 @@ def test_create_pro_support_report_after_renewal_for_employer(client, membership
             "autonomy": "3",
             "has_solution": "True",
             "solution": ProSupportReportSolution.TRAINING,
+            "no_known_prescriber": "on",
         },
     )
     assertRedirects(
@@ -251,15 +262,31 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     response = client.get(create_url(contract.job_seeker))
     assertContains(response, f"{NO_RECIPIENT} {contract.job_seeker.get_full_name()}.")
 
+    # Notifying nobody is an explicit choice.
+    response = client.post(create_url(contract.job_seeker), data=REPORT_DATA)
+    assert response.context["form"].errors == {
+        "no_known_prescriber": ["Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."]
+    }
+    assert not ProSupportReport.objects.exists()
+
+    # Displayed again with the box checked, the email stays aside and the report is only saved.
+    response = client.post(create_url(contract.job_seeker), data={"no_known_prescriber": "on"})
+    assert parse_response_to_soup(response, selector="#id_prescriber_email").has_attr("disabled")
+    save_buttons = parse_response_to_soup(response, selector='[data-emplois-elements-visibility-on-selection="shown"]')
+    assert "d-none" not in save_buttons.get("class", [])
+
+    # The box prevails over an email left in the field.
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
     response = client.post(
         create_url(contract.job_seeker),
-        data={"autonomy": "3", "has_solution": "True", "solution": ProSupportReportSolution.TRAINING},
+        data=REPORT_DATA | {"no_known_prescriber": "on", "prescriber_email": prescriber.email},
     )
     assertMessages(
         response,
         [
             messages.Message(
-                messages.SUCCESS, "Bilan enregistré dans le dossier du salarié. Il n’a été envoyé à personne."
+                messages.SUCCESS,
+                "Bilan enregistré||Bilan enregistré dans le dossier du salarié et n’a été envoyé à personne.",
             )
         ],
     )
@@ -268,6 +295,343 @@ def test_create_pro_support_report_without_recipient_for_employer(client, mailou
     assert report.notified_prescriber_organization is None
     assert report.notified_prescriber_source == ""
     assert mailoutbox == []
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_recipient_block(client, snapshot, membership):
+    contract = end_of_journey_contract(
+        membership.company,
+        timezone.localdate() + datetime.timedelta(days=10),
+        job_seeker__for_snapshot=True,
+    )
+    client.force_login(membership.user)
+
+    response = client.get(create_url(contract.job_seeker))
+    assert pretty_indented(parse_response_to_soup(response, selector=RECIPIENT_BLOCK)) == snapshot(
+        name="without_suggestion"
+    )
+
+    advisor = PrescriberFactory(
+        for_snapshot=True, membership__organization__for_snapshot=True, membership__organization__authorized=True
+    )
+    assignment = JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker,
+        professional=advisor,
+        prescriber_organization=advisor.prescriberorganization_set.get(),
+        last_action_at=datetime.datetime(2025, 3, 10, tzinfo=datetime.UTC),
+    )
+    response = client.get(create_url(contract.job_seeker))
+    recipient_block = parse_response_to_soup(
+        response,
+        selector=RECIPIENT_BLOCK,
+        replace_in_attr=[("value", str(assignment.pk), "[PK of JobSeekerAssignment]")],
+    )
+    assert pretty_indented(recipient_block) == snapshot(name="with_suggestion")
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize(
+    "with_suggestion,choose_the_suggestion,source",
+    [
+        (True, False, ProSupportReportRecipientSource.CHOSEN),
+        (True, True, ProSupportReportRecipientSource.SUGGESTED),
+        (False, False, ProSupportReportRecipientSource.ADDED),
+    ],
+    ids=["another_prescriber", "the_suggested_prescriber", "without_suggestion"],
+)
+def test_create_pro_support_report_for_a_prescriber_chosen_by_employer(
+    client, mailoutbox, membership, with_suggestion, choose_the_suggestion, source
+):
+    contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+    suggested_membership = PrescriberMembershipFactory(organization__authorized=True)
+    if with_suggestion:
+        JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            professional=suggested_membership.user,
+            prescriber_organization=suggested_membership.organization,
+        )
+    if choose_the_suggestion:
+        chosen_membership = suggested_membership
+    else:
+        chosen_membership = PrescriberMembershipFactory(organization__authorized=True)
+    client.force_login(membership.user)
+
+    response = client.post(
+        create_url(contract.job_seeker), data=REPORT_DATA | {"prescriber_email": chosen_membership.user.email}
+    )
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS,
+                f"Bilan envoyé||Bilan envoyé à {chosen_membership.user.get_full_name()}, "
+                f"de {chosen_membership.organization.display_name}.",
+            )
+        ],
+    )
+    report = ProSupportReport.objects.get()
+    assert report.notified_prescriber == chosen_membership.user
+    assert report.notified_prescriber_organization == chosen_membership.organization
+    assert report.notified_prescriber_source == source
+    # The suggested prescriber is not notified when another one is chosen.
+    assert [email.to for email in mailoutbox] == [[chosen_membership.user.email]]
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize(
+    "email_factory",
+    [
+        lambda: "inconnu@example.com",
+        lambda: PrescriberFactory(membership__organization__authorized=False).email,
+    ],
+    ids=["unknown", "prescriber_not_authorized"],
+)
+def test_create_pro_support_report_for_an_unknown_authorized_prescriber(client, membership, email_factory):
+    contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+    client.force_login(membership.user)
+
+    response = client.post(create_url(contract.job_seeker), data=REPORT_DATA | {"prescriber_email": email_factory()})
+    assertContains(response, UNKNOWN_AUTHORIZED_PRESCRIBER)
+    # Also listed above the form, which the page scrolls to.
+    form_errors = parse_response_to_soup(response, selector="[data-emplois-give-focus-if-exist]")
+    assert UNKNOWN_AUTHORIZED_PRESCRIBER in form_errors.get_text()
+    assert not ProSupportReport.objects.exists()
+
+
+@freeze_time("2026-01-15")
+def test_create_pro_support_report_for_a_prescriber_of_several_organizations(client, mailoutbox, membership):
+    contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    other_organization = PrescriberMembershipFactory(user=prescriber, organization__authorized=True).organization
+    client.force_login(membership.user)
+
+    # The organization is asked for, even if the email was not checked beforehand.
+    data = REPORT_DATA | {"prescriber_email": prescriber.email}
+    response = client.post(create_url(contract.job_seeker), data=data)
+    assert response.context["form"].errors == {"prescriber_organization": ["Ce champ est obligatoire."]}
+    assertContains(response, f"Organisation de {prescriber.get_full_name()} qui recevra le bilan")
+
+    # The employer cannot open the report to an organization the prescriber is not a member of.
+    forged_organization = PrescriberOrganizationFactory(authorized=True)
+    response = client.post(
+        create_url(contract.job_seeker), data=data | {"prescriber_organization": forged_organization.pk}
+    )
+    assert response.context["form"].errors == {
+        "prescriber_organization": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."]
+    }
+    assert not ProSupportReport.objects.exists()
+
+    client.post(create_url(contract.job_seeker), data=data | {"prescriber_organization": other_organization.pk})
+    report = ProSupportReport.objects.get()
+    assert report.notified_prescriber == prescriber
+    assert report.notified_prescriber_organization == other_organization
+    assert [email.to for email in mailoutbox] == [[prescriber.email]]
+
+
+@freeze_time("2026-01-15")
+@pytest.mark.parametrize(
+    "displayed_the_previous_recipient,with_new_suggestion,expected",
+    [
+        (
+            True,
+            True,
+            "Pierre MARTIN n’est plus le prescripteur à prévenir : ce sera Léa BERNARD, de {organization}. "
+            "Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour Samir DUPONT "
+            "(le 13 janvier 2026). "
+            "Si c’est bon pour vous, cliquez à nouveau sur « Envoyer le bilan ». "
+            "Sinon, choisissez un autre prescripteur habilité.",
+        ),
+        (
+            True,
+            False,
+            "Pierre MARTIN n’est plus le prescripteur à prévenir, "
+            "et aucun autre prescripteur habilité n’est rattaché à Samir DUPONT. "
+            "Indiquez l’adresse e-mail d’un prescripteur habilité, "
+            "ou cochez « Je ne connais pas le prescripteur… ».",
+        ),
+        (
+            False,
+            True,
+            "un prescripteur habilité a été rattaché à Samir DUPONT : ce sera Léa BERNARD, de {organization}. "
+            "Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour Samir DUPONT "
+            "(le 13 janvier 2026). "
+            "Si c’est bon pour vous, cliquez à nouveau sur « Envoyer le bilan ». "
+            "Sinon, choisissez un autre prescripteur habilité.",
+        ),
+    ],
+    ids=["another_suggestion", "no_suggestion_anymore", "new_suggestion"],
+)
+def test_create_pro_support_report_when_the_suggested_recipient_changed(
+    client, mailoutbox, membership, displayed_the_previous_recipient, with_new_suggestion, expected
+):
+    contract = end_of_journey_contract(
+        membership.company,
+        timezone.localdate() + datetime.timedelta(days=10),
+        job_seeker__first_name="Samir",
+        job_seeker__last_name="Dupont",
+    )
+    # The previous recipient left their organization after the form was displayed.
+    previous_membership = PrescriberMembershipFactory(
+        user__first_name="Pierre", user__last_name="Martin", organization__authorized=True, is_active=False
+    )
+    previous_assignment = JobSeekerAssignmentFactory(
+        job_seeker=contract.job_seeker,
+        professional=previous_membership.user,
+        prescriber_organization=previous_membership.organization,
+    )
+    new_membership = PrescriberMembershipFactory(
+        user__first_name="Léa", user__last_name="Bernard", organization__authorized=True
+    )
+    if with_new_suggestion:
+        JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            professional=new_membership.user,
+            prescriber_organization=new_membership.organization,
+            last_action_at=datetime.datetime(2026, 1, 13, 10, tzinfo=datetime.UTC),
+        )
+    client.force_login(membership.user)
+
+    data = REPORT_DATA | {"displayed_recipient": previous_assignment.pk if displayed_the_previous_recipient else ""}
+    response = client.post(create_url(contract.job_seeker), data=data)
+    alert = parse_response_to_soup(response, selector=f"{RECIPIENT_BLOCK} .alert-danger")
+    # Line breaks of the template are not displayed, unlike non-breaking spaces.
+    assert re.sub(r"[ \n]+", " ", alert.get_text()).strip() == (
+        "Le bilan n’a pas été envoyé Le prescripteur à prévenir a changé entre-temps. "
+        "Depuis l’ouverture de ce formulaire, "
+        + expected.format(organization=new_membership.organization.display_name)
+    )
+    assert alert.has_attr("data-emplois-give-focus-if-exist")
+    # Only in the recipient block, the page scrolls there.
+    assert len(parse_response_to_soup(response).select("[data-emplois-give-focus-if-exist]")) == 1
+    assert not ProSupportReport.objects.exists()
+    assert mailoutbox == []
+
+    # Sent again, the report goes to the recipient now displayed.
+    data["displayed_recipient"] = parse_response_to_soup(response, selector="[name=displayed_recipient]").get(
+        "value", ""
+    )
+    if not with_new_suggestion:
+        data["no_known_prescriber"] = "on"
+    client.post(create_url(contract.job_seeker), data=data)
+    report = ProSupportReport.objects.get()
+    assert report.notified_prescriber == (new_membership.user if with_new_suggestion else None)
+
+
+def reload_recipient_url(job_seeker):
+    return reverse("job_seekers_views:reload_pro_support_report_recipient", kwargs={"public_id": job_seeker.public_id})
+
+
+@freeze_time("2026-01-15")
+class TestReloadProSupportReportRecipient:
+    CHECKED = "recevra le bilan."
+
+    def test_check_email(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": prescriber.email})
+        assertContains(
+            response,
+            f"{prescriber.get_full_name()}, de {prescriber.prescriberorganization_set.get().display_name}, "
+            f"{self.CHECKED}",
+        )
+        assert not ProSupportReport.objects.exists()
+
+    def test_check_unknown_email(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        client.force_login(membership.user)
+
+        response = client.post(
+            reload_recipient_url(contract.job_seeker), data={"prescriber_email": "inconnu@example.com"}
+        )
+        assertContains(response, UNKNOWN_AUTHORIZED_PRESCRIBER)
+        assertNotContains(response, self.CHECKED)
+
+    def test_check_email_of_a_prescriber_of_several_organizations(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        PrescriberMembershipFactory(user=prescriber, organization__authorized=True)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": prescriber.email})
+        assertContains(response, f"{prescriber.get_full_name()} {self.CHECKED}")
+        assertContains(response, f"Organisation de {prescriber.get_full_name()} qui recevra le bilan")
+        # The organization is not chosen yet.
+        assertNotContains(response, "Ce champ est obligatoire.")
+
+    @pytest.mark.parametrize(
+        "with_suggestion,error",
+        [
+            (False, "Indiquez l’adresse e-mail d’un prescripteur habilité ou cochez cette case."),
+            (True, "Le bilan n’a pas été envoyé"),
+        ],
+        ids=["no_known_prescriber", "displayed_recipient"],
+    )
+    def test_report_errors_are_not_displayed(self, client, membership, with_suggestion, error):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        if with_suggestion:
+            advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
+            JobSeekerAssignmentFactory(
+                job_seeker=contract.job_seeker,
+                professional=advisor_membership.user,
+                prescriber_organization=advisor_membership.organization,
+            )
+        client.force_login(membership.user)
+
+        # The report has not been sent yet: no suggestion displayed beforehand, and no box checked.
+        response = client.post(reload_recipient_url(contract.job_seeker), data={"prescriber_email": ""})
+        assertNotContains(response, error)
+
+    def test_keep_the_suggested_recipient(self, client, membership):
+        contract = end_of_journey_contract(membership.company, timezone.localdate() + datetime.timedelta(days=10))
+        advisor_membership = PrescriberMembershipFactory(organization__authorized=True)
+        assignment = JobSeekerAssignmentFactory(
+            job_seeker=contract.job_seeker,
+            professional=advisor_membership.user,
+            prescriber_organization=advisor_membership.organization,
+        )
+        client.force_login(membership.user)
+
+        # "Annuler et garder" displays the block again without the email that was checked.
+        response = client.post(
+            reload_recipient_url(contract.job_seeker),
+            data={"prescriber_email": "", "displayed_recipient": assignment.pk},
+        )
+        suggested_recipient = parse_response_to_soup(response, selector="#pro-support-report-suggested-recipient")
+        assert "show" in suggested_recipient["class"]
+        assertNotContains(response, self.CHECKED)
+
+    @pytest.mark.parametrize(
+        "end_date,with_report",
+        [(datetime.date(2026, 1, 25), True), (datetime.date(2026, 3, 15), False)],
+        ids=["report_already_sent", "not_at_the_end_of_journey"],
+    )
+    def test_not_found(self, client, membership, end_date, with_report):
+        contract = end_of_journey_contract(membership.company, end_date)
+        if with_report:
+            ProSupportReportFactory(contract=contract)
+        client.force_login(membership.user)
+
+        response = client.post(reload_recipient_url(contract.job_seeker))
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            lambda: CompanyMembershipFactory(company__not_subject_to_iae_rules=True).user,
+            lambda: PrescriberOrganizationFactory(with_membership=True, authorized=True).members.get(),
+        ],
+        ids=["non_iae_employer", "authorized_prescriber"],
+    )
+    def test_not_for_other_roles(self, client, user_factory):
+        contract = end_of_journey_contract(
+            CompanyFactory(subject_to_iae_rules=True), timezone.localdate() + datetime.timedelta(days=10)
+        )
+        client.force_login(user_factory())
+
+        response = client.post(reload_recipient_url(contract.job_seeker))
+        assert response.status_code == 403
 
 
 @freeze_time("2026-01-15")

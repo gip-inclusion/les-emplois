@@ -1,0 +1,134 @@
+{% load components %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% load str_filters %}
+
+<div id="pro-support-report-recipient">
+    {% with job_seeker_name=job_seeker.get_full_name|mask_unless:can_view_personal_information suggested_recipient=form.suggested_recipient %}
+        {% fragment as authorized_prescribers %}
+            <p class="mb-0">
+                Seul un prescripteur habilité peut recevoir le bilan : France Travail, Mission locale, CCAS, Département…
+                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733442624657--Liste-des-prescripteurs-habilités-au-national/"
+                   target="_blank"
+                   rel="noopener"
+                   class="has-external-link"
+                   aria-label="Voir la liste complète des prescripteurs habilités (ouverture dans un nouvel onglet)">Voir la liste complète</a>
+            </p>
+        {% endfragment %}
+        {% fragment as changed_recipient %}
+            {% if form.displayed_recipient.errors %}
+                {% component_alert title=title content=content variant="danger" form_error=True %}
+                    {% fragment as title %}
+                        Le bilan n’a pas été envoyé
+                    {% endfragment %}
+                    {% fragment as content %}
+                        {% with previous_recipient=form.previous_recipient %}
+                            <p>
+                                Le prescripteur à prévenir a changé entre-temps.
+                                {% if suggested_recipient %}
+                                    Depuis l’ouverture de ce formulaire,
+                                    {% if previous_recipient %}
+                                        {{ previous_recipient.professional.get_full_name }} n’est plus le prescripteur à prévenir :
+                                    {% else %}
+                                        un prescripteur habilité a été rattaché à {{ job_seeker_name }} :
+                                    {% endif %}
+                                    ce sera <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }}.
+                                    Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour {{ job_seeker_name }} (le {{ suggested_recipient.last_action_at|date:"j F Y" }}).
+                                {% else %}
+                                    Depuis l’ouverture de ce formulaire, {{ previous_recipient.professional.get_full_name }} n’est plus le prescripteur à prévenir, et aucun autre prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                                {% endif %}
+                            </p>
+                        {% endwith %}
+                        <p class="mb-0">
+                            {% if suggested_recipient %}
+                                Si c’est bon pour vous, cliquez à nouveau sur « Envoyer le bilan ». Sinon, choisissez un autre prescripteur habilité.
+                            {% else %}
+                                Indiquez l’adresse e-mail d’un prescripteur habilité, ou cochez « Je ne connais pas le prescripteur… ».
+                            {% endif %}
+                        </p>
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
+        {% endfragment %}
+        {# Not the posted value of form.displayed_recipient: nothing is sent if the suggestion displayed changes. #}
+        <input type="hidden"
+               name="{{ form.displayed_recipient.html_name }}"{% if suggested_recipient %} value="{{ suggested_recipient.pk }}"{% endif %}>
+        {% if suggested_recipient %}
+            <div class="collapse pro-support-report-recipient-collapse{% if not form.prescriber_email.value %} show{% endif %}"
+                 id="pro-support-report-suggested-recipient">
+                {% if form.displayed_recipient.errors %}
+                    {{ changed_recipient }}
+                {% else %}
+                    {% component_alert content=content variant="info" custom_icon="ri-mail-send-line" %}
+                        {% fragment as content %}
+                            <p class="mb-0">
+                                Ce bilan sera envoyé à <strong>{{ suggested_recipient.professional.get_full_name }}</strong>, de {{ suggested_recipient.prescriber_organization.display_name }}.
+                                Nous l’avons choisi car c’est le dernier prescripteur habilité à être intervenu pour {{ job_seeker_name }} (en {{ suggested_recipient.last_action_at|date:"F Y" }}).
+                            </p>
+                        {% endfragment %}
+                    {% endcomponent_alert %}
+                {% endif %}
+                <p>
+                    Ce n’est pas la bonne personne ?
+                    <button type="button"
+                            class="btn btn-link p-0 align-baseline"
+                            data-bs-toggle="collapse"
+                            data-bs-target=".pro-support-report-recipient-collapse"
+                            aria-expanded="false"
+                            aria-controls="pro-support-report-other-recipient"
+                            {% matomo_event "employeurs" "clic" "choisir-autre-prescripteur-bilan" %}>
+                        Choisir un autre prescripteur habilité
+                    </button>
+                </p>
+            </div>
+        {% endif %}
+        <div {% if suggested_recipient %}class="collapse pro-support-report-recipient-collapse{% if form.prescriber_email.value %} show{% endif %}"{% endif %} id="pro-support-report-other-recipient">
+            {% if suggested_recipient %}
+                {% component_alert content=authorized_prescribers variant="info" %}
+                {% endcomponent_alert %}
+            {% else %}
+                {{ changed_recipient }}
+                {% component_alert title=title content=authorized_prescribers variant="warning" %}
+                    {% fragment as title %}
+                        Aucun prescripteur habilité n’est rattaché à {{ job_seeker_name }}.
+                    {% endfragment %}
+                {% endcomponent_alert %}
+            {% endif %}
+            {% bootstrap_field form.prescriber_email wrapper_class="form-group form-group-input-w-lg-66" %}
+            <button type="button" class="btn btn-secondary mb-3" hx-post="{% url "job_seekers_views:reload_pro_support_report_recipient" public_id=job_seeker.public_id %}" hx-target="#pro-support-report-recipient" hx-swap="outerHTML" hx-indicator="#pro-support-report-recipient" {% if form.no_known_prescriber %}data-emplois-elements-visibility-on-selection="disabled"{% if form.no_known_prescriber.value %} disabled{% endif %}{% endif %} {% matomo_event "employeurs" "clic" "verifier-email-prescripteur-bilan" %}>
+                Vérifier l’e-mail
+            </button>
+            {% if form.prescriber_from_email %}
+                <p class="mb-2" data-emplois-elements-visibility-on-selection="hidden">
+                    <i class="ri-checkbox-circle-line text-success me-1" aria-hidden="true"></i>
+                    {% if form.prescriber_organization %}
+                        {{ form.prescriber_from_email.get_full_name }} recevra le bilan.
+                    {% else %}
+                        {{ form.prescriber_from_email.get_full_name }}, de {{ form.organizations_from_email.0.display_name }}, recevra le bilan.
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if form.prescriber_organization %}
+                {% bootstrap_field form.prescriber_organization wrapper_class="form-group form-group-input-w-lg-66" %}
+            {% endif %}
+            {% if form.no_known_prescriber %}
+                {% bootstrap_field form.no_known_prescriber wrapper_class="form-group mb-5" %}
+            {% endif %}
+            {% if suggested_recipient %}
+                <p class="mb-4">
+                    {# Displayed again without the email, so that its check is cleared too. #}
+                    <button type="button"
+                            class="btn btn-link p-0"
+                            hx-post="{% url "job_seekers_views:reload_pro_support_report_recipient" public_id=job_seeker.public_id %}"
+                            hx-vals='{"prescriber_email": ""}'
+                            hx-target="#pro-support-report-recipient"
+                            hx-swap="outerHTML"
+                            hx-indicator="#pro-support-report-recipient"
+                            {% matomo_event "employeurs" "clic" "garder-prescripteur-propose-bilan" %}>
+                        Annuler et garder {{ suggested_recipient.professional.get_full_name }}
+                    </button>
+                </p>
+            {% endif %}
+        </div>
+    {% endwith %}
+</div>
