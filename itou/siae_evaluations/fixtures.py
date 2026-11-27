@@ -9,6 +9,7 @@ import random
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import transaction
 from django.test import override_settings
@@ -142,7 +143,15 @@ def load_data():
     institution = Institution.objects.get(pk=2)
     job_applications = JobApplication.objects.filter(pk__in=created_job_applications_pks)
 
-    with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"), transaction.atomic():
+    with (
+        override_settings(
+            MAILERS={
+                **settings.MAILERS,
+                "default": {**settings.MAILERS["default"], "BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+            }
+        ),
+        transaction.atomic(),
+    ):
         create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start)
         evaluation_campaign = EvaluationCampaign.objects.get(institution=institution)
 

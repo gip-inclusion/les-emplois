@@ -605,9 +605,15 @@ ANYMAIL = {
     "MAILJET_SECRET_KEY": os.getenv("API_MAILJET_SECRET_APP"),
 }
 
-EMAIL_BACKEND = "itou.emails.tasks.AsyncEmailBackend"
-# This is the "real" email backend used by the async wrapper / email backend
-ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+MAILERS = {
+    "default": {
+        "BACKEND": "itou.emails.tasks.AsyncEmailBackend",
+    },
+    # This is the "real" email backend used by the async wrapper / email backend
+    "async": {
+        "BACKEND": "anymail.backends.mailjet.EmailBackend",
+    },
+}
 
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600

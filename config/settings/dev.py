@@ -25,7 +25,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.1", "0.0.0.0"]
 if os.getenv("RUNSERVER_DOMAIN"):
     ALLOWED_HOSTS.append(os.getenv("RUNSERVER_DOMAIN").split(":")[0])
 
-ASYNC_EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+MAILERS["async"]["BACKEND"] = "django.core.mail.backends.console.EmailBackend"  # noqa F405
 
 SHOW_DEMO_ACCOUNTS_BANNER = True
 

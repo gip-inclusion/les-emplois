@@ -5,7 +5,7 @@ from itertools import batched
 import sentry_sdk
 from anymail.exceptions import AnymailError
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail import EmailMultiAlternatives, mailers
 from django.core.mail.backends.base import BaseEmailBackend
 from django.db import ProgrammingError, connection, transaction
 from huey.contrib.djhuey import on_commit_task
@@ -88,7 +88,7 @@ def _async_send_message(email_id, *, task=None):
         if email.body_html:
             message.attach_alternative(email.body_html, "text/html")
         try:
-            with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
+            with mailers.get("async") as connection:
                 connection.send_messages([message])
         except AnymailError as e:
             if e.response is not None:
@@ -108,7 +108,7 @@ def _async_send_message(email_id, *, task=None):
                 email.esp_response = message.anymail_status.esp_response.json()
             except AttributeError:
                 # anymail_status is None in development and default test environments.
-                if settings.ASYNC_EMAIL_BACKEND in [
+                if settings.MAILERS["async"]["BACKEND"] in [
                     "django.core.mail.backends.console.EmailBackend",
                     "django.core.mail.backends.locmem.EmailBackend",
                 ]:
@@ -136,7 +136,7 @@ class AsyncEmailBackend(BaseEmailBackend):
     Only functions can be Huey tasks.
 
     This class:
-    * wraps an email backend defined in `settings.ASYNC_EMAIL_BACKEND`
+    * wraps an email backend defined in `MAILERS["async"]`
     * delegate the actual email sending to a function with *serializable* parameters
 
     See `_async_send_messages` for more on details on the serialization and
