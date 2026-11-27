@@ -38,3 +38,7 @@ def can_view_pro_support_report(request, report):
             .exists()
         )
     return False
+
+
+def can_see_cnav_certification_infos(request):
+    return bool(request.user.is_authenticated and (request.from_employer or request.from_prescriber))
