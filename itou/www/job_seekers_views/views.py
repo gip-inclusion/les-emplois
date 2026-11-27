@@ -28,6 +28,9 @@ from itou.approvals.models import ProlongationRequest
 from itou.approvals.utils import get_contracts
 from itou.asp.models import Country
 from itou.asp.utils import guess_birth_place_from_nir
+from itou.cnav.enums import CNAVRecordOrigin
+from itou.cnav.models import CNAVRecord, match
+from itou.cnav.tasks import plan_retrieve_cnav_infos
 from itou.companies.enums import ProSupportReportRecipientSource
 from itou.companies.models import Company, CompanyMembership, Contract, ProSupportReport
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -1508,6 +1511,18 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                     "profile",
                     self.job_seeker_session.get("profile", {}) | self.form.cleaned_data_from_profile_fields,
                 )
+                if session_nir := self.job_seeker_session.get("profile", {}).get("nir"):
+                    cnav_record = CNAVRecord.objects.create(
+                        origin=CNAVRecordOrigin.USER_CREATION,
+                        input_nir=session_nir,
+                        input_last_name=self.form.cleaned_data["last_name"],
+                        input_first_name=self.form.cleaned_data["first_name"],
+                        input_title=self.form.cleaned_data["title"],
+                        input_birthdate=self.form.cleaned_data["birthdate"],
+                    )
+                    logger.info("CNAVRecord pk=%s created", cnav_record.pk)
+                    plan_retrieve_cnav_infos(record_pk=cnav_record.pk)
+                    self.job_seeker_session.set("cnav_record", cnav_record.pk)
                 return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(context)
@@ -1643,6 +1658,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         )
 
     def post(self, request, *args, **kwargs):
+        cnav_record = None
         try:
             with transaction.atomic():
                 user = User.create_job_seeker_by_proxy(
@@ -1666,6 +1682,17 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 logger.info(
                     "user=%s created job_seeker=%s source=%s", self.sender.pk, user.pk, self.profile.creation_source
                 )
+                if cnav_record_pk := self.job_seeker_session.get("cnav_record"):
+                    cnav_record = (
+                        CNAVRecord.objects.filter(pk=cnav_record_pk)
+                        .select_for_update(of=("self",), no_key=True)
+                        .first()
+                    )
+                    if cnav_record:
+                        cnav_record.profile = self.profile
+                        cnav_record.save(update_fields={"profile"})
+                        logger.info("Attached CNAVRecord pk=%s to profile=%s", cnav_record_pk, self.profile.pk)
+                        cnav_record.try_to_certify_profile()
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
