@@ -120,7 +120,7 @@ dumpcreate: $(VIRTUAL_ENV)
 	createdb $(PGDATABASE)
 	python manage.py migrate
 	$(MAKE) populate_db
-	mkdir --parents $(CACHEDIR)
+	mkdir -p $(CACHEDIR)
 	pg_dump --format=c --dbname=$(PGDATABASE) --file=$(DBDUMP)
 
 # There are no dependencies on fixtures, allowing developers to manage their DB dump manually.
