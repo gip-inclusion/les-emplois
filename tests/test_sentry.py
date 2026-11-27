@@ -8,6 +8,7 @@ import httpx
 import pytest
 import respx
 import sentry_sdk
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseServerError
@@ -510,6 +511,14 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("address_line_1", True),
         ("contact_phone", True),
         ("client_secret", True),
+        # Names, whatever prefixes them
+        ("referent_first_name", True),
+        ("user_first_name", True),
+        ("job_seeker_last_name", True),
+        ("candidat_nom", True),
+        ("contact_full_name", True),
+        ("hexa_lane_name", True),
+        ("ip", True),
         # The France Travail identifier, under each of its names
         ("pole_emploi_id", True),
         ("job_seeker_france_travail_id", True),
@@ -517,6 +526,7 @@ def test_scrubbing_reaches_nested_frame_variables():
         # Credentials, which `data_collection` stopped the SDK from scrubbing for us
         ("password", True),
         ("authorization", True),
+        ("proxy_authorization", True),
         ("sessionid", True),
         ("x_forwarded_for", True),
         ("key", True),  # the TOTP secret of the OTP views
@@ -529,12 +539,19 @@ def test_scrubbing_reaches_nested_frame_variables():
         ("draft_id", False),
         ("author", False),
         ("denominationUniteLegale", False),
+        ("nombre", False),
+        ("description", False),
         ("siret", False),
         ("email_id", False),
         ("lack_of_nir_reason", False),
         ("lack_of_pole_emploi_id_reason", False),
         ("pe_obfuscated_nir", False),
         ("require_phone_interview", False),
+        ("authorization_status", False),  # the habilitation of a prescriber organization, not a credential
+        ("training_session", False),
+        ("email_address_id", False),
+        ("email_address", True),  # the allauth `EmailAddress` that the ID above points at
+        ("email_tracking_consent", False),
     ],
 )
 def test_is_sensitive_key(key, expected):
@@ -786,3 +803,19 @@ def test_cookies_are_not_collected(client, captured_event):
     client.get("/boom")
 
     assert "cookies" not in captured_event()["request"]
+
+
+def test_classification_of_the_model_field_names(snapshot):
+    """Whether the value of each model field is redacted from the events.
+
+    The fragments match more than a list of names would, on purpose, and still miss what nobody
+    spelled yet. This makes the classification of a new field show up in review rather than in
+    Sentry: after a `--snapshot-update`, check the lines it added.
+    """
+    names = {
+        name
+        for model in apps.get_models()
+        for field in [*model._meta.concrete_fields, *model._meta.many_to_many]
+        for name in (field.name, field.attname)
+    }
+    assert {name: _is_sensitive_key(name) for name in sorted(names)} == snapshot

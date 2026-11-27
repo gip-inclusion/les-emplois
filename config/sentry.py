@@ -26,15 +26,22 @@ from itou.utils.redaction import (
 logger = logging.getLogger(__name__)
 
 # A key holding one of these is sensitive whatever is spelled around it: `birth_place`,
-# `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `date_naissance`…
+# `adresseEmail`, `numeroTelephone`, `address_line_1`, `contact_phone`, `referent_first_name`…
 # `nom` and `name` are deliberately absent: they sit inside `denomination`, `nombre`,
 # `template_name` or `model_name`, and those are the variables that make a traceback readable.
+# The identity spellings are enumerated in the lists below, or caught by `first_name`,
+# `last_name`, `full_name` and `_nom`, which ends the French field names (`candidat_nom`).
 SENSITIVE_KEY_FRAGMENTS = {
+    "_nom",
     "address",
     "adresse",
     "birth",
     "email",
+    "first_name",
     "france_travail_id",
+    "full_name",
+    "hexa_",  # the components of an address in the format of the ASP, see itou.users.models.JobSeekerProfile
+    "last_name",
     "naissance",
     "nir",
     "phone",
@@ -65,11 +72,11 @@ SENSITIVE_CREDENTIAL_FRAGMENTS = {
     "xsrf",
 }
 
-# Whole names, for what no fragment above can catch without redacting far more than intended
+# Whole names, for what no fragment above can catch without redacting far more than intended:
+# as fragments, `ft_id` would redact `draft_id` and `ip` would redact `description`
 SENSITIVE_VARIABLE_NAMES = {
-    "first_name",
     "ft_id",
-    "last_name",
+    "ip",  # see itou.audit_trail.models.AuditTrail
 }
 
 # Credential terms the SDK matches as fragments in the headers it collects, matched here as whole
@@ -124,14 +131,30 @@ SENSITIVE_API_PARAMETERS = {
 }
 
 NON_SENSITIVE_KEYS = {
+    "active_members_email_reminder_last_sent_at",  # when an organization was last reminded of its members
+    "address_filled_at",  # when a user filled in their address, see itou.users.models.User
+    "approval_number_sent_by_email",  # a boolean of itou.job_applications.models.JobApplication
+    # The habilitation of a prescriber organization, see itou.prescribers.models.PrescriberOrganization
+    "authorization_status",
+    "authorization_updated_at",
+    "authorization_updated_by",
+    "authorization_updated_by_id",
+    # The primary key of an allauth `EmailAddress`, whereas the `email_address` it points at is an address
+    "email_address_id",
     "email_id",  # the primary key of an itou.emails.models.Email row, logged when sending fails
+    # Whether a user accepts the tracking of the emails sent to them, and when they last said so
+    "email_tracking_consent",
+    "email_tracking_consent_updated_at",
     "had_nir",  # a boolean kept on anonymized job seekers
     "had_pole_emploi_id",  # a boolean kept on anonymized job seekers
     "lack_of_nir_reason",  # why a job seeker has no NIR, not a NIR
     "lack_of_pole_emploi_id_reason",  # why a job seeker has no France Travail ID, not an ID
+    "last_reminder_email_sent_at",  # when an orientation was last reminded, see itou.insertion.models
     "pe_obfuscated_nir",  # the France Travail "id national", obfuscated by design
     "pole_emploi_id_forgotten",  # a boolean of the job seeker forms
     "require_phone_interview",  # a boolean of the PASS IAE forms
+    "sender_prescriber_organization_authorization_status",  # kept on anonymized job applications
+    "training_session",  # what a sanctioned company has to attend, see itou.siae_evaluations.models.Sanctions
 }
 
 _SENSITIVE_NAMES = (
