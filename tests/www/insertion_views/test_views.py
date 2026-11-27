@@ -53,7 +53,7 @@ from itou.users.models import JobSeekerAssignment
 from itou.utils import triggers
 from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 from itou.utils.brand import product_name
-from itou.www.insertion_views.views import ServiceDetailView
+from itou.www.insertion_views.views import CONTACT_ORIENTATION_SESSION_KEY, ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.geo.factories import create_qpv
@@ -71,6 +71,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -1654,31 +1655,52 @@ class TestStartContactOrientation:
         # A phone only service: it cannot be oriented to via the internal form.
         service = ServiceFactory(contact_email="", contact_phone="01 23 45 67 89")
         job_seeker = JobSeekerFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=sender, prescriber_organization=membership.organization
+        )
         client.force_login(sender)
 
         response = client.post(self.get_url(service), data={"kind": "tel", "notes": "Pas joignable."})
-        select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+        select_url = reverse(
+            "insertion_views:orientation_select_job_seeker",
+            kwargs={"service_uid": service.uid},
+            query={"kind": "tel"},
+        )
         assertRedirects(response, select_url)
         assert not Orientation.objects.exists()
 
-        # The selection screen is reachable even though the service is not orientable.
+        # The selection screen is reachable even though the service is not orientable,
+        # and explains why a job seeker is needed to save the "prise de contact".
         response = client.get(select_url)
         assert response.status_code == 200
+        assertContains(
+            response,
+            "Afin d’enregistrer cette prise de contact dans votre tableau de suivi, "
+            "merci de la rattacher à un usager.",
+        )
 
-        # Selecting a job seeker goes through the wizard entry point, which resumes the contact orientation.
+        # Selecting a job seeker comes back to the "prise de contact" view.
+        response = client.post(select_url, data={"job_seeker": job_seeker.public_id})
+        assertRedirects(
+            response,
+            self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id),
+            fetch_redirect_response=False,
+        )
+
+        # The light creation tunnel comes back through the wizard entry point, which resumes the contact orientation.
         start_orientation_url = reverse(
             "insertion_views:start_orientation",
             kwargs={"service_uid": service.uid},
-            query={"job_seeker_public_id": job_seeker.public_id},
+            query={"kind": "tel", "job_seeker_public_id": job_seeker.public_id},
         )
         response = client.get(start_orientation_url)
         assertRedirects(
             response,
-            self.get_url(service, job_seeker_public_id=job_seeker.public_id),
+            self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id),
             fetch_redirect_response=False,
         )
 
-        response = client.get(self.get_url(service, job_seeker_public_id=job_seeker.public_id))
+        response = client.get(self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id))
         orientation = Orientation.objects.get()
         assertRedirects(
             response,
@@ -1687,6 +1709,43 @@ class TestStartContactOrientation:
         # The notes typed in the modal survived the tunnel.
         assert orientation.referent_notes == "Pas joignable."
         assert orientation.status == OrientationStatus.DIRECT_CONTACT
+
+    def test_abandoned_contact_orientation_does_not_hijack_a_plain_orientation(self, client):
+        """Going back and starting a regular orientation must ignore the pending "prise de contact"."""
+        membership = PrescriberMembershipFactory()
+        sender = membership.user
+        service = ServiceFactory(contact_email="contact@example.com", contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=sender, prescriber_organization=membership.organization
+        )
+        client.force_login(sender)
+
+        # A "prise de contact" is started, then abandoned: its session key remains.
+        client.post(self.get_url(service), data={"kind": "tel", "notes": "Pas joignable."})
+        assert CONTACT_ORIENTATION_SESSION_KEY in client.session
+
+        # "Orienter votre usager en ligne" sends the user to the selection screen, without the banner.
+        start_orientation_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+        select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+        response = client.get(start_orientation_url, follow=True)
+        assertRedirects(response, select_url)
+        assertNotContains(response, "Afin d’enregistrer cette prise de contact")
+
+        # Selecting a job seeker runs the orientation wizard instead of saving a direct contact.
+        response = client.post(select_url, data={"job_seeker": job_seeker.public_id})
+        assertRedirects(
+            response,
+            reverse(
+                "insertion_views:start_orientation",
+                kwargs={"service_uid": service.uid},
+                query={"job_seeker_public_id": job_seeker.public_id},
+            ),
+            fetch_redirect_response=False,
+        )
+        response = client.get(response["Location"], follow=True)
+        assert response.status_code == 200
+        assert not Orientation.objects.exists()
 
     def test_bad_kind(self, client):
         service = ServiceFactory()

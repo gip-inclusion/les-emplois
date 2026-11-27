@@ -1,5 +1,6 @@
 {% extends "insertion/orientation_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
@@ -9,6 +10,14 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    {% if is_direct_contact_orientation %}
+                        {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+                            {% fragment as c_info__summary %}
+                                Afin d’enregistrer cette prise de contact dans votre tableau de suivi, merci de la rattacher à un usager.
+                                Vous pouvez sélectionner ou créer un nouveau compte usager ci-dessous.
+                            {% endfragment %}
+                        {% endcomponent_info %}
+                    {% endif %}
                     <div class="c-form mb-5">
                         <h2 class="h3">Rechercher ou créer un usager *</h2>
                         <p class="text-muted">Commencez à saisir un nom</p>

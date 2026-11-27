@@ -357,7 +357,11 @@ def start_contact_orientation(request, service_uid):
             "notes": notes,
         }
         return HttpResponseRedirect(
-            reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+            reverse(
+                "insertion_views:orientation_select_job_seeker",
+                kwargs={"service_uid": service.uid},
+                query={"kind": kind},
+            )
         )
 
     orientation = create_contact_orientation(request, kind, service, job_seeker, notes)
@@ -406,8 +410,9 @@ class OrientationStep(enum.StrEnum):
 @readonly_view
 def start_orientation(request, service_uid):
     service = get_object_or_404(insertion_models.Service.objects.select_related("source"), uid=service_uid)
-    if get_pending_contact_orientation(request, service):
-        # Both the job seeker selection and the light creation tunnel come back here.
+    # The intent is carried by the URL: a stale session key must not hijack a plain orientation.
+    if request.GET.get("kind") in CONTACT_ORIENTATION_KINDS and get_pending_contact_orientation(request, service):
+        # The light creation tunnel comes back here.
         return HttpResponseRedirect(
             reverse(
                 "insertion_views:start_contact_orientation",
@@ -471,7 +476,13 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             insertion_models.Service.objects.select_related("kind", "source", "structure"),
             uid=service_uid,
         )
-        self.is_direct_contact_orientation = bool(get_pending_contact_orientation(request, self.service))
+        self.contact_orientation_kind = (
+            request.GET.get("kind")
+            if request.GET.get("kind") in CONTACT_ORIENTATION_KINDS
+            and get_pending_contact_orientation(request, self.service)
+            else ""
+        )
+        self.is_direct_contact_orientation = bool(self.contact_orientation_kind)
         if request.GET.get("mtm_campaign") == "DORA":
             request.session[DORA_CAMPAIGN_SESSION_KEY] = True
 
@@ -479,6 +490,17 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
         return super().get_form_kwargs() | {"request": self.request}
 
     def form_valid(self, form):
+        if self.is_direct_contact_orientation:
+            return HttpResponseRedirect(
+                reverse(
+                    "insertion_views:start_contact_orientation",
+                    kwargs={"service_uid": self.service.uid},
+                    query={
+                        "kind": self.contact_orientation_kind,
+                        "job_seeker_public_id": form.cleaned_data["job_seeker"],
+                    },
+                )
+            )
         return HttpResponseRedirect(
             reverse(
                 "insertion_views:start_orientation",
@@ -498,9 +520,11 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
                     "tunnel": "orientation",
                     "from_url": service_detail_url,
                     "service_uid": self.service.uid,
-                },
+                }
+                | ({"kind": self.contact_orientation_kind} if self.is_direct_contact_orientation else {}),
             ),
             "matomo_custom_title": "Orientation service - rechercher un usager",
+            "is_direct_contact_orientation": self.is_direct_contact_orientation,
             # FIXME(vperron): remove this modal once the DORA migration is over (added 2026-10-23).
             "show_dora_modal": self.request.GET.get("mtm_campaign") == "DORA",
         }
