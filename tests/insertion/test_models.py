@@ -171,13 +171,25 @@ class TestMobilizationEvent:
             structure=StructureFactory(), service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT
         )
 
-    def test_service_and_structure_kind_coherence(self):
+    @pytest.mark.parametrize(
+        "kind",
+        [
+            MobilizationEventKind.SERVICE_CONTACT,
+            MobilizationEventKind.SERVICE_CONTACT_EMAIL,
+            MobilizationEventKind.SERVICE_CONTACT_TEL,
+        ],
+    )
+    def test_service_and_structure_kind_coherence(self, kind):
         with transaction.atomic():
             with pytest.raises(IntegrityError, match=r".*service_and_structure_kind_coherence.*"):
                 MobilizationEventFactory(service=ServiceFactory())
 
+        with transaction.atomic():
+            with pytest.raises(IntegrityError, match=r".*service_and_structure_kind_coherence.*"):
+                MobilizationEventFactory(service=None, kind=kind)
+
         # No integrity error
-        MobilizationEventFactory(service=ServiceFactory(), kind=MobilizationEventKind.SERVICE_CONTACT)
+        MobilizationEventFactory(service=ServiceFactory(), kind=kind)
 
     def test_service_external_link_coherence(self):
         service = ServiceFactory()
@@ -211,7 +223,8 @@ class TestMobilizationEvent:
         "kind,service_factory",
         [
             (MobilizationEventKind.STRUCTURE_CONTACT, None),
-            (MobilizationEventKind.SERVICE_CONTACT, ServiceFactory),
+            (MobilizationEventKind.SERVICE_CONTACT_EMAIL, ServiceFactory),
+            (MobilizationEventKind.SERVICE_CONTACT_TEL, ServiceFactory),
         ],
     )
     def test_create_mobilization_event(self, kind, user_factory, organization_factory, service_factory):

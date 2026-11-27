@@ -36,6 +36,7 @@ from itou.insertion.enums import (
     GenericReferenceItemKind,
     GenericReferenceItemSource,
     MobilizationEventKind,
+    OrientationContactKind,
     OrientationRefusalReason,
     OrientationStatus,
     OrientationTransition,
@@ -757,6 +758,8 @@ class MobilizationEvent(models.Model):
                     kind__in=[
                         MobilizationEventKind.SERVICE_ORIENTATION,
                         MobilizationEventKind.SERVICE_CONTACT,
+                        MobilizationEventKind.SERVICE_CONTACT_EMAIL,
+                        MobilizationEventKind.SERVICE_CONTACT_TEL,
                         MobilizationEventKind.SERVICE_EXT_LINK,
                     ],
                     service__isnull=False,
@@ -849,9 +852,21 @@ class OrientationWorkflow(xwf_models.Workflow):
     initial_state = OrientationStatus.PENDING
 
     transitions = (
-        (OrientationTransition.ACCEPT, OrientationStatus.PENDING, OrientationStatus.ACCEPTED),
-        (OrientationTransition.REFUSE, OrientationStatus.PENDING, OrientationStatus.REFUSED),
-        (OrientationTransition.EXPIRE, OrientationStatus.PENDING, OrientationStatus.EXPIRED),
+        (
+            OrientationTransition.ACCEPT,
+            [OrientationStatus.PENDING, OrientationStatus.DIRECT_CONTACT],
+            OrientationStatus.ACCEPTED,
+        ),
+        (
+            OrientationTransition.REFUSE,
+            [OrientationStatus.PENDING, OrientationStatus.DIRECT_CONTACT],
+            OrientationStatus.REFUSED,
+        ),
+        (
+            OrientationTransition.EXPIRE,
+            [OrientationStatus.PENDING, OrientationStatus.DIRECT_CONTACT],
+            OrientationStatus.EXPIRED,
+        ),
     )
 
     log_model = "insertion.OrientationTransitionLog"
@@ -946,6 +961,15 @@ class Orientation(xwf_models.WorkflowEnabled, models.Model):
     referent_phone = models.CharField(verbose_name="téléphone du référent", max_length=10, blank=True)
     referent_email = models.EmailField(verbose_name="e-mail du référent")
     orientation_reasons = models.TextField(verbose_name="motif de l'orientation", blank=True)
+    referent_notes = models.TextField(verbose_name="notes du référent", blank=True, default="")
+
+    # Set when the orientation was saved after a direct contact with the service ("prise de contact").
+    contact_kind = models.CharField(
+        verbose_name="type de prise de contact",
+        choices=OrientationContactKind,
+        blank=True,
+        default="",
+    )
 
     refusal_reasons = ArrayField(
         models.CharField(max_length=30, choices=OrientationRefusalReason.choices),

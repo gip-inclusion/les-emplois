@@ -93,6 +93,8 @@ def test_orientation_wizard_happy_path(client, snapshot, mailoutbox):
 
     response = client.get(select_job_seeker_url)
     assert pretty_indented(parse_response_to_soup(response, "#main .s-section")) == snapshot(name="select-job-seeker")
+    # The "prise de contact" banner is reserved for direct contact orientations.
+    assertNotContains(response, "Afin d’enregistrer cette prise de contact")
 
     response = client.post(select_job_seeker_url, data={"job_seeker": job_seeker.public_id}, follow=True)
     session_uuid = get_session_name(client.session, OrientationWizardView.expected_session_kind)

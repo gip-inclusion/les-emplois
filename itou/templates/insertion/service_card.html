@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load enums %}
-{% load format_filters %}
 {% load markdownify %}
 {% load matomo %}
 {% load str_filters %}
@@ -48,28 +47,60 @@
                                    {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre usager en ligne</span> </a>
                             {% else %}
                                 <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center"
-                                   href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}> <span>Orienter votre usager en ligne</span> </a>
+                                   href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "fiche-service" "clic" "orienter-un-bénéficiaire" %}>
+                                    <i class="ri-file-lock-line" aria-hidden="true"></i>
+                                    <span>Orienter votre usager en ligne</span>
+                                </a>
                             {% endif %}
                         </div>
                     {% endif %}
                 {% endif %}
 
-                {% if has_contact_to_display %}
+                {% if service.contact_phone %}
                     <div class="form-group col-12 col-lg-auto">
-                        {% if can_view_contact_modal %}
+                        {% if contact_requires_login %}
+                            <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                               href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "fiche-service" "clic" "appeler-contact" %}>
+                                <i class="ri-phone-lock-line" aria-hidden="true"></i>
+                                <span>Appeler</span>
+                            </a>
+                        {% else %}
                             <button class="btn btn-lg btn-outline-white btn-block justify-content-center"
                                     type="button"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#service-contact-modal"
-                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT }}"
-                                    {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}>
-                                {{ contact_button_label }}
+                                    data-bs-target="#service-contact-phone-modal"
+                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT_TEL }}"
+                                    {% matomo_event "fiche-service" "clic" "appeler-contact" %}>Appeler</button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if service.contact_email %}
+                    <div class="form-group col-12 col-lg-auto">
+                        {% if contact_requires_login %}
+                            <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center"
+                               href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"
+                               {% matomo_event "fiche-service" "clic" "envoyer-email-contact" %}>
+                                <i class="ri-mail-lock-line" aria-hidden="true"></i>
+                                <span>Envoyer un email</span>
+                            </a>
+                        {% elif can_orient_towards_insertion_service %}
+                            <button class="btn btn-lg btn-outline-white btn-block justify-content-center"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#service-send-email-modal"
+                                    data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT_EMAIL }}"
+                                    {% matomo_event "fiche-service" "clic" "envoyer-email-contact" %}>
+                                Envoyer un email
                             </button>
                         {% else %}
+                            {# Users who cannot orient (eg. labor inspectors) only get a mailto link. #}
                             <a class="btn btn-lg btn-outline-white btn-block justify-content-center"
-                               href="{% url 'login:existing_user' %}?next={{ request.get_full_path|urlencode }}"
-                               {% matomo_event "fiche-service" "clic" "voir-coordonnees-contact" %}> {{ contact_button_label }} </a>
+                               href="mailto:{{ service.contact_email }}"
+                               data-emplois-mobilization-kind="{{ MobilizationEventKind.SERVICE_CONTACT_EMAIL }}"
+                               {% matomo_event "fiche-service" "clic" "envoyer-email-contact" %}>Envoyer un email</a>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -393,62 +424,10 @@
 {% endblock %}
 
 {% block modals %}
-    {% if can_view_contact_modal %}
-        <div class="modal fade"
-             id="service-contact-modal"
-             tabindex="-1"
-             aria-labelledby="service-contact-modal-label"
-             aria-modal="true"
-             role="dialog">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="service-contact-modal-label">Coordonnées de contact</h3>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                    </div>
-                    <div class="modal-body">
-                        {% if service.contact_full_name %}
-                            <div class="d-flex align-items-center justify-content-start border rounded p-3 mb-3">
-                                <i class="ri-user-line me-2" aria-hidden="true"></i>
-                                <span>{{ service.contact_full_name }}</span>
-                            </div>
-                        {% endif %}
-                        {% if service.contact_email %}
-                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
-                                {% if can_orient_towards_insertion_service %}
-                                    <button class="btn btn-lg btn-primary justify-content-center"
-                                            type="button"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#service-send-email-modal">
-                                        Écrire un email à {{ service.contact_email }}
-                                    </button>
-                                {% else %}
-                                    <div class="d-flex align-items-start overflow-hidden me-2">
-                                        <i class="ri-mail-line fw-normal flex-shrink-0 me-2" aria-hidden="true"></i>
-                                        <a href="mailto:{{ service.contact_email }}"
-                                           aria-label="Contact par mail"
-                                           class="text-break">{{ service.contact_email }}</a>
-                                    </div>
-                                    {% matomo_event "fiche-service" "clic" "copier-email-contact" as matomo_event_attrs %}
-                                    {% include "includes/copy_to_clipboard.html" with content=service.contact_email css_classes="flex-shrink-0 btn-link fw-medium ms-1" only_icon=True text="Copier l'adresse e-mail" matomo_event_attrs=matomo_event_attrs in_modal=True only %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                        {% if service.contact_phone %}
-                            <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
-                                <div class="d-flex align-items-start overflow-hidden me-2">
-                                    <i class="ri-phone-line fw-normal me-2" aria-hidden="true"></i>
-                                    {{ service.contact_phone|format_phone }}
-                                </div>
-                                {% include "includes/copy_to_clipboard.html" with content=service.contact_phone|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True text="Copier le numéro de téléphone" in_modal=True only %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+    {% if can_view_contact_modal and service.contact_phone %}
+        {% include "insertion/includes/service_contact_phone_modal.html" with service=service job_seeker=job_seeker can_orient_towards_insertion_service=can_orient_towards_insertion_service show_phone_number_copy_button=show_phone_number_copy_button csrf_token=csrf_token only %}
     {% endif %}
-    {% if service.contact_email and can_orient_towards_insertion_service %}
+    {% if can_view_contact_modal and service.contact_email and can_orient_towards_insertion_service %}
         {% include "insertion/includes/service_send_email_modal.html" with service=service send_email_form=send_email_form request=request csrf_token=csrf_token only %}
     {% endif %}
 {% endblock %}

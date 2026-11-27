@@ -1037,7 +1037,7 @@ class GetOrCreateJobSeekerStartView(View):
             service_uid = request.GET.get("service_uid")
             if not service_uid:
                 raise Http404
-            data["orientation"] = {"service_uid": service_uid}
+            data["orientation"] = {"service_uid": service_uid, "kind": request.GET.get("kind", "")}
 
         self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
@@ -1122,11 +1122,14 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def get_exit_url(self, job_seeker, created=False, active_assignment=None):
         if self.is_orientation:
-            service_uid = self.job_seeker_session.get("orientation", {}).get("service_uid")
+            orientation_data = self.job_seeker_session.get("orientation", {})
+            query = {"job_seeker_public_id": job_seeker.public_id}
+            if kind := orientation_data.get("kind"):
+                query["kind"] = kind
             return reverse(
                 "insertion_views:start_orientation",
-                kwargs={"service_uid": service_uid},
-                query={"job_seeker_public_id": job_seeker.public_id},
+                kwargs={"service_uid": orientation_data.get("service_uid")},
+                query=query,
             )
         if self.standalone_creation:
             if created:
@@ -1390,10 +1393,12 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
     def get_back_url(self):
         if self.is_orientation:
-            service_uid = self.job_seeker_session.get("orientation", {}).get("service_uid")
+            orientation_data = self.job_seeker_session.get("orientation", {})
+            query = {"kind": kind} if (kind := orientation_data.get("kind")) else {}
             return reverse(
                 "insertion_views:orientation_select_job_seeker",
-                kwargs={"service_uid": service_uid},
+                kwargs={"service_uid": orientation_data.get("service_uid")},
+                query=query,
             )
         view_name = (
             "job_seekers_views:check_nir_for_hire" if self.hire_process else "job_seekers_views:check_nir_for_sender"

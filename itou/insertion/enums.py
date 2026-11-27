@@ -23,7 +23,10 @@ class GenericReferenceItemKind(models.TextChoices):
 class MobilizationEventKind(models.TextChoices):
     SERVICE_ORIENTATION = "service_orientation", "Orientation vers un service"
     SERVICE_EXT_LINK = "service_ext_link", "Orientation via un lien externe ou clic sur un lien de démarche à réaliser"
+    # Deprecated: replaced by SERVICE_CONTACT_EMAIL and SERVICE_CONTACT_TEL, kept for existing rows.
     SERVICE_CONTACT = "service_contact", "Affichage des informations de contact du service"
+    SERVICE_CONTACT_EMAIL = "service_contact_email", "Clic sur « Envoyer un email » au service"
+    SERVICE_CONTACT_TEL = "service_contact_tel", "Clic sur « Appeler » le service"
     STRUCTURE_CONTACT = "structure_contact", "Affichage des informations de contact de la structure"
 
 
@@ -39,6 +42,14 @@ class OrientationStatus(models.TextChoices):
     ACCEPTED = "VALIDÉE", "Validée"
     EXPIRED = "EXPIRÉE", "Expirée"
     REFUSED = "REFUSÉE", "Déclinée"
+    DIRECT_CONTACT = "CONTACT", "Prise de contact"
+
+
+class OrientationContactKind(models.TextChoices):
+    """How the sender contacted the service before saving the orientation."""
+
+    PHONE = "tel", "téléphone"
+    EMAIL = "email", "e-mail"
 
 
 class OrientationTransition(enum.StrEnum):

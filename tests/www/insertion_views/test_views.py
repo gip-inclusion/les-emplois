@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import json
 import random
 import uuid
@@ -32,6 +33,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.insertion.enums import (
     BeneficiaryContactPreference,
     MobilizationEventKind,
+    OrientationContactKind,
     OrientationRefusalReason,
     OrientationStatus,
 )
@@ -46,11 +48,12 @@ from itou.insertion.models import (
 )
 from itou.job_applications.enums import SenderKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import Title
+from itou.users.enums import IdentityProvider, Title
+from itou.users.models import JobSeekerAssignment
 from itou.utils import triggers
 from itou.utils.apis.inbound_parsing import generate_inbound_parsing_address
 from itou.utils.brand import product_name
-from itou.www.insertion_views.views import ServiceDetailView
+from itou.www.insertion_views.views import CONTACT_ORIENTATION_SESSION_KEY, ServiceDetailView
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.geo.factories import create_qpv
@@ -68,6 +71,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -312,20 +316,52 @@ class TestStructures:
 
 
 class TestServices:
-    LOGIN_URL = reverse("login:existing_user")
+    LOGIN_URL = reverse("account_login")
     ORIENT_BTN_LABEL = "Orienter votre usager en ligne"
-    DISPLAY_SERVICE_CONTACT_BTN = """
+    PHONE_CONTACT_BTN = """
     <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
-            data-bs-target="#service-contact-modal" data-emplois-mobilization-kind="service_contact"
+            data-bs-target="#service-contact-phone-modal" data-emplois-mobilization-kind="service_contact_tel"
             data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
-            data-matomo-option="voir-coordonnees-contact">
-        Contacter le service par email
+            data-matomo-option="appeler-contact">
+        Appeler
     </button>"""
-    DISPLAY_SERVICE_CONTACT_LINK = """
-    <a class="btn btn-lg btn-outline-white btn-block justify-content-center" href="%s"
+    EMAIL_CONTACT_BTN = """
+    <button class="btn btn-lg btn-outline-white btn-block justify-content-center" type="button" data-bs-toggle="modal"
+            data-bs-target="#service-send-email-modal" data-emplois-mobilization-kind="service_contact_email"
+            data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+            data-matomo-option="envoyer-email-contact">
+        Envoyer un email
+    </button>"""
+    # Displayed to users who cannot orient (labor inspectors, itou staff) instead of the modal button.
+    EMAIL_CONTACT_MAILTO_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block justify-content-center" href="mailto:%s"
+       data-emplois-mobilization-kind="service_contact_email"
        data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
-       data-matomo-option="voir-coordonnees-contact">
-        Contacter le service par email
+       data-matomo-option="envoyer-email-contact">
+        Envoyer un email
+    </a>"""
+    # Displayed when contact details are private and the user is not authenticated: the padlock
+    # links to the login page and no iMER is registered.
+    LOCKED_PHONE_CONTACT_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="appeler-contact">
+        <i class="ri-phone-lock-line" aria-hidden="true"></i>
+        <span>Appeler</span>
+    </a>"""
+    LOCKED_EMAIL_CONTACT_LINK = """
+    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="envoyer-email-contact">
+        <i class="ri-mail-lock-line" aria-hidden="true"></i>
+        <span>Envoyer un email</span>
+    </a>"""
+    LOCKED_ORIENT_BTN_LINK = """
+    <a class="btn btn-lg btn-white btn-block btn-ico justify-content-center" href="%s"
+       data-matomo-event="true" data-matomo-category="fiche-service" data-matomo-action="clic"
+       data-matomo-option="orienter-un-bénéficiaire">
+        <i class="ri-file-lock-line" aria-hidden="true"></i>
+        <span>Orienter votre usager en ligne</span>
     </a>"""
     MISSING_CONTACT_LABEL = "Informations de contact non renseignées"
     DISPLAY_SERVICE_CONTACT_JS = 'body.set("service_uid", "%s");'
@@ -671,7 +707,7 @@ class TestServices:
         assert "Utiliser le lien de mobilisation" in mobilization_modes.get_text()
         assert mobilization_modes.find("a", href=external_link)
 
-    def test_detail_contact_modal_has_phone_copy_button(self, client):
+    def test_detail_phone_modal_title(self, client):
         user = PrescriberFactory()
         service = ServiceFactory(
             uid="test-contact-phone-copy-uid",
@@ -681,8 +717,23 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        modal = parse_response_to_soup(response, "#service-contact-modal")
-        assert modal.find("button", {"data-it-copy-to-clipboard": "0123456789"})
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        assert "Contacter le service par téléphone au 01 23 45 67 89" in modal.find("h3").get_text(strip=True)
+        assert modal.find(attrs={"data-it-clipboard-button": "copy"}) is None
+
+    def test_detail_phone_modal_with_copy_button(self, client):
+        service = ServiceFactory(
+            uid="test-contact-phone-copy-public-uid",
+            updated_on="2025-01-15",
+            contact_phone="01 23 45 67 89",
+            extra={"is_contact_public": True},
+            structure__updated_on="2025-01-15",
+        )
+        response = client.get(self.get_service_url(service))
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        copy_button = modal.find(attrs={"data-it-clipboard-button": "copy"})
+        assert copy_button is not None
+        assert copy_button["data-it-copy-to-clipboard"] == "01 23 45 67 89"
 
     def test_detail_with_external_orientation_link_for_non_orientable_service(self, client):
         user = PrescriberFactory()
@@ -842,7 +893,8 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.PHONE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertNotContains(response, self.ORIENT_BTN_LABEL)
         assertContains(response, self.MISSING_CONTACT_LABEL)
 
@@ -857,34 +909,40 @@ class TestServices:
         )
         client.force_login(user)
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
     @pytest.mark.parametrize(
-        "contact_email,contact_phone,expected_label",
+        "contact_email,contact_phone,expected_buttons",
         [
-            pytest.param("", "01 23 45 67 89", "Contacter le service par téléphone", id="phone"),
-            pytest.param("contact@example.com", "", "Contacter le service par email", id="email"),
+            pytest.param("", "01 23 45 67 89", ["Appeler"], id="phone"),
+            pytest.param("contact@example.com", "", ["Envoyer un email"], id="email"),
             pytest.param(
                 "contact@example.com",
                 "01 23 45 67 89",
-                "Contacter le service par téléphone ou email",
+                ["Appeler", "Envoyer un email"],
                 id="phone_and_email",
             ),
+            pytest.param("", "", [], id="no_contact"),
         ],
     )
-    def test_detail_contact_button_label(self, client, contact_email, contact_phone, expected_label):
+    def test_detail_contact_buttons(self, client, contact_email, contact_phone, expected_buttons):
         user = PrescriberFactory()
         service = ServiceFactory(contact_email=contact_email, contact_phone=contact_phone)
         client.force_login(user)
 
         response = client.get(self.get_service_url(service))
 
-        contact_button = parse_response_to_soup(response, ".c-box--action").find(
-            "button", {"data-bs-target": "#service-contact-modal"}
-        )
-        assert contact_button.get_text(strip=True) == expected_label
+        action_box = parse_response_to_soup(response, ".c-box--action")
+        contact_buttons = [
+            button.get_text(strip=True)
+            for button in action_box.find_all(
+                "button",
+                {"data-bs-target": ["#service-contact-phone-modal", "#service-send-email-modal"]},
+            )
+        ]
+        assert contact_buttons == expected_buttons
 
     @pytest.mark.parametrize(
         "extra,is_authenticated_user",
@@ -898,6 +956,7 @@ class TestServices:
             uid="test-contact-public-uid",
             updated_on="2025-01-15",
             contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
             extra=extra,
@@ -907,7 +966,12 @@ class TestServices:
             client.force_login(PrescriberFactory())
 
         response = client.get(self.get_service_url(service))
-        assertContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertContains(response, self.PHONE_CONTACT_BTN, html=True)
+        if is_authenticated_user:
+            assertContains(response, self.EMAIL_CONTACT_BTN, html=True)
+        else:
+            # An anonymous user cannot orient: they only get a mailto link.
+            assertContains(response, self.EMAIL_CONTACT_MAILTO_LINK % service.contact_email, html=True)
         assertContains(response, self.DISPLAY_SERVICE_CONTACT_JS % service.uid)
         assertContains(response, "contact@example.com")
 
@@ -930,6 +994,7 @@ class TestServices:
             updated_on="2025-01-15",
             contact_full_name="Joe Blow",
             contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
             structure__uid="test-structure-contact-public-uid",
             structure__updated_on="2025-01-15",
             extra=extra,
@@ -937,15 +1002,63 @@ class TestServices:
 
         service_url = self.get_service_url(service)
         response = client.get(service_url)
+        login_url = f"{self.LOGIN_URL}?next={urlencode(service_url)}"
 
-        assertNotContains(response, self.DISPLAY_SERVICE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.PHONE_CONTACT_BTN, html=True)
+        assertNotContains(response, self.EMAIL_CONTACT_BTN, html=True)
         assertNotContains(response, "Joe Blow")
         assertNotContains(response, "contact@example.com")
+        assertNotContains(response, "01 23 45 67 89")
+        assertContains(response, self.LOCKED_PHONE_CONTACT_LINK % login_url, html=True)
+        assertContains(response, self.LOCKED_EMAIL_CONTACT_LINK % login_url, html=True)
+        # The padlock only leads to the login page: no iMER is registered yet.
+        assertNotContains(response, "service_contact_tel")
+        assertNotContains(response, "service_contact_email")
+
+    def test_locked_contact_button_login_keeps_the_next_url(self, client):
+        # The padlock must link to the first step of the login funnel: "login:existing_user" only
+        # works once the email was submitted, and would drop the next param.
+        service = ServiceFactory(
+            contact_email="contact@example.com",
+            contact_phone="01 23 45 67 89",
+            extra={"is_contact_public": False},
+        )
+        service_url = self.get_service_url(service)
+        user = PrescriberFactory(email="sender@example.com", identity_provider=IdentityProvider.DJANGO)
+
+        response = client.get(service_url)
+        login_url = f"{self.LOGIN_URL}?next={urlencode(service_url)}"
+        assertContains(response, self.LOCKED_PHONE_CONTACT_LINK % login_url, html=True)
+
+        # Following the padlock displays the login form, which carries the next url over.
+        response = client.get(login_url)
+        assertContains(response, f'value="{service_url}"')
+
+        response = client.post(login_url, data={"email": user.email})
+        assertRedirects(
+            response,
+            reverse(
+                "login:existing_user",
+                query={"back_url": f"/accounts/login/?next={urlencode(service_url)}", "next": service_url},
+            ),
+        )
+
+    def test_detail_orient_button_has_padlock_for_unauthenticated_user(self, client):
+        service = ServiceFactory(contact_email="contact@example.com")
+        service_url = self.get_service_url(service)
+
+        response = client.get(service_url)
+
         assertContains(
             response,
-            self.DISPLAY_SERVICE_CONTACT_LINK % f"{self.LOGIN_URL}?next={urlencode(service_url)}",
+            self.LOCKED_ORIENT_BTN_LINK % f"{self.LOGIN_URL}?next={urlencode(service_url)}",
             html=True,
         )
+
+        client.force_login(PrescriberFactory())
+        response = client.get(service_url)
+        assertContains(response, self.ORIENT_BTN_LABEL)
+        assertNotContains(response, "lock-line")
 
     def test_detail_with_source_link(self, client):
         user = PrescriberFactory()
@@ -1134,20 +1247,52 @@ class TestServices:
         [
             (None, assertContains, assertNotContains),
             (ItouStaffFactory, assertContains, assertNotContains),
-            (JobSeekerFactory, assertContains, assertNotContains),
+            (JobSeekerFactory, assertNotContains, assertNotContains),  # the action bar is hidden to job seekers
             (LaborInspectorFactory, assertContains, assertNotContains),
             (PrescriberFactory, assertNotContains, assertContains),
             (EmployerFactory, assertNotContains, assertContains),
         ],
     )
-    def test_render_contact_modal(self, client, user_factory, assertion_mailto, assertion_button):
+    def test_render_email_contact_button(self, client, user_factory, assertion_mailto, assertion_button):
         service = ServiceFactory(contact_email="contact@example.com", extra={"is_contact_public": True})
         if user_factory:
             client.force_login(user_factory())
         response = client.get(self.get_service_url(service))
 
+        # Users who cannot orient only get a mailto link, the others open the send email modal.
         assertion_mailto(response, f"mailto:{service.contact_email}")
-        assertion_button(response, f"Écrire un email à {service.contact_email}")
+        assertion_button(response, self.EMAIL_CONTACT_BTN, html=True)
+
+    @pytest.mark.parametrize(
+        "user_factory,assertion",
+        [
+            (None, assertContains),
+            (ItouStaffFactory, assertContains),
+            (JobSeekerFactory, assertNotContains),  # the action bar is hidden to job seekers
+            (LaborInspectorFactory, assertContains),
+            (PrescriberFactory, assertContains),
+            (EmployerFactory, assertContains),
+        ],
+    )
+    def test_render_phone_modal(self, client, user_factory, assertion):
+        service = ServiceFactory(contact_phone="01 23 45 67 89", extra={"is_contact_public": True})
+        if user_factory:
+            client.force_login(user_factory())
+        response = client.get(self.get_service_url(service))
+
+        assertion(response, self.PHONE_CONTACT_BTN, html=True)
+        modal = parse_response_to_soup(response, "#service-contact-phone-modal")
+        save_button = modal.find("button", string="Enregistrer dans le tableau de suivi")
+        if user_factory in (PrescriberFactory, EmployerFactory):
+            assert not save_button.has_attr("disabled")
+            assert modal.find("form")["action"] == reverse(
+                "insertion_views:start_contact_orientation", kwargs={"service_uid": service.uid}
+            )
+            assert modal.find("textarea", {"name": "notes"})
+        else:
+            # Users who cannot orient only see the contact details.
+            assert save_button is None
+            assert modal.find("textarea", {"name": "notes"}) is None
 
     @pytest.mark.parametrize(
         "user_factory,do_snapshot",
@@ -1226,9 +1371,11 @@ class TestServices:
 
         client.force_login(membership_factory().user)
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, selector="#service-send-email-content")) == snapshot(
-            name="send-email-content"
-        )
+        # The htmx POST target keeps the job seeker public id of the current page.
+        replace_in_attr = [("hx-post", str(job_seeker.public_id), "[PUBLIC ID of JobSeeker]")] if job_seeker else None
+        assert pretty_indented(
+            parse_response_to_soup(response, selector="#service-send-email-content", replace_in_attr=replace_in_attr)
+        ) == snapshot(name="send-email-content")
 
     @pytest.mark.parametrize(
         "user_factory,is_htmx,expected_status_code",
@@ -1290,7 +1437,12 @@ class TestServices:
         data = {"body": "Bonjour, je souhaiterais orienter un usager."}
         response = client.post(self.get_service_url(service), headers=headers, data=data)
 
-        assertContains(response, "Le message a bien été envoyé.")
+        # The email is sent, the user is then redirected to the follow up table save procedure.
+        assert response["HX-Redirect"] == reverse(
+            "insertion_views:start_contact_orientation",
+            kwargs={"service_uid": service.uid},
+            query={"kind": "email"},
+        )
         mobilization_email = MobilizationEmail.objects.filter(
             sender=sender,
             sender_prescriber_organization=sender_prescriber_organization,
@@ -1325,7 +1477,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong organization
         MobilizationEventFactory(
@@ -1333,7 +1485,7 @@ class TestServices:
             prescriber_organization=PrescriberOrganizationFactory(),
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong service
         MobilizationEventFactory(
@@ -1341,7 +1493,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=ServiceFactory(),
             structure=StructureFactory(),
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         # Wrong kind
         MobilizationEventFactory(
@@ -1350,6 +1502,14 @@ class TestServices:
             service=service,
             structure=StructureFactory(),
             kind=MobilizationEventKind.SERVICE_ORIENTATION,
+        )
+        # Wrong kind: the deprecated kind is not picked up anymore
+        MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=sender_prescriber_organization,
+            service=service,
+            structure=service.structure,
+            kind=MobilizationEventKind.SERVICE_CONTACT,
         )
         data = {"body": "Bonjour, je souhaiterais orienter un usager."}
         client.post(self.get_service_url(service), headers=headers, data=data)
@@ -1366,7 +1526,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         client.post(self.get_service_url(service), headers=headers, data=data)
         mobilization_email = MobilizationEmail.objects.filter(
@@ -1382,7 +1542,7 @@ class TestServices:
             prescriber_organization=sender_prescriber_organization,
             service=service,
             structure=service.structure,
-            kind=MobilizationEventKind.SERVICE_CONTACT,
+            kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
         )
         client.post(self.get_service_url(service), headers=headers, data=data)
         mobilization_email = MobilizationEmail.objects.filter(
@@ -1391,6 +1551,222 @@ class TestServices:
             service=service,
         ).last()
         assert mobilization_email.mobilization_event == second_mobilization_event
+
+
+class TestStartContactOrientation:
+    def get_url(self, service, **query):
+        return reverse(
+            "insertion_views:start_contact_orientation",
+            kwargs={"service_uid": service.uid},
+            query=query,
+        )
+
+    @pytest.mark.parametrize(
+        "kind,event_kind",
+        [
+            ("tel", MobilizationEventKind.SERVICE_CONTACT_TEL),
+            ("email", MobilizationEventKind.SERVICE_CONTACT_EMAIL),
+        ],
+    )
+    def test_creates_contact_orientation_with_known_job_seeker(self, client, kind, event_kind):
+        membership = PrescriberMembershipFactory(user__phone="01 23 45 67 89")
+        sender = membership.user
+        service = ServiceFactory(contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        client.force_login(sender)
+        # The iMER registered when clicking "Appeler" / "Envoyer un email".
+        event = MobilizationEventFactory(
+            user=sender,
+            prescriber_organization=membership.organization,
+            service=service,
+            structure=service.structure,
+            kind=event_kind,
+            hashed_session_key=hashlib.sha256(client.session.session_key.encode()).hexdigest(),
+        )
+
+        response = client.post(
+            self.get_url(service, job_seeker_public_id=job_seeker.public_id),
+            data={"kind": kind, "notes": "Rappeler la semaine prochaine."},
+        )
+
+        orientation = Orientation.objects.get()
+        assertRedirects(
+            response,
+            reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id}),
+        )
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+        assert orientation.service == service
+        assert orientation.beneficiary == job_seeker
+        assert orientation.sender == sender
+        assert orientation.sender_kind == SenderKind.PRESCRIBER
+        assert orientation.sender_prescriber_organization == membership.organization
+        assert orientation.referent_notes == "Rappeler la semaine prochaine."
+        assert orientation.referent_email == sender.email
+        assert orientation.referent_last_name == sender.last_name
+        assert orientation.referent_first_name == sender.first_name
+        # The referent phone is normalized from the sender's own phone number.
+        assert orientation.referent_phone == "0123456789"
+        assert orientation.contact_kind == kind
+        # The iMER is linked to the created orientation.
+        event.refresh_from_db()
+        assert event.orientation == orientation
+        assert JobSeekerAssignment.objects.filter(job_seeker=job_seeker, professional=sender).exists()
+        # No notification is sent: the user already contacted the service themselves.
+        assert not OrientationProcessLink.objects.exists()
+
+    def test_email_body_is_saved_as_referent_notes(self, client):
+        service = ServiceFactory(contact_email="contact@example.com")
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberMembershipFactory().user)
+        body = "Bonjour, je souhaiterais orienter un usager."
+
+        # Sending the email redirects to the follow up table save procedure.
+        response = client.post(
+            reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}),
+            headers={"HX-Request": "true"},
+            data={"body": body},
+        )
+        follow_up_url = self.get_url(service, kind="email", job_seeker_public_id=job_seeker.public_id)
+        client.get(follow_up_url)
+
+        orientation = Orientation.objects.get()
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+        assert orientation.referent_notes == body
+        assert response["HX-Redirect"] == self.get_url(service, kind="email")
+
+    def test_employer_sender(self, client):
+        membership = CompanyMembershipFactory()
+        service = ServiceFactory(contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        client.force_login(membership.user)
+
+        client.post(self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "tel"})
+
+        orientation = Orientation.objects.get()
+        assert orientation.sender_kind == SenderKind.EMPLOYER
+        assert orientation.sender_company == membership.company
+        assert orientation.sender_prescriber_organization is None
+        assert orientation.referent_notes == ""
+        assert orientation.contact_kind == OrientationContactKind.PHONE
+
+    def test_without_job_seeker_goes_through_the_selection_tunnel(self, client):
+        membership = PrescriberMembershipFactory()
+        sender = membership.user
+        # A phone only service: it cannot be oriented to via the internal form.
+        service = ServiceFactory(contact_email="", contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=sender, prescriber_organization=membership.organization
+        )
+        client.force_login(sender)
+
+        response = client.post(self.get_url(service), data={"kind": "tel", "notes": "Pas joignable."})
+        select_url = reverse(
+            "insertion_views:orientation_select_job_seeker",
+            kwargs={"service_uid": service.uid},
+            query={"kind": "tel"},
+        )
+        assertRedirects(response, select_url)
+        assert not Orientation.objects.exists()
+
+        # The selection screen is reachable even though the service is not orientable,
+        # and explains why a job seeker is needed to save the "prise de contact".
+        response = client.get(select_url)
+        assert response.status_code == 200
+        assertContains(
+            response,
+            "Afin d’enregistrer cette prise de contact dans votre tableau de suivi, "
+            "merci de la rattacher à un usager.",
+        )
+
+        # Selecting a job seeker comes back to the "prise de contact" view.
+        response = client.post(select_url, data={"job_seeker": job_seeker.public_id})
+        assertRedirects(
+            response,
+            self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id),
+            fetch_redirect_response=False,
+        )
+
+        # The light creation tunnel comes back through the wizard entry point, which resumes the contact orientation.
+        start_orientation_url = reverse(
+            "insertion_views:start_orientation",
+            kwargs={"service_uid": service.uid},
+            query={"kind": "tel", "job_seeker_public_id": job_seeker.public_id},
+        )
+        response = client.get(start_orientation_url)
+        assertRedirects(
+            response,
+            self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id),
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(self.get_url(service, kind="tel", job_seeker_public_id=job_seeker.public_id))
+        orientation = Orientation.objects.get()
+        assertRedirects(
+            response,
+            reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id}),
+        )
+        # The notes typed in the modal survived the tunnel.
+        assert orientation.referent_notes == "Pas joignable."
+        assert orientation.status == OrientationStatus.DIRECT_CONTACT
+
+    def test_abandoned_contact_orientation_does_not_hijack_a_plain_orientation(self, client):
+        """Going back and starting a regular orientation must ignore the pending "prise de contact"."""
+        membership = PrescriberMembershipFactory()
+        sender = membership.user
+        service = ServiceFactory(contact_email="contact@example.com", contact_phone="01 23 45 67 89")
+        job_seeker = JobSeekerFactory()
+        JobSeekerAssignmentFactory(
+            job_seeker=job_seeker, professional=sender, prescriber_organization=membership.organization
+        )
+        client.force_login(sender)
+
+        # A "prise de contact" is started, then abandoned: its session key remains.
+        client.post(self.get_url(service), data={"kind": "tel", "notes": "Pas joignable."})
+        assert CONTACT_ORIENTATION_SESSION_KEY in client.session
+
+        # "Orienter votre usager en ligne" sends the user to the selection screen, without the banner.
+        start_orientation_url = reverse("insertion_views:start_orientation", kwargs={"service_uid": service.uid})
+        select_url = reverse("insertion_views:orientation_select_job_seeker", kwargs={"service_uid": service.uid})
+        response = client.get(start_orientation_url, follow=True)
+        assertRedirects(response, select_url)
+        assertNotContains(response, "Afin d’enregistrer cette prise de contact")
+
+        # Selecting a job seeker runs the orientation wizard instead of saving a direct contact.
+        response = client.post(select_url, data={"job_seeker": job_seeker.public_id})
+        assertRedirects(
+            response,
+            reverse(
+                "insertion_views:start_orientation",
+                kwargs={"service_uid": service.uid},
+                query={"job_seeker_public_id": job_seeker.public_id},
+            ),
+            fetch_redirect_response=False,
+        )
+        response = client.get(response["Location"], follow=True)
+        assert response.status_code == 200
+        assert not Orientation.objects.exists()
+
+    def test_bad_kind(self, client):
+        service = ServiceFactory()
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberMembershipFactory().user)
+
+        response = client.post(
+            self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "carrier pigeon"}
+        )
+        assert response.status_code == 404
+        assert not Orientation.objects.exists()
+
+    @pytest.mark.parametrize("user_factory", [JobSeekerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_forbidden_for_users_who_cannot_orient(self, client, user_factory):
+        service = ServiceFactory()
+        job_seeker = JobSeekerFactory()
+        client.force_login(user_factory())
+
+        response = client.post(self.get_url(service, job_seeker_public_id=job_seeker.public_id), data={"kind": "tel"})
+        assert response.status_code == 403
+        assert not Orientation.objects.exists()
 
 
 class TestOrientationDetailsForSender:
@@ -2785,6 +3161,8 @@ class TestRegisterMobilizationEvent:
         [
             (MobilizationEventKind.STRUCTURE_CONTACT, False, ""),
             (MobilizationEventKind.SERVICE_CONTACT, True, ""),
+            (MobilizationEventKind.SERVICE_CONTACT_EMAIL, True, ""),
+            (MobilizationEventKind.SERVICE_CONTACT_TEL, True, ""),
             (MobilizationEventKind.SERVICE_EXT_LINK, True, "https://site.fake"),
         ],
     )

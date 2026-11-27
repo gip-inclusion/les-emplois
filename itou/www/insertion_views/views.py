@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.views import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch, Q
-from django.http import Http404, HttpRequest, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
 from django.urls import reverse
@@ -32,6 +32,7 @@ from itou.insertion.division_labels import bulk_load_division_labels
 from itou.insertion.enums import MobilizationEventKind, OrientationStatus
 from itou.insertion.opening_hours import format_osm_hours
 from itou.insertion.utils import (
+    get_job_seeker_from_request,
     get_missing_orientation_beneficiary_field_labels,
     get_orient_for_job_seeker_context,
 )
@@ -48,6 +49,7 @@ from itou.users.utils import refresh_rsa_certification
 from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.phone import normalize_phone_number
 from itou.utils.readonly import ReadonlyViewMixin, readonly_view
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.templatetags.str_filters import mask_unless
@@ -69,6 +71,13 @@ logger = logging.getLogger(__name__)
 # Users coming from the DORA campaign get the Zendesk callback widget along the orientation tunnel.
 # The mtm_campaign param is only present on the tunnel entry point, hence the session flag.
 DORA_CAMPAIGN_SESSION_KEY = "dora_orientation_campaign"
+
+# A "prise de contact" started from the service card, waiting for a job seeker to be selected or created.
+CONTACT_ORIENTATION_SESSION_KEY = "contact_orientation"
+CONTACT_ORIENTATION_KINDS = {
+    "tel": MobilizationEventKind.SERVICE_CONTACT_TEL,
+    "email": MobilizationEventKind.SERVICE_CONTACT_EMAIL,
+}
 
 
 class StructureCardView(LoginNotRequiredMixin, ReadonlyViewMixin, TemplateView):
@@ -141,15 +150,6 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
             for category_label in sorted(categories.keys())
         ]
 
-    def get_contact_button_label(self) -> str:
-        if self.object.contact_phone and self.object.contact_email:
-            return "Contacter le service par téléphone ou email"
-        if self.object.contact_phone:
-            return "Contacter le service par téléphone"
-        if self.object.contact_email:
-            return "Contacter le service par email"
-        return "Contacter le service"
-
     def get_send_email_form(self, request, job_seeker):
         if not can_orient_towards_insertion_service(request):
             return
@@ -172,9 +172,11 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
         has_contact_to_display = bool(
             self.object.contact_full_name or self.object.contact_email or self.object.contact_phone
         )
-        can_view_contact_modal = has_contact_to_display and bool(
-            self.request.user.is_authenticated or (self.object.extra or {}).get("is_contact_public")
-        )
+
+        is_contact_public = (self.object.extra or {}).get("is_contact_public")
+        contact_requires_login = not (self.request.user.is_authenticated or is_contact_public)
+        can_view_contact_modal = has_contact_to_display and not contact_requires_login
+        show_phone_number_copy_button = not self.request.user.is_authenticated and is_contact_public
 
         orient_for_job_seeker_context = get_orient_for_job_seeker_context(self.request)
         send_email_form = self.get_send_email_form(self.request, orient_for_job_seeker_context.get("job_seeker"))
@@ -188,9 +190,10 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 "geographic_perimeter": get_division_label(self.object.eligibility_zones) or "France entière",
                 "credential_documents": self.object.generate_extra_credential_documents_info(),
                 "formatted_categories": self.format_categories(),
-                "contact_button_label": self.get_contact_button_label(),
                 "has_contact_to_display": has_contact_to_display,
                 "can_view_contact_modal": can_view_contact_modal,
+                "contact_requires_login": contact_requires_login,
+                "show_phone_number_copy_button": show_phone_number_copy_button,
                 "can_register_mobilization_event": can_register_mobilization_event(self.request),
                 "send_email_form": send_email_form,
             }
@@ -214,7 +217,7 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                     prescriber_organization=prescriber_organization,
                     company=company,
                     service=self.object,
-                    kind=MobilizationEventKind.SERVICE_CONTACT,
+                    kind=MobilizationEventKind.SERVICE_CONTACT_EMAIL,
                     created_at__gte=timezone.now() - datetime.timedelta(hours=6),
                 )
                 .order_by("-created_at")
@@ -227,8 +230,22 @@ class ServiceDetailView(LoginNotRequiredMixin, DetailView):
                 sender_prescriber_organization=prescriber_organization,
                 sender_company=company,
             )
-            mobilization_email.free_form_email_to_service(body_message=send_email_form.cleaned_data["body"]).send()
-            partial_name = "#email-sent"
+            body = send_email_form.cleaned_data["body"]
+            mobilization_email.free_form_email_to_service(body_message=body).send()
+            # The email is sent, now save the contact in the sender's follow up table.
+            # The email body is kept as the referent notes of the orientation to come.
+            request.session[CONTACT_ORIENTATION_SESSION_KEY] = {
+                "service_uid": self.object.uid,
+                "kind": "email",
+                "notes": body,
+            }
+            response = HttpResponse()
+            response["HX-Redirect"] = reverse(
+                "insertion_views:start_contact_orientation",
+                kwargs={"service_uid": self.object.uid},
+                query={"kind": "email"} | contact_orientation_query(orient_for_job_seeker_context.get("job_seeker")),
+            )
+            return response
 
         context = {"send_email_form": send_email_form, "service": self.object}
         return render(request, "insertion/includes/service_send_email_modal.html" + partial_name, context)
@@ -278,6 +295,111 @@ def register_mobilization_event(request):
     return JsonResponse({"message": "ok"})
 
 
+def contact_orientation_query(job_seeker) -> dict:
+    return {"job_seeker_public_id": str(job_seeker.public_id)} if job_seeker else {}
+
+
+def get_pending_contact_orientation(request, service) -> dict | None:
+    """The "prise de contact" the user started on this service card, if any."""
+    pending = request.session.get(CONTACT_ORIENTATION_SESSION_KEY) or {}
+    return pending if pending.get("service_uid") == service.uid else None
+
+
+def create_contact_orientation(request, contact_kind, service, job_seeker, notes) -> insertion_models.Orientation:
+    if request.from_employer:
+        sender_kind = SenderKind.EMPLOYER
+        sender_prescriber_organization = None
+        sender_company = request.current_organization
+    else:
+        sender_kind = SenderKind.PRESCRIBER
+        sender_prescriber_organization = request.current_organization
+        sender_company = None
+
+    # The referent is the user making the contact: the "prise de contact" collects no referent information.
+    # Orientation.referent_phone only holds 10 digits, unlike the free form User.phone.
+    referent_phone = normalize_phone_number(request.user.phone) or ""
+    return insertion_models.Orientation.objects.create(
+        service=service,
+        beneficiary=job_seeker,
+        sender=request.user,
+        sender_kind=sender_kind,
+        sender_prescriber_organization=sender_prescriber_organization,
+        sender_company=sender_company,
+        referent_last_name=request.user.last_name,
+        referent_first_name=request.user.first_name,
+        referent_phone=referent_phone,
+        referent_email=request.user.email,
+        referent_notes=notes,
+        status=OrientationStatus.DIRECT_CONTACT,
+        contact_kind=contact_kind,
+    )
+
+
+@check_request(can_orient_towards_insertion_service)
+def start_contact_orientation(request, service_uid):
+    """Save a phone call or an email sent to a service as a "prise de contact" orientation.
+
+    A job seeker is required: when none is known yet, the user goes through the usual
+    selection/creation tunnel and comes back here (see `start_orientation`).
+    """
+    service = get_object_or_404(insertion_models.Service.objects.select_related("structure"), uid=service_uid)
+    pending = get_pending_contact_orientation(request, service) or {}
+    kind = request.POST.get("kind") or request.GET.get("kind") or pending.get("kind", "")
+    notes = request.POST.get("notes") or pending.get("notes", "")
+    if kind not in CONTACT_ORIENTATION_KINDS:
+        raise Http404
+
+    job_seeker = get_job_seeker_from_request(request)
+    if job_seeker is None:
+        request.session[CONTACT_ORIENTATION_SESSION_KEY] = {
+            "service_uid": service.uid,
+            "kind": kind,
+            "notes": notes,
+        }
+        return HttpResponseRedirect(
+            reverse(
+                "insertion_views:orientation_select_job_seeker",
+                kwargs={"service_uid": service.uid},
+                query={"kind": kind},
+            )
+        )
+
+    orientation = create_contact_orientation(request, kind, service, job_seeker, notes)
+    logger.info(
+        "contact orientation created orientation=%s kind=%s for user=%s service_uid=%s job_seeker=%s",
+        orientation.pk,
+        kind,
+        request.user.pk,
+        service.uid,
+        job_seeker.public_id,
+    )
+
+    # Link the iMER registered when clicking "Appeler" or "Envoyer un email" to the created Orientation.
+    hashed_session_key = hashlib.sha256(request.session.session_key.encode()).hexdigest()
+    event = (
+        insertion_models.MobilizationEvent.objects.filter(
+            kind=CONTACT_ORIENTATION_KINDS[kind],
+            hashed_session_key=hashed_session_key,
+            service=service,
+            user=request.user,
+            orientation__isnull=True,
+        )
+        .order_by("-created_at")
+        .first()
+    )
+    if event is not None:
+        event.orientation = orientation
+        event.save(update_fields=["orientation"])
+
+    JobSeekerAssignment.objects.upsert_assignment(
+        job_seeker, request.user, request.current_organization, ActionKind.ORIENT
+    )
+    request.session.pop(CONTACT_ORIENTATION_SESSION_KEY, None)
+    return HttpResponseRedirect(
+        reverse("insertion_views:orientation_details_for_sender", kwargs={"orientation_id": orientation.id})
+    )
+
+
 class OrientationStep(enum.StrEnum):
     CONFORMITY = "confirm"
     REFERENT = "fill"
@@ -288,6 +410,16 @@ class OrientationStep(enum.StrEnum):
 @readonly_view
 def start_orientation(request, service_uid):
     service = get_object_or_404(insertion_models.Service.objects.select_related("source"), uid=service_uid)
+    # The intent is carried by the URL: a stale session key must not hijack a plain orientation.
+    if request.GET.get("kind") in CONTACT_ORIENTATION_KINDS and get_pending_contact_orientation(request, service):
+        # The light creation tunnel comes back here.
+        return HttpResponseRedirect(
+            reverse(
+                "insertion_views:start_contact_orientation",
+                kwargs={"service_uid": service.uid},
+                query=request.GET.dict(),
+            )
+        )
     if service.should_mobilize_via_external_link:
         return HttpResponseRedirect(reverse("insertion_views:service_detail", kwargs={"service_uid": service.uid}))
     if not service.is_orientable_via_internal_form:
@@ -328,12 +460,14 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
     def dispatch(self, request, *args, **kwargs):
         if not (request.from_employer or request.from_prescriber):
             raise PermissionDenied("Vous n'êtes pas autorisé à orienter un usager.")
-        if self.service.should_mobilize_via_external_link:
-            return HttpResponseRedirect(
-                reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
-            )
-        if not self.service.is_orientable_via_internal_form:
-            raise Http404
+        # A "prise de contact" is saved for any service with contact details, orientable or not.
+        if not self.is_direct_contact_orientation:
+            if self.service.should_mobilize_via_external_link:
+                return HttpResponseRedirect(
+                    reverse("insertion_views:service_detail", kwargs={"service_uid": self.service.uid})
+                )
+            if not self.service.is_orientable_via_internal_form:
+                raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request: HttpRequest, *args, service_uid: str, **kwargs) -> None:
@@ -342,6 +476,13 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
             insertion_models.Service.objects.select_related("kind", "source", "structure"),
             uid=service_uid,
         )
+        self.contact_orientation_kind = (
+            request.GET.get("kind")
+            if request.GET.get("kind") in CONTACT_ORIENTATION_KINDS
+            and get_pending_contact_orientation(request, self.service)
+            else ""
+        )
+        self.is_direct_contact_orientation = bool(self.contact_orientation_kind)
         if request.GET.get("mtm_campaign") == "DORA":
             request.session[DORA_CAMPAIGN_SESSION_KEY] = True
 
@@ -349,6 +490,17 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
         return super().get_form_kwargs() | {"request": self.request}
 
     def form_valid(self, form):
+        if self.is_direct_contact_orientation:
+            return HttpResponseRedirect(
+                reverse(
+                    "insertion_views:start_contact_orientation",
+                    kwargs={"service_uid": self.service.uid},
+                    query={
+                        "kind": self.contact_orientation_kind,
+                        "job_seeker_public_id": form.cleaned_data["job_seeker"],
+                    },
+                )
+            )
         return HttpResponseRedirect(
             reverse(
                 "insertion_views:start_orientation",
@@ -368,9 +520,11 @@ class OrientationSelectJobSeekerView(ReadonlyViewMixin, FormView):
                     "tunnel": "orientation",
                     "from_url": service_detail_url,
                     "service_uid": self.service.uid,
-                },
+                }
+                | ({"kind": self.contact_orientation_kind} if self.is_direct_contact_orientation else {}),
             ),
             "matomo_custom_title": "Orientation service - rechercher un usager",
+            "is_direct_contact_orientation": self.is_direct_contact_orientation,
             # FIXME(vperron): remove this modal once the DORA migration is over (added 2026-10-23).
             "show_dora_modal": self.request.GET.get("mtm_campaign") == "DORA",
         }

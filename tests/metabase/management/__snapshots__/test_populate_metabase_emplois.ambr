@@ -8353,7 +8353,7 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_mer_mail_v0"."imer_id" IS \'ID de l’iMER enregistrée au clic sur \'\'Voir les coordonnées\'\'\'',
+        'sql': 'COMMENT ON COLUMN "z_new_mer_mail_v0"."imer_id" IS \'ID de l’iMER enregistrée au clic sur « Envoyer un email »\'',
       }),
       dict({
         'origin': list([
@@ -8931,6 +8931,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."referent_notes",
+                 "insertion_orientation"."contact_kind",
                  "insertion_orientation"."refusal_reasons",
                  "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
@@ -9971,6 +9973,8 @@
                  "insertion_orientation"."referent_phone",
                  "insertion_orientation"."referent_email",
                  "insertion_orientation"."orientation_reasons",
+                 "insertion_orientation"."referent_notes",
+                 "insertion_orientation"."contact_kind",
                  "insertion_orientation"."refusal_reasons",
                  "insertion_orientation"."refusal_details",
                  "insertion_orientation"."status",
