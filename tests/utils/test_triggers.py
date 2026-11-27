@@ -86,7 +86,7 @@ def test_context_consecutively_with_same_data():
 def test_context_savepoint_rollback():
     expected = {"uuid": str(uuid.uuid4())}
     with transaction.atomic(), triggers.connection_wrapper(), assertNumQueries(7), connection.cursor() as cursor:
-        savepoint_id = transaction.savepoint()  # 1 query: SAVEPOINT
+        savepoint_id = transaction.savepoint_create()  # 1 query: SAVEPOINT
         with triggers.context(**expected):
             cursor.execute("SELECT current_setting('itou.context')")  # 2 queries: set_config + current_setting
             assert cursor.fetchone() == (json.dumps(expected),)
